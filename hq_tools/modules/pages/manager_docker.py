@@ -12,6 +12,8 @@ from krita import DockWidget, Krita
 
 from ...core import krita_helpers as helpers
 from ...core.compat import (
+    DIALOG_NO,
+    DIALOG_YES,
     DRAG_INTERNAL_MOVE,
     ICON_MODE,
     LIST_ADJUST,
@@ -21,10 +23,12 @@ from ...core.compat import (
     QtGui,
     QtWidgets,
     pyqtSignal,
+    standard_icon,
 )
 from ...core.config import Config
-from ...core.cpmt import CPMTProject
+from ...core.cpmt import CPMTProject, create_project_with_page
 from ...core.thumbs import thumbnail_pixmap
+from ..biblioteca import core as biblioteca_core
 from . import generator, roteiro
 
 
@@ -67,51 +71,64 @@ class PagesDocker(DockWidget):
         main = widgets.QWidget(self)
         layout = widgets.QVBoxLayout(main)
 
-        row = widgets.QHBoxLayout()
+        group_project = widgets.QGroupBox("Projeto")
+        project_layout = widgets.QVBoxLayout(group_project)
         self.lbl_project = widgets.QLabel(
-            "Nenhum projeto aberto. Crie um projeto (pasta), abra um "
-            "comicConfig.json do CPMT ou abra uma pasta com .kra."
+            "Nenhum projeto aberto. Crie um projeto a partir da página salva, "
+            "abra um comicConfig.json do CPMT ou abra uma pasta com .kra."
         )
         self.lbl_project.setWordWrap(True)
-        row.addWidget(self.lbl_project, 1)
+        project_layout.addWidget(self.lbl_project)
+        row = widgets.QHBoxLayout()
         button_new = widgets.QPushButton("Novo projeto...")
-        button_new.setToolTip("Cria uma pasta para as páginas do projeto")
+        button_new.setIcon(standard_icon("SP_FileDialogNewFolder"))
+        button_new.setToolTip(
+            "Usa a pasta da página atual salva como pasta do projeto"
+        )
         button_new.clicked.connect(self.new_project)
         row.addWidget(button_new)
         button_open = widgets.QPushButton("Abrir projeto...")
+        button_open.setIcon(standard_icon("SP_DialogOpenButton"))
         button_open.setToolTip("Abre o comicConfig.json de um projeto CPMT")
         button_open.clicked.connect(self.pick_project)
         row.addWidget(button_open)
         button_folder = widgets.QPushButton("Pasta...")
+        button_folder.setIcon(standard_icon("SP_DirOpenIcon"))
         button_folder.setToolTip("Abre uma pasta com arquivos .kra")
         button_folder.clicked.connect(self.pick_folder)
         row.addWidget(button_folder)
-        layout.addLayout(row)
+        project_layout.addLayout(row)
+        layout.addWidget(group_project)
 
-        row2 = widgets.QHBoxLayout()
-        button_refresh = widgets.QPushButton("Atualizar miniaturas")
-        button_refresh.clicked.connect(self.refresh)
-        row2.addWidget(button_refresh)
-        button_open_folder = widgets.QPushButton("Abrir pasta")
-        button_open_folder.clicked.connect(self.open_current_folder)
-        row2.addWidget(button_open_folder)
-        layout.addLayout(row2)
-
-        row3 = widgets.QHBoxLayout()
+        group_page = widgets.QGroupBox("Página")
+        page_layout = widgets.QHBoxLayout(group_page)
         button_new_page = widgets.QPushButton("Criar próxima página")
+        button_new_page.setIcon(standard_icon("SP_FileDialogNewFolder"))
         button_new_page.setToolTip(
             "Cria uma página nova na pasta do projeto e atualiza as miniaturas"
         )
         button_new_page.clicked.connect(self.create_next_page)
-        row3.addWidget(button_new_page)
+        page_layout.addWidget(button_new_page)
         button_guides = widgets.QPushButton("Guias de margem")
         button_guides.setToolTip(
             "Cria 12 guias no documento ativo (0,5 / 1 / 1,5 cm por lado); "
             "substitui as guias existentes"
         )
         button_guides.clicked.connect(self.create_margin_guides)
-        row3.addWidget(button_guides)
-        layout.addLayout(row3)
+        page_layout.addWidget(button_guides)
+        layout.addWidget(group_page)
+
+        group_list = widgets.QGroupBox("Páginas")
+        list_layout = widgets.QVBoxLayout(group_list)
+        row2 = widgets.QHBoxLayout()
+        button_refresh = widgets.QPushButton("Atualizar miniaturas")
+        button_refresh.setIcon(standard_icon("SP_BrowserReload"))
+        button_refresh.clicked.connect(self.refresh)
+        row2.addWidget(button_refresh)
+        button_open_folder = widgets.QPushButton("Abrir pasta")
+        button_open_folder.clicked.connect(self.open_current_folder)
+        row2.addWidget(button_open_folder)
+        list_layout.addLayout(row2)
 
         self.list_pages = PageListWidget()
         self.list_pages.setViewMode(ICON_MODE)
@@ -123,7 +140,8 @@ class PagesDocker(DockWidget):
         self.list_pages.setWordWrap(True)
         self.list_pages.itemDoubleClicked.connect(self.open_page)
         self.list_pages.orderChanged.connect(self._on_order_changed)
-        layout.addWidget(self.list_pages, 1)
+        list_layout.addWidget(self.list_pages, 1)
+        layout.addWidget(group_list, 1)
 
         hint = widgets.QLabel(
             "Clique duas vezes para abrir a página. Arraste para reordenar "
@@ -135,66 +153,67 @@ class PagesDocker(DockWidget):
         self.setWidget(main)
 
     def new_project(self):
-        widgets = QtWidgets
-        dialog = widgets.QDialog(self.widget())
-        dialog.setWindowTitle("Novo projeto de HQ")
-        form = widgets.QFormLayout(dialog)
-
-        edit_name = widgets.QLineEdit("")
-        edit_name.setPlaceholderText("ex.: minha-hq")
-        form.addRow("Nome do projeto:", edit_name)
-
-        row = widgets.QHBoxLayout()
-        edit_base = widgets.QLineEdit(os.path.expanduser("~"))
-        button_browse = widgets.QPushButton("...")
-        button_browse.clicked.connect(
-            lambda: edit_base.setText(
-                widgets.QFileDialog.getExistingDirectory(
-                    dialog, "Pasta base", edit_base.text()
-                )
+        """Cria o projeto a partir da pasta da página atual salva."""
+        document = helpers.active_document()
+        if document is None:
+            helpers.show_info(
+                "Novo projeto",
+                "Abra e salve a página antes de criar o projeto.",
             )
-        )
-        row.addWidget(edit_base, 1)
-        row.addWidget(button_browse)
-        form.addRow("Pasta base:", row)
-
-        chk_sub = widgets.QCheckBox("Criar subpasta com o nome do projeto")
-        chk_sub.setChecked(True)
-        form.addRow("", chk_sub)
-
-        buttons_row = widgets.QHBoxLayout()
-        button_ok = widgets.QPushButton("Criar")
-        button_ok.setDefault(True)
-        button_cancel = widgets.QPushButton("Cancelar")
-        button_ok.clicked.connect(dialog.accept)
-        button_cancel.clicked.connect(dialog.reject)
-        buttons_row.addStretch(1)
-        buttons_row.addWidget(button_cancel)
-        buttons_row.addWidget(button_ok)
-        form.addRow(buttons_row)
-
-        if dialog.exec() != 1:
             return
-        name = edit_name.text().strip()
-        base = edit_base.text().strip()
-        if not name:
-            helpers.show_message("Informe o nome do projeto.")
-            return
-        if not base:
-            helpers.show_message("Informe a pasta base.")
-            return
-        folder = os.path.join(base, name) if chk_sub.isChecked() else base
+        if not document.fileName():
+            answer = QtWidgets.QMessageBox.question(
+                self.widget(),
+                "Novo projeto",
+                "Salve a página atual em uma pasta. Essa pasta será a pasta "
+                "do projeto.\n\nSalvar a página agora?",
+                DIALOG_YES | DIALOG_NO,
+            )
+            if answer != DIALOG_YES:
+                return
+            path, _ = QtWidgets.QFileDialog.getSaveFileName(
+                self.widget(),
+                "Salvar a página (pasta do projeto)",
+                self.folder or os.path.expanduser("~"),
+                "Krita (*.kra)",
+            )
+            if not path:
+                return
+            if not path.lower().endswith(".kra"):
+                path += ".kra"
+            if not document.saveAs(path):
+                helpers.show_info(
+                    "Novo projeto",
+                    "Não foi possível salvar a página.",
+                )
+                return
+        folder = os.path.dirname(document.fileName())
+        page_name = os.path.basename(document.fileName())
+        biblio = os.path.join(folder, "biblioteca")
+        for _, _, sub in biblioteca_core.TIPOS:
+            try:
+                os.makedirs(os.path.join(biblio, sub), exist_ok=True)
+            except OSError as error:
+                helpers.show_info(
+                    "Novo projeto",
+                    "Não foi possível criar a biblioteca: {0}".format(error),
+                )
+                return
         try:
-            os.makedirs(folder, exist_ok=True)
+            create_project_with_page(folder, page_name, os.path.basename(folder))
         except OSError as error:
-            helpers.show_message("Não foi possível criar a pasta: {0}".format(error))
+            helpers.show_info(
+                "Novo projeto",
+                "Não foi possível gravar o projeto: {0}".format(error),
+            )
             return
-        self.project = None
-        self.folder = folder
-        self.config.set("pages.last_folder", folder)
-        self.lbl_project.setText("Projeto: {0}".format(folder))
-        self.refresh()
-        helpers.show_message("Projeto criado: {0}".format(folder))
+        self.config.set("biblioteca.folder", biblio)
+        self._load_project(os.path.join(folder, "comicConfig.json"))
+        helpers.show_info(
+            "Novo projeto",
+            "Projeto criado em {0}.\n\nA biblioteca (balões, painéis e "
+            "onomatopeias) fica na subpasta 'biblioteca'.".format(folder),
+        )
 
     def pick_project(self):
         path, _ = QtWidgets.QFileDialog.getOpenFileName(
