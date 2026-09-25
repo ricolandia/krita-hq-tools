@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Service
+ServiceTypes=Krita/PythonPlugin
+X-KDE-Library=hq_tools
+X-Python-2-Compatible=false
+X-Krita-Manual=hq_tools_manual.html
+Name=HQ Tools
+Comment=Ferramentas para quadrinhos: retículas, balões, paletas, páginas e pincéis.

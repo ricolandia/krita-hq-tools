@@ -1,0 +1,70 @@
+<html>
+<body>
+<h1>HQ Tools</h1>
+<p>Ferramentas de quadrinhos para o Krita: retículas e hachuras, balões vetoriais,
+paletas, gerenciador de páginas com miniaturas, gerador de páginas a partir do
+roteiro e atalhos de pincel.</p>
+
+<h2>Instalação</h2>
+<p>Pelo Krita: <b>Ferramentas &gt; Scripts &gt; Importar plugin Python</b> e escolha o
+arquivo ZIP. Depois ative o plugin em <b>Configurar Krita &gt; Gerenciador de
+plugins Python</b> e reinicie o Krita.</p>
+<p>Os dockers aparecem em <b>Configurações &gt; Dockers</b> com o prefixo
+"HQ Tools".</p>
+
+<h2>Retículas e hachuras</h2>
+<p>Aplica o gerador Screentone nativo como camada de preenchimento (não
+destrutiva), dentro do grupo ativo, opcionalmente limitado pela seleção. O botão
+de meio-tom aplica o filtro Halftone como máscara na camada ativa, convertendo o
+tom pintado em pontos ou linhas. A frequência é dada em linhas por polegada
+(LPI) e o plugin calcula o tamanho da célula pelo DPI do documento. Para
+cross-hatch, aplique o preset A e depois o B em ângulos complementares.</p>
+
+<h2>Balões</h2>
+<p>Mostra os modelos SVG de uma pasta (por padrão,
+<code>~/.local/share/krita/hq_tools/balloons</code>). Clique duas vezes para
+inserir o balão no grupo ativo como camada vetorial. Você pode desenhar seus
+próprios balões e salvá-los nessa pasta. A opção de nomear a camada como
+<code>text</code> faz o CPMT usar o conteúdo na exportação ACBF/EPUB.</p>
+
+<h2>Paletas</h2>
+<p>Templates de paleta de HQ (tons, nanquim, pele, céu, vegetação, cores
+chapadas) com aplicação direta na cor de frente ou de fundo. O botão
+"Instalar no Krita" copia os arquivos para a pasta de paletas do Krita
+(é preciso reiniciar o programa). A segunda aba mostra as paletas já instaladas
+no Krita.</p>
+
+<h2>Páginas</h2>
+<p>O gerenciador lê um projeto do CPMT (arquivo <code>comicsConfig.json</code>)
+ou uma pasta com arquivos <code>.kra</code>, mostra miniaturas internas das
+páginas, abre com duplo clique e permite reordenar arrastando (a ordem é gravada
+no projeto).</p>
+<p>A aba Roteiro gera páginas novas a partir de uma sintaxe simples:</p>
+<pre>
+pagina 1
+formato A4
+layout grade2x2
+fala p1: texto da fala
+narracao p1: texto de narração
+</pre>
+<p>Cada página é criada com o grupo Page, a camada vetorial <code>panels</code>
+com os painéis, as camadas Sketch, Color e Ink, o contorno multiplicado e a
+camada <code>text</code> com as falas, prontas para exportar pelo CPMT.</p>
+
+<h2>Pincéis</h2>
+<p>Doze slots que ativam presets instalados no Krita. Escolha o preset de cada
+slot no docker e defina os atalhos em <b>Configurar Krita &gt; Atalhos &gt;
+Scripts &gt; HQ Tools</b> (ações "HQ Tools: pincel 1" a "pincel 12").</p>
+
+<h2>Configuração</h2>
+<p>As preferências ficam em <code>~/.local/share/krita/hq_tools/config.json</code>
+e os presets de retícula do usuário em
+<code>~/.local/share/krita/hq_tools/screentone_presets.json</code>. Cada módulo
+pode ser desligado na chave <code>modules</code> do arquivo de configuração
+(é preciso reiniciar o Krita).</p>
+
+<h2>Licença</h2>
+<p>MIT. O plugin usa recursos nativos do Krita (gerador Screentone e filtro
+Halftone, de Deif Lou, e o CPMT, do time do Krita).</p>
+</body>
+</html>
