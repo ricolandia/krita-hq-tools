@@ -45,6 +45,7 @@ SIZE_MODE_RESOLUTION = 0
 SIZE_MODE_PIXEL = 1
 
 GENERATOR_ID = "screentone"
+PATTERN_GENERATOR_ID = "pattern"
 HALFTONE_FILTER_NAMES = ("halftone", "krita_filter_halftone")
 
 DEFAULT_PRESET = {
@@ -157,18 +158,21 @@ def screentone_properties(preset, dpi):
     return properties
 
 
-def halftone_properties(preset, color_model_id, dpi, mode="intensity"):
-    """Propriedades do filtro Halftone com o gerador Screentone como tela.
+def halftone_properties(preset, color_model_id, dpi, mode="intensity",
+                        generator=GENERATOR_ID, pattern_name=None):
+    """Propriedades do filtro Halftone com um gerador como tela.
 
     O filtro guarda cada opção com prefixo do modo (``intensity_``, ``alpha_``)
-    e as opções do gerador com o prefixo adicional ``generator_screentone_``.
+    e as opções do gerador com o prefixo adicional ``generator_<id>_``. Com
+    ``generator="pattern"`` e ``pattern_name``, a tela passa a ser um padrão
+    instalado do Krita (estrelas, listras, quadrados...).
     """
     preset = normalize_preset(preset)
     prefix = "{0}_".format(mode)
     properties = {
         "color_model_id": color_model_id,
         "mode": mode,
-        prefix + "generator": GENERATOR_ID,
+        prefix + "generator": generator,
         prefix + "hardness": preset["hardness"],
         prefix + "invert": preset["invert"],
         prefix + "foreground_color": preset["fg"],
@@ -176,10 +180,107 @@ def halftone_properties(preset, color_model_id, dpi, mode="intensity"):
         prefix + "foreground_opacity": preset["fg_opacity"],
         prefix + "background_opacity": preset["bg_opacity"],
     }
-    generator_prefix = prefix + "generator_{0}_".format(GENERATOR_ID)
+    if generator == PATTERN_GENERATOR_ID:
+        if pattern_name:
+            properties[prefix + "generator_pattern_pattern"] = pattern_name
+        return properties
+    generator_prefix = prefix + "generator_{0}_".format(generator)
     for key, value in screentone_properties(preset, dpi).items():
         properties[generator_prefix + key] = value
     return properties
+
+
+def halftone_cmyk_properties(preset, color_model_id, dpi, angles=(15.0, 75.0, 0.0, 45.0)):
+    """Meio-tom colorido por canal (modo independent_channels do Halftone).
+
+    Cada canal recebe a própria tela com um ângulo clássico de impressão:
+    ciano 15°, magenta 75°, amarelo 0° e preto 45° (evita moiré).
+    """
+    preset = normalize_preset(preset)
+    properties = {
+        "color_model_id": color_model_id,
+        "mode": "independent_channels",
+    }
+    for index, angle in enumerate(angles):
+        channel_preset = dict(preset)
+        channel_preset["rotation"] = float(angle)
+        prefix = "{0}_channel{1}_".format(color_model_id, index)
+        properties.update(
+            halftone_properties(
+                channel_preset, color_model_id, dpi,
+                mode="{0}_channel{1}".format(color_model_id, index),
+                generator=GENERATOR_ID,
+            )
+        )
+    properties["mode"] = "independent_channels"
+    properties["color_model_id"] = color_model_id
+    return properties
+
+
+def pattern_fill_properties(pattern_name):
+    """Propriedades de uma camada de preenchimento com o gerador Pattern."""
+    return {"pattern": str(pattern_name)}
+
+
+TONE_FINGERPRINT_KEYS = (
+    "pattern",
+    "shape",
+    "interpolation",
+    "equalization_mode",
+    "units",
+    "frequency_x",
+    "frequency_y",
+    "rotation",
+    "brightness",
+    "contrast",
+    "invert",
+    "foreground_color",
+    "background_color",
+    "foreground_opacity",
+    "background_opacity",
+    "align_to_pixel_grid",
+)
+
+
+def tone_fingerprint(properties):
+    """Identificador canônico das opções que definem uma retícula igual."""
+    items = []
+    for key in TONE_FINGERPRINT_KEYS:
+        if key in properties:
+            items.append((key, repr(properties[key])))
+    return tuple(sorted(items))
+
+
+def color_xml_to_hex(value):
+    """Converte a cor vinda da API (XML de KoColor) em hex ``#rrggbb``.
+
+    A API devolve cores de configuração como ``<color .../>``; o que já vier
+    como hex passa direto.
+    """
+    if value is None:
+        return None
+    text = str(value).strip()
+    if text.startswith("#"):
+        return text[:7]
+    if "<" not in text:
+        return None
+    try:
+        import xml.etree.ElementTree as ET
+
+        element = ET.fromstring(text)
+    except (ET.ParseError, ValueError):
+        return None
+    red = element.get("r")
+    green = element.get("g")
+    blue = element.get("b")
+    if red is None or green is None or blue is None:
+        return None
+    try:
+        return "#{0:02x}{1:02x}{2:02x}".format(
+            int(round(float(red))), int(round(float(green))), int(round(float(blue)))
+        )
+    except (TypeError, ValueError):
+        return None
 
 
 def load_presets(path):
