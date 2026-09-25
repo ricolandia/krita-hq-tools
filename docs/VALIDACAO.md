@@ -45,6 +45,31 @@ Diferenças entre o dump do bloco 2/3 e o que o plugin gera (ver
 - Cross-hatch: aplicar "Hachura cruzada A" e "B" em sequência.
 - Salvar um preset novo e reiniciar o Krita: o preset persiste.
 
+### 2b. Retículas v0.2
+
+- **Editar selecionada**: aplicar uma retícula, selecionar a camada e clicar
+  "Editar selecionada": os campos carregam os valores; mudar LPI/ângulo e
+  "Aplicar" atualiza a mesma camada. Repetir com uma máscara de meio-tom
+  (intensity e cmyk).
+- **Máscara vazia**: aplicar com "Máscara vazia (revelar pintando)": a camada
+  nasce sem retícula visível; pintar branco na máscara (camada de seleção)
+  revela o tom.
+- **Mostrar área**: com a camada de retícula selecionada, o botão vira a
+  máscara em seleção (formigas dançando na área do tom).
+- **Reutilizar**: aplicar duas vezes o mesmo preset na mesma página: a segunda
+  não cria camada nova, só máscara de seleção na existente.
+- **Posição X/Y**: aplicar, selecionar, "Editar selecionada", mudar posição e
+  reaplicar: o padrão desloca sem mover a camada.
+- **Tom por padrão**: marcar "Usar padrão do Krita" e escolher um padrão
+  (ex.: Stripes02.pat): camada de preenchimento com o padrão. E no meio-tom
+  com o mesmo padrão: a tela usa o padrão (ex.: listras virando meio-tom).
+- **CMYK**: em documento CMYKA, aplicar "Cores por canal": a máscara gera
+  meios-tons por canal; conferir os 4 ângulos (15/75/0/45) e a ausência de
+  moiré em zoom.
+- **Linhas de efeito**: "Foco" com centro em 50/50: linhas convergem ao centro;
+  "Paralelas" com região e ângulo: linhas preenchem a região; a camada é
+  vetorial e editável.
+
 ### 3. Balões
 
 - Primeira execução cria a pasta padrão com as amostras.
@@ -53,6 +78,16 @@ Diferenças entre o dump do bloco 2/3 e o que o plugin gera (ver
 - Com a opção "text" marcada, a camada se chama `text`; num projeto CPMT, a
   exportação ACBF/EPUB coleta os textos.
 - Adicionar um SVG próprio na pasta e clicar Atualizar.
+
+### 3b. Símbolos do Krita (aba dos balões)
+
+- Aba "Símbolos do Krita": aparecem as bibliotecas `BalloonSymbols.svg` e
+  `pepper_carrot_speech_bubbles.svg` com miniaturas e licença.
+- Duplo clique insere o símbolo no grupo ativo como camada vetorial.
+- Adicionar uma biblioteca própria em `~/.local/share/krita/symbols/`,
+  Atualizar e inserir.
+- Comparar com o docker nativo "Bibliotecas de símbolos": a inserção por aqui
+  deve renderizar igual (formas, estilos e gradientes).
 
 ### 4. Paletas
 
@@ -80,10 +115,14 @@ Diferenças entre o dump do bloco 2/3 e o que o plugin gera (ver
 
 ### 7. Pincéis
 
-- Docker mostra 12 slots com os presets instalados no Krita.
-- "Sugerir padrões" preenche os slots com presets existentes.
-- Atalhos: Configurar Krita > Atalhos > Scripts > HQ Tools, atribuir teclas
-  (ex.: F5 a F8 para os 4 primeiros) e testar a troca de pincel.
+- Docker mostra os conjuntos (Rascunho, Contornos, Aquarela/Guache,
+  Acrílico/Óleo, Retículas) com cartões de miniatura + nome, montados com os
+  presets instalados.
+- Clique no cartão ativa o pincel; botão direito atribui ao slot.
+- "Preencher slots com sugestões": os 16 slots recebem 4 por conjunto.
+- Atalhos: Configurar Krita > Atalhos > Scripts > HQ Tools (pincel 1 a 16).
+- "Instalar bundle...": escolher um `.bundle` (ex.: Cityscape Brushes em
+  APP/Plugins/Krita), reiniciar e conferir os presets novos no Krita.
 
 ## Problemas conhecidos e tratamento
 

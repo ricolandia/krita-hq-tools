@@ -117,6 +117,38 @@ AppImage `krita-6.0.x`/`5.3.4` (conteúdo de `usr/lib/kritaplugins` e
   branco fora do grupo. Estrutura replicada pelo gerador de páginas (com
   `panels` no lugar de `Mask` para o CPMT).
 
+## Descobertas da v0.2
+
+- **Gerador Pattern** (id `pattern`): a propriedade da tela é o nome do recurso
+  (`pattern` = nome, ex.: `Stars_Sized.png`). O filtro Halftone aceita qualquer
+  gerador de preenchimento como tela; o Krita traz 112 padrões (Stripes,
+  Squares, Zigzag, Stars, hexacolBW...). Chave na config do filtro:
+  `{mode}_generator_pattern_pattern`.
+- **Meio-tom por canal**: modo `independent_channels` usa prefixos
+  `{color_model_id}_channel{i}_` (i = 0..3), cada um com `generator`,
+  `hardness`, `invert`, cores e a tela própria. Ângulos clássicos de impressão:
+  ciano 15°, magenta 75°, amarelo 0°, preto 45° (evita moiré).
+- **Posição do padrão**: o gerador Screentone guarda `position_x`/`position_y`
+  (px), que deslocam a tela sem mover a camada (equivalente ao "mover padrão
+  do tom" do CSP).
+- **Preview de pincel**: os `.kpp` são PNGs 200×200 com o preview (a doc do
+  Krita confirma); `Resource.image()` devolve essa imagem, usada nas
+  miniaturas do módulo de pincéis. Pincéis MyPaint usam `<nome>_prev.png`.
+- **Conjuntos de pincéis**: os presets do bundle Krita 4 têm prefixos por
+  categoria (`c)` lápis, `d)` tintas, `f)`/`g)` bristles secos, `i)` molhados,
+  `j)` aquarela, `y)` screentones...); a busca por nome (normalizado, sem
+  pontuação) casa cada conjunto com o que está instalado.
+- **Bibliotecas de símbolos**: SVG na pasta `symbols` dos recursos; cada
+  símbolo é `<symbol id="...">` ou `<g id="...">`. O Krita 5.3.4 não expõe
+  símbolos pela API Python, então o plugin faz a extração por XML
+  (`xml.etree`) e insere via `addShapesFromSvg`, com viewBox calculada por
+  `QSvgRenderer.boundsOnElement`. Bibliotecas que vêm com o Krita:
+  `BalloonSymbols.svg` (8 balões, domínio público de Martin Owens e Tavmjong
+  Bah) e `pepper_carrot_speech_bubbles.svg` (CC-BY-SA 4.0, David Revoy).
+- **Bundles de pincel**: arquivos `.bundle` na pasta de recursos do Krita são
+  carregados na inicialização; o instalador do plugin copia o arquivo e pede
+  reinício.
+
 ## Decisões resultantes
 
 - Cores dos presets são hex; o filtro/generador converte.
