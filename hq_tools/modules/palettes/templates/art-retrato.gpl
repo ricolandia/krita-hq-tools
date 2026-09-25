@@ -1,0 +1,12 @@
+GIMP Palette
+Name: Art Retrato
+Columns: 6
+# Peles e neutros para retratos
+255 224 196	Pele clara
+244 196 160	Pele média clara
+224 160 124	Pele média
+190 120 92	Pele escura média
+150 84 66	Pele escura
+110 60 52	Pele profunda
+120 96 84	Neutro quente
+86 74 68	Neutro frio

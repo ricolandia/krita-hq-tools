@@ -1,0 +1,10 @@
+GIMP Palette
+Name: Art Noite
+Columns: 6
+# Azuis profundos de cenas noturnas
+48 56 92	Noite clara
+36 42 84	Noite média
+26 30 66	Noite escura
+18 20 48	Noite profunda
+92 100 140	Luz da lua
+170 176 210	Reflexo prateado
