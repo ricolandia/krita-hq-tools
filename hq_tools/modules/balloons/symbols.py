@@ -52,12 +52,13 @@ def _svg_element(root, element_id):
     return None
 
 
-def extract_symbol_svg(svg_text, element_id):
+def extract_symbol_svg(svg_text, element_id, view_box=None):
     """Gera um SVG pequeno com o conteúdo do símbolo (para addShapesFromSvg).
 
     O elemento de origem vira um ``<g>``; o ``<defs>`` do arquivo original é
-    preservado para manter estilos e gradientes. A viewBox não entra aqui:
-    quem chama calcula os limites via ``QSvgRenderer.boundsOnElement``.
+    preservado para manter estilos e gradientes. ``view_box`` opcional
+    (``"x y w h"``) limita a janela ao símbolo, calculada em tempo de execução
+    por ``QSvgRenderer.boundsOnElement``.
     """
     root = ET.fromstring(svg_text)
     target = _svg_element(root, element_id)
@@ -73,6 +74,8 @@ def extract_symbol_svg(svg_text, element_id):
     container = ET.Element(
         "{0}svg".format(SVG_NAMESPACE), {"xmlns": SVG_NAMESPACE}
     )
+    if view_box:
+        container.set("viewBox", view_box)
     if defs is not None:
         container.append(defs)
     group = ET.SubElement(container, "{0}g".format(SVG_NAMESPACE))

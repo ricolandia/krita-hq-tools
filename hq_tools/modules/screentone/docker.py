@@ -46,6 +46,20 @@ class ScreentoneDocker(DockWidget):
         widgets = QtWidgets
         main = widgets.QWidget(self)
         layout = widgets.QVBoxLayout(main)
+        self.tabs = widgets.QTabWidget()
+        layout.addWidget(self.tabs, 1)
+        self.tabs.addTab(self._build_tones_tab(), "Retículas")
+        self.tabs.addTab(self._build_effects_tab(), "Linhas de efeito")
+        self.setWidget(main)
+        self._sync_colors()
+        self._update_info()
+        self._update_pattern_enabled()
+        self._update_effect_enabled()
+
+    def _build_tones_tab(self):
+        widgets = QtWidgets
+        tab = widgets.QWidget()
+        layout = widgets.QVBoxLayout(tab)
 
         preset_row = widgets.QHBoxLayout()
         preset_row.addWidget(widgets.QLabel("Preset:"))
@@ -196,8 +210,6 @@ class ScreentoneDocker(DockWidget):
         edit_row.addWidget(button_area)
         layout.addLayout(edit_row)
 
-        layout.addWidget(self._build_effects_group())
-
         hint = widgets.QLabel(
             "A retícula entra dentro do grupo ativo. 'Editar selecionada' carrega "
             "as opções da camada/máscara ativa; 'Mostrar área' transforma a "
@@ -206,16 +218,12 @@ class ScreentoneDocker(DockWidget):
         hint.setWordWrap(True)
         layout.addWidget(hint)
         layout.addStretch(1)
+        return tab
 
-        self.setWidget(main)
-        self._sync_colors()
-        self._update_info()
-        self._update_pattern_enabled()
-
-    def _build_effects_group(self):
+    def _build_effects_tab(self):
         widgets = QtWidgets
-        group = widgets.QGroupBox("Linhas de efeito / velocidade")
-        layout = widgets.QVBoxLayout(group)
+        tab = widgets.QWidget()
+        layout = widgets.QVBoxLayout(tab)
 
         form = widgets.QFormLayout()
         self.cmb_effect = widgets.QComboBox()
@@ -292,8 +300,15 @@ class ScreentoneDocker(DockWidget):
         button_effects = widgets.QPushButton("Inserir linhas de efeito")
         button_effects.clicked.connect(self.insert_effect_lines)
         layout.addWidget(button_effects)
-        self._update_effect_enabled()
-        return group
+
+        hint = widgets.QLabel(
+            "Foco: linhas radiais saindo de um ponto (linhas de velocidade). "
+            "Paralelas: linhas preenchendo a região indicada. A camada é vetorial."
+        )
+        hint.setWordWrap(True)
+        layout.addWidget(hint)
+        layout.addStretch(1)
+        return tab
 
     def _update_effect_enabled(self):
         focus = self.cmb_effect.currentData() == "focus"

@@ -71,7 +71,10 @@ class PalettesDocker(DockWidget):
 
         self.list_swatches = widgets.QListWidget()
         self.list_swatches.setViewMode(ICON_MODE)
-        self.list_swatches.setIconSize(QtCore.QSize(24, 24))
+        self.list_swatches.setIconSize(QtCore.QSize(26, 26))
+        self.list_swatches.setGridSize(QtCore.QSize(28, 28))
+        self.list_swatches.setSpacing(1)
+        self.list_swatches.setUniformItemSizes(True)
         self.list_swatches.setResizeMode(LIST_ADJUST)
         self.list_swatches.setMovement(LIST_STATIC)
         layout.addWidget(self.list_swatches, 1)
@@ -155,11 +158,13 @@ class PalettesDocker(DockWidget):
             return
         for color in palette["colors"]:
             red, green, blue = color["rgb"]
-            item = QtWidgets.QListWidgetItem(color.get("name") or "")
+            name = color.get("name") or ""
+            hex_value = "#{0:02x}{1:02x}{2:02x}".format(red, green, blue)
+            item = QtWidgets.QListWidgetItem()
             item.setIcon(QtGui.QIcon(swatch_pixmap(red, green, blue)))
             item.setData(USER_ROLE, (red, green, blue))
             item.setToolTip(
-                "#{0:02x}{1:02x}{2:02x}".format(red, green, blue)
+                "{0} ({1})".format(name, hex_value) if name else hex_value
             )
             self.list_swatches.addItem(item)
 

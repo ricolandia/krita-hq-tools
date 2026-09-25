@@ -14,6 +14,8 @@ from krita import DockWidget
 
 from ...core import krita_helpers as helpers
 from ...core.compat import (
+    ALIGN_CENTER_FULL,
+    ANTIALIASING,
     ICON_MODE,
     IMAGE_FORMAT_ARGB32,
     LIST_ADJUST,
@@ -75,7 +77,8 @@ class BalloonsDocker(DockWidget):
         self.config = Config()
         self.folder = ensure_default_folder(self.config)
         self.libraries = {}
-        self._symbols_cache = {}
+        self._sources = {}
+        self._renderers = {}
         self._build_ui()
         self.refresh()
         self._load_symbol_libraries()
@@ -257,6 +260,21 @@ class BalloonsDocker(DockWidget):
 
     def _load_symbol_libraries(self):
         self.libraries = symbols_lib.list_libraries()
+        self._sources = {}
+        self._renderers = {}
+        for name, library in self.libraries.items():
+            try:
+                with open(library["path"], "r", encoding="utf-8", errors="replace") as handle:
+                    self._sources[name] = handle.read()
+            except OSError:
+                self._sources[name] = ""
+            if QSvgRenderer is not None:
+                try:
+                    self._renderers[name] = QSvgRenderer(library["path"])
+                except (TypeError, RuntimeError):
+                    self._renderers[name] = None
+            else:
+                self._renderers[name] = None
         self.cmb_library.blockSignals(True)
         self.cmb_library.clear()
         for name in sorted(self.libraries.keys()):
@@ -276,21 +294,42 @@ class BalloonsDocker(DockWidget):
                 SYMBOL_LICENSES.get(name, "confira os metadados do arquivo")
             )
         )
-        self._symbols_cache = {}
-        renderer = None
-        if QSvgRenderer is not None:
-            renderer = QSvgRenderer(library["path"])
+        renderer = self._renderers.get(name)
+        source = self._sources.get(name, "")
         for symbol in library["symbols"]:
             item = QtWidgets.QListWidgetItem(symbol["title"])
             item.setToolTip("{0} ({1})".format(symbol["id"], symbol["kind"]))
             item.setData(USER_ROLE, symbol["id"])
-            self._symbols_cache[symbol["id"]] = symbol
-            pixmap = self._render_symbol(renderer, symbol["id"])
-            if pixmap is not None:
-                item.setIcon(QtGui.QIcon(pixmap))
             self.list_symbols.addItem(item)
 
+            pixmap = self._render_symbol(renderer, symbol["id"])
+            if pixmap is None and source:
+                try:
+                    wrapper = symbols_lib.extract_symbol_svg(source, symbol["id"])
+                    wrap_renderer = QSvgRenderer(bytes(wrapper, "utf-8"))
+                    if wrap_renderer.isValid():
+                        pixmap = self._render_symbol(wrap_renderer, symbol["id"])
+                except (ValueError, TypeError, RuntimeError):
+                    pixmap = None
+            if pixmap is None:
+                pixmap = self._fallback_icon(symbol["title"])
+            item.setIcon(QtGui.QIcon(pixmap))
+
+    def _fallback_icon(self, text, size=96):
+        pixmap = QPixmap(size, size)
+        pixmap.fill(QtGui.QColor("#3a3a3a"))
+        painter = QtGui.QPainter(pixmap)
+        painter.setPen(QtGui.QColor("#ffffff"))
+        font = painter.font()
+        font.setBold(True)
+        font.setPointSize(26)
+        painter.setFont(font)
+        painter.drawText(pixmap.rect(), ALIGN_CENTER_FULL, str(text)[:2].upper())
+        painter.end()
+        return pixmap
+
     def _render_symbol(self, renderer, element_id, size=96):
+        """Renderiza o elemento centralizado na imagem (com recorte pelos bounds)."""
         if renderer is None or not renderer.isValid():
             return None
         try:
@@ -299,9 +338,13 @@ class BalloonsDocker(DockWidget):
             return None
         if bounds is None or bounds.isEmpty():
             return None
+        scale = size / max(bounds.width(), bounds.height())
         image = QImage(size, size, IMAGE_FORMAT_ARGB32)
         image.fill(TRANSPARENT)
         painter = QtGui.QPainter(image)
+        painter.setRenderHint(ANTIALIASING, True)
+        painter.translate(-bounds.x() * scale, -bounds.y() * scale)
+        painter.scale(scale, scale)
         try:
             renderer.render(painter, element_id)
         except (TypeError, RuntimeError):
@@ -322,29 +365,43 @@ class BalloonsDocker(DockWidget):
         element_id = item.data(USER_ROLE)
         library_name = self.cmb_library.currentData()
         library = self.libraries.get(library_name)
-        if not library:
-            return
-        try:
-            with open(library["path"], "r", encoding="utf-8", errors="replace") as handle:
-                source = handle.read()
-            svg = symbols_lib.extract_symbol_svg(source, element_id)
-        except (OSError, ValueError) as error:
-            helpers.show_message("Não foi possível extrair o símbolo: {0}".format(error))
+        source = self._sources.get(library_name, "")
+        if not library or not source:
+            helpers.show_message("Biblioteca não encontrada.")
             return
 
-        renderer = None
-        if QSvgRenderer is not None:
-            renderer = QSvgRenderer(library["path"])
-            bounds = None
-            if renderer.isValid():
-                try:
-                    bounds = renderer.boundsOnElement(element_id)
-                except (TypeError, RuntimeError):
-                    bounds = None
+        view_box = None
+        renderer = self._renderers.get(library_name)
+        if renderer is not None and renderer.isValid():
+            try:
+                bounds = renderer.boundsOnElement(element_id)
+            except (TypeError, RuntimeError):
+                bounds = None
             if bounds is not None and not bounds.isEmpty():
-                svg = svg.replace("</svg>", 'viewBox="{0} {1} {2} {3}"></svg>'.format(
+                view_box = "{0} {1} {2} {3}".format(
                     bounds.x(), bounds.y(), bounds.width(), bounds.height()
-                ))
+                )
+        if view_box is None:
+            try:
+                wrapper = symbols_lib.extract_symbol_svg(source, element_id)
+                wrap_renderer = QSvgRenderer(bytes(wrapper, "utf-8"))
+                if wrap_renderer.isValid():
+                    try:
+                        bounds = wrap_renderer.boundsOnElement(element_id)
+                    except (TypeError, RuntimeError):
+                        bounds = None
+                    if bounds is not None and not bounds.isEmpty():
+                        view_box = "{0} {1} {2} {3}".format(
+                            bounds.x(), bounds.y(), bounds.width(), bounds.height()
+                        )
+            except (ValueError, TypeError, RuntimeError):
+                view_box = None
+
+        try:
+            svg = symbols_lib.extract_symbol_svg(source, element_id, view_box=view_box)
+        except ValueError as error:
+            helpers.show_message("Não foi possível extrair o símbolo: {0}".format(error))
+            return
 
         base = "text" if self.chk_text_layer.isChecked() else item.text()
         name = helpers.unique_layer_name(document, base)

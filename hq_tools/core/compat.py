@@ -57,6 +57,11 @@ QPixmap = QtGui.QPixmap
 QSize = QtCore.QSize
 
 if QT_VERSION == 6:
+    ANTIALIASING = QtGui.QPainter.RenderHint.Antialiasing
+else:
+    ANTIALIASING = QtGui.QPainter.Antialiasing
+
+if QT_VERSION == 6:
     IMAGE_FORMAT_ARGB32 = QtGui.QImage.Format.Format_ARGB32
     TRANSPARENT = QtCore.Qt.GlobalColor.transparent
     LIST_ADJUST = QtWidgets.QListView.ResizeMode.Adjust
@@ -87,6 +92,7 @@ __all__ = [
     "QIcon",
     "QPixmap",
     "QSize",
+    "ANTIALIASING",
     "IMAGE_FORMAT_ARGB32",
     "TRANSPARENT",
     "LIST_ADJUST",
