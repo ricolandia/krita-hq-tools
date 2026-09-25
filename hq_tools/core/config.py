@@ -15,9 +15,11 @@ DEFAULT_CONFIG = {
     "modules": {
         "screentone": True,
         "balloons": True,
+        "onomatopeias": True,
         "palettes": True,
         "pages": True,
         "brushes": True,
+        "biblioteca": True,
     },
     "screentone": {
         "last_preset": "Sombra média 60 LPI",
@@ -27,11 +29,18 @@ DEFAULT_CONFIG = {
         "folder": "",
         "insert_as_text_layer": False,
     },
+    "onomatopeias": {
+        "folder": "",
+    },
+    "biblioteca": {
+        "folder": "",
+    },
     "palettes": {
         "last_template": "tons-hq",
     },
     "pages": {
         "last_project": "",
+        "last_folder": "",
         "format": "A4",
         "dpi": 300,
     },

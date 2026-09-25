@@ -1,10 +1,9 @@
-"""Docker de páginas: gerenciador com miniaturas e gerador a partir do roteiro.
+"""Docker de páginas: gerenciador com miniaturas (aba única).
 
-O gerenciador lê o ``comicsConfig.json`` de um projeto do CPMT (ou uma pasta
-qualquer com arquivos ``.kra``), mostra as miniaturas internas das páginas,
-abre a página com duplo clique e permite reordenar arrastando (a ordem é
-gravada no projeto). A aba Roteiro gera páginas novas a partir da sintaxe
-própria do HQ Tools.
+O projeto é uma pasta com arquivos ``.kra``: "Novo projeto..." cria a pasta,
+"Abrir projeto..." lê o ``comicConfig.json`` de um projeto CPMT e "Pasta..."
+abre qualquer pasta com páginas. Clique duplo abre a página; arrastar reordena
+(gravado no projeto CPMT quando houver).
 """
 
 import os
@@ -18,7 +17,6 @@ from ...core.compat import (
     LIST_ADJUST,
     MOVE_ACTION,
     USER_ROLE,
-    WAIT_CURSOR,
     QtCore,
     QtGui,
     QtWidgets,
@@ -28,16 +26,6 @@ from ...core.config import Config
 from ...core.cpmt import CPMTProject
 from ...core.thumbs import thumbnail_pixmap
 from . import generator, roteiro
-
-SAMPLE_SCRIPT = """# Roteiro de exemplo
-pagina 1
-formato A4
-layout grade2x2
-narracao p1: Era uma vez, numa cidade pequena...
-fala p1: Voce viu aquilo?
-fala p2: Nao vi nada.
-fala p3: Entao olhe de novo.
-"""
 
 
 class PageListWidget(QtWidgets.QListWidget):
@@ -57,38 +45,45 @@ class PagesDocker(DockWidget):
         self.folder = ""
         self._loading = False
         self._build_ui()
-        last = self.config.get("pages.last_project")
-        if last and os.path.isfile(last):
-            self._load_project(last)
+        self._restore_last()
 
     def canvasChanged(self, canvas):
         pass
+
+    def _restore_last(self):
+        last_project = self.config.get("pages.last_project")
+        if last_project and os.path.isfile(last_project):
+            self._load_project(last_project)
+            return
+        last_folder = self.config.get("pages.last_folder")
+        if last_folder and os.path.isdir(last_folder):
+            self.project = None
+            self.folder = last_folder
+            self.lbl_project.setText("Projeto: {0}".format(last_folder))
+            self.refresh()
 
     def _build_ui(self):
         widgets = QtWidgets
         main = widgets.QWidget(self)
         layout = widgets.QVBoxLayout(main)
-        self.tabs = widgets.QTabWidget()
-        layout.addWidget(self.tabs, 1)
-        self.tabs.addTab(self._build_manager_tab(), "Gerenciador")
-        self.tabs.addTab(self._build_script_tab(), "Roteiro")
-        self.setWidget(main)
-
-    def _build_manager_tab(self):
-        widgets = QtWidgets
-        tab = widgets.QWidget()
-        layout = widgets.QVBoxLayout(tab)
 
         row = widgets.QHBoxLayout()
-        self.lbl_project = widgets.QLabel("Nenhum projeto aberto.")
+        self.lbl_project = widgets.QLabel(
+            "Nenhum projeto aberto. Crie um projeto (pasta), abra um "
+            "comicConfig.json do CPMT ou abra uma pasta com .kra."
+        )
         self.lbl_project.setWordWrap(True)
         row.addWidget(self.lbl_project, 1)
-        button_open = widgets.QPushButton("Projeto...")
-        button_open.setToolTip("Abrir um comicsConfig.json do CPMT")
+        button_new = widgets.QPushButton("Novo projeto...")
+        button_new.setToolTip("Cria uma pasta para as páginas do projeto")
+        button_new.clicked.connect(self.new_project)
+        row.addWidget(button_new)
+        button_open = widgets.QPushButton("Abrir projeto...")
+        button_open.setToolTip("Abre o comicConfig.json de um projeto CPMT")
         button_open.clicked.connect(self.pick_project)
         row.addWidget(button_open)
         button_folder = widgets.QPushButton("Pasta...")
-        button_folder.setToolTip("Abrir uma pasta com arquivos .kra")
+        button_folder.setToolTip("Abre uma pasta com arquivos .kra")
         button_folder.clicked.connect(self.pick_folder)
         row.addWidget(button_folder)
         layout.addLayout(row)
@@ -101,6 +96,22 @@ class PagesDocker(DockWidget):
         button_open_folder.clicked.connect(self.open_current_folder)
         row2.addWidget(button_open_folder)
         layout.addLayout(row2)
+
+        row3 = widgets.QHBoxLayout()
+        button_new_page = widgets.QPushButton("Criar próxima página")
+        button_new_page.setToolTip(
+            "Cria uma página nova na pasta do projeto e atualiza as miniaturas"
+        )
+        button_new_page.clicked.connect(self.create_next_page)
+        row3.addWidget(button_new_page)
+        button_guides = widgets.QPushButton("Guias de margem")
+        button_guides.setToolTip(
+            "Cria 12 guias no documento ativo (0,5 / 1 / 1,5 cm por lado); "
+            "substitui as guias existentes"
+        )
+        button_guides.clicked.connect(self.create_margin_guides)
+        row3.addWidget(button_guides)
+        layout.addLayout(row3)
 
         self.list_pages = PageListWidget()
         self.list_pages.setViewMode(ICON_MODE)
@@ -116,54 +127,81 @@ class PagesDocker(DockWidget):
 
         hint = widgets.QLabel(
             "Clique duas vezes para abrir a página. Arraste para reordenar "
-            "(a ordem é salva no projeto CPMT)."
+            "(a ordem é salva no projeto CPMT quando aberto por ele)."
         )
         hint.setWordWrap(True)
         layout.addWidget(hint)
-        return tab
 
-    def _build_script_tab(self):
+        self.setWidget(main)
+
+    def new_project(self):
         widgets = QtWidgets
-        tab = widgets.QWidget()
-        layout = widgets.QVBoxLayout(tab)
+        dialog = widgets.QDialog(self.widget())
+        dialog.setWindowTitle("Novo projeto de HQ")
+        form = widgets.QFormLayout(dialog)
 
-        form = widgets.QFormLayout()
-        self.cmb_format = widgets.QComboBox()
-        for name in roteiro.FORMATS:
-            self.cmb_format.addItem(name)
-        self.cmb_format.setCurrentText(self.config.get("pages.format", "A4"))
-        form.addRow("Formato:", self.cmb_format)
+        edit_name = widgets.QLineEdit("")
+        edit_name.setPlaceholderText("ex.: minha-hq")
+        form.addRow("Nome do projeto:", edit_name)
 
-        self.spin_dpi = widgets.QSpinBox()
-        self.spin_dpi.setRange(72, 1200)
-        self.spin_dpi.setValue(int(self.config.get("pages.dpi", 300)))
-        form.addRow("DPI:", self.spin_dpi)
-
-        self.chk_use_project = widgets.QCheckBox("Gerar dentro do projeto CPMT aberto")
-        self.chk_use_project.setChecked(True)
-        form.addRow("", self.chk_use_project)
-        layout.addLayout(form)
-
-        self.txt_script = widgets.QPlainTextEdit(SAMPLE_SCRIPT)
-        self.txt_script.setTabChangesFocus(True)
-        layout.addWidget(self.txt_script, 1)
-
-        button_generate = widgets.QPushButton("Gerar páginas")
-        button_generate.clicked.connect(self.generate_pages)
-        layout.addWidget(button_generate)
-
-        hint = widgets.QLabel(
-            "Sintaxe: pagina, formato, dpi, layout (grade2x2, tira3, 2x3...), "
-            "direcao (ltr/rtl), margem, sarjeta, fala pN: texto, "
-            "narracao pN: texto. Veja docs/ROTEIRO-SINTAXE.md."
+        row = widgets.QHBoxLayout()
+        edit_base = widgets.QLineEdit(os.path.expanduser("~"))
+        button_browse = widgets.QPushButton("...")
+        button_browse.clicked.connect(
+            lambda: edit_base.setText(
+                widgets.QFileDialog.getExistingDirectory(
+                    dialog, "Pasta base", edit_base.text()
+                )
+            )
         )
-        hint.setWordWrap(True)
-        layout.addWidget(hint)
-        return tab
+        row.addWidget(edit_base, 1)
+        row.addWidget(button_browse)
+        form.addRow("Pasta base:", row)
+
+        chk_sub = widgets.QCheckBox("Criar subpasta com o nome do projeto")
+        chk_sub.setChecked(True)
+        form.addRow("", chk_sub)
+
+        buttons_row = widgets.QHBoxLayout()
+        button_ok = widgets.QPushButton("Criar")
+        button_ok.setDefault(True)
+        button_cancel = widgets.QPushButton("Cancelar")
+        button_ok.clicked.connect(dialog.accept)
+        button_cancel.clicked.connect(dialog.reject)
+        buttons_row.addStretch(1)
+        buttons_row.addWidget(button_cancel)
+        buttons_row.addWidget(button_ok)
+        form.addRow(buttons_row)
+
+        if dialog.exec() != 1:
+            return
+        name = edit_name.text().strip()
+        base = edit_base.text().strip()
+        if not name:
+            helpers.show_message("Informe o nome do projeto.")
+            return
+        if not base:
+            helpers.show_message("Informe a pasta base.")
+            return
+        folder = os.path.join(base, name) if chk_sub.isChecked() else base
+        try:
+            os.makedirs(folder, exist_ok=True)
+        except OSError as error:
+            helpers.show_message("Não foi possível criar a pasta: {0}".format(error))
+            return
+        self.project = None
+        self.folder = folder
+        self.config.set("pages.last_folder", folder)
+        self.lbl_project.setText("Projeto: {0}".format(folder))
+        self.refresh()
+        helpers.show_message("Projeto criado: {0}".format(folder))
 
     def pick_project(self):
         path, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self.widget(), "Abrir comicsConfig.json", self.folder, "comicsConfig.json"
+            self.widget(),
+            "Abrir comicConfig.json do CPMT",
+            self.folder or os.path.expanduser("~"),
+            "comicConfig.json",
         )
         if path:
             self._load_project(path)
@@ -175,7 +213,8 @@ class PagesDocker(DockWidget):
         if folder:
             self.project = None
             self.folder = folder
-            self.lbl_project.setText("Pasta: {0}".format(folder))
+            self.config.set("pages.last_folder", folder)
+            self.lbl_project.setText("Projeto: {0}".format(folder))
             self.refresh()
 
     def _load_project(self, config_path):
@@ -193,10 +232,86 @@ class PagesDocker(DockWidget):
         self.config.set("pages.last_project", config_path)
         self.refresh()
 
+    def create_next_page(self):
+        """Cria uma página nova na pasta do projeto e atualiza a grade."""
+        if not self.folder:
+            helpers.show_message("Crie ou abra um projeto primeiro.")
+            return
+        fmt = self.config.get("pages.format", "A4") or "A4"
+        dpi = int(self.config.get("pages.dpi", 300) or 300)
+
+        if self.project is not None:
+            numero = len(self.project.page_relatives()) + 1
+            filename = self.project.next_page_name(offset=numero)
+            path = os.path.join(self.project.pages_dir(), filename)
+            if self.project.pages_location:
+                relative = os.path.join(self.project.pages_location, filename)
+            else:
+                relative = filename
+            titulo = "{0} - pagina {1}".format(self.project.project_name, numero)
+        else:
+            try:
+                existentes = [
+                    name
+                    for name in os.listdir(self.folder)
+                    if name.lower().endswith(".kra")
+                ]
+            except OSError:
+                existentes = []
+            numero = len(existentes) + 1
+            filename = "pagina_{0:03d}.kra".format(numero)
+            path = os.path.join(self.folder, filename)
+            relative = filename
+            titulo = "pagina {0}".format(numero)
+
+        page = {
+            "index": numero,
+            "format": fmt,
+            "dpi": dpi,
+            "margin": 0.05,
+            "gutter": 0.0,
+            "panels": [(0.05, 0.05, 0.9, 0.9)],
+            "balloons": [],
+        }
+        width, height = roteiro.page_pixels(page, fmt, dpi)
+        panel_svg = generator._panels_svg(page, width, height, dpi)
+        try:
+            document = generator._build_document(
+                page, titulo, panel_svg, "", width, height, dpi
+            )
+            generator._save_document(document, path)
+        except (RuntimeError, OSError) as error:
+            helpers.show_message("Falha ao criar a página: {0}".format(error))
+            return
+
+        if self.project is not None:
+            self.project.register_pages([relative])
+        self.refresh()
+        helpers.show_message("Página criada: {0}".format(filename))
+
+    def create_margin_guides(self):
+        """Cria 12 guias no documento ativo: 0,5 / 1 / 1,5 cm por lado."""
+        document = helpers.active_document()
+        if document is None:
+            helpers.show_message("Abra a página para criar as guias.")
+            return
+        dpi = helpers.document_dpi(document)
+        width = document.width()
+        height = document.height()
+        verticais = []
+        horizontais = []
+        for margem in (0.5, 1.0, 1.5):
+            px = float(margem) * dpi / 2.54
+            verticais.extend([px, width - px])
+            horizontais.extend([px, height - px])
+        document.setVerticalGuides(sorted(set(round(v, 3) for v in verticais)))
+        document.setHorizontalGuides(sorted(set(round(v, 3) for v in horizontais)))
+        helpers.show_message("Guias de margem criadas (0,5 / 1 / 1,5 cm por lado).")
+
     def open_current_folder(self):
         folder = self.folder
         if not folder:
-            helpers.show_message("Abra um projeto ou uma pasta primeiro.")
+            helpers.show_message("Crie ou abra um projeto primeiro.")
             return
         os.makedirs(folder, exist_ok=True)
         QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(folder))
@@ -261,49 +376,3 @@ class PagesDocker(DockWidget):
         if window is not None:
             window.addView(document)
         Krita.instance().setActiveDocument(document)
-
-    def generate_pages(self):
-        script = self.txt_script.toPlainText()
-        try:
-            pages = roteiro.parse_script(script)
-        except roteiro.RoteiroError as error:
-            helpers.show_message(str(error))
-            return
-        if not pages:
-            helpers.show_message("O roteiro está vazio.")
-            return
-
-        self.config.set("pages.format", self.cmb_format.currentText())
-        self.config.set("pages.dpi", self.spin_dpi.value())
-
-        use_project = self.chk_use_project.isChecked() and self.project is not None
-        project = self.project if use_project else None
-        target_dir = None
-        if project is None:
-            target_dir = QtWidgets.QFileDialog.getExistingDirectory(
-                self.widget(), "Pasta de destino das páginas"
-            )
-            if not target_dir:
-                return
-
-        QtWidgets.QApplication.setOverrideCursor(WAIT_CURSOR)
-        try:
-            created = generator.generate(
-                script,
-                target_dir=target_dir,
-                project=project,
-                format_override=self.cmb_format.currentText(),
-                dpi_override=self.spin_dpi.value(),
-            )
-        except roteiro.RoteiroError as error:
-            helpers.show_message(str(error))
-            return
-        except (RuntimeError, OSError) as error:
-            helpers.show_message("Falha ao gerar: {0}".format(error))
-            return
-        finally:
-            QtWidgets.QApplication.restoreOverrideCursor()
-
-        if project is not None:
-            self.refresh()
-        helpers.show_message("{0} página(s) gerada(s).".format(len(created)))
