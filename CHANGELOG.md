@@ -21,6 +21,14 @@
   miniaturas e inserção em um clique, com licença creditada.
 - Testes do núcleo ampliados (44 no total).
 
+### Corrigido
+
+- Símbolos: a inserção passou a abrir o docker nativo "Bibliotecas de
+  símbolos" do Krita (a renderização própria não cobria todos os formatos de
+  biblioteca); a aba vira navegação com licença.
+- Retículas em abas (Retículas / Linhas de efeito) para não estourar a tela.
+- Grade de paletas compacta, com nome e código no tooltip.
+
 ## [0.1.0] — 2026-09-25
 
 Primeira versão.

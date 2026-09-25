@@ -82,12 +82,11 @@ Diferenças entre o dump do bloco 2/3 e o que o plugin gera (ver
 ### 3b. Símbolos do Krita (aba dos balões)
 
 - Aba "Símbolos do Krita": aparecem as bibliotecas `BalloonSymbols.svg` e
-  `pepper_carrot_speech_bubbles.svg` com miniaturas e licença.
-- Duplo clique insere o símbolo no grupo ativo como camada vetorial.
-- Adicionar uma biblioteca própria em `~/.local/share/krita/symbols/`,
-  Atualizar e inserir.
-- Comparar com o docker nativo "Bibliotecas de símbolos": a inserção por aqui
-  deve renderizar igual (formas, estilos e gradientes).
+  `pepper_carrot_speech_bubbles.svg` com nomes e licença (miniaturas quando o
+  Qt conseguir renderizar; senão, quadrados com iniciais).
+- O botão e o duplo clique abrem o docker nativo "Bibliotecas de símbolos" do
+  Krita (a renderização e a inserção ficam por conta dele: arraste e solte no
+  canvas).
 
 ### 4. Paletas
 

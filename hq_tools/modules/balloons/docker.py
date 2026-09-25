@@ -10,7 +10,7 @@ grupo do painel.
 import os
 import shutil
 
-from krita import DockWidget
+from krita import DockWidget, Krita
 
 from ...core import krita_helpers as helpers
 from ...core.compat import (
@@ -172,17 +172,21 @@ class BalloonsDocker(DockWidget):
         self.list_symbols.setResizeMode(LIST_ADJUST)
         self.list_symbols.setMovement(LIST_STATIC)
         self.list_symbols.setWordWrap(True)
-        self.list_symbols.itemDoubleClicked.connect(self.insert_symbol)
+        self.list_symbols.itemDoubleClicked.connect(self.open_native_docker)
         layout.addWidget(self.list_symbols, 1)
 
-        button_insert = widgets.QPushButton("Inserir símbolo no grupo ativo")
-        button_insert.clicked.connect(self.insert_symbol)
+        button_insert = widgets.QPushButton("Abrir docker de símbolos do Krita")
+        button_insert.setToolTip(
+            "Abre o docker nativo 'Bibliotecas de símbolos' para arrastar e soltar"
+        )
+        button_insert.clicked.connect(self.open_native_docker)
         layout.addWidget(button_insert)
 
         hint = widgets.QLabel(
-            "Símbolos das bibliotecas instaladas em "
-            "~/.local/share/krita/symbols (o Krita também tem um docker nativo; "
-            "aqui a inserção é em um clique, dentro do grupo do painel)."
+            "A lista mostra as bibliotecas instaladas em "
+            "~/.local/share/krita/symbols. A inserção usa o docker nativo do "
+            "Krita (arraste o símbolo para o canvas), que renderiza tudo o que "
+            "estas bibliotecas usam."
         )
         hint.setWordWrap(True)
         layout.addWidget(hint)
@@ -353,69 +357,20 @@ class BalloonsDocker(DockWidget):
         painter.end()
         return QPixmap.fromImage(image)
 
-    def insert_symbol(self):
-        document = helpers.active_document()
-        if document is None:
-            helpers.show_message("Abra um documento para inserir o símbolo.")
+    def open_native_docker(self, *args):
+        """Mostra o docker nativo 'Bibliotecas de símbolos' do Krita."""
+        window = Krita.instance().activeWindow()
+        if window is None:
+            helpers.show_message("Abra uma janela do Krita primeiro.")
             return
-        item = self.list_symbols.currentItem()
-        if item is None:
-            helpers.show_message("Escolha um símbolo na lista.")
-            return
-        element_id = item.data(USER_ROLE)
-        library_name = self.cmb_library.currentData()
-        library = self.libraries.get(library_name)
-        source = self._sources.get(library_name, "")
-        if not library or not source:
-            helpers.show_message("Biblioteca não encontrada.")
-            return
-
-        view_box = None
-        renderer = self._renderers.get(library_name)
-        if renderer is not None and renderer.isValid():
-            try:
-                bounds = renderer.boundsOnElement(element_id)
-            except (TypeError, RuntimeError):
-                bounds = None
-            if bounds is not None and not bounds.isEmpty():
-                view_box = "{0} {1} {2} {3}".format(
-                    bounds.x(), bounds.y(), bounds.width(), bounds.height()
-                )
-        if view_box is None:
-            try:
-                wrapper = symbols_lib.extract_symbol_svg(source, element_id)
-                wrap_renderer = QSvgRenderer(bytes(wrapper, "utf-8"))
-                if wrap_renderer.isValid():
-                    try:
-                        bounds = wrap_renderer.boundsOnElement(element_id)
-                    except (TypeError, RuntimeError):
-                        bounds = None
-                    if bounds is not None and not bounds.isEmpty():
-                        view_box = "{0} {1} {2} {3}".format(
-                            bounds.x(), bounds.y(), bounds.width(), bounds.height()
-                        )
-            except (ValueError, TypeError, RuntimeError):
-                view_box = None
-
-        try:
-            svg = symbols_lib.extract_symbol_svg(source, element_id, view_box=view_box)
-        except ValueError as error:
-            helpers.show_message("Não foi possível extrair o símbolo: {0}".format(error))
-            return
-
-        base = "text" if self.chk_text_layer.isChecked() else item.text()
-        name = helpers.unique_layer_name(document, base)
-        layer = document.createVectorLayer(name)
-        if layer is None:
-            helpers.show_message("Não foi possível criar a camada vetorial.")
-            return
-        shapes = layer.addShapesFromSvg(svg)
-        if not shapes:
-            helpers.show_message(
-                "O símbolo não gerou formas nesta versão do Krita; tente pelo "
-                "docker nativo 'Bibliotecas de símbolos'."
-            )
-            return
-        helpers.attach(document, layer)
-        document.setActiveNode(layer)
-        helpers.show_message("Símbolo inserido: {0}".format(item.text()))
+        for dock in window.dockers():
+            title = str(dock.windowTitle()).lower()
+            if any(token in title for token in ("symbol", "símbolo", "simbolo")):
+                dock.show()
+                dock.raise_()
+                helpers.show_message("Docker de símbolos do Krita aberto.")
+                return
+        helpers.show_message(
+            "Docker 'Bibliotecas de símbolos' não encontrado; habilite em "
+            "Configurações > Dockers."
+        )

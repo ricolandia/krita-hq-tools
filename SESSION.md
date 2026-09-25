@@ -45,8 +45,9 @@ Feito:
   super-herói, mangá, sépia).
 - **Símbolos do Krita**: aba nos balões listando as bibliotecas de
   `~/.local/share/krita/symbols` (BalloonSymbols e Pepper&Carrot inclusas),
-  miniaturas via QSvgRenderer e inserção vetorial em um clique com licença
-  creditada.
+  com licença creditada; a inserção abre o docker nativo "Bibliotecas de
+  símbolos" do Krita (renderização própria abandonada por não cobrir todos os
+  formatos de biblioteca).
 - Testes do núcleo: 44 passando (`python3 -m unittest discover -s tests`).
 
 Pendente (validação dentro do Krita):
