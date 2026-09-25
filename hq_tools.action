@@ -146,5 +146,53 @@
       <isCheckable>false</isCheckable>
       <statusTip></statusTip>
     </Action>
+    <Action name="hq_tools_brush_13">
+      <icon></icon>
+      <text>HQ Tools: pincel 13</text>
+      <whatsThis></whatsThis>
+      <toolTip>Ativa o preset do slot 13</toolTip>
+      <iconText></iconText>
+      <activationFlags>10000</activationFlags>
+      <activationConditions>0</activationConditions>
+      <shortcut></shortcut>
+      <isCheckable>false</isCheckable>
+      <statusTip></statusTip>
+    </Action>
+    <Action name="hq_tools_brush_14">
+      <icon></icon>
+      <text>HQ Tools: pincel 14</text>
+      <whatsThis></whatsThis>
+      <toolTip>Ativa o preset do slot 14</toolTip>
+      <iconText></iconText>
+      <activationFlags>10000</activationFlags>
+      <activationConditions>0</activationConditions>
+      <shortcut></shortcut>
+      <isCheckable>false</isCheckable>
+      <statusTip></statusTip>
+    </Action>
+    <Action name="hq_tools_brush_15">
+      <icon></icon>
+      <text>HQ Tools: pincel 15</text>
+      <whatsThis></whatsThis>
+      <toolTip>Ativa o preset do slot 15</toolTip>
+      <iconText></iconText>
+      <activationFlags>10000</activationFlags>
+      <activationConditions>0</activationConditions>
+      <shortcut></shortcut>
+      <isCheckable>false</isCheckable>
+      <statusTip></statusTip>
+    </Action>
+    <Action name="hq_tools_brush_16">
+      <icon></icon>
+      <text>HQ Tools: pincel 16</text>
+      <whatsThis></whatsThis>
+      <toolTip>Ativa o preset do slot 16</toolTip>
+      <iconText></iconText>
+      <activationFlags>10000</activationFlags>
+      <activationConditions>0</activationConditions>
+      <shortcut></shortcut>
+      <isCheckable>false</isCheckable>
+      <statusTip></statusTip>
+    </Action>
   </Actions>
 </ActionCollection>

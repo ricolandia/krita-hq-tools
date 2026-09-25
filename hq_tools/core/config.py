@@ -36,7 +36,7 @@ DEFAULT_CONFIG = {
         "dpi": 300,
     },
     "brushes": {
-        "slots": [""] * 12,
+        "slots": [""] * 16,
     },
 }
 

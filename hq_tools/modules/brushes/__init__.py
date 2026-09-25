@@ -1,6 +1,6 @@
 """Registro de slots de pincel do módulo de pincéis."""
 
-SLOT_COUNT = 12
+from .sets import SLOT_COUNT  # noqa: F401
 
 _docker = None
 

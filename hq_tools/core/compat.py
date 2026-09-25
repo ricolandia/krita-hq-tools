@@ -18,6 +18,8 @@ try:  # Krita 6
     SMOOTH_TRANSFORMATION = QtCore.Qt.TransformationMode.SmoothTransformation
     NO_FOCUS = QtCore.Qt.FocusPolicy.NoFocus
     CURSOR_POINTING = QtCore.Qt.CursorShape.PointingHandCursor
+    ALIGN_CENTER_FULL = QtCore.Qt.AlignmentFlag.AlignCenter
+    TOOL_BUTTON_TEXT_BESIDE_ICON = QtCore.Qt.ToolButtonStyle.ToolButtonTextBesideIcon
     DIALOG_YES = QtWidgets.QMessageBox.StandardButton.Yes
     DIALOG_NO = QtWidgets.QMessageBox.StandardButton.No
     DIALOG_OK = QtWidgets.QMessageBox.StandardButton.Ok
@@ -41,6 +43,8 @@ except ImportError:  # Krita 5.x
     SMOOTH_TRANSFORMATION = QtCore.Qt.SmoothTransformation
     NO_FOCUS = QtCore.Qt.NoFocus
     CURSOR_POINTING = QtCore.Qt.PointingHandCursor
+    ALIGN_CENTER_FULL = QtCore.Qt.AlignCenter
+    TOOL_BUTTON_TEXT_BESIDE_ICON = QtCore.Qt.ToolButtonTextBesideIcon
     DIALOG_YES = QtWidgets.QMessageBox.Yes
     DIALOG_NO = QtWidgets.QMessageBox.No
     DIALOG_OK = QtWidgets.QMessageBox.Ok
@@ -98,6 +102,8 @@ __all__ = [
     "SMOOTH_TRANSFORMATION",
     "NO_FOCUS",
     "CURSOR_POINTING",
+    "ALIGN_CENTER_FULL",
+    "TOOL_BUTTON_TEXT_BESIDE_ICON",
     "DIALOG_YES",
     "DIALOG_NO",
     "DIALOG_OK",
