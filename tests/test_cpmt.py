@@ -6,7 +6,7 @@ import shutil
 import tempfile
 import unittest
 
-from hq_tools.core.cpmt import CPMTProject
+from hq_tools.core.cpmt import CPMTProject, create_project_with_page
 
 
 def make_project(root, name="Meu Projeto", location="pages", legacy=False):
@@ -47,6 +47,23 @@ class TestCPMTProject(unittest.TestCase):
             self.assertTrue(CPMTProject.is_project(root))
             project = CPMTProject(root)
             self.assertEqual(project.project_name, "Meu Projeto")
+        finally:
+            shutil.rmtree(root, ignore_errors=True)
+
+    def test_create_project_with_page(self):
+        root = tempfile.mkdtemp(prefix="hq_tools_cpmt_")
+        try:
+            path = create_project_with_page(root, "pagina_001.kra", "minha-hq")
+            self.assertTrue(os.path.isfile(path))
+            self.assertEqual(os.path.basename(path), "comicConfig.json")
+            project = CPMTProject(root)
+            self.assertEqual(project.project_name, "minha-hq")
+            self.assertEqual(project.pages_location, ".")
+            self.assertEqual(project.page_number, 1)
+            self.assertEqual(project.page_relatives(), ["pagina_001.kra"])
+            self.assertEqual(project.next_page_name(1), "minha-hq002.kra")
+            for sub in ("export", "templates", "translations"):
+                self.assertTrue(os.path.isdir(os.path.join(root, sub)), sub)
         finally:
             shutil.rmtree(root, ignore_errors=True)
 

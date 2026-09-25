@@ -9,8 +9,38 @@ import json
 import os
 import re
 import tempfile
+import uuid
 
 CONFIG_NAMES = ("comicConfig.json", "comicsConfig.json")
+
+
+def create_project_with_page(folder, page_relative, project_name=None):
+    """Cria um projeto CPMT na pasta, registrando a página já salva.
+
+    Grava ``comicConfig.json`` (UTF-16, padrão do CPMT) com a página na lista
+    ``pages`` e ``pageNumber`` em 1. Devolve o caminho do arquivo criado.
+    """
+    folder = os.path.abspath(folder)
+    os.makedirs(folder, exist_ok=True)
+    name = project_name or os.path.basename(folder) or "projeto"
+    config = {
+        "projectName": name,
+        "concept": "",
+        "language": "pt_BR",
+        "pagesLocation": ".",
+        "exportLocation": "export",
+        "templateLocation": "templates",
+        "translationsLocation": "translations",
+        "uuid": str(uuid.uuid4()),
+        "pageNumber": 1,
+        "pages": [str(page_relative)],
+    }
+    for sub in ("export", "templates", "translations"):
+        os.makedirs(os.path.join(folder, sub), exist_ok=True)
+    path = os.path.join(folder, "comicConfig.json")
+    with open(path, "w", encoding="utf-16", newline="") as handle:
+        json.dump(config, handle, indent=4, sort_keys=True, ensure_ascii=False)
+    return path
 
 
 class CPMTProject:
