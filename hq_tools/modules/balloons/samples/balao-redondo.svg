@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="78pt" height="60pt" viewBox="0 0 78 60">
+  <ellipse cx="38" cy="25" rx="36" ry="22" fill="#ffffff" stroke="#000000" stroke-width="2"/>
+  <path d="M 30 44 L 22 58 L 40 45 Z" fill="#ffffff" stroke="#000000" stroke-width="2"/>
+  <text x="38" y="28" font-family="sans-serif" font-size="9" text-anchor="middle" fill="#000000">Texto</text>
+</svg>
