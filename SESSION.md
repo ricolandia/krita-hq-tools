@@ -1,6 +1,6 @@
 # SESSION — HQ Tools (Krita-Comics-Plugin)
 
-Fonte da verdade do projeto. Atualizado em 2026-09-25 (v0.2).
+Fonte da verdade do projeto. Atualizado em 2026-09-25 (v0.3.0).
 
 ## Contexto
 
@@ -23,39 +23,38 @@ conclusão da pesquisa está em `docs/contexto/` (os 4 arquivos originais).
 - **Paletas:** docker próprio com templates `.gpl`.
 - Licença MIT; docs em `.md` na pasta do projeto (regra de documentação).
 
-## Estado (v0.2.0)
+## Estado (v0.3.0)
 
 Feito:
 
-- v0.1.0 completa: plugin com 5 módulos, núcleo, testes (23), scripts,
-  documentação e git com tag v0.1.0.
-- **Pincéis v2**: conjuntos (Rascunho, Contornos, Aquarela/Guache,
-  Acrílico/Óleo, Retículas) montados com os presets do próprio Krita, cartões
-  com miniatura + nome, 16 slots (4 por conjunto), atribuição por menu de
-  contexto, instalador de bundles (.bundle).
-- **Retículas v2**: editar retícula selecionada (camada de preenchimento e
-  máscara de meio-tom), máscara vazia (revelar pintando), mostrar área como
-  seleção, reutilizar tons idênticos, posição X/Y do padrão, tom com padrões
-  instalados do Krita (gerador Pattern no preenchimento e como tela do
-  Halftone), meio-tom por canal CMYK (ângulos 15/75/0/45).
-- **Linhas de efeito/velocidade**: gerador vetorial (foco e paralelas) no
-  docker de retículas.
-- **Paletas artísticas**: 15 novas `.gpl` (Zorn, retrato, paisagem, amanhecer,
-  noite, terra, pastel, aquarela, guache, acrílico, retrô HQ, BD linha clara,
-  super-herói, mangá, sépia).
-- **Símbolos do Krita**: aba nos balões listando as bibliotecas de
-  `~/.local/share/krita/symbols` (BalloonSymbols e Pepper&Carrot inclusas),
-  com licença creditada; a inserção abre o docker nativo "Bibliotecas de
-  símbolos" do Krita (renderização própria abandonada por não cobrir todos os
-  formatos de biblioteca).
-- Testes do núcleo: 44 passando (`python3 -m unittest discover -s tests`).
+- v0.1.0 e v0.2.0 completas (ver CHANGELOG).
+- **Gerenciador de páginas repensado (v0.3.0)**: aba única; "Novo projeto..."
+  cria a pasta do projeto (diálogo nome + pasta base + subpasta); "Criar
+  próxima página" gera página (A4 300 dpi padrão, fundo, grupo PageNN, painel
+  com margem, Sketch/Color/Ink, contorno) e atualiza as miniaturas; "Guias de
+  margem" cria 12 guias (0,5/1/1,5 cm por lado) no documento ativo; aba
+  Roteiro removida da interface (módulos puros preservados).
+- **CPMT corrigido**: arquivo real é `comicConfig.json` (sem "s") em UTF-16;
+  leitura com BOM e fallback para `comicsConfig.json` legado.
+- **Kit de HQ**: fontes OFL (Bangers, Comic Relief Regular/Bold, Patrick
+  Hand) instaláveis com um clique; 2 balões CC0/PD (Amada44 e SupremeLordBagel)
+  copiados na primeira execução; `CREDITS.md` com todas as licenças.
+- **Docker "HQ Tools: biblioteca"**: cria balões, painéis e onomatopeias do
+  autor em documento 15 x 15 cm a 300 dpi; "Salvar recurso do documento"
+  exporta a camada vetorial como SVG na pasta da biblioteca (subpastas por
+  tipo); inserção com duplo clique.
+- **Docker "HQ Tools: onomatopeias"**: 8 amostras + pasta própria.
+- **Balões**: aba de símbolos removida; botão "Símbolos do Krita" abre o
+  docker nativo.
+- Testes do núcleo: 51 passando.
 
 Pendente (validação dentro do Krita):
 
-- Rodar o roteiro de `docs/VALIDACAO.md` (inclui os itens 2b, 3b e o pincel v2).
-- Confirmar: inserção de símbolos via `addShapesFromSvg` (estilos/defs),
-  edição de máscara de meio-tom e CMYK em documento CMYKA, padrões como tela,
-  `Resource.image()` devolvendo a miniatura dos `.kpp`.
+- Rodar o roteiro de `docs/VALIDACAO.md` (itens 3c/3d/3e, 5 com nova página e
+  guias).
+- Confirmar: `Document.setVerticalGuides`/`setHorizontalGuides` substituindo
+  guias; exportação `VectorLayer.toSvg()` gerando SVG reimportável; fontes
+  instaladas aparecendo no seletor de fontes do Krita após reinício.
 
 ## Comandos
 
@@ -69,8 +68,8 @@ bash scripts/build-zip.sh                  # gerar ZIP instalável
 
 - Krita 6 (migração PyQt6 e ferramentas novas de texto/painéis).
 - Renders do Blender como camada de referência (convenção `pXX_qYY`).
-- Balão com forma gerado pelo roteiro (hoje só o texto é posicionado).
 - Exportação e renomeação em lote no manager (segue no CPMT).
 - Hachura desenhada à mão via presets de pincel específicos.
-- Atualizar textos das páginas geradas a partir do roteiro (regravar a camada
-  `text`) e camada de referência (v0.3).
+- Atualizar textos das páginas geradas e camada de referência.
+- Página criada por "Criar próxima página" com guias de margem já aplicadas
+  (hoje as guias são um botão separado).

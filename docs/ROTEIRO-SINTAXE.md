@@ -1,5 +1,10 @@
 # Sintaxe do roteiro (HQ Tools)
 
+> **Aviso (v0.3.0):** a aba Roteiro saiu da interface do plugin. Os módulos
+> puros (`hq_tools/modules/pages/roteiro.py` e `generator.py`) e os testes
+> continuam no repositório como referência e para criação de páginas por
+> script; este documento registra a sintaxe original.
+
 Formato de texto simples, um arquivo por capítulo, uma página por bloco.
 Palavras-chave sem acento e sem distinção de maiúsculas; linhas em branco e
 comentários (`#`) são ignorados.

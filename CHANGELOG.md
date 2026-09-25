@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.3.0] — 2026-09-25
+
+### Adicionado
+
+- Gerenciador de páginas: "Novo projeto..." cria a pasta do projeto (diálogo
+  com nome, pasta base e subpasta); "Criar próxima página" gera a página na
+  pasta do projeto (com painel, camadas e contorno) e atualiza as miniaturas;
+  "Guias de margem" cria 12 guias (0,5 / 1 / 1,5 cm por lado) no documento
+  ativo.
+- Docker "HQ Tools: biblioteca": cria balões, painéis e onomatopeias do autor
+  em documento 15 x 15 cm a 300 dpi, exporta a camada vetorial como SVG na
+  pasta da biblioteca (subpastas por tipo) e insere com duplo clique.
+- Docker "HQ Tools: onomatopeias": 8 amostras e pasta própria para modelos
+  criados no Inkscape.
+- Kit de HQ: fontes OFL (Bangers, Comic Relief Regular/Bold, Patrick Hand)
+  instaláveis com um clique; balões de domínio público (CC0/PD) copiados na
+  primeira execução; `CREDITS.md` com todas as licenças.
+- Balões: botão "Símbolos do Krita" que abre o docker nativo do Krita.
+
+### Corrigido
+
+- Projetos do CPMT: o arquivo real é `comicConfig.json` (sem "s") em UTF-16;
+  agora é lido corretamente, com fallback para o nome antigo.
+- Aba Roteiro removida da interface (módulos puros preservados no repo).
+- Slug de nomes de arquivos sem acentos quebrados (normalização Unicode).
+
 ## [0.2.0] — 2026-09-25
 
 ### Adicionado

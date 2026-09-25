@@ -79,14 +79,37 @@ Diferenças entre o dump do bloco 2/3 e o que o plugin gera (ver
   exportação ACBF/EPUB coleta os textos.
 - Adicionar um SVG próprio na pasta e clicar Atualizar.
 
-### 3b. Símbolos do Krita (aba dos balões)
+### 3b. Símbolos do Krita (botão nos balões)
 
-- Aba "Símbolos do Krita": aparecem as bibliotecas `BalloonSymbols.svg` e
-  `pepper_carrot_speech_bubbles.svg` com nomes e licença (miniaturas quando o
-  Qt conseguir renderizar; senão, quadrados com iniciais).
-- O botão e o duplo clique abrem o docker nativo "Bibliotecas de símbolos" do
-  Krita (a renderização e a inserção ficam por conta dele: arraste e solte no
-  canvas).
+- No docker de balões, o botão "Símbolos do Krita" abre o docker nativo
+  "Bibliotecas de símbolos" (título em pt_BR ou en, casado por substring).
+- Com o docker nativo aberto, arrastar um balão para o canvas funciona como o
+  Krita espera.
+
+### 3c. Kit de HQ (balões CC0 e fontes)
+
+- Primeira execução: a pasta padrão de balões recebe as amostras do plugin e
+  os 2 balões CC0/PD (`balao-fala-amada44.svg`, `balao-talk-to-me-cc0.svg`).
+- "Instalar fontes de HQ": as 3 fontes (Bangers, Comic Relief, Patrick Hand)
+  vão para `~/.local/share/fonts/hq_tools`; após reiniciar o Krita, aparecem
+  na ferramenta de texto. Conferir créditos em `CREDITS.md`.
+
+### 3d. Onomatopeias
+
+- Docker "HQ Tools: onomatopeias": 8 amostras na primeira execução; duplo
+  clique insere no grupo ativo como camada vetorial.
+- Adicionar um SVG próprio (Inkscape) na pasta e Atualizar.
+
+### 3e. Biblioteca do projeto
+
+- "Criar novo recurso": abre um documento 15 x 15 cm a 300 dpi com camada
+  vetorial "recurso".
+- Desenhar formas/texto e "Salvar recurso do documento": o SVG entra na
+  subpasta do tipo (baloes/paineis/onomatopeias) e a lista atualiza; o
+  documento pergunta se fecha.
+- Duplo clique no recurso insere no grupo ativo do documento da página.
+- Trocar a pasta da biblioteca (pode ser a pasta do projeto) e conferir a
+  listagem.
 
 ### 4. Paletas
 
@@ -96,21 +119,26 @@ Diferenças entre o dump do bloco 2/3 e o que o plugin gera (ver
 
 ### 5. Páginas (gerenciador)
 
-- Criar um projeto no CPMT (docker Comic Management > New Project).
-- No HQ Tools > Páginas > Projeto..., abrir o `comicsConfig.json` do projeto:
-  grade com miniaturas aparece.
-- Duplo clique abre a página; arrastar reordena e grava no `comicsConfig.json`
+- "Novo projeto...": nome + pasta base + subpasta marcada: a pasta é criada e
+  vira o projeto (grade vazia).
+- "Abrir projeto...": abrir o `comicConfig.json` de um projeto criado pelo
+  CPMT (agora o nome/encoding corretos são aceitos).
+- "Criar próxima página": gera a página (A4 300 dpi por padrão, configurável
+  em `pages.format`/`pages.dpi`), com fundo branco, grupo PageNN, painel com
+  margem, Sketch/Color/Ink e contorno; a miniatura aparece na grade. Em
+  projeto CPMT, a página é registrada no `comicConfig.json`.
+- "Guias de margem": no documento ativo, criam-se 12 guias (0,5 / 1 / 1,5 cm
+  por lado); conferir posições: 59/118/177 px a 300 dpi a partir de cada borda.
+  Atenção: substitui as guias existentes.
+- Duplo clique abre a página; arrastar reordena e grava no `comicConfig.json`
   (abrir o arquivo e conferir a ordem da lista `pages`).
 
-### 6. Páginas (roteiro)
+### 6. Páginas (roteiro) — removido
 
-- Aba Roteiro: usar o exemplo, escolher formato/DPI e "Gerar páginas" dentro
-  do projeto aberto.
-- Esperado: N arquivos `.kra` na pasta de páginas, registrados no
-  `comicsConfig.json`, cada um com grupo PageNN, `panels` (retângulos),
-  Sketch/Color/Ink, contorno multiplicado e `text` com falas.
-- Exportar via CPMT (ACBF ou EPUB) e conferir frames/texto por painel.
-- Testar `direcao rtl` e `layout 2x3`.
+A aba Roteiro saiu da interface na v0.3.0; os módulos puros
+(`modules/pages/roteiro.py` e `generator.py`) continuam no repositório como
+referência e para a criação de páginas por script, mas não são mais
+registrados no plugin.
 
 ### 7. Pincéis
 

@@ -13,10 +13,21 @@ Os quatro documentos originais de contexto do projeto estão em
 | Módulo | O que faz |
 |---|---|
 | Retículas e hachuras | Presets de retícula com LPI real (célula calculada pelo DPI do documento), aplicação como camada de preenchimento não destrutiva dentro do grupo do painel, meio-tom como máscara do filtro Halftone sobre tom pintado, tom com padrões do Krita, meio-tom colorido por canal (CMYK), edição da retícula já aplicada, máscara vazia para revelar pintando, mostrar área, reutilização de tons idênticos, posição do padrão e linhas de efeito/velocidade. |
-| Balões | Catálogo de balões vetoriais em SVG (amostras inclusas e pasta própria), inserção com um clique no grupo ativo, opção de camada `text` para o CPMT e aba com as bibliotecas de símbolos do Krita (BalloonSymbols, Pepper&Carrot e as que você instalar). |
+| Balões | Catálogo de balões vetoriais em SVG (amostras e kit CC0 na primeira execução, pasta própria), inserção com um clique no grupo ativo, opção de camada `text` para o CPMT, botão que abre o docker nativo "Bibliotecas de símbolos" e instalação das fontes de HQ inclusas. |
+| Onomatopeias | Catálogo de efeitos sonoros em SVG (8 amostras, pasta própria), inserção como vetor; crie os seus no Inkscape. |
+| Biblioteca do projeto | Cria os seus balões, painéis e onomatopeias dentro do Krita: "Criar novo recurso" abre um documento 15 x 15 cm a 300 dpi; "Salvar recurso do documento" exporta a camada vetorial como SVG na biblioteca; duplo clique insere no grupo ativo. |
 | Paletas | Templates de HQ e artísticas (tons, nanquim, pele, céu, vegetação, chapadas, Zorn, retrato, paisagem, amanhecer, noite, terra, pastel, aquarela, guache, acrílico, retrô, BD, super-herói, mangá, sépia), aplicação na cor de frente/fundo, instalação no Krita e visualização das paletas instaladas. |
-| Páginas | Gerenciador com miniaturas internas dos `.kra`, duplo clique para abrir e reordenação arrastando (gravada no projeto CPMT); gerador de páginas a partir de roteiro em sintaxe própria. |
+| Páginas | Gerenciador com miniaturas internas dos `.kra`: "Novo projeto..." cria uma pasta, "Abrir projeto..." lê um `comicConfig.json` do CPMT (agora com o nome e encoding corretos) e "Pasta..." abre qualquer pasta; duplo clique abre, arrastar reordena (gravado no CPMT), "Criar próxima página" gera uma página nova e "Guias de margem" cria 12 guias (0,5 / 1 / 1,5 cm por lado) no documento ativo. |
 | Pincéis | Conjuntos sugeridos (Rascunho, Contornos, Aquarela/Guache, Acrílico/Óleo, Retículas) com cartões de miniatura + nome, montados com os presets instalados no Krita; 16 slots com atalhos configuráveis; instalador de bundles de pincel. |
+
+## Kit de HQ (fontes e balões livres)
+
+O plugin acompanha um kit com licenças documentadas em `CREDITS.md`:
+
+- **Fontes** (SIL OFL 1.1): Bangers, Comic Relief (Regular/Bold) e Patrick
+  Hand, instaláveis com um clique no docker de balões;
+- **Balões** de domínio público (CC0/PD): copiados para a pasta padrão na
+  primeira execução.
 
 ## Instalação
 
@@ -47,14 +58,18 @@ Krita. Os dockers ficam em Configurações > Dockers com o prefixo "HQ Tools".
    filtro)"; o preset vira pontos ou linhas reativos ao tom. Em documento
    CMYKA, o modo "Cores por canal" usa os ângulos de impressão (15/75/0/45).
 3. **Balão**: duplo clique no modelo; o balão entra no grupo ativo como vetor.
-   A aba "Símbolos do Krita" insere os balões das bibliotecas do Krita.
-4. **Páginas**: crie um projeto no CPMT, abra o `comicsConfig.json` no
-   gerenciador e use a aba Roteiro para gerar páginas com painéis e falas.
+   Instale as fontes de HQ com um clique e, se quiser, crie os seus balões no
+   docker "Biblioteca do projeto".
+4. **Páginas**: "Novo projeto..." cria a pasta do projeto; "Criar próxima
+   página" gera a página (com painel e camadas) e atualiza as miniaturas;
+   "Guias de margem" cria 12 guias no documento ativo.
 5. **Pincéis**: navegue pelos conjuntos (Rascunho, Contornos, Aquarela/Guache,
    Acrílico/Óleo, Retículas), clique no cartão para ativar; botão direito
    atribui ao slot. Atalhos em Configurar Krita > Atalhos > Scripts > HQ Tools.
-6. **Linhas de efeito**: no docker de retículas, seção "Linhas de
-   efeito/velocidade": escolha foco ou paralelas e insira como vetor.
+6. **Linhas de efeito**: no docker de retículas, aba "Linhas de efeito":
+   escolha foco ou paralelas e insira como vetor.
+7. **Biblioteca do projeto**: "Criar novo recurso" abre o documento 15 x 15 cm
+   a 300 dpi; desenhe, "Salvar recurso do documento" e insira com duplo clique.
 
 ## Sintaxe do roteiro
 
