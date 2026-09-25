@@ -9,10 +9,11 @@ import unittest
 from hq_tools.core.cpmt import CPMTProject
 
 
-def make_project(root, name="Meu Projeto", location="pages"):
+def make_project(root, name="Meu Projeto", location="pages", legacy=False):
     config = {
         "projectName": name,
         "concept": "teste",
+        "language": "pt_BR",
         "pagesLocation": location,
         "exportLocation": "export",
         "templateLocation": "templates",
@@ -21,8 +22,10 @@ def make_project(root, name="Meu Projeto", location="pages"):
         "pages": [],
     }
     os.makedirs(os.path.join(root, location), exist_ok=True)
-    with open(os.path.join(root, "comicsConfig.json"), "w", encoding="utf-8") as handle:
-        json.dump(config, handle)
+    filename = "comicsConfig.json" if legacy else "comicConfig.json"
+    encoding = "utf-8" if legacy else "utf-16"
+    with open(os.path.join(root, filename), "w", encoding=encoding, newline="") as handle:
+        json.dump(config, handle, indent=4, sort_keys=True, ensure_ascii=False)
     return root
 
 
@@ -36,6 +39,16 @@ class TestCPMTProject(unittest.TestCase):
 
     def test_is_project(self):
         self.assertTrue(CPMTProject.is_project(self.root))
+
+    def test_legado_comicsconfig_utf8(self):
+        root = tempfile.mkdtemp(prefix="hq_tools_cpmt_")
+        try:
+            make_project(root, legacy=True)
+            self.assertTrue(CPMTProject.is_project(root))
+            project = CPMTProject(root)
+            self.assertEqual(project.project_name, "Meu Projeto")
+        finally:
+            shutil.rmtree(root, ignore_errors=True)
 
     def test_nome_da_proxima_pagina(self):
         project = CPMTProject(self.root)

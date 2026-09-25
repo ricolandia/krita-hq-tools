@@ -10,25 +10,40 @@ import os
 import re
 import tempfile
 
-CONFIG_NAME = "comicsConfig.json"
+CONFIG_NAMES = ("comicConfig.json", "comicsConfig.json")
 
 
 class CPMTProject:
-    """Acesso tolerante ao projeto CPMT em uma pasta."""
+    """Acesso tolerante ao projeto CPMT em uma pasta.
+
+    O CPMT grava ``comicConfig.json`` em UTF-16 (com BOM); o nome antigo
+    ``comicsConfig.json`` (UTF-8) continua sendo aceito na leitura.
+    """
 
     def __init__(self, root):
         self.root = os.path.abspath(root)
-        self.config_path = os.path.join(self.root, CONFIG_NAME)
-        if not os.path.isfile(self.config_path):
+        self.config_name = None
+        for name in CONFIG_NAMES:
+            if os.path.isfile(os.path.join(self.root, name)):
+                self.config_name = name
+                break
+        if self.config_name is None:
             raise FileNotFoundError(
-                "comicsConfig.json não encontrado em {0}".format(self.root)
+                "comicConfig.json não encontrado em {0}".format(self.root)
             )
-        with open(self.config_path, "r", encoding="utf-8") as handle:
+        self.config_path = os.path.join(self.root, self.config_name)
+        with open(self.config_path, "rb") as handle:
+            head = handle.read(2)
+        encoding = "utf-16" if head in (b"\xff\xfe", b"\xfe\xff") else "utf-8"
+        with open(self.config_path, "r", encoding=encoding) as handle:
             self.config = json.load(handle)
 
     @classmethod
     def is_project(cls, root):
-        return os.path.isfile(os.path.join(os.path.abspath(root), CONFIG_NAME))
+        root = os.path.abspath(root)
+        return any(
+            os.path.isfile(os.path.join(root, name)) for name in CONFIG_NAMES
+        )
 
     @property
     def project_name(self):
@@ -93,11 +108,11 @@ class CPMTProject:
     def save(self):
         directory = os.path.dirname(self.config_path)
         handle = tempfile.NamedTemporaryFile(
-            "w", encoding="utf-8", dir=directory, delete=False
+            "w", encoding="utf-16", newline="", dir=directory, delete=False
         )
         try:
             with handle:
-                json.dump(self.config, handle, indent=2, ensure_ascii=False)
+                json.dump(self.config, handle, indent=4, sort_keys=True, ensure_ascii=False)
             os.replace(handle.name, self.config_path)
         except OSError:
             try:
