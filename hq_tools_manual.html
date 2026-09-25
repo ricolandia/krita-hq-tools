@@ -36,13 +36,14 @@ inserir como camada vetorial no grupo ativo; crie os seus modelos no Inkscape
 e salve como SVG na pasta.</p>
 
 <h2>Biblioteca do projeto</h2>
-<p>Crie os seus balões, painéis e onomatopeias dentro do Krita:
-"Criar novo recurso" abre um documento quadrado de 15 x 15 cm a 300 dpi com uma
-camada vetorial; desenhe com formas e texto e clique em "Salvar recurso do
-documento" para exportar o desenho como SVG na pasta da biblioteca (subpastas
-por tipo). O recurso aparece na lista e é inserido no grupo ativo com um duplo
-clique. A pasta da biblioteca pode ser trocada (inclusive para a pasta do
-projeto).</p>
+<p>Crie os seus balões, painéis e onomatopeias dentro do Krita: escolha o tipo
+de camada (Vetorial ou Pintura) e "Criar novo recurso" abre um documento
+quadrado de 15 x 15 cm a 300 dpi. Vetorial: desenhe com formas e texto e
+salve como SVG. Pintura: desenhe com pincel e salve como PNG transparente,
+recortado pela camada ativa. O recurso aparece na lista e é inserido no grupo
+ativo com um duplo clique (PNG vira camada de pintura). A pasta da biblioteca
+pode ser trocada; ao criar um projeto pelo gerenciador, a biblioteca fica na
+subpasta <code>biblioteca</code> da pasta do projeto.</p>
 
 <h2>Paletas</h2>
 <p>Templates de paleta de HQ (tons, nanquim, pele, céu, vegetação, cores
@@ -52,16 +53,17 @@ chapadas) com aplicação direta na cor de frente ou de fundo. O botão
 no Krita.</p>
 
 <h2>Páginas</h2>
-<p>O gerenciador trabalha com a pasta do projeto: "Novo projeto..." cria a
-pasta, "Abrir projeto..." lê um <code>comicConfig.json</code> do CPMT e
-"Pasta..." abre qualquer pasta com arquivos <code>.kra</code>. Mostra as
-miniaturas internas das páginas, abre com duplo clique e permite reordenar
-arrastando (a ordem é gravada no projeto CPMT). "Criar próxima página" gera
-uma página nova na pasta do projeto (painel com margem, camadas Sketch, Color
-e Ink, contorno) e atualiza as miniaturas. "Guias de margem" cria 12 guias no
-documento ativo (0,5 / 1 / 1,5 cm por lado), substituindo as guias existentes.
-A opção de nomear a camada do balão como <code>text</code> faz o CPMT usar o
-conteúdo na exportação ACBF/EPUB.</p>
+<p>O gerenciador trabalha com a pasta do projeto: "Novo projeto..." usa a pasta
+da página atual salva (se a página não estiver salva, aparece o aviso "Salve a
+página atual em uma pasta. Essa pasta será a pasta do projeto."). O plugin
+cria o <code>comicConfig.json</code> do CPMT, as subpastas da biblioteca e de
+exportação na pasta. "Abrir projeto..." lê um projeto CPMT e "Pasta..." abre
+qualquer pasta com arquivos <code>.kra</code>. Mostra as miniaturas internas,
+abre com duplo clique e permite reordenar arrastando. "Criar próxima página"
+gera uma página nova na pasta do projeto e atualiza as miniaturas. "Guias de
+margem" cria 12 guias no documento ativo (0,5 / 1 / 1,5 cm por lado),
+substituindo as guias existentes. A opção de nomear a camada do balão como
+<code>text</code> faz o CPMT usar o conteúdo na exportação ACBF/EPUB.</p>
 
 <h2>Pincéis</h2>
 <p>Doze slots que ativam presets instalados no Krita. Escolha o preset de cada

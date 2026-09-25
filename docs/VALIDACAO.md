@@ -102,14 +102,17 @@ Diferenças entre o dump do bloco 2/3 e o que o plugin gera (ver
 
 ### 3e. Biblioteca do projeto
 
-- "Criar novo recurso": abre um documento 15 x 15 cm a 300 dpi com camada
-  vetorial "recurso".
-- Desenhar formas/texto e "Salvar recurso do documento": o SVG entra na
-  subpasta do tipo (baloes/paineis/onomatopeias) e a lista atualiza; o
-  documento pergunta se fecha.
+- "Criar novo recurso" (tipo de camada Vetorial ou Pintura): abre um documento
+  15 x 15 cm a 300 dpi com a camada "recurso".
+- Vetorial: desenhar formas/texto e "Salvar recurso do documento": SVG na
+  subpasta do tipo.
+- Pintura: desenhar com pincel e salvar: PNG transparente recortado pela
+  camada ativa (RGBA 8 bits); conferir transparência abrindo o PNG.
+- Inserir: SVG vira camada vetorial; PNG vira camada de pintura
+  (setPixelData; fallback camada de arquivo).
 - Duplo clique no recurso insere no grupo ativo do documento da página.
-- Trocar a pasta da biblioteca (pode ser a pasta do projeto) e conferir a
-  listagem.
+- Trocar a pasta da biblioteca (pode ser a pasta do projeto, criada por
+  "Novo projeto...") e conferir a listagem.
 
 ### 4. Paletas
 
@@ -119,10 +122,13 @@ Diferenças entre o dump do bloco 2/3 e o que o plugin gera (ver
 
 ### 5. Páginas (gerenciador)
 
-- "Novo projeto...": nome + pasta base + subpasta marcada: a pasta é criada e
-  vira o projeto (grade vazia).
+- "Novo projeto...": com a página atual salva, a pasta dela vira o projeto:
+  subpastas `biblioteca/{baloes,paineis,onomatopeias}`, `export`, `templates`,
+  `translations` e `comicConfig.json` (UTF-16) com a página em `pages`.
+- Sem documento ativo ou página não salva: aviso modal; "Salvar agora" abre o
+  diálogo e continua o fluxo com a pasta escolhida.
 - "Abrir projeto...": abrir o `comicConfig.json` de um projeto criado pelo
-  CPMT (agora o nome/encoding corretos são aceitos).
+  CPMT ou pelo próprio fluxo acima.
 - "Criar próxima página": gera a página (A4 300 dpi por padrão, configurável
   em `pages.format`/`pages.dpi`), com fundo branco, grupo PageNN, painel com
   margem, Sketch/Color/Ink e contorno; a miniatura aparece na grade. Em
@@ -132,6 +138,12 @@ Diferenças entre o dump do bloco 2/3 e o que o plugin gera (ver
   Atenção: substitui as guias existentes.
 - Duplo clique abre a página; arrastar reordena e grava no `comicConfig.json`
   (abrir o arquivo e conferir a ordem da lista `pages`).
+
+### 5b. Avisos
+
+- Fluxos e decisões (salvar página, projeto criado, recurso salvo, falhas)
+  aparecem em janela modal; sucessos rápidos (pincel, retícula, inserção)
+  continuam no toast flutuante do canvas.
 
 ### 6. Páginas (roteiro) — removido
 

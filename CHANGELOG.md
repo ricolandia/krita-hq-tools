@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.3.1] — 2026-09-25
+
+### Adicionado
+
+- "Novo projeto..." agora usa a pasta da página atual salva: sem documento ou
+  página não salva, aviso modal "Salve a página atual em uma pasta. Essa pasta
+  será a pasta do projeto."; cria `comicConfig.json` (CPMT, UTF-16) com a
+  página registrada, subpastas `biblioteca/{baloes,paineis,onomatopeias}`,
+  `export`, `templates` e `translations`, e aponta a biblioteca para a pasta
+  do projeto.
+- Biblioteca do projeto com dois tipos de camada: Vetorial (SVG via `toSvg`)
+  e Pintura (PNG transparente recortado pela camada ativa, via `pixelData` +
+  `QImage`); inserção de PNG como camada de pintura (`setPixelData`, com
+  fallback para camada de arquivo); lista com `.svg` e `.png`.
+- Avisos mistos: modais (`QMessageBox`) para fluxos e decisões; toast
+  flutuante para sucessos rápidos.
+- Polimento de interface: grupos (`QGroupBox`), ícones de tema
+  (`compat.standard_icon`) e tooltips nos dockers de páginas e biblioteca.
+
+### Corrigido
+
+- Nada quebrado; ajustes de compatibilidade (enums PyQt5/PyQt6) nos dockers
+  novos.
+
 ## [0.3.0] — 2026-09-25
 
 ### Adicionado
