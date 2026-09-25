@@ -43,6 +43,17 @@ class HQTools(Extension):
                 )
             )
 
+        if modules.get("onomatopeias", True):
+            from .modules.onomatopeias.docker import OnomatopoeiasDocker
+
+            instance.addDockWidgetFactory(
+                DockWidgetFactory(
+                    "hq_tools_onomatopeias",
+                    DockWidgetFactoryBase.DockRight,
+                    OnomatopoeiasDocker,
+                )
+            )
+
         if modules.get("palettes", True):
             from .modules.palettes.docker import PalettesDocker
 
@@ -62,6 +73,17 @@ class HQTools(Extension):
                     "hq_tools_pages",
                     DockWidgetFactoryBase.DockRight,
                     PagesDocker,
+                )
+            )
+
+        if modules.get("biblioteca", True):
+            from .modules.biblioteca.docker import BibliotecaDocker
+
+            instance.addDockWidgetFactory(
+                DockWidgetFactory(
+                    "hq_tools_biblioteca",
+                    DockWidgetFactoryBase.DockRight,
+                    BibliotecaDocker,
                 )
             )
 
