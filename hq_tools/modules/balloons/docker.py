@@ -1,21 +1,19 @@
-"""Docker de balões (com aba de símbolos do Krita).
+"""Docker de balões (com kit de HQ).
 
-Mostra os modelos SVG de uma pasta (própria do usuário por padrão e amostras
-do plugin) e insere o balão escolhido como camada vetorial no grupo ativo.
-A aba "Símbolos do Krita" lista as bibliotecas de símbolos instaladas nos
-recursos do Krita (``symbols/*.svg``), com inserção em um clique dentro do
-grupo do painel.
+Catálogo de balões vetoriais em SVG: amostras do plugin na primeira execução
+e uma pasta própria para os seus modelos. O botão "Símbolos do Krita" abre o
+docker nativo "Bibliotecas de símbolos" para as bibliotecas instaladas.
+Inclui também a instalação das fontes de HQ que acompanham o plugin.
 """
 
 import os
 import shutil
+import subprocess
 
 from krita import DockWidget, Krita
 
 from ...core import krita_helpers as helpers
 from ...core.compat import (
-    ALIGN_CENTER_FULL,
-    ANTIALIASING,
     ICON_MODE,
     IMAGE_FORMAT_ARGB32,
     LIST_ADJUST,
@@ -31,14 +29,19 @@ from ...core.compat import (
 )
 from ...core.config import Config
 from ...core.paths import BALLOONS_DIR
-from . import symbols as symbols_lib
 
 SAMPLES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "samples")
-
-SYMBOL_LICENSES = {
-    "BalloonSymbols.svg": "Domínio público (Martin Owens, Tavmjong Bah, 2013)",
-    "pepper_carrot_speech_bubbles.svg": "CC-BY-SA 4.0 (David Revoy)",
-}
+KIT_CC0_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "resources",
+    "balloons-cc0",
+)
+KIT_FONTS_DIR = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "resources", "fonts"
+)
+FONTS_TARGET = os.path.join(
+    os.path.expanduser("~"), ".local", "share", "fonts", "hq_tools"
+)
 
 
 def ensure_default_folder(config):
@@ -52,6 +55,13 @@ def ensure_default_folder(config):
                     shutil.copy2(
                         os.path.join(SAMPLES_DIR, name), os.path.join(folder, name)
                     )
+            if os.path.isdir(KIT_CC0_DIR):
+                for name in sorted(os.listdir(KIT_CC0_DIR)):
+                    if name.lower().endswith(".svg"):
+                        shutil.copy2(
+                            os.path.join(KIT_CC0_DIR, name),
+                            os.path.join(folder, name),
+                        )
     return folder
 
 
@@ -76,12 +86,8 @@ class BalloonsDocker(DockWidget):
         self.setWindowTitle("HQ Tools: balões")
         self.config = Config()
         self.folder = ensure_default_folder(self.config)
-        self.libraries = {}
-        self._sources = {}
-        self._renderers = {}
         self._build_ui()
         self.refresh()
-        self._load_symbol_libraries()
 
     def canvasChanged(self, canvas):
         pass
@@ -90,16 +96,6 @@ class BalloonsDocker(DockWidget):
         widgets = QtWidgets
         main = widgets.QWidget(self)
         layout = widgets.QVBoxLayout(main)
-        self.tabs = widgets.QTabWidget()
-        layout.addWidget(self.tabs, 1)
-        self.tabs.addTab(self._build_balloons_tab(), "Balões")
-        self.tabs.addTab(self._build_symbols_tab(), "Símbolos do Krita")
-        self.setWidget(main)
-
-    def _build_balloons_tab(self):
-        widgets = QtWidgets
-        tab = widgets.QWidget()
-        layout = widgets.QVBoxLayout(tab)
 
         folder_row = widgets.QHBoxLayout()
         self.lbl_folder = widgets.QLabel("")
@@ -139,58 +135,30 @@ class BalloonsDocker(DockWidget):
         buttons.addWidget(button_refresh)
         layout.addLayout(buttons)
 
+        kit_row = widgets.QHBoxLayout()
+        button_symbols = widgets.QPushButton("Símbolos do Krita")
+        button_symbols.setToolTip(
+            "Abre o docker nativo 'Bibliotecas de símbolos' do Krita"
+        )
+        button_symbols.clicked.connect(self.open_native_symbols_docker)
+        kit_row.addWidget(button_symbols)
+        button_fonts = widgets.QPushButton("Instalar fontes de HQ")
+        button_fonts.setToolTip(
+            "Copia as fontes inclusas (OFL) para o sistema e atualiza o cache"
+        )
+        button_fonts.clicked.connect(self.install_kit_fonts)
+        kit_row.addWidget(button_fonts)
+        layout.addLayout(kit_row)
+
         hint = widgets.QLabel(
-            "Os modelos são SVGs comuns: você pode desenhar os seus e salvá-los "
-            "na pasta acima. Clique duas vezes para inserir no grupo ativo."
+            "Os modelos são SVGs comuns: você pode desenhar os seus (Inkscape) e "
+            "salvá-los na pasta acima. Clique duas vezes para inserir no grupo "
+            "ativo."
         )
         hint.setWordWrap(True)
         layout.addWidget(hint)
-        return tab
 
-    def _build_symbols_tab(self):
-        widgets = QtWidgets
-        tab = widgets.QWidget()
-        layout = widgets.QVBoxLayout(tab)
-
-        row = widgets.QHBoxLayout()
-        row.addWidget(widgets.QLabel("Biblioteca:"))
-        self.cmb_library = widgets.QComboBox()
-        self.cmb_library.currentIndexChanged.connect(self._load_symbols_list)
-        row.addWidget(self.cmb_library, 1)
-        button_reload = widgets.QPushButton("Atualizar")
-        button_reload.clicked.connect(self._load_symbol_libraries)
-        row.addWidget(button_reload)
-        layout.addLayout(row)
-
-        self.lbl_license = widgets.QLabel("")
-        self.lbl_license.setWordWrap(True)
-        layout.addWidget(self.lbl_license)
-
-        self.list_symbols = widgets.QListWidget()
-        self.list_symbols.setViewMode(ICON_MODE)
-        self.list_symbols.setIconSize(QtCore.QSize(96, 96))
-        self.list_symbols.setResizeMode(LIST_ADJUST)
-        self.list_symbols.setMovement(LIST_STATIC)
-        self.list_symbols.setWordWrap(True)
-        self.list_symbols.itemDoubleClicked.connect(self.open_native_docker)
-        layout.addWidget(self.list_symbols, 1)
-
-        button_insert = widgets.QPushButton("Abrir docker de símbolos do Krita")
-        button_insert.setToolTip(
-            "Abre o docker nativo 'Bibliotecas de símbolos' para arrastar e soltar"
-        )
-        button_insert.clicked.connect(self.open_native_docker)
-        layout.addWidget(button_insert)
-
-        hint = widgets.QLabel(
-            "A lista mostra as bibliotecas instaladas em "
-            "~/.local/share/krita/symbols. A inserção usa o docker nativo do "
-            "Krita (arraste o símbolo para o canvas), que renderiza tudo o que "
-            "estas bibliotecas usam."
-        )
-        hint.setWordWrap(True)
-        layout.addWidget(hint)
-        return tab
+        self.setWidget(main)
 
     def pick_folder(self):
         folder = QtWidgets.QFileDialog.getExistingDirectory(
@@ -260,104 +228,7 @@ class BalloonsDocker(DockWidget):
         )
         helpers.show_message("Balão inserido: {0}".format(item.text()))
 
-    # ------------------------------------------------------------------ símbolos
-
-    def _load_symbol_libraries(self):
-        self.libraries = symbols_lib.list_libraries()
-        self._sources = {}
-        self._renderers = {}
-        for name, library in self.libraries.items():
-            try:
-                with open(library["path"], "r", encoding="utf-8", errors="replace") as handle:
-                    self._sources[name] = handle.read()
-            except OSError:
-                self._sources[name] = ""
-            if QSvgRenderer is not None:
-                try:
-                    self._renderers[name] = QSvgRenderer(library["path"])
-                except (TypeError, RuntimeError):
-                    self._renderers[name] = None
-            else:
-                self._renderers[name] = None
-        self.cmb_library.blockSignals(True)
-        self.cmb_library.clear()
-        for name in sorted(self.libraries.keys()):
-            self.cmb_library.addItem(name, name)
-        self.cmb_library.blockSignals(False)
-        self._load_symbols_list()
-
-    def _load_symbols_list(self):
-        self.list_symbols.clear()
-        name = self.cmb_library.currentData()
-        library = self.libraries.get(name)
-        if not library:
-            self.lbl_license.setText("Nenhuma biblioteca de símbolos encontrada.")
-            return
-        self.lbl_license.setText(
-            "Licença: {0}".format(
-                SYMBOL_LICENSES.get(name, "confira os metadados do arquivo")
-            )
-        )
-        renderer = self._renderers.get(name)
-        source = self._sources.get(name, "")
-        for symbol in library["symbols"]:
-            item = QtWidgets.QListWidgetItem(symbol["title"])
-            item.setToolTip("{0} ({1})".format(symbol["id"], symbol["kind"]))
-            item.setData(USER_ROLE, symbol["id"])
-            self.list_symbols.addItem(item)
-
-            pixmap = self._render_symbol(renderer, symbol["id"])
-            if pixmap is None and source:
-                try:
-                    wrapper = symbols_lib.extract_symbol_svg(source, symbol["id"])
-                    wrap_renderer = QSvgRenderer(bytes(wrapper, "utf-8"))
-                    if wrap_renderer.isValid():
-                        pixmap = self._render_symbol(wrap_renderer, symbol["id"])
-                except (ValueError, TypeError, RuntimeError):
-                    pixmap = None
-            if pixmap is None:
-                pixmap = self._fallback_icon(symbol["title"])
-            item.setIcon(QtGui.QIcon(pixmap))
-
-    def _fallback_icon(self, text, size=96):
-        pixmap = QPixmap(size, size)
-        pixmap.fill(QtGui.QColor("#3a3a3a"))
-        painter = QtGui.QPainter(pixmap)
-        painter.setPen(QtGui.QColor("#ffffff"))
-        font = painter.font()
-        font.setBold(True)
-        font.setPointSize(26)
-        painter.setFont(font)
-        painter.drawText(pixmap.rect(), ALIGN_CENTER_FULL, str(text)[:2].upper())
-        painter.end()
-        return pixmap
-
-    def _render_symbol(self, renderer, element_id, size=96):
-        """Renderiza o elemento centralizado na imagem (com recorte pelos bounds)."""
-        if renderer is None or not renderer.isValid():
-            return None
-        try:
-            bounds = renderer.boundsOnElement(element_id)
-        except (TypeError, RuntimeError):
-            return None
-        if bounds is None or bounds.isEmpty():
-            return None
-        scale = size / max(bounds.width(), bounds.height())
-        image = QImage(size, size, IMAGE_FORMAT_ARGB32)
-        image.fill(TRANSPARENT)
-        painter = QtGui.QPainter(image)
-        painter.setRenderHint(ANTIALIASING, True)
-        painter.translate(-bounds.x() * scale, -bounds.y() * scale)
-        painter.scale(scale, scale)
-        try:
-            renderer.render(painter, element_id)
-        except (TypeError, RuntimeError):
-            painter.end()
-            return None
-        painter.end()
-        return QPixmap.fromImage(image)
-
-    def open_native_docker(self, *args):
+    def open_native_symbols_docker(self, *args):
         """Mostra o docker nativo 'Bibliotecas de símbolos' do Krita."""
         window = Krita.instance().activeWindow()
         if window is None:
@@ -373,4 +244,38 @@ class BalloonsDocker(DockWidget):
         helpers.show_message(
             "Docker 'Bibliotecas de símbolos' não encontrado; habilite em "
             "Configurações > Dockers."
+        )
+
+    def install_kit_fonts(self):
+        """Instala as fontes de HQ (OFL) inclusas no plugin."""
+        if not os.path.isdir(KIT_FONTS_DIR):
+            helpers.show_message("Pasta de fontes não encontrada no plugin.")
+            return
+        try:
+            os.makedirs(FONTS_TARGET, exist_ok=True)
+        except OSError as error:
+            helpers.show_message("Falha ao criar a pasta de fontes: {0}".format(error))
+            return
+        installed = 0
+        for name in sorted(os.listdir(KIT_FONTS_DIR)):
+            if name.lower().endswith((".ttf", ".otf")):
+                try:
+                    shutil.copy2(
+                        os.path.join(KIT_FONTS_DIR, name),
+                        os.path.join(FONTS_TARGET, name),
+                    )
+                    installed += 1
+                except OSError:
+                    continue
+        try:
+            subprocess.run(
+                ["fc-cache", "-f", FONTS_TARGET],
+                timeout=60,
+                capture_output=True,
+            )
+        except (OSError, subprocess.SubprocessError):
+            pass
+        helpers.show_message(
+            "{0} fonte(s) instalada(s). Reinicie o Krita para listá-las na "
+            "ferramenta de texto.".format(installed)
         )
