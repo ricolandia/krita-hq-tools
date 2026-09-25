@@ -1,0 +1,15 @@
+GIMP Palette
+Name: HQ Tons
+Columns: 11
+# Tons de cinza para retículas e sombras
+255 255 255	Branco
+242 242 242	Cinza 5
+230 230 230	Cinza 10
+217 217 217	Cinza 15
+204 204 204	Cinza 20
+191 191 191	Cinza 25
+178 178 178	Cinza 30
+153 153 153	Cinza 40
+128 128 128	Cinza 50
+102 102 102	Cinza 60
+0 0 0	Preto
