@@ -50,6 +50,28 @@ class TestBiblioteca(unittest.TestCase):
         nome = core.nome_padrao("painel")
         self.assertTrue(nome.startswith("painel-"))
 
+    def test_salvar_bytes_png(self):
+        path = core.salvar_bytes(b"\x89PNG\r\n\x1a\n", self.base, "balao", "Pintura", ".png")
+        self.assertTrue(path.endswith(".png"))
+        self.assertTrue(os.path.isfile(path))
+        with open(path, "rb") as handle:
+            self.assertEqual(handle.read(8), b"\x89PNG\r\n\x1a\n")
+
+    def test_listar_svg_e_png(self):
+        core.salvar_recurso("<svg/>", self.base, "balao", "Vetor")
+        core.salvar_bytes(b"dados", self.base, "balao", "Pintura", ".png")
+        items = core.listar_recursos(self.base, "balao")
+        nomes = [nome for nome, _ in items]
+        self.assertIn("vetor", nomes)
+        self.assertIn("pintura", nomes)
+
+    def test_caminho_livre_com_extensao(self):
+        primeiro = core.salvar_bytes(b"a", self.base, "balao", "teste", ".png")
+        pasta = core.pasta_do_tipo(self.base, "balao")
+        segundo = core.caminho_livre(pasta, "teste", ".png")
+        self.assertTrue(primeiro.endswith(".png"))
+        self.assertNotEqual(primeiro, segundo)
+
 
 if __name__ == "__main__":
     unittest.main()

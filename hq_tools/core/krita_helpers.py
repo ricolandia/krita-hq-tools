@@ -28,6 +28,24 @@ def show_message(text, timeout=4000):
             pass
 
 
+def modal_parent():
+    """Widget pai para janelas modais (QMainWindow do Krita), ou None."""
+    window = app().activeWindow()
+    if window is not None:
+        try:
+            return window.qwindow()
+        except (AttributeError, RuntimeError):
+            pass
+    return None
+
+
+def show_info(title, text):
+    """Aviso modal para fluxos e decisões importantes."""
+    from .compat import QtWidgets
+
+    QtWidgets.QMessageBox.information(modal_parent(), title, text)
+
+
 def find_filter(*names):
     """Procura um filtro instalado pelo id, tolerando variações de nome."""
     wanted = {name.lower() for name in names}

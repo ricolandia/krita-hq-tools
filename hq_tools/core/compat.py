@@ -58,8 +58,23 @@ QSize = QtCore.QSize
 
 if QT_VERSION == 6:
     ANTIALIASING = QtGui.QPainter.RenderHint.Antialiasing
+    IMAGE_FORMAT_RGBA8888 = QtGui.QImage.Format.Format_RGBA8888
 else:
     ANTIALIASING = QtGui.QPainter.Antialiasing
+    IMAGE_FORMAT_RGBA8888 = QtGui.QImage.Format_RGBA8888
+
+
+def standard_icon(name):
+    """Ícone de tema do Qt a partir do nome do QStyle.StandardPixmap."""
+    style = QtWidgets.QApplication.style()
+    if style is None:  # pragma: no cover
+        return QIcon()
+    if QT_VERSION == 6:
+        enum = QtWidgets.QStyle.StandardPixmap
+    else:
+        enum = QtWidgets.QStyle
+    pixmap = style.standardPixmap(getattr(enum, name, enum.SP_FileIcon))
+    return QIcon(pixmap)
 
 if QT_VERSION == 6:
     IMAGE_FORMAT_ARGB32 = QtGui.QImage.Format.Format_ARGB32
@@ -93,6 +108,8 @@ __all__ = [
     "QPixmap",
     "QSize",
     "ANTIALIASING",
+    "IMAGE_FORMAT_RGBA8888",
+    "standard_icon",
     "IMAGE_FORMAT_ARGB32",
     "TRANSPARENT",
     "LIST_ADJUST",

@@ -45,27 +45,25 @@ def nome_padrao(tipo):
     return "{0}-{1}".format(tipo, time.strftime("%Y%m%d-%H%M%S"))
 
 
-def caminho_livre(folder, nome):
-    """Caminho de arquivo .svg sem colisão (acrescenta sufixo numérico)."""
+def caminho_livre(folder, nome, extensao=".svg"):
+    """Caminho de arquivo sem colisão (acrescenta sufixo numérico)."""
     base = slugify(nome)
-    candidato = os.path.join(folder, "{0}.svg".format(base))
+    candidato = os.path.join(folder, "{0}{1}".format(base, extensao))
     indice = 2
     while os.path.exists(candidato):
-        candidato = os.path.join(folder, "{0}-{1}.svg".format(base, indice))
+        candidato = os.path.join(folder, "{0}-{1}{2}".format(base, indice, extensao))
         indice += 1
     return candidato
 
 
-def salvar_recurso(svg_text, base, tipo, nome):
-    """Salva o SVG na biblioteca e devolve o caminho criado."""
+def salvar_bytes(dados, base, tipo, nome, extensao=".svg"):
+    """Salva bytes (SVG ou PNG) na biblioteca e devolve o caminho criado."""
     folder = pasta_do_tipo(base, tipo)
-    path = caminho_livre(folder, nome)
-    handle = tempfile.NamedTemporaryFile(
-        "w", encoding="utf-8", dir=folder, delete=False
-    )
+    path = caminho_livre(folder, nome, extensao)
+    handle = tempfile.NamedTemporaryFile("wb", dir=folder, delete=False)
     try:
         with handle:
-            handle.write(svg_text)
+            handle.write(dados)
         os.replace(handle.name, path)
     except OSError:
         try:
@@ -76,8 +74,13 @@ def salvar_recurso(svg_text, base, tipo, nome):
     return path
 
 
+def salvar_recurso(svg_text, base, tipo, nome):
+    """Salva o SVG na biblioteca e devolve o caminho criado."""
+    return salvar_bytes(svg_text.encode("utf-8"), base, tipo, nome, ".svg")
+
+
 def listar_recursos(base, tipo):
-    """Lista (nome sem extensão, caminho) dos SVGs da subpasta do tipo."""
+    """Lista (nome sem extensão, caminho) dos recursos da subpasta do tipo."""
     folder = pasta_do_tipo(base, tipo)
     try:
         names = sorted(os.listdir(folder))
@@ -85,7 +88,7 @@ def listar_recursos(base, tipo):
         return []
     resultado = []
     for name in names:
-        if name.lower().endswith(".svg"):
+        if name.lower().endswith((".svg", ".png")):
             resultado.append((os.path.splitext(name)[0], os.path.join(folder, name)))
     return resultado
 

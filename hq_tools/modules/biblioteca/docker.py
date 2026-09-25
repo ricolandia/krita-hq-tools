@@ -1,10 +1,10 @@
 """Docker "biblioteca do projeto": cria e guarda os recursos do autor.
 
-Balões, painéis e onomatopeias criados pelo próprio autor: o botão "Criar novo
-recurso" abre um documento quadrado (15 x 15 cm a 300 dpi); depois de desenhar
-na camada vetorial, "Salvar recurso do documento" exporta o desenho como SVG
-na pasta da biblioteca e já aparece na lista, pronto para inserir com um
-clique dentro do grupo ativo.
+O autor pode criar o recurso como vetorial (camada de formas) ou como pintura
+(camada de desenho comum). O vetorial é salvo como SVG (``toSvg``); a pintura
+é salva como PNG transparente recortado pela própria camada ativa. Os dois
+tipos aparecem na lista e são inseridos no grupo ativo com um duplo clique
+(SVG vira camada vetorial; PNG vira camada de pintura).
 """
 
 import os
@@ -13,10 +13,15 @@ from krita import DockWidget, Krita
 
 from ...core import krita_helpers as helpers
 from ...core.compat import (
+    DIALOG_NO,
+    DIALOG_YES,
     ICON_MODE,
     IMAGE_FORMAT_ARGB32,
+    IMAGE_FORMAT_RGBA8888,
+    KEEP_ASPECT,
     LIST_ADJUST,
     LIST_STATIC,
+    SMOOTH_TRANSFORMATION,
     QImage,
     QPixmap,
     QSvgRenderer,
@@ -25,12 +30,15 @@ from ...core.compat import (
     QtCore,
     QtGui,
     QtWidgets,
+    standard_icon,
 )
 from ...core.config import Config
 from ...core.paths import BIBLIOTECA_DIR
 from . import core as lib
 
 TAMANHO = lib.tamanho_novo_documento()
+
+MODOS_CAMADA = (("Vetorial (formas)", "vetorial"), ("Pintura (pincel)", "pintura"))
 
 
 def render_svg_thumbnail(path, size=120):
@@ -45,6 +53,22 @@ def render_svg_thumbnail(path, size=120):
     renderer.render(painter)
     painter.end()
     return QPixmap.fromImage(image)
+
+
+def render_png_thumbnail(path, size=120):
+    pixmap = QPixmap(path)
+    if pixmap.isNull():
+        return None
+    return pixmap.scaled(size, size, KEEP_ASPECT, SMOOTH_TRANSFORMATION)
+
+
+def _qimage_bytes(image):
+    bits = image.constBits()
+    size = image.sizeInBytes()
+    try:
+        return bytes(bits.asstring(size))
+    except AttributeError:
+        return bits.tobytes()
 
 
 class BibliotecaDocker(DockWidget):
@@ -67,18 +91,40 @@ class BibliotecaDocker(DockWidget):
         main = widgets.QWidget(self)
         layout = widgets.QVBoxLayout(main)
 
+        group_lib = widgets.QGroupBox("Biblioteca")
+        lib_layout = widgets.QVBoxLayout(group_lib)
         folder_row = widgets.QHBoxLayout()
         self.lbl_folder = widgets.QLabel("")
         self.lbl_folder.setWordWrap(True)
         folder_row.addWidget(self.lbl_folder, 1)
         button_pick = widgets.QPushButton("Pasta...")
+        button_pick.setIcon(standard_icon("SP_DirOpenIcon"))
         button_pick.clicked.connect(self.pick_folder)
         folder_row.addWidget(button_pick)
         button_open = widgets.QPushButton("Abrir")
         button_open.clicked.connect(self.open_folder)
         folder_row.addWidget(button_open)
-        layout.addLayout(folder_row)
+        lib_layout.addLayout(folder_row)
+        layout.addWidget(group_lib)
 
+        group_new = widgets.QGroupBox("Recurso novo")
+        new_layout = widgets.QHBoxLayout(group_new)
+        new_layout.addWidget(widgets.QLabel("Tipo de camada:"))
+        self.cmb_camada = widgets.QComboBox()
+        for rotulo, valor in MODOS_CAMADA:
+            self.cmb_camada.addItem(rotulo, valor)
+        new_layout.addWidget(self.cmb_camada, 1)
+        button_new = widgets.QPushButton("Criar novo recurso")
+        button_new.setIcon(standard_icon("SP_FileDialogNewFolder"))
+        button_new.setToolTip(
+            "Abre um documento 15 x 15 cm a 300 dpi para desenhar o recurso"
+        )
+        button_new.clicked.connect(self.create_resource)
+        new_layout.addWidget(button_new)
+        layout.addWidget(group_new)
+
+        group_list = widgets.QGroupBox("Recursos")
+        list_layout = widgets.QVBoxLayout(group_list)
         tipo_row = widgets.QHBoxLayout()
         tipo_row.addWidget(widgets.QLabel("Tipo:"))
         self.cmb_tipo = widgets.QComboBox()
@@ -87,42 +133,38 @@ class BibliotecaDocker(DockWidget):
         self.cmb_tipo.currentIndexChanged.connect(self.refresh)
         tipo_row.addWidget(self.cmb_tipo, 1)
         button_refresh = widgets.QPushButton("Atualizar")
+        button_refresh.setIcon(standard_icon("SP_BrowserReload"))
         button_refresh.clicked.connect(self.refresh)
         tipo_row.addWidget(button_refresh)
-        layout.addLayout(tipo_row)
+        list_layout.addLayout(tipo_row)
 
         self.list_items = widgets.QListWidget()
         self.list_items.setViewMode(ICON_MODE)
-        self.list_items.setIconSize(QtCore.QSize(120, 120))
+        self.list_items.setIconSize(QtCore.QSize(110, 110))
         self.list_items.setResizeMode(LIST_ADJUST)
         self.list_items.setMovement(LIST_STATIC)
         self.list_items.setWordWrap(True)
         self.list_items.itemDoubleClicked.connect(self.insert_resource)
-        layout.addWidget(self.list_items, 1)
+        list_layout.addWidget(self.list_items, 1)
 
         buttons = widgets.QHBoxLayout()
-        button_new = widgets.QPushButton("Criar novo recurso")
-        button_new.setToolTip(
-            "Abre um documento 15 x 15 cm a 300 dpi para desenhar o recurso"
-        )
-        button_new.clicked.connect(self.create_resource)
-        buttons.addWidget(button_new)
         button_save = widgets.QPushButton("Salvar recurso do documento")
+        button_save.setIcon(standard_icon("SP_DialogSaveButton"))
         button_save.setToolTip(
-            "Exporta a camada vetorial do documento ativo como SVG na biblioteca"
+            "Exporta a camada ativa (vetorial ou pintura) para a biblioteca"
         )
         button_save.clicked.connect(self.save_resource)
         buttons.addWidget(button_save)
         button_insert = widgets.QPushButton("Inserir selecionado")
         button_insert.clicked.connect(self.insert_resource)
         buttons.addWidget(button_insert)
-        layout.addLayout(buttons)
+        list_layout.addLayout(buttons)
+        layout.addWidget(group_list, 1)
 
         hint = widgets.QLabel(
-            "1) 'Criar novo recurso' abre o documento quadrado. 2) Desenhe na "
-            "camada vetorial (formas e texto). 3) 'Salvar recurso do documento' "
-            "guarda o SVG na pasta da biblioteca. Depois é só inserir no grupo "
-            "ativo com duplo clique."
+            "1) Escolha o tipo e 'Criar novo recurso'. 2) Desenhe na camada "
+            "(formas/texto ou pincel). 3) 'Salvar recurso do documento' guarda "
+            "como SVG ou PNG transparente. 4) Duplo clique insere no grupo ativo."
         )
         hint.setWordWrap(True)
         layout.addWidget(hint)
@@ -149,7 +191,11 @@ class BibliotecaDocker(DockWidget):
             item = QtWidgets.QListWidgetItem(nome)
             item.setData(USER_ROLE, path)
             item.setToolTip(path)
-            pixmap = render_svg_thumbnail(path)
+            pixmap = None
+            if path.lower().endswith(".png"):
+                pixmap = render_png_thumbnail(path)
+            else:
+                pixmap = render_svg_thumbnail(path)
             if pixmap is not None:
                 item.setIcon(QtGui.QIcon(pixmap))
             self.list_items.addItem(item)
@@ -157,6 +203,7 @@ class BibliotecaDocker(DockWidget):
     def create_resource(self):
         tipo = self.cmb_tipo.currentData()
         rotulo = lib.TIPO_CHAVE[tipo]
+        modo = self.cmb_camada.currentData()
         document = Krita.instance().createDocument(
             TAMANHO, TAMANHO, "Novo {0}".format(rotulo),
             "RGBA", "U8", "sRGB built-in", lib.DPI_PADRAO,
@@ -164,13 +211,19 @@ class BibliotecaDocker(DockWidget):
         if document is None:
             helpers.show_message("Não foi possível criar o documento.")
             return
-        layer = document.createVectorLayer("recurso")
-        if layer is not None:
-            document.rootNode().addChildNode(layer, None)
-            document.setActiveNode(layer)
+        if modo == "pintura":
+            layer = document.createNode("recurso", "paintlayer")
+            if layer is not None:
+                document.rootNode().addChildNode(layer, None)
+                document.setActiveNode(layer)
+        else:
+            layer = document.createVectorLayer("recurso")
+            if layer is not None:
+                document.rootNode().addChildNode(layer, None)
+                document.setActiveNode(layer)
         document.refreshProjection()
         helpers.show_message(
-            "Desenhe o {0} na camada vetorial e use 'Salvar recurso do "
+            "Desenhe o {0} na camada 'recurso' e use 'Salvar recurso do "
             "documento'.".format(rotulo.lower())
         )
 
@@ -191,51 +244,126 @@ class BibliotecaDocker(DockWidget):
                     continue
         return None
 
+    def _paint_layer_with_content(self, document):
+        node = document.activeNode()
+        if node is not None and node.type() == "paintlayer":
+            try:
+                if not node.bounds().isEmpty():
+                    return node
+            except (AttributeError, RuntimeError):
+                pass
+        for child in document.rootNode().findChildNodes(recursive=True):
+            if child.type() == "paintlayer":
+                try:
+                    if not child.bounds().isEmpty():
+                        return child
+                except (AttributeError, RuntimeError):
+                    continue
+        return None
+
     def save_resource(self):
         document = helpers.active_document()
         if document is None:
-            helpers.show_message("Abra o documento do recurso desenhado.")
+            helpers.show_info("Biblioteca", "Abra o documento do recurso desenhado.")
             return
+        tipo = self.cmb_tipo.currentData()
+        rotulo = lib.TIPO_CHAVE[tipo]
+        modo = self.cmb_camada.currentData()
+
+        if modo == "pintura":
+            self._save_paint(document, tipo, rotulo)
+        else:
+            self._save_vector(document, tipo, rotulo)
+
+    def _save_vector(self, document, tipo, rotulo):
         layer = self._vector_layer_with_shapes(document)
         if layer is None:
-            helpers.show_message(
-                "O documento não tem uma camada vetorial com formas."
+            helpers.show_info(
+                "Biblioteca",
+                "O documento não tem uma camada vetorial com formas.",
             )
             return
         try:
             svg = layer.toSvg()
         except (AttributeError, RuntimeError) as error:
-            helpers.show_message("Não foi possível exportar a camada: {0}".format(error))
+            helpers.show_info("Biblioteca", "Não foi possível exportar: {0}".format(error))
             return
         if not svg or "<svg" not in svg.lower():
-            helpers.show_message("A camada vetorial está vazia.")
+            helpers.show_info("Biblioteca", "A camada vetorial está vazia.")
             return
-        tipo = self.cmb_tipo.currentData()
-        rotulo = lib.TIPO_CHAVE[tipo]
         nome, ok = QtWidgets.QInputDialog.getText(
-            self.widget(),
-            "Salvar {0}".format(rotulo.lower()),
-            "Nome do recurso:",
-            text=lib.nome_padrao(tipo),
+            self.widget(), "Salvar {0}".format(rotulo.lower()),
+            "Nome do recurso:", text=lib.nome_padrao(tipo),
         )
         if not ok or not nome.strip():
             return
         try:
             path = lib.salvar_recurso(svg, self.folder, tipo, nome.strip())
         except OSError as error:
-            helpers.show_message("Falha ao salvar: {0}".format(error))
+            helpers.show_info("Biblioteca", "Falha ao salvar: {0}".format(error))
             return
         self.refresh()
+        self._ask_close(document)
+        helpers.show_info("Biblioteca", "Recurso salvo: {0}".format(os.path.basename(path)))
+
+    def _save_paint(self, document, tipo, rotulo):
+        layer = self._paint_layer_with_content(document)
+        if layer is None:
+            helpers.show_info(
+                "Biblioteca",
+                "O documento não tem uma camada de pintura com conteúdo.",
+            )
+            return
+        if document.colorModel() != "RGBA" or document.colorDepth() != "U8":
+            helpers.show_info(
+                "Biblioteca",
+                "O documento não é RGBA 8 bits; exporte a camada como PNG "
+                "manualmente (Camada > Importar/Exportar).",
+            )
+            return
+        try:
+            bounds = layer.bounds()
+        except (AttributeError, RuntimeError):
+            helpers.show_info("Biblioteca", "Não foi possível ler a camada.")
+            return
+        if bounds is None or bounds.isEmpty():
+            helpers.show_info("Biblioteca", "A camada de pintura está vazia.")
+            return
+        data = layer.pixelData(bounds.x(), bounds.y(), bounds.width(), bounds.height())
+        image = QImage(
+            bytes(data), bounds.width(), bounds.height(), IMAGE_FORMAT_RGBA8888
+        )
+        if image.isNull():
+            helpers.show_info("Biblioteca", "Não foi possível montar a imagem.")
+            return
+        nome, ok = QtWidgets.QInputDialog.getText(
+            self.widget(), "Salvar {0}".format(rotulo.lower()),
+            "Nome do recurso:", text=lib.nome_padrao(tipo),
+        )
+        if not ok or not nome.strip():
+            return
+        try:
+            folder = lib.pasta_do_tipo(self.folder, tipo)
+            path = lib.caminho_livre(folder, nome.strip(), ".png")
+            if not image.save(path, "PNG"):
+                raise OSError("PNG não gravado")
+        except OSError as error:
+            helpers.show_info("Biblioteca", "Falha ao salvar: {0}".format(error))
+            return
+        self.refresh()
+        self._ask_close(document)
+        helpers.show_info("Biblioteca", "Recurso salvo: {0}".format(os.path.basename(path)))
+
+    def _ask_close(self, document):
         answer = QtWidgets.QMessageBox.question(
             self.widget(),
             "Fechar documento?",
             "Recurso salvo. Fechar o documento de desenho?",
-            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+            DIALOG_YES | DIALOG_NO,
         )
-        if answer == QtWidgets.QMessageBox.Yes:
+        if answer == DIALOG_YES:
             document.setModified(False)
             document.close()
-        helpers.show_message("Recurso salvo: {0}".format(os.path.basename(path)))
 
     def insert_resource(self):
         document = helpers.active_document()
@@ -247,13 +375,19 @@ class BibliotecaDocker(DockWidget):
             helpers.show_message("Escolha um recurso na lista.")
             return
         path = item.data(USER_ROLE)
+        if path.lower().endswith(".png"):
+            self._insert_paint(document, path, item.text())
+        else:
+            self._insert_vector(document, path, item.text())
+
+    def _insert_vector(self, document, path, nome):
         try:
             with open(path, "r", encoding="utf-8") as handle:
                 svg = handle.read()
         except OSError:
             helpers.show_message("Não foi possível ler o arquivo.")
             return
-        name = helpers.unique_layer_name(document, item.text())
+        name = helpers.unique_layer_name(document, nome)
         layer = document.createVectorLayer(name)
         if layer is None:
             helpers.show_message("Não foi possível criar a camada vetorial.")
@@ -264,4 +398,32 @@ class BibliotecaDocker(DockWidget):
             return
         helpers.attach(document, layer)
         document.setActiveNode(layer)
-        helpers.show_message("Recurso inserido: {0}".format(item.text()))
+        helpers.show_message("Recurso inserido: {0}".format(nome))
+
+    def _insert_paint(self, document, path, nome):
+        image = QImage(path)
+        if image.isNull():
+            helpers.show_message("Não foi possível ler o PNG.")
+            return
+        rgba = image.convertToFormat(IMAGE_FORMAT_RGBA8888)
+        width = rgba.width()
+        height = rgba.height()
+        name = helpers.unique_layer_name(document, nome)
+        layer = document.createNode(name, "paintlayer")
+        if layer is None:
+            helpers.show_message("Não foi possível criar a camada de pintura.")
+            return
+        data = _qimage_bytes(rgba)
+        if not layer.setPixelData(data, 0, 0, width, height):
+            file_layer = document.createFileLayer(
+                name, path, "KeepAspectRatio", "Bilinear"
+            )
+            if file_layer is None:
+                helpers.show_message("Não foi possível inserir o PNG.")
+                return
+            helpers.attach(document, file_layer)
+            document.setActiveNode(file_layer)
+        else:
+            helpers.attach(document, layer)
+            document.setActiveNode(layer)
+        helpers.show_message("Recurso inserido: {0}".format(nome))
