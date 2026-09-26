@@ -68,3 +68,8 @@ bash scripts/build-zip.sh                  # gerar ZIP instalável
 - Atualizar textos das páginas geradas e camada de referência.
 - Página criada por "Criar próxima página" com guias de margem já aplicadas
   (hoje as guias são um botão separado).
+- Balde com fechamento de falhas (proposta avaliada em `Novas_ideias/`, ver
+  `docs/IDEIAS-FUTURAS.md`): núcleo sem numpy, canais RGBA, camada nova
+  transparente; UX com seleção + X/Y manual; PoC de clique no canvas como
+  v1.1.
+- Presets de assistentes por painel; balão paramétrico (depende do Krita 6).
