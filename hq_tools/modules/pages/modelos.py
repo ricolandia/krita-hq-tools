@@ -42,3 +42,8 @@ def slug(nome):
     texto = "".join(c for c in texto if not unicodedata.combining(c))
     texto = _re.sub(r"[^a-z0-9]+", "-", texto.lower()).strip("-")
     return texto or "modelo"
+
+
+def nome_por_slug():
+    """Mapa slug -> nome amigável dos modelos padrão."""
+    return {slug(nome): nome for nome, _, _ in MODELOS}

@@ -643,6 +643,16 @@ class PagesDocker(DockWidget):
         cmb.addItem("Página atual (precisa estar salva)", "atual")
         for nome, caminho in self._listar_templates_krita().items():
             cmb.addItem("Template do Krita: {0}".format(nome), caminho)
+        nomes_por_slug = modelos_lib.nome_por_slug()
+        if os.path.isdir(MODELOS_DIR):
+            for nome in sorted(os.listdir(MODELOS_DIR)):
+                if not (nome.lower().endswith(".kra") and nome.startswith("modelo-")):
+                    continue
+                slug_arquivo = nome[len("modelo-"):-4]
+                rotulo = nomes_por_slug.get(slug_arquivo, nome)
+                caminho = os.path.join(MODELOS_DIR, nome)
+                if cmb.findData(caminho) < 0:
+                    cmb.addItem("HQ Tools: {0}".format(rotulo), caminho)
         gerar_row = widgets.QHBoxLayout()
         button_gerar = widgets.QPushButton("Gerar modelos padrão do HQ Tools")
         button_gerar.setToolTip(
