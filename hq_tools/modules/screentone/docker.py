@@ -440,7 +440,7 @@ class ScreentoneDocker(DockWidget):
     def _apply_selection(self, document):
         mode = self.cmb_mask.currentData()
         if mode == "empty":
-            return Selection()
+            return helpers.full_selection(document)
         if self.chk_selection.isChecked() and document.selection() is not None:
             return document.selection()
         return helpers.full_selection(document)
@@ -498,7 +498,8 @@ class ScreentoneDocker(DockWidget):
         if fingerprint is not None:
             existing = self._find_same_tone(document, generator, fingerprint)
             if existing is not None:
-                self._set_selection_mask(document, existing, selection)
+                mask_target = Selection() if self.cmb_mask.currentData() == "empty" else selection
+                self._set_selection_mask(document, existing, mask_target)
                 document.refreshProjection()
                 helpers.show_message("Retícula idêntica reutilizada em '{0}'.".format(existing.name()))
                 return
@@ -510,6 +511,8 @@ class ScreentoneDocker(DockWidget):
             helpers.show_message("Gerador indisponível nesta versão do Krita.")
             return
         helpers.attach(document, layer)
+        if self.cmb_mask.currentData() == "empty":
+            self._set_selection_mask(document, layer, Selection())
         document.setActiveNode(layer)
         helpers.show_message("Retícula aplicada: {0} a {1} LPI.".format(preset["name"], preset["lpi"]))
 
@@ -777,9 +780,9 @@ class ScreentoneDocker(DockWidget):
             self.widget(),
             "Excluir preset",
             "Excluir o preset '{0}'?".format(preset["name"]),
-            QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+            DIALOG_YES | DIALOG_NO,
         )
-        if answer != QtWidgets.QMessageBox.Yes:
+        if answer != DIALOG_YES:
             return
         self.user_presets = [item for item in self.user_presets if item["name"] != preset["name"]]
         core.save_presets(USER_PRESETS_PATH, self.user_presets)

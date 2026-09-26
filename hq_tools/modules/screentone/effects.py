@@ -139,7 +139,7 @@ def lines_to_svg(lines, width, height, dpi, color="#000000"):
                 line["x2"] * scale,
                 line["y2"] * scale,
                 color,
-                line["width"],
+                line["width"] * scale,
             )
         )
     parts.append("</svg>")

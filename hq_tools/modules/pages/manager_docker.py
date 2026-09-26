@@ -260,11 +260,13 @@ class PagesDocker(DockWidget):
         dpi = int(self.config.get("pages.dpi", 300) or 300)
 
         if self.project is not None:
-            numero = len(self.project.page_relatives()) + 1
-            filename = self.project.next_page_name(offset=numero)
+            numero = self.project.page_number + 1
+            filename = self.project.next_page_name(offset=1)
             path = os.path.join(self.project.pages_dir(), filename)
             if self.project.pages_location:
-                relative = os.path.join(self.project.pages_location, filename)
+                relative = os.path.normpath(
+                    os.path.join(self.project.pages_location, filename)
+                )
             else:
                 relative = filename
             titulo = "{0} - pagina {1}".format(self.project.project_name, numero)

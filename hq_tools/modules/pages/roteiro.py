@@ -48,7 +48,7 @@ DEFAULT_GUTTER = 0.02
 DEFAULT_DIRECTION = "ltr"
 
 BALLOON_PATTERN = re.compile(
-    r"^(fala|narracao|narracao|narração|legenda)\s+p?(\d+)\s*:\s*(.*)$",
+    r"^(fala|narracao|narração|legenda)\s+p?(\d+)\s*:\s*(.*)$",
     re.IGNORECASE,
 )
 LAYOUT_PATTERN = re.compile(r"^(\d+)\s*[x×]\s*(\d+)$")

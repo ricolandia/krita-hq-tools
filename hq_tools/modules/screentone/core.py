@@ -204,7 +204,6 @@ def halftone_cmyk_properties(preset, color_model_id, dpi, angles=(15.0, 75.0, 0.
     for index, angle in enumerate(angles):
         channel_preset = dict(preset)
         channel_preset["rotation"] = float(angle)
-        prefix = "{0}_channel{1}_".format(color_model_id, index)
         properties.update(
             halftone_properties(
                 channel_preset, color_model_id, dpi,

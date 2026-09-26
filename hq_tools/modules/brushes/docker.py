@@ -14,10 +14,14 @@ from krita import DockWidget, Krita
 from ...core import krita_helpers as helpers
 from ...core.compat import (
     ALIGN_CENTER_FULL,
+    CONTEXT_MENU,
     ICON_MODE,
     LIST_ADJUST,
     LIST_STATIC,
+    SIZE_EXPANDING,
+    SIZE_FIXED,
     TOOL_BUTTON_TEXT_BESIDE_ICON,
+    USER_ROLE,
     QIcon,
     QPixmap,
     QtCore,
@@ -85,7 +89,7 @@ class BrushesDocker(DockWidget):
             button = QtWidgets.QToolButton()
             button.setText("{0}:".format(index + 1))
             button.setToolButtonStyle(TOOL_BUTTON_TEXT_BESIDE_ICON)
-            button.setSizePolicy(widgets.QSizePolicy.Expanding, widgets.QSizePolicy.Fixed)
+            button.setSizePolicy(SIZE_EXPANDING, SIZE_FIXED)
             button.clicked.connect(lambda checked=False, slot=index: self.activate_slot(slot))
             slots_layout.addWidget(button, index // 4, index % 4)
             self.slot_buttons.append(button)
@@ -123,7 +127,7 @@ class BrushesDocker(DockWidget):
         list_widget.setResizeMode(LIST_ADJUST)
         list_widget.setMovement(LIST_STATIC)
         list_widget.setWordWrap(True)
-        list_widget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        list_widget.setContextMenuPolicy(CONTEXT_MENU)
         list_widget.itemClicked.connect(self.activate_item)
         list_widget.itemDoubleClicked.connect(self.activate_item)
         list_widget.customContextMenuRequested.connect(
@@ -153,7 +157,7 @@ class BrushesDocker(DockWidget):
             list_widget.clear()
             for name in self.tab_sets.get(label, []):
                 item = QtWidgets.QListWidgetItem(name)
-                item.setData(QtCore.Qt.UserRole, name)
+                item.setData(USER_ROLE, name)
                 resource = self.resources.get(name)
                 if resource is not None:
                     item.setIcon(preset_icon(resource, name))
@@ -183,7 +187,7 @@ class BrushesDocker(DockWidget):
         item = self._current_item(list_widget, position)
         if item is None:
             return
-        preset = item.data(QtCore.Qt.UserRole)
+        preset = item.data(USER_ROLE)
         menu = QtWidgets.QMenu(self)
         activate = menu.addAction("Ativar pincel")
         menu.addSeparator()
@@ -207,7 +211,7 @@ class BrushesDocker(DockWidget):
         helpers.show_message("Slot {0} = {1}".format(slot + 1, preset))
 
     def activate_item(self, item):
-        preset = item.data(QtCore.Qt.UserRole)
+        preset = item.data(USER_ROLE)
         if preset:
             self.activate_preset(preset)
 

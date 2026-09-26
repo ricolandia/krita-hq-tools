@@ -108,11 +108,9 @@ def make_info_object(properties):
 
 def unique_layer_name(document, base_name):
     """Gera um nome de camada livre, com sufixo numérico se preciso."""
-    existing = {node.name() for node in document.rootNode().findChildNodes()}
-    existing.update(
-        node.name()
-        for node in document.rootNode().findChildNodes(recursive=True)
-    )
+    existing = {
+        node.name() for node in document.rootNode().findChildNodes(recursive=True)
+    }
     if base_name not in existing:
         return base_name
     index = 2

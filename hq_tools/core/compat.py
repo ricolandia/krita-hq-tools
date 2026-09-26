@@ -85,6 +85,9 @@ if QT_VERSION == 6:
     DRAG_INTERNAL_MOVE = QtWidgets.QAbstractItemView.DragDropMode.InternalMove
     MOVE_ACTION = QtCore.Qt.DropAction.MoveAction
     WAIT_CURSOR = QtCore.Qt.CursorShape.WaitCursor
+    CONTEXT_MENU = QtCore.Qt.ContextMenuPolicy.CustomContextMenu
+    SIZE_EXPANDING = QtWidgets.QSizePolicy.Policy.Expanding
+    SIZE_FIXED = QtWidgets.QSizePolicy.Policy.Fixed
 else:
     IMAGE_FORMAT_ARGB32 = QtGui.QImage.Format_ARGB32
     TRANSPARENT = QtCore.Qt.transparent
@@ -94,6 +97,9 @@ else:
     DRAG_INTERNAL_MOVE = QtWidgets.QAbstractItemView.InternalMove
     MOVE_ACTION = QtCore.Qt.MoveAction
     WAIT_CURSOR = QtCore.Qt.WaitCursor
+    CONTEXT_MENU = QtCore.Qt.CustomContextMenu
+    SIZE_EXPANDING = QtWidgets.QSizePolicy.Expanding
+    SIZE_FIXED = QtWidgets.QSizePolicy.Fixed
 
 __all__ = [
     "QtCore",
@@ -118,6 +124,9 @@ __all__ = [
     "DRAG_INTERNAL_MOVE",
     "MOVE_ACTION",
     "WAIT_CURSOR",
+    "CONTEXT_MENU",
+    "SIZE_EXPANDING",
+    "SIZE_FIXED",
     "ICON_MODE",
     "ADJUST_IGNORED",
     "ALIGN_CENTER",

@@ -64,8 +64,8 @@ class CPMTProject:
         self.config_path = os.path.join(self.root, self.config_name)
         with open(self.config_path, "rb") as handle:
             head = handle.read(2)
-        encoding = "utf-16" if head in (b"\xff\xfe", b"\xfe\xff") else "utf-8"
-        with open(self.config_path, "r", encoding=encoding) as handle:
+        self._encoding = "utf-16" if head in (b"\xff\xfe", b"\xfe\xff") else "utf-8"
+        with open(self.config_path, "r", encoding=self._encoding) as handle:
             self.config = json.load(handle)
 
     @classmethod
@@ -138,7 +138,7 @@ class CPMTProject:
     def save(self):
         directory = os.path.dirname(self.config_path)
         handle = tempfile.NamedTemporaryFile(
-            "w", encoding="utf-16", newline="", dir=directory, delete=False
+            "w", encoding=self._encoding, newline="", dir=directory, delete=False
         )
         try:
             with handle:
