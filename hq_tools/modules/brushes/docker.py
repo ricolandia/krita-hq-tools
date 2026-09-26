@@ -29,7 +29,9 @@ from ...core.compat import (
     QtWidgets,
 )
 from ...core.config import Config
+from ...core.paths import BRUSHES_KIT_DIR
 from . import SLOT_COUNT, register_docker
+from . import packs as packs_lib
 from .sets import BRUSH_SETS, slot_suggestions, suggest_sets
 
 
@@ -66,6 +68,7 @@ class BrushesDocker(DockWidget):
         register_docker(self)
         self._build_ui()
         self.reload_presets()
+        self._refresh_packs()
 
     def canvasChanged(self, canvas):
         pass
@@ -81,6 +84,7 @@ class BrushesDocker(DockWidget):
         for label, _ in BRUSH_SETS:
             self._add_set_tab(label)
         self._add_set_tab("Todos")
+        self.tabs.addTab(self._build_packs_tab(), "Packs")
         layout.addWidget(self.tabs, 1)
 
         self.slots_box = widgets.QGroupBox("Slots (atalhos em Configurar Krita > Atalhos > HQ Tools)")
@@ -137,6 +141,85 @@ class BrushesDocker(DockWidget):
         self.tabs.addTab(tab, label)
         self.tab_lists[label] = list_widget
         self.tab_sets[label] = []
+
+    def _build_packs_tab(self):
+        widgets = QtWidgets
+        tab = widgets.QWidget()
+        layout = widgets.QVBoxLayout(tab)
+
+        self.list_packs = widgets.QListWidget()
+        self.list_packs.setSelectionMode(widgets.QAbstractItemView.SingleSelection)
+        layout.addWidget(self.list_packs, 1)
+
+        buttons = widgets.QHBoxLayout()
+        button_install = widgets.QPushButton("Instalar pack selecionado")
+        button_install.setIcon(standard_icon("SP_DialogApplyButton"))
+        button_install.clicked.connect(self.install_pack)
+        buttons.addWidget(button_install)
+        button_license = widgets.QPushButton("Ver licença")
+        button_license.clicked.connect(self.view_pack_license)
+        buttons.addWidget(button_license)
+        button_refresh = widgets.QPushButton("Atualizar")
+        button_refresh.setIcon(standard_icon("SP_BrowserReload"))
+        button_refresh.clicked.connect(self._refresh_packs)
+        buttons.addWidget(button_refresh)
+        layout.addLayout(buttons)
+
+        hint = widgets.QLabel(
+            "Packs da comunidade incluídos com licença verificada (créditos em "
+            "CREDITS.md). Instalar copia os arquivos para os recursos do Krita "
+            "e exige reiniciar o programa."
+        )
+        hint.setWordWrap(True)
+        layout.addWidget(hint)
+        return tab
+
+    def _refresh_packs(self):
+        self.list_packs.clear()
+        destinos = self._pack_destinos()
+        for nome, caminho in packs_lib.listar_packs(BRUSHES_KIT_DIR).items():
+            info = packs_lib.pack_info(caminho)
+            autor = info.get("autor", "autor desconhecido")
+            licenca = info.get("licenca", "licença desconhecida")
+            marcador = " [instalado]" if packs_lib.pack_instalado(caminho, destinos) else ""
+            item = QtWidgets.QListWidgetItem(
+                "{0} — {1} ({2}){3}".format(nome, autor, licenca, marcador)
+            )
+            item.setData(USER_ROLE, caminho)
+            item.setToolTip(info.get("origem", ""))
+            self.list_packs.addItem(item)
+
+    def _pack_destinos(self):
+        base = os.path.join(os.path.expanduser("~"), ".local", "share", "krita")
+        return {tipo: os.path.join(base, tipo) for tipo in packs_lib.TIPOS}
+
+    def install_pack(self):
+        item = self.list_packs.currentItem()
+        if item is None:
+            helpers.show_info("Packs", "Escolha um pack na lista.")
+            return
+        pack_dir = item.data(USER_ROLE)
+        total = packs_lib.instalar_pack(pack_dir, self._pack_destinos())
+        self._refresh_packs()
+        helpers.show_info(
+            "Packs",
+            "Pack instalado: {0} arquivos copiados para os recursos do Krita.\n\n"
+            "Reinicie o Krita para carregar os pincéis novos.".format(total),
+        )
+
+    def view_pack_license(self):
+        item = self.list_packs.currentItem()
+        if item is None:
+            helpers.show_info("Packs", "Escolha um pack na lista.")
+            return
+        pack_dir = item.data(USER_ROLE)
+        info = packs_lib.pack_info(pack_dir)
+        texto = packs_lib.pack_license(pack_dir)
+        QtWidgets.QMessageBox.information(
+            helpers.modal_parent(),
+            "Licença de {0}".format(info.get("nome", pack_dir)),
+            texto,
+        )
 
     def reload_presets(self):
         self.resources = dict(Krita.instance().resources("preset") or {})

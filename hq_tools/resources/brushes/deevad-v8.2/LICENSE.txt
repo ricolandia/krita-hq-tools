@@ -1,0 +1,14 @@
+This brushes are licensed under the Creative Commons Attribution 4.0
+(https://creativecommons.org/licenses/by/4.0/) to "David Revoy, www.davidrevoy.com".
+
+This attribution is necessary in case of redistributing, commercializing, or
+modifying the brush kit.
+
+This attribution is not necessary in case of usage (you can paint any artwork
+you want with it, you still own totally your artwork).
+
+This attribution is not necessary in case of doing screenshot/screenrecording
+of Krita and have the brushkit visible.
+
+Texto original do autor (David Revoy), de:
+https://github.com/Deevad/deevad-krita-brushpresets (README, seção License)
