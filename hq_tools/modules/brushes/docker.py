@@ -27,6 +27,7 @@ from ...core.compat import (
     QtCore,
     QtGui,
     QtWidgets,
+    standard_icon,
 )
 from ...core.config import Config
 from ...core.paths import BRUSHES_KIT_DIR
