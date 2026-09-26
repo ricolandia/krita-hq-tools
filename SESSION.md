@@ -73,3 +73,8 @@ bash scripts/build-zip.sh                  # gerar ZIP instalável
   transparente; UX com seleção + X/Y manual; PoC de clique no canvas como
   v1.1.
 - Presets de assistentes por painel; balão paramétrico (depende do Krita 6).
+- Referência 3D: decisão atual é seguir o plano original (Blender renderiza
+  por painel, `pXX_qYY_*.png` importado como camada de referência travada);
+  o botão "Camada de referência" no HQ Tools foi aprovado. Rotas alternativas
+  anotadas em `docs/IDEIAS-FUTURAS.md` (visualizador próprio com rig do
+  Blender via JSON, Blender Layer, pose makers web).
