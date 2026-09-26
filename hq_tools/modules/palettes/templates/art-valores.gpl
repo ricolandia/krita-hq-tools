@@ -1,0 +1,17 @@
+GIMP Palette
+Name: Art Valores
+Columns: 11
+# Escala de valores para planejar sombras e luz
+255 255 255	Branco
+242 242 242	Valor 5
+230 230 230	Valor 10
+217 217 217	Valor 15
+204 204 204	Valor 20
+178 178 178	Valor 30
+153 153 153	Valor 40
+128 128 128	Valor 50
+102 102 102	Valor 60
+77 77 77	Valor 70
+51 51 51	Valor 80
+26 26 26	Valor 90
+0 0 0	Preto

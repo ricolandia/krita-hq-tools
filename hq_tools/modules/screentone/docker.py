@@ -217,6 +217,14 @@ class ScreentoneDocker(DockWidget):
         )
         hint.setWordWrap(True)
         layout.addWidget(hint)
+
+        button_patterns = widgets.QPushButton("Instalar padrões e texturas (kit)")
+        button_patterns.setToolTip(
+            "Copia os padrões próprios do kit (papéis, retículas, hachuras) "
+            "para os padrões do Krita"
+        )
+        button_patterns.clicked.connect(self.install_kit_patterns)
+        layout.addWidget(button_patterns)
         layout.addStretch(1)
         return tab
 
@@ -754,6 +762,38 @@ class ScreentoneDocker(DockWidget):
         helpers.show_message("{0} linhas inseridas.".format(len(lines)))
 
     # ------------------------------------------------------------------ presets
+
+    def install_kit_patterns(self):
+        """Instala os padrões e texturas do kit nos padrões do Krita."""
+        import shutil
+
+        from ...core.paths import KRITA_PATTERNS_DIR, PATTERNS_KIT_DIR
+
+        if not os.path.isdir(PATTERNS_KIT_DIR):
+            helpers.show_info("Padrões", "Pasta de padrões não encontrada no plugin.")
+            return
+        try:
+            os.makedirs(KRITA_PATTERNS_DIR, exist_ok=True)
+        except OSError as error:
+            helpers.show_info("Padrões", "Falha ao criar a pasta: {0}".format(error))
+            return
+        instalados = 0
+        for nome in sorted(os.listdir(PATTERNS_KIT_DIR)):
+            if nome.lower().endswith(".png"):
+                try:
+                    shutil.copy2(
+                        os.path.join(PATTERNS_KIT_DIR, nome),
+                        os.path.join(KRITA_PATTERNS_DIR, nome),
+                    )
+                    instalados += 1
+                except OSError:
+                    continue
+        self._reload_patterns()
+        helpers.show_info(
+            "Padrões",
+            "{0} padrões instalados. Reinicie o Krita para usá-los no modo "
+            "'tom com padrão' e nos pincéis.".format(instalados),
+        )
 
     def _save_preset(self):
         name, ok = QtWidgets.QInputDialog.getText(

@@ -1,0 +1,17 @@
+GIMP Palette
+Name: Art Carta Retícula
+Columns: 11
+# Tons da retícula com sugestão de LPI (300 dpi: célula = 300/LPI px)
+255 255 255	Sem retícula
+242 242 242	5% - 85 LPI
+230 230 230	10% - 85 LPI
+217 217 217	15% - 60 LPI
+204 204 204	20% - 60 LPI
+178 178 178	30% - 60 LPI
+153 153 153	40% - 45 LPI
+128 128 128	50% - 45 LPI
+102 102 102	60% - 45 LPI
+77 77 77	70% - 30 LPI
+51 51 51	80% - 30 LPI
+26 26 26	90% - 30 LPI
+0 0 0	Sólido

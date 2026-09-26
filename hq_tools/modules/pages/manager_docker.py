@@ -33,7 +33,7 @@ from ...core.cpmt import CPMTProject, create_project_with_page
 from ...core.paths import MODELOS_DIR
 from ...core.thumbs import thumbnail_pixmap
 from ..biblioteca import core as biblioteca_core
-from . import generator, roteiro
+from . import generator, modelos as modelos_lib, roteiro
 
 FORMATO_ITENS = (
     ("A4", "A4"),
@@ -595,6 +595,37 @@ class PagesDocker(DockWidget):
                         resultado[nome] = os.path.join(raiz, nome)
         return resultado
 
+    def _gerar_modelos_padrao(self):
+        """Gera os modelos de página do HQ Tools na pasta de modelos."""
+        os.makedirs(MODELOS_DIR, exist_ok=True)
+        gerados = []
+        for nome, formato, chave in modelos_lib.MODELOS:
+            dpi = 300
+            width_px, height_px = roteiro.page_pixels({"format": formato}, formato, dpi)
+            page = {
+                "index": 1,
+                "format": formato,
+                "dpi": dpi,
+                "margin": 0.05,
+                "gutter": 0.0,
+                "panels": modelos_lib.layout_paineis(chave),
+                "balloons": [],
+            }
+            panel_svg = generator.panels_svg(page, width_px, height_px, dpi)
+            try:
+                document = generator.build_page_document(
+                    page, nome, panel_svg, "", width_px, height_px, dpi
+                )
+                self.apply_margin_guides(document)
+                destino = os.path.join(
+                    MODELOS_DIR, "modelo-{0}.kra".format(modelos_lib.slug(nome))
+                )
+                generator.save_page(document, destino)
+                gerados.append((nome, destino))
+            except (RuntimeError, OSError):
+                continue
+        return gerados
+
     def define_model(self):
         """Escolhe o modelo de página: página atual salva ou template do Krita."""
         widgets = QtWidgets
@@ -610,8 +641,27 @@ class PagesDocker(DockWidget):
         )
         cmb = widgets.QComboBox()
         cmb.addItem("Página atual (precisa estar salva)", "atual")
-        for nome in sorted(self._listar_templates_krita().keys()):
-            cmb.addItem("Template do Krita: {0}".format(nome), nome)
+        for nome, caminho in self._listar_templates_krita().items():
+            cmb.addItem("Template do Krita: {0}".format(nome), caminho)
+        gerar_row = widgets.QHBoxLayout()
+        button_gerar = widgets.QPushButton("Gerar modelos padrão do HQ Tools")
+        button_gerar.setToolTip(
+            "Cria A4, A3, tirinhas (1-3) e grades (2x2, 3x3) na pasta de modelos"
+        )
+        gerar_row.addWidget(button_gerar)
+
+        def _gerar_agora():
+            gerados = self._gerar_modelos_padrao()
+            for nome, caminho in gerados:
+                if cmb.findData(caminho) < 0:
+                    cmb.addItem("HQ Tools: {0}".format(nome), caminho)
+            helpers.show_info(
+                "Modelo de página",
+                "{0} modelos gerados em {1}.".format(len(gerados), MODELOS_DIR),
+            )
+
+        button_gerar.clicked.connect(_gerar_agora)
+        layout.addLayout(gerar_row)
         layout.addWidget(cmb)
         buttons_row = widgets.QHBoxLayout()
         button_ok = widgets.QPushButton("Usar como modelo")
@@ -637,9 +687,9 @@ class PagesDocker(DockWidget):
                 return
             origem = document.fileName()
         else:
-            origem = self._listar_templates_krita().get(escolha)
+            origem = escolha if os.path.isfile(escolha) else None
             if not origem:
-                helpers.show_info("Modelo de página", "Template não encontrado.")
+                helpers.show_info("Modelo de página", "Modelo não encontrado.")
                 return
         os.makedirs(MODELOS_DIR, exist_ok=True)
         destino = os.path.join(MODELOS_DIR, "modelo-{0}".format(os.path.basename(origem)))
