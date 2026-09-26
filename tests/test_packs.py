@@ -70,6 +70,12 @@ class TestPacks(unittest.TestCase):
         total = packs.instalar_pack(self.pack, {})
         self.assertEqual(total, 0)
 
+    def test_preset_names(self):
+        nomes = packs.preset_names(self.pack)
+        self.assertIn("A-Teste", nomes)
+        self.assertIn("B-Teste", nomes)
+        self.assertEqual(len(nomes), 2)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.1] — 2026-09-26
+
+### Adicionado
+
+- Aba "Comunidade" no docker de pincéis: presets dos packs da comunidade já
+  instalados no Krita, agrupados por pack com autor e licença; clique ativa o
+  pincel.
+
+### Corrigido
+
+- Import ausente de `standard_icon` na aba Packs (erro ao abrir o Krita).
+
 ## [0.5.0] — 2026-09-26
 
 ### Adicionado

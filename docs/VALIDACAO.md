@@ -179,8 +179,10 @@ registrados no plugin.
 - "Ver licença" mostra o LICENSE.txt do pack; os créditos estão no CREDITS.md.
 - "Instalar pack selecionado" copia os arquivos para as pastas de recursos do
   Krita (paintoppresets/brushes/patterns/palettes) e marca "[instalado]".
-- Após reiniciar o Krita, os presets aparecem no docker de presets e nos
-  conjuntos (nomes como "Ink ..." do Deevad e "PW ..." do Watercolor Set).
+- Após reiniciar o Krita, os presets aparecem no docker de presets e na aba
+  "Comunidade" do HQ Tools (agrupados por pack, com autor e licença); clique
+  no preset ativa o pincel. Os conjuntos padrão (Rascunho, Contornos, etc.)
+  continuam montados pelos presets nativos do Krita, sem poluir com os packs.
 
 ## Problemas conhecidos e tratamento
 

@@ -1,6 +1,6 @@
 # SESSION — HQ Tools (Krita-Comics-Plugin)
 
-Fonte da verdade do projeto. Atualizado em 2026-09-26 (v0.5.0).
+Fonte da verdade do projeto. Atualizado em 2026-09-26 (v0.5.1).
 
 ## Contexto
 
@@ -39,11 +39,14 @@ Feito:
   testes; CREDITS.md com atribuições e a lista de candidatos excluídos por
   falta de licença (Cityscape, Pesi's, portnov, Lilly_Mist, InkP).
 - Testes do núcleo: 64 passando.
+- **Ajuste (v0.5.1)**: aba "Comunidade" no docker de pincéis com os presets
+  dos packs já instalados, agrupados por pack (autor e licença); fix do import
+  de `standard_icon`. 65 testes passando.
 
 Pendente (validação dentro do Krita):
 
 - Rodar o roteiro de `docs/VALIDACAO.md` (item 7b): instalar os dois packs,
-  reiniciar e conferir os presets nos conjuntos e no docker de presets.
+  reiniciar e conferir os presets na aba "Comunidade" e no docker de presets.
 
 ## Comandos
 

@@ -18,6 +18,7 @@ from ...core.compat import (
     ICON_MODE,
     LIST_ADJUST,
     LIST_STATIC,
+    NO_ITEM_FLAGS,
     SIZE_EXPANDING,
     SIZE_FIXED,
     TOOL_BUTTON_TEXT_BESIDE_ICON,
@@ -86,6 +87,7 @@ class BrushesDocker(DockWidget):
             self._add_set_tab(label)
         self._add_set_tab("Todos")
         self.tabs.addTab(self._build_packs_tab(), "Packs")
+        self.tabs.addTab(self._build_community_tab(), "Comunidade")
         layout.addWidget(self.tabs, 1)
 
         self.slots_box = widgets.QGroupBox("Slots (atalhos em Configurar Krita > Atalhos > HQ Tools)")
@@ -175,6 +177,48 @@ class BrushesDocker(DockWidget):
         layout.addWidget(hint)
         return tab
 
+    def _build_community_tab(self):
+        """Presets dos packs da comunidade já instalados no Krita."""
+        widgets = QtWidgets
+        tab = widgets.QWidget()
+        layout = widgets.QVBoxLayout(tab)
+        self.list_community = widgets.QListWidget()
+        self.list_community.setViewMode(widgets.QListView.ListMode)
+        self.list_community.itemClicked.connect(self.activate_item)
+        self.list_community.itemDoubleClicked.connect(self.activate_item)
+        layout.addWidget(self.list_community, 1)
+        hint = widgets.QLabel(
+            "Presets dos packs da comunidade já instalados no Krita, agrupados "
+            "por pack. Clique para ativar; os créditos estão no CREDITS.md."
+        )
+        hint.setWordWrap(True)
+        layout.addWidget(hint)
+        return tab
+
+    def _refresh_community(self):
+        if not hasattr(self, "list_community"):
+            return
+        self.list_community.clear()
+        for nome, caminho in packs_lib.listar_packs(BRUSHES_KIT_DIR).items():
+            info = packs_lib.pack_info(caminho)
+            nomes = packs_lib.preset_names(caminho)
+            presentes = [nome_preset for nome_preset in nomes if nome_preset in self.resources]
+            if not presentes:
+                continue
+            cabecalho = QtWidgets.QListWidgetItem(
+                "{0} — {1} ({2})".format(
+                    nome, info.get("autor", "autor?"), info.get("licenca", "licença?")
+                )
+            )
+            cabecalho.setFlags(NO_ITEM_FLAGS)
+            cabecalho.setToolTip(info.get("origem", ""))
+            self.list_community.addItem(cabecalho)
+            for nome_preset in presentes:
+                item = QtWidgets.QListWidgetItem("  {0}".format(nome_preset))
+                item.setData(USER_ROLE, nome_preset)
+                item.setToolTip("Clique para ativar (preset instalado)")
+                self.list_community.addItem(item)
+
     def _refresh_packs(self):
         self.list_packs.clear()
         destinos = self._pack_destinos()
@@ -247,6 +291,7 @@ class BrushesDocker(DockWidget):
                     item.setIcon(preset_icon(resource, name))
                 list_widget.addItem(item)
         self._refresh_slots()
+        self._refresh_community()
 
     def _refresh_slots(self):
         for index, button in enumerate(self.slot_buttons):

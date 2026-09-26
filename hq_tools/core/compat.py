@@ -95,6 +95,7 @@ if QT_VERSION == 6:
     CONTEXT_MENU = QtCore.Qt.ContextMenuPolicy.CustomContextMenu
     SIZE_EXPANDING = QtWidgets.QSizePolicy.Policy.Expanding
     SIZE_FIXED = QtWidgets.QSizePolicy.Policy.Fixed
+    NO_ITEM_FLAGS = QtCore.Qt.ItemFlag.NoItemFlags
 else:
     IMAGE_FORMAT_ARGB32 = QtGui.QImage.Format_ARGB32
     TRANSPARENT = QtCore.Qt.transparent
@@ -107,6 +108,7 @@ else:
     CONTEXT_MENU = QtCore.Qt.CustomContextMenu
     SIZE_EXPANDING = QtWidgets.QSizePolicy.Expanding
     SIZE_FIXED = QtWidgets.QSizePolicy.Fixed
+    NO_ITEM_FLAGS = QtCore.Qt.NoItemFlags
 
 __all__ = [
     "QtCore",
@@ -135,6 +137,7 @@ __all__ = [
     "CONTEXT_MENU",
     "SIZE_EXPANDING",
     "SIZE_FIXED",
+    "NO_ITEM_FLAGS",
     "ICON_MODE",
     "ADJUST_IGNORED",
     "ALIGN_CENTER",

@@ -75,6 +75,18 @@ def arquivos_por_tipo(pack_dir):
     return resultado
 
 
+def preset_names(pack_dir):
+    """Nomes (sem extensão) dos presets do pack (paintoppresets)."""
+    pasta = os.path.join(pack_dir, "paintoppresets")
+    if not os.path.isdir(pasta):
+        return []
+    nomes = []
+    for nome in sorted(os.listdir(pasta)):
+        if nome.lower().endswith((".kpp", ".myb")):
+            nomes.append(os.path.splitext(nome)[0])
+    return nomes
+
+
 def instalar_pack(pack_dir, destinos):
     """Copia os arquivos do pack para as pastas de recursos do usuário.
 
