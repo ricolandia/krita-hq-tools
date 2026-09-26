@@ -216,6 +216,9 @@ class BrushesDocker(DockWidget):
             for nome_preset in presentes:
                 item = QtWidgets.QListWidgetItem("  {0}".format(nome_preset))
                 item.setData(USER_ROLE, nome_preset)
+                resource = self.resources.get(nome_preset)
+                if resource is not None:
+                    item.setIcon(preset_icon(resource, nome_preset))
                 item.setToolTip("Clique para ativar (preset instalado)")
                 self.list_community.addItem(item)
 
