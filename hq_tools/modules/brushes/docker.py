@@ -205,8 +205,16 @@ class BrushesDocker(DockWidget):
         self.list_community.clear()
         for nome, caminho in packs_lib.listar_packs(BRUSHES_KIT_DIR).items():
             info = packs_lib.pack_info(caminho)
-            nomes = packs_lib.preset_names(caminho)
-            presentes = [nome_preset for nome_preset in nomes if nome_preset in self.resources]
+            aliases = packs_lib.preset_aliases(caminho)
+            presentes = []
+            for nome_arquivo, nome_interno in aliases:
+                recurso_nome = (
+                    nome_interno
+                    if nome_interno in self.resources
+                    else (nome_arquivo if nome_arquivo in self.resources else None)
+                )
+                if recurso_nome is not None:
+                    presentes.append(recurso_nome)
             if not presentes:
                 continue
             cabecalho = QtWidgets.QListWidgetItem(
@@ -217,12 +225,12 @@ class BrushesDocker(DockWidget):
             cabecalho.setFlags(NO_ITEM_FLAGS)
             cabecalho.setToolTip(info.get("origem", ""))
             self.list_community.addItem(cabecalho)
-            for nome_preset in presentes:
-                item = QtWidgets.QListWidgetItem("  {0}".format(nome_preset))
-                item.setData(USER_ROLE, nome_preset)
-                resource = self.resources.get(nome_preset)
+            for recurso_nome in presentes:
+                item = QtWidgets.QListWidgetItem("  {0}".format(recurso_nome))
+                item.setData(USER_ROLE, recurso_nome)
+                resource = self.resources.get(recurso_nome)
                 if resource is not None:
-                    item.setIcon(preset_icon(resource, nome_preset))
+                    item.setIcon(preset_icon(resource, recurso_nome))
                 item.setToolTip("Clique para ativar (preset instalado)")
                 self.list_community.addItem(item)
 

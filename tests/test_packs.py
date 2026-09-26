@@ -2,10 +2,27 @@
 
 import os
 import shutil
+import struct
 import tempfile
 import unittest
+import zlib
 
 from hq_tools.modules.brushes import packs
+
+
+def png_com_preset(nome_interno):
+    """PNG sintético com o chunk tEXt 'preset' (formato real do .kpp)."""
+    dados = bytearray(b"\x89PNG\r\n\x1a\n")
+
+    def chunk(tipo, payload):
+        parte = struct.pack(">I", len(payload)) + tipo + payload
+        parte += struct.pack(">I", zlib.crc32(tipo + payload) & 0xFFFFFFFF)
+        return parte
+
+    xml = '<param name="name" value="{0}"/>'.format(nome_interno).encode()
+    dados += chunk(b"tEXt", b"preset\0" + xml)
+    dados += chunk(b"IEND", b"")
+    return bytes(dados)
 
 
 def fazer_pack(base, nome="deevad-v8.2"):
@@ -75,6 +92,17 @@ class TestPacks(unittest.TestCase):
         self.assertIn("A-Teste", nomes)
         self.assertIn("B-Teste", nomes)
         self.assertEqual(len(nomes), 2)
+
+    def test_preset_aliases(self):
+        pasta = os.path.join(self.pack, "paintoppresets")
+        with open(os.path.join(pasta, "X9AA_WC_Basic.kpp"), "wb") as handle:
+            handle.write(png_com_preset("X9AA - WC Basic"))
+        with open(os.path.join(pasta, "SemNome.kpp"), "wb") as handle:
+            handle.write(b"\x89PNG\r\n\x1a\n")
+        aliases = dict(packs.preset_aliases(self.pack))
+        self.assertEqual(aliases["X9AA_WC_Basic"], "X9AA - WC Basic")
+        self.assertEqual(aliases["SemNome"], "SemNome")
+        self.assertEqual(aliases["A-Teste"], "A-Teste")
 
 
 if __name__ == "__main__":

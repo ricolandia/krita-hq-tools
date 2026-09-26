@@ -8,6 +8,7 @@ que são carregadas na inicialização do programa.
 """
 
 import os
+import re
 import shutil
 
 TIPOS = ("paintoppresets", "brushes", "patterns", "palettes")
@@ -85,6 +86,57 @@ def preset_names(pack_dir):
         if nome.lower().endswith((".kpp", ".myb")):
             nomes.append(os.path.splitext(nome)[0])
     return nomes
+
+
+def _preset_chunk_xml(caminho):
+    """Extrai o XML do chunk tEXt 'preset' de um .kpp (PNG com anotação)."""
+    try:
+        with open(caminho, "rb") as handle:
+            dados = handle.read()
+    except OSError:
+        return None
+    offset = 8
+    while offset + 8 <= len(dados):
+        tamanho = int.from_bytes(dados[offset:offset + 4], "big")
+        tipo = dados[offset + 4:offset + 8].decode("latin1", "replace")
+        if tipo == "tEXt":
+            texto = dados[offset + 8:offset + 8 + tamanho]
+            if texto.startswith(b"preset\0"):
+                return texto[len(b"preset\0"):].decode("utf-8", "replace")
+        if tipo == "IEND":
+            break
+        offset += 12 + tamanho
+    return None
+
+
+def _preset_internal_name(caminho):
+    """Nome interno do preset (do XML dentro do .kpp), ou None."""
+    xml = _preset_chunk_xml(caminho)
+    if not xml:
+        return None
+    match = re.search(r'<param name="name" value="([^"]*)"', xml)
+    if match:
+        return match.group(1)
+    return None
+
+
+def preset_aliases(pack_dir):
+    """Aliases por preset: ``(nome do arquivo, nome interno)``.
+
+    O Krita lista os presets pelo nome interno (que pode diferir do nome do
+    arquivo); este par permite casar os dois no ``resources("preset")``.
+    """
+    pasta = os.path.join(pack_dir, "paintoppresets")
+    if not os.path.isdir(pasta):
+        return []
+    aliases = []
+    for nome in sorted(os.listdir(pasta)):
+        if not nome.lower().endswith((".kpp", ".myb")):
+            continue
+        nome_arquivo = os.path.splitext(nome)[0]
+        interno = _preset_internal_name(os.path.join(pasta, nome))
+        aliases.append((nome_arquivo, interno or nome_arquivo))
+    return aliases
 
 
 def instalar_pack(pack_dir, destinos):

@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.5.3] — 2026-09-26
+
+### Corrigido
+
+- Aba "Comunidade": presets de packs cujo nome interno difere do nome do
+  arquivo não apareciam (ex.: Krita Watercolor Set, arquivos `X9AA_WC_*.kpp`
+  com preset "X9AA - WC Basic"). Agora o casamento usa o nome interno (lido
+  do chunk tEXt 'preset' do .kpp) com fallback para o nome do arquivo.
+
 ## [0.5.2] — 2026-09-26
 
 ### Adicionado
