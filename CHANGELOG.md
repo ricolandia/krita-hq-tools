@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.5.2] — 2026-09-26
+
+### Adicionado
+
+- Pack de fontes de HQ ampliado (9 famílias, todas SIL OFL 1.1 com créditos):
+  Bangers, Comic Relief (Regular/Bold), Patrick Hand, Comic Neue
+  (Regular/Bold), Londrina Solid, Nanum Pen Script, Gaegu e Boogaloo;
+  instaláveis com um clique no docker de balões. (Luckiest Guy e Chewy saíram
+  do Google Fonts; Boogaloo entrou no lugar.)
+
+### Corrigido
+
+- Miniaturas da aba "Comunidade" no docker de pincéis: agora em grade (72 px),
+  mesmo tamanho das abas de conjuntos.
+
 ## [0.5.1] — 2026-09-26
 
 ### Adicionado

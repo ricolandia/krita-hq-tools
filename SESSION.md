@@ -1,6 +1,6 @@
 # SESSION — HQ Tools (Krita-Comics-Plugin)
 
-Fonte da verdade do projeto. Atualizado em 2026-09-26 (v0.5.1).
+Fonte da verdade do projeto. Atualizado em 2026-09-26 (v0.5.2).
 
 ## Contexto
 
@@ -42,11 +42,15 @@ Feito:
 - **Ajuste (v0.5.1)**: aba "Comunidade" no docker de pincéis com os presets
   dos packs já instalados, agrupados por pack (autor e licença); fix do import
   de `standard_icon`. 65 testes passando.
+- **Ajuste (v0.5.2)**: pack de fontes ampliado para 9 famílias OFL (Bangers,
+  Comic Relief, Patrick Hand, Comic Neue, Londrina Solid, Nanum Pen Script,
+  Gaegu, Boogaloo) com créditos no CREDITS.md; miniaturas da aba "Comunidade"
+  em grade 72 px (mesmo tamanho dos conjuntos).
 
 Pendente (validação dentro do Krita):
 
-- Rodar o roteiro de `docs/VALIDACAO.md` (item 7b): instalar os dois packs,
-  reiniciar e conferir os presets na aba "Comunidade" e no docker de presets.
+- Rodar o roteiro de `docs/VALIDACAO.md` (itens 3c e 7b): instalar os packs e
+  as fontes, reiniciar e conferir a aba "Comunidade" e o seletor de fontes.
 
 ## Comandos
 

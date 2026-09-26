@@ -90,9 +90,10 @@ Diferenças entre o dump do bloco 2/3 e o que o plugin gera (ver
 
 - Primeira execução: a pasta padrão de balões recebe as amostras do plugin e
   os 2 balões CC0/PD (`balao-fala-amada44.svg`, `balao-talk-to-me-cc0.svg`).
-- "Instalar fontes de HQ": as 3 fontes (Bangers, Comic Relief, Patrick Hand)
-  vão para `~/.local/share/fonts/hq_tools`; após reiniciar o Krita, aparecem
-  na ferramenta de texto. Conferir créditos em `CREDITS.md`.
+- "Instalar fontes de HQ": as 9 famílias (Bangers, Comic Relief, Patrick Hand,
+  Comic Neue, Londrina Solid, Nanum Pen Script, Gaegu, Boogaloo) vão para
+  `~/.local/share/fonts/hq_tools`; após reiniciar o Krita, aparecem na
+  ferramenta de texto. Conferir créditos em `CREDITS.md`.
 
 ### 3d. Onomatopeias
 

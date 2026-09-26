@@ -15,6 +15,11 @@ Instaláveis pelo botão "Instalar fontes de HQ" no docker de balões
 | Bangers | The Bangers Project Authors (googlefonts/bangers) | SIL OFL 1.1 (`OFL-Bangers.txt`) |
 | Comic Relief (Regular e Bold) | The Comic Relief Project Authors (loudifier/Comic-Relief) | SIL OFL 1.1 (`OFL-ComicRelief.txt`) |
 | Patrick Hand | Patrick Wagesreiter | SIL OFL 1.1 (`OFL-PatrickHand.txt`) |
+| Comic Neue (Regular e Bold) | The Comic Neue Project Authors (crozynski/comicneue) | SIL OFL 1.1 (`OFL-Comicneue.txt`) |
+| Londrina Solid | The Londrina Solid Authors (marcelommp/Londrina-Typeface) | SIL OFL 1.1 (`OFL-Londrinasolid.txt`) |
+| Nanum Pen Script | NHN Corporation | SIL OFL 1.1 (`OFL-Nanumpenscript.txt`) |
+| Gaegu | The Gaegu Project Authors | SIL OFL 1.1 (`OFL-Gaegu.txt`) |
+| Boogaloo | John Vargas Beltrán | SIL OFL 1.1 (`OFL-Boogaloo.txt`) |
 
 A SIL OFL permite uso, modificação e redistribuição, incluindo uso comercial;
 o nome das fontes não pode ser usado para vender as fontes sozinhas. O texto

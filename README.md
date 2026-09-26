@@ -24,8 +24,9 @@ Os quatro documentos originais de contexto do projeto estão em
 
 O plugin acompanha um kit com licenças documentadas em `CREDITS.md`:
 
-- **Fontes** (SIL OFL 1.1): Bangers, Comic Relief (Regular/Bold) e Patrick
-  Hand, instaláveis com um clique no docker de balões;
+- **Fontes** (SIL OFL 1.1): Bangers, Comic Relief (Regular/Bold), Patrick
+  Hand, Comic Neue (Regular/Bold), Londrina Solid, Nanum Pen Script, Gaegu e
+  Boogaloo, instaláveis com um clique no docker de balões;
 - **Balões** de domínio público (CC0/PD): copiados para a pasta padrão na
   primeira execução;
 - **Pincéis da comunidade** (aba "Packs" no docker de pincéis): Deevad v8.2
