@@ -2,6 +2,8 @@
 
 import os
 
+HOME = os.path.expanduser("~")
+
 PACKAGE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODULES_DIR = os.path.join(PACKAGE_DIR, "modules")
 RESOURCES_DIR = os.path.join(PACKAGE_DIR, "resources")
@@ -9,7 +11,6 @@ BRUSHES_KIT_DIR = os.path.join(RESOURCES_DIR, "brushes")
 PATTERNS_KIT_DIR = os.path.join(RESOURCES_DIR, "patterns")
 KRITA_PATTERNS_DIR = os.path.join(HOME, ".local", "share", "krita", "patterns")
 
-HOME = os.path.expanduser("~")
 USER_DIR = os.path.join(HOME, ".local", "share", "krita", "hq_tools")
 CACHE_DIR = os.path.join(HOME, ".cache", "hq_tools")
 BALLOONS_DIR = os.path.join(USER_DIR, "balloons")
