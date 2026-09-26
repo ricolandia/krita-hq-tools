@@ -23,6 +23,8 @@ import re
 FORMATS = {
     "A4": (210.0, 297.0),
     "A5": (148.0, 210.0),
+    "A3": (297.0, 420.0),
+    "tirinha": (297.0, 210.0),
     "americano": (168.0, 259.0),
     "tankobon": (128.0, 182.0),
     "quadrado": (210.0, 210.0),
@@ -230,6 +232,20 @@ def page_pixels(page, format_override=None, dpi_override=None):
     width = int(round(width_mm * dpi / 25.4))
     height = int(round(height_mm * dpi / 25.4))
     return width, height
+
+
+def build_strip_panels(count, margin=DEFAULT_MARGIN, gutter=DEFAULT_GUTTER):
+    """Painéis de tirinha: ``count`` retângulos iguais numa linha horizontal."""
+    count = max(1, min(8, int(count)))
+    margin = max(0.0, float(margin))
+    gutter = max(0.0, float(gutter))
+    available_w = 1.0 - 2.0 * margin
+    panel_w = max(0.0, (available_w - (count - 1) * gutter) / count)
+    panel_h = 1.0 - 2.0 * margin
+    return [
+        (margin + index * (panel_w + gutter), margin, panel_w, panel_h)
+        for index in range(count)
+    ]
 
 
 def wrap_text(text, max_chars):

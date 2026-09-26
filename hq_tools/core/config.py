@@ -43,6 +43,9 @@ DEFAULT_CONFIG = {
         "last_folder": "",
         "format": "A4",
         "dpi": 300,
+        "model": "",
+        "use_model": False,
+        "strip_panels": 3,
     },
     "brushes": {
         "slots": [""] * 16,

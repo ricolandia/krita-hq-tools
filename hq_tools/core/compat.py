@@ -76,6 +76,13 @@ def standard_icon(name):
     pixmap = style.standardPixmap(getattr(enum, name, enum.SP_FileIcon))
     return QIcon(pixmap)
 
+
+def qlibrary_prefix():
+    """Prefixo de instalação do Qt (raiz dos recursos do Krita no AppImage)."""
+    if QT_VERSION == 6:
+        return QtCore.QLibraryInfo.path(QtCore.QLibraryInfo.LibraryPath.PrefixPath)
+    return QtCore.QLibraryInfo.location(QtCore.QLibraryInfo.PrefixPath)
+
 if QT_VERSION == 6:
     IMAGE_FORMAT_ARGB32 = QtGui.QImage.Format.Format_ARGB32
     TRANSPARENT = QtCore.Qt.GlobalColor.transparent
@@ -116,6 +123,7 @@ __all__ = [
     "ANTIALIASING",
     "IMAGE_FORMAT_RGBA8888",
     "standard_icon",
+    "qlibrary_prefix",
     "IMAGE_FORMAT_ARGB32",
     "TRANSPARENT",
     "LIST_ADJUST",

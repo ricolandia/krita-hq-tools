@@ -11,13 +11,21 @@ CACHE_DIR = os.path.join(HOME, ".cache", "hq_tools")
 BALLOONS_DIR = os.path.join(USER_DIR, "balloons")
 ONOMATOPEIAS_DIR = os.path.join(USER_DIR, "onomatopeias")
 BIBLIOTECA_DIR = os.path.join(USER_DIR, "biblioteca")
+MODELOS_DIR = os.path.join(USER_DIR, "modelos")
 KRITA_PALETTES_DIR = os.path.join(HOME, ".local", "share", "krita", "palettes")
 CONFIG_PATH = os.path.join(USER_DIR, "config.json")
 
 
 def ensure_user_dirs():
     """Garante que as pastas de dados do usuário existam."""
-    for path in (USER_DIR, CACHE_DIR, BALLOONS_DIR, ONOMATOPEIAS_DIR, BIBLIOTECA_DIR):
+    for path in (
+        USER_DIR,
+        CACHE_DIR,
+        BALLOONS_DIR,
+        ONOMATOPEIAS_DIR,
+        BIBLIOTECA_DIR,
+        MODELOS_DIR,
+    ):
         os.makedirs(path, exist_ok=True)
 
 

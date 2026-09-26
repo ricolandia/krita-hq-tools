@@ -72,6 +72,28 @@ class TestRoteiro(unittest.TestCase):
         self.assertEqual(width, 2480)
         self.assertEqual(height, 3508)
 
+    def test_page_pixels_a3_e_tirinha(self):
+        width, height = roteiro.page_pixels(roteiro.new_page(), "A3", 300)
+        self.assertEqual(width, 3508)
+        self.assertEqual(height, 4961)
+        width, height = roteiro.page_pixels(roteiro.new_page(), "tirinha", 300)
+        self.assertEqual(width, 3508)
+        self.assertEqual(height, 2480)
+
+    def test_build_strip_panels(self):
+        paineis = roteiro.build_strip_panels(3)
+        self.assertEqual(len(paineis), 3)
+        self.assertAlmostEqual(sum(p[2] for p in paineis) + 2 * 0.02, 0.9, delta=1e-9)
+        for painel in paineis:
+            self.assertAlmostEqual(painel[1], 0.05)
+            self.assertAlmostEqual(painel[3], 0.9)
+        self.assertAlmostEqual(paineis[0][0], 0.05)
+        self.assertGreater(paineis[1][0], paineis[0][0])
+
+    def test_build_strip_panels_limites(self):
+        self.assertEqual(len(roteiro.build_strip_panels(0)), 1)
+        self.assertEqual(len(roteiro.build_strip_panels(9)), 8)
+
     def test_wrap_text(self):
         lines = roteiro.wrap_text("uma frase um pouco maior para quebrar", 12)
         self.assertTrue(all(len(line) <= 12 for line in lines))

@@ -1,12 +1,14 @@
 """Docker de páginas: gerenciador com miniaturas (aba única).
 
-O projeto é uma pasta com arquivos ``.kra``: "Novo projeto..." cria a pasta,
-"Abrir projeto..." lê o ``comicConfig.json`` de um projeto CPMT e "Pasta..."
-abre qualquer pasta com páginas. Clique duplo abre a página; arrastar reordena
-(gravado no projeto CPMT quando houver).
+O projeto é uma pasta com arquivos ``.kra``: "Novo projeto..." usa a pasta da
+página salva, "Abrir projeto..." lê um ``comicConfig.json`` do CPMT e "Pasta..."
+abre qualquer pasta. "Criar próxima página" gera (ou usa o modelo de página)
+com guias de margem automáticas. Referências: marca a camada como referência
+travada ou importa um PNG como camada de arquivo.
 """
 
 import os
+import shutil
 
 from krita import DockWidget, Krita
 
@@ -23,13 +25,26 @@ from ...core.compat import (
     QtGui,
     QtWidgets,
     pyqtSignal,
+    qlibrary_prefix,
     standard_icon,
 )
 from ...core.config import Config
 from ...core.cpmt import CPMTProject, create_project_with_page
+from ...core.paths import MODELOS_DIR
 from ...core.thumbs import thumbnail_pixmap
 from ..biblioteca import core as biblioteca_core
 from . import generator, roteiro
+
+FORMATO_ITENS = (
+    ("A4", "A4"),
+    ("A5", "A5"),
+    ("A3", "A3 (297 x 420 mm)"),
+    ("tirinha", "Tirinha (297 x 210 mm)"),
+    ("americano", "Americano"),
+    ("tankobon", "Tankobon"),
+    ("quadrado", "Quadrado"),
+    ("livre", "Livre (largura x altura)"),
+)
 
 
 class PageListWidget(QtWidgets.QListWidget):
@@ -101,22 +116,53 @@ class PagesDocker(DockWidget):
         layout.addWidget(group_project)
 
         group_page = widgets.QGroupBox("Página")
-        page_layout = widgets.QHBoxLayout(group_page)
+        page_layout = widgets.QVBoxLayout(group_page)
+        row_page = widgets.QHBoxLayout()
         button_new_page = widgets.QPushButton("Criar próxima página")
         button_new_page.setIcon(standard_icon("SP_FileDialogNewFolder"))
         button_new_page.setToolTip(
-            "Cria uma página nova na pasta do projeto e atualiza as miniaturas"
+            "Cria uma página nova (formato, DPI, modelo) na pasta do projeto"
         )
         button_new_page.clicked.connect(self.create_next_page)
-        page_layout.addWidget(button_new_page)
+        row_page.addWidget(button_new_page)
         button_guides = widgets.QPushButton("Guias de margem")
         button_guides.setToolTip(
             "Cria 12 guias no documento ativo (0,5 / 1 / 1,5 cm por lado); "
             "substitui as guias existentes"
         )
         button_guides.clicked.connect(self.create_margin_guides)
-        page_layout.addWidget(button_guides)
+        row_page.addWidget(button_guides)
+        page_layout.addLayout(row_page)
+        row_model = widgets.QHBoxLayout()
+        button_model = widgets.QPushButton("Definir modelo de página...")
+        button_model.setToolTip(
+            "Usa a página atual ou um template de HQ do Krita como modelo "
+            "para as próximas páginas"
+        )
+        button_model.clicked.connect(self.define_model)
+        row_model.addWidget(button_model)
+        self.lbl_model = widgets.QLabel("")
+        self.lbl_model.setWordWrap(True)
+        row_model.addWidget(self.lbl_model, 1)
+        page_layout.addLayout(row_model)
         layout.addWidget(group_page)
+
+        group_ref = widgets.QGroupBox("Referência")
+        ref_layout = widgets.QHBoxLayout(group_ref)
+        button_ref = widgets.QPushButton("Camada de referência")
+        button_ref.setToolTip(
+            "Marca a camada selecionada como referência (rótulo, trava e "
+            "opacidade reduzida)"
+        )
+        button_ref.clicked.connect(self.mark_reference_layer)
+        ref_layout.addWidget(button_ref)
+        button_import = widgets.QPushButton("Importar referência (PNG)...")
+        button_import.setToolTip(
+            "Insere um PNG como camada de referência travada no grupo ativo"
+        )
+        button_import.clicked.connect(self.import_reference)
+        ref_layout.addWidget(button_import)
+        layout.addWidget(group_ref)
 
         group_list = widgets.QGroupBox("Páginas")
         list_layout = widgets.QVBoxLayout(group_list)
@@ -151,6 +197,9 @@ class PagesDocker(DockWidget):
         layout.addWidget(hint)
 
         self.setWidget(main)
+        self._refresh_model_label()
+
+    # ------------------------------------------------------------------ projeto
 
     def new_project(self):
         """Cria o projeto a partir da pasta da página atual salva."""
@@ -251,13 +300,106 @@ class PagesDocker(DockWidget):
         self.config.set("pages.last_project", config_path)
         self.refresh()
 
+    # ------------------------------------------------------------------ páginas
+
+    def _new_page_dialog(self):
+        """Diálogo de nova página; devolve opções ou None se cancelado."""
+        widgets = QtWidgets
+        dialog = widgets.QDialog(self.widget())
+        dialog.setWindowTitle("Criar página")
+        form = widgets.QFormLayout(dialog)
+
+        cmb_formato = widgets.QComboBox()
+        for chave, rotulo in FORMATO_ITENS:
+            cmb_formato.addItem(rotulo, chave)
+        atual = self.config.get("pages.format", "A4") or "A4"
+        index = cmb_formato.findData(atual)
+        if index >= 0:
+            cmb_formato.setCurrentIndex(index)
+        form.addRow("Formato:", cmb_formato)
+
+        spin_dpi = widgets.QSpinBox()
+        spin_dpi.setRange(72, 1200)
+        spin_dpi.setValue(int(self.config.get("pages.dpi", 300) or 300))
+        form.addRow("DPI:", spin_dpi)
+
+        spin_w = widgets.QDoubleSpinBox()
+        spin_w.setRange(50, 600)
+        spin_w.setValue(210)
+        spin_w.setSuffix(" mm")
+        spin_h = widgets.QDoubleSpinBox()
+        spin_h.setRange(50, 600)
+        spin_h.setValue(210)
+        spin_h.setSuffix(" mm")
+        row_livre = widgets.QHBoxLayout()
+        row_livre.addWidget(widgets.QLabel("L:"))
+        row_livre.addWidget(spin_w)
+        row_livre.addWidget(widgets.QLabel("A:"))
+        row_livre.addWidget(spin_h)
+        form.addRow("Livre:", row_livre)
+
+        spin_strip = widgets.QSpinBox()
+        spin_strip.setRange(1, 8)
+        spin_strip.setValue(int(self.config.get("pages.strip_panels", 3) or 3))
+        form.addRow("Painéis da tirinha:", spin_strip)
+
+        def _update_enabled():
+            chave = cmb_formato.currentData()
+            row_livre.setEnabled(chave == "livre")
+            spin_strip.setEnabled(chave == "tirinha")
+
+        cmb_formato.currentIndexChanged.connect(_update_enabled)
+        _update_enabled()
+
+        modelo_path = self.config.get("pages.model") or ""
+        chk_modelo = widgets.QCheckBox("Usar modelo de página")
+        chk_modelo.setChecked(bool(self.config.get("pages.use_model", False)))
+        chk_modelo.setEnabled(bool(modelo_path) and os.path.isfile(modelo_path))
+        form.addRow("", chk_modelo)
+
+        buttons_row = widgets.QHBoxLayout()
+        button_ok = widgets.QPushButton("Criar")
+        button_ok.setDefault(True)
+        button_cancel = widgets.QPushButton("Cancelar")
+        button_ok.clicked.connect(dialog.accept)
+        button_cancel.clicked.connect(dialog.reject)
+        buttons_row.addStretch(1)
+        buttons_row.addWidget(button_cancel)
+        buttons_row.addWidget(button_ok)
+        form.addRow(buttons_row)
+
+        if dialog.exec() != 1:
+            return None
+        chave = cmb_formato.currentData()
+        dpi = spin_dpi.value()
+        self.config.set("pages.format", chave)
+        self.config.set("pages.dpi", dpi)
+        self.config.set("pages.strip_panels", spin_strip.value())
+        self.config.set("pages.use_model", chk_modelo.isChecked())
+        return {
+            "formato": chave,
+            "dpi": dpi,
+            "w_mm": spin_w.value(),
+            "h_mm": spin_h.value(),
+            "strip_panels": spin_strip.value(),
+            "modelo_path": modelo_path if chk_modelo.isChecked() else "",
+        }
+
     def create_next_page(self):
         """Cria uma página nova na pasta do projeto e atualiza a grade."""
         if not self.folder:
-            helpers.show_message("Crie ou abra um projeto primeiro.")
+            helpers.show_info("Nova página", "Crie ou abra um projeto primeiro.")
             return
-        fmt = self.config.get("pages.format", "A4") or "A4"
-        dpi = int(self.config.get("pages.dpi", 300) or 300)
+        opcoes = self._new_page_dialog()
+        if opcoes is None:
+            return
+        fmt = opcoes["formato"]
+        dpi = opcoes["dpi"]
+        if fmt == "livre":
+            width_px = int(round(opcoes["w_mm"] * dpi / 25.4))
+            height_px = int(round(opcoes["h_mm"] * dpi / 25.4))
+        else:
+            width_px, height_px = roteiro.page_pixels({"format": fmt}, fmt, dpi)
 
         if self.project is not None:
             numero = self.project.page_number + 1
@@ -285,37 +427,84 @@ class PagesDocker(DockWidget):
             relative = filename
             titulo = "pagina {0}".format(numero)
 
-        page = {
-            "index": numero,
-            "format": fmt,
-            "dpi": dpi,
-            "margin": 0.05,
-            "gutter": 0.0,
-            "panels": [(0.05, 0.05, 0.9, 0.9)],
-            "balloons": [],
-        }
-        width, height = roteiro.page_pixels(page, fmt, dpi)
-        panel_svg = generator._panels_svg(page, width, height, dpi)
-        try:
-            document = generator._build_document(
-                page, titulo, panel_svg, "", width, height, dpi
-            )
-            generator._save_document(document, path)
-        except (RuntimeError, OSError) as error:
-            helpers.show_message("Falha ao criar a página: {0}".format(error))
-            return
+        modelo = opcoes.get("modelo_path") or ""
+        if modelo and os.path.isfile(modelo):
+            try:
+                shutil.copy2(modelo, path)
+                document = Krita.instance().openDocument(path)
+                if document is None:
+                    raise RuntimeError("não foi possível abrir o modelo")
+                self._adaptar_modelo(
+                    document, fmt, width_px, height_px, dpi, opcoes["strip_panels"]
+                )
+                self.apply_margin_guides(document)
+                document.setModified(False)
+                document.close()
+            except (OSError, RuntimeError) as error:
+                helpers.show_info(
+                    "Nova página", "Falha ao usar o modelo: {0}".format(error)
+                )
+                return
+        else:
+            page = {
+                "index": numero,
+                "format": fmt if fmt != "livre" else "A4",
+                "dpi": dpi,
+                "margin": 0.05,
+                "gutter": 0.0,
+                "panels": [(0.05, 0.05, 0.9, 0.9)],
+                "balloons": [],
+            }
+            if fmt == "tirinha":
+                page["panels"] = roteiro.build_strip_panels(opcoes["strip_panels"])
+            panel_svg = generator._panels_svg(page, width_px, height_px, dpi)
+            try:
+                document = generator._build_document(
+                    page, titulo, panel_svg, "", width_px, height_px, dpi
+                )
+                self.apply_margin_guides(document)
+                generator._save_document(document, path)
+            except (RuntimeError, OSError) as error:
+                helpers.show_info("Nova página", "Falha ao criar a página: {0}".format(error))
+                return
 
         if self.project is not None:
             self.project.register_pages([relative])
         self.refresh()
-        helpers.show_message("Página criada: {0}".format(filename))
+        helpers.show_info("Nova página", "Página criada: {0}".format(filename))
 
-    def create_margin_guides(self):
-        """Cria 12 guias no documento ativo: 0,5 / 1 / 1,5 cm por lado."""
-        document = helpers.active_document()
-        if document is None:
-            helpers.show_message("Abra a página para criar as guias.")
-            return
+    def _adaptar_modelo(self, document, fmt, width_px, height_px, dpi, strip_panels):
+        """Redimensiona e/ou adapta o modelo ao formato pedido."""
+        if document.width() != width_px or document.height() != height_px:
+            document.scaleImage(width_px, height_px, dpi, dpi, "Bilinear")
+        if fmt == "tirinha":
+            self._aplicar_tira(document, strip_panels, width_px, height_px, dpi)
+        document.refreshProjection()
+
+    def _aplicar_tira(self, document, count, width_px, height_px, dpi):
+        """Substitui os painéis do documento por uma tira horizontal."""
+        target = None
+        for node in document.rootNode().findChildNodes(recursive=True):
+            if node.type() == "grouplayer" and node.name().lower().startswith("page"):
+                target = node
+                break
+        if target is None:
+            target = document.rootNode()
+        for child in list(target.childNodes()):
+            if child.type() == "vectorlayer" and child.name().lower() in ("panels", "mask"):
+                child.setVisible(False)
+        page = {"panels": roteiro.build_strip_panels(count), "format": "tirinha", "dpi": dpi}
+        svg = generator._panels_svg(page, width_px, height_px, dpi)
+        nova = document.createVectorLayer("panels")
+        target.addChildNode(nova, None)
+        nova.addShapesFromSvg(svg)
+        clone = document.createCloneLayer("panels contorno", nova)
+        if clone is not None:
+            clone.setBlendingMode("multiply")
+            target.addChildNode(clone, None)
+
+    def apply_margin_guides(self, document):
+        """Cria 12 guias no documento: 0,5 / 1 / 1,5 cm por lado."""
         dpi = helpers.document_dpi(document)
         width = document.width()
         height = document.height()
@@ -327,7 +516,160 @@ class PagesDocker(DockWidget):
             horizontais.extend([px, height - px])
         document.setVerticalGuides(sorted(set(round(v, 3) for v in verticais)))
         document.setHorizontalGuides(sorted(set(round(v, 3) for v in horizontais)))
+
+    def create_margin_guides(self):
+        document = helpers.active_document()
+        if document is None:
+            helpers.show_message("Abra a página para criar as guias.")
+            return
+        self.apply_margin_guides(document)
         helpers.show_message("Guias de margem criadas (0,5 / 1 / 1,5 cm por lado).")
+
+    # ------------------------------------------------------------------ modelo
+
+    def _refresh_model_label(self):
+        modelo = self.config.get("pages.model") or ""
+        if modelo and os.path.isfile(modelo):
+            self.lbl_model.setText("Modelo: {0}".format(os.path.basename(modelo)))
+        else:
+            self.lbl_model.setText("Sem modelo definido (gera o padrão).")
+
+    def _listar_templates_krita(self):
+        """Templates de HQ do Krita: prefixo do Qt e pasta de templates do usuário."""
+        candidatos = []
+        prefixo = qlibrary_prefix()
+        if prefixo:
+            candidatos.append(os.path.join(prefixo, "share", "krita", "templates", "comics"))
+        candidatos.append(
+            os.path.join(os.path.expanduser("~"), ".local", "share", "krita", "templates", "comics")
+        )
+        resultado = {}
+        for pasta in candidatos:
+            if not os.path.isdir(pasta):
+                continue
+            for raiz in (pasta, os.path.join(pasta, ".source")):
+                if not os.path.isdir(raiz):
+                    continue
+                for nome in sorted(os.listdir(raiz)):
+                    if nome.lower().endswith(".kra") and nome not in resultado:
+                        resultado[nome] = os.path.join(raiz, nome)
+        return resultado
+
+    def define_model(self):
+        """Escolhe o modelo de página: página atual salva ou template do Krita."""
+        widgets = QtWidgets
+        dialog = widgets.QDialog(self.widget())
+        dialog.setWindowTitle("Definir modelo de página")
+        layout = widgets.QVBoxLayout(dialog)
+        layout.addWidget(
+            widgets.QLabel(
+                "O modelo é copiado para {0} e usado pelas próximas páginas.".format(
+                    MODELOS_DIR
+                )
+            )
+        )
+        cmb = widgets.QComboBox()
+        cmb.addItem("Página atual (precisa estar salva)", "atual")
+        for nome in sorted(self._listar_templates_krita().keys()):
+            cmb.addItem("Template do Krita: {0}".format(nome), nome)
+        layout.addWidget(cmb)
+        buttons_row = widgets.QHBoxLayout()
+        button_ok = widgets.QPushButton("Usar como modelo")
+        button_ok.setDefault(True)
+        button_cancel = widgets.QPushButton("Cancelar")
+        button_ok.clicked.connect(dialog.accept)
+        button_cancel.clicked.connect(dialog.reject)
+        buttons_row.addStretch(1)
+        buttons_row.addWidget(button_cancel)
+        buttons_row.addWidget(button_ok)
+        layout.addLayout(buttons_row)
+
+        if dialog.exec() != 1:
+            return
+        escolha = cmb.currentData()
+        if escolha == "atual":
+            document = helpers.active_document()
+            if document is None or not document.fileName():
+                helpers.show_info(
+                    "Modelo de página",
+                    "Salve a página atual antes de usá-la como modelo.",
+                )
+                return
+            origem = document.fileName()
+        else:
+            origem = self._listar_templates_krita().get(escolha)
+            if not origem:
+                helpers.show_info("Modelo de página", "Template não encontrado.")
+                return
+        os.makedirs(MODELOS_DIR, exist_ok=True)
+        destino = os.path.join(MODELOS_DIR, "modelo-{0}".format(os.path.basename(origem)))
+        try:
+            shutil.copy2(origem, destino)
+        except OSError as error:
+            helpers.show_info("Modelo de página", "Falha ao copiar: {0}".format(error))
+            return
+        self.config.set("pages.model", destino)
+        self.config.set("pages.use_model", True)
+        self._refresh_model_label()
+        helpers.show_info(
+            "Modelo de página",
+            "Modelo definido: {0}.\n\nAs próximas páginas usarão este modelo "
+            "(formato/DPI escolhidos no diálogo adaptam tamanho e tirinha).".format(
+                os.path.basename(destino)
+            ),
+        )
+
+    # ------------------------------------------------------------------ referência
+
+    def mark_reference_layer(self):
+        """Marca a camada selecionada como referência (rótulo, trava, opacidade)."""
+        document = helpers.active_document()
+        if document is None:
+            helpers.show_info("Referência", "Abra um documento.")
+            return
+        node = document.activeNode()
+        if node is None:
+            helpers.show_info("Referência", "Selecione a camada a marcar.")
+            return
+        node.setColorLabel(1)
+        node.setLocked(True)
+        node.setOpacity(150)
+        document.refreshProjection()
+        helpers.show_info(
+            "Referência",
+            "Camada '{0}' marcada como referência (travada).".format(node.name()),
+        )
+
+    def import_reference(self):
+        """Importa um PNG como camada de referência travada no grupo ativo."""
+        path, _ = QtWidgets.QFileDialog.getOpenFileName(
+            self.widget(), "Referência (PNG)", os.path.expanduser("~"), "PNG (*.png)"
+        )
+        if not path:
+            return
+        document = helpers.active_document()
+        if document is None:
+            helpers.show_info("Referência", "Abra a página para importar.")
+            return
+        parent, above = helpers.target_container(document)
+        nome = helpers.unique_layer_name(document, "Referência")
+        layer = document.createFileLayer(nome, path, "KeepAspectRatio", "Bilinear")
+        if layer is None:
+            helpers.show_info("Referência", "Não foi possível criar a camada.")
+            return
+        parent.addChildNode(layer, above)
+        layer.setLocked(True)
+        layer.setOpacity(150)
+        layer.setColorLabel(1)
+        document.refreshProjection()
+        helpers.show_info(
+            "Referência",
+            "Referência importada e travada no grupo ativo: {0}".format(
+                os.path.basename(path)
+            ),
+        )
+
+    # ------------------------------------------------------------------ lista
 
     def open_current_folder(self):
         folder = self.folder
