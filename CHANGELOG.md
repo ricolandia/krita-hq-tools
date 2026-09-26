@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.5.0] — 2026-09-26
+
+### Adicionado
+
+- Kit de pincéis da comunidade (bundling curado): Deevad v8.2 (David Revoy,
+  CC-BY 4.0; 64 presets, brushes, patterns e palettes) e Krita Watercolor Set
+  (Vasco Basqué, CC-0; 13 presets e 11 brushes), em
+  `hq_tools/resources/brushes/<pack>/` com `LICENSE.txt` e `FONTE.md`
+  (autor, origem, licença, alterações: nenhuma).
+- Aba "Packs" no docker de pincéis: lista com autor/licença, "Instalar pack
+  selecionado" (copia para os recursos do Krita e marca "[instalado]") e
+  "Ver licença".
+- `modules/brushes/packs.py` (núcleo puro) com 6 testes; CREDITS.md com as
+  atribuições e a lista de candidatos excluídos por falta de licença.
+
 ## [0.4.0] — 2026-09-26
 
 ### Adicionado

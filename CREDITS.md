@@ -60,6 +60,23 @@ O plugin configura recursos nativos do Krita, de autoria do projeto Krita:
 - 112 padrões de preenchimento e presets de pincel dos bundles padrão:
   Krita team e contribuidores (licenças dos respectivos bundles).
 
+## Pincéis da comunidade (kit, `hq_tools/resources/brushes/`)
+
+| Pack | Autor | Origem | Licença |
+|---|---|---|---|
+| Deevad v8.2 (brushkit) | David Revoy | https://github.com/Deevad/deevad-krita-brushpresets | CC-BY 4.0 (atribuição a David Revoy em redistribuição) |
+| Krita Watercolor Set | Vasco Basqué | https://github.com/vascoalexander/krita-watercolor-set | CC-0 (ícones de David Revoy/MyPaint também CC-0) |
+
+Regra do kit: só entram packs com licença explícita que permita redistribuição;
+os arquivos são os originais do autor, sem alteração; cada pack traz
+`LICENSE.txt` e `FONTE.md` (autor, origem, licença, alterações).
+
+Candidatos avaliados e **não incluídos** por falta de licença clara (podem
+entrar após contato com o autor ou como link): Cityscape Brushes e Pesi's
+Watercolors (packs locais do autor do plugin), packs do repo portnov/krita-brushes
+(comics de Animtim, Ramon de Ramon Miranda, Gouache, pencils), Lilly_Mist
+Comics pack e InkP/Expressive Inks.
+
 ## Projeto e contato
 
 HQ Tools, por Ricardo Graça. Repositório:

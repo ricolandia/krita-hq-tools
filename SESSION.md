@@ -1,6 +1,6 @@
 # SESSION — HQ Tools (Krita-Comics-Plugin)
 
-Fonte da verdade do projeto. Atualizado em 2026-09-26 (v0.4.0).
+Fonte da verdade do projeto. Atualizado em 2026-09-26 (v0.5.0).
 
 ## Contexto
 
@@ -25,36 +25,25 @@ conclusão da pesquisa está em `docs/contexto/` (os 4 arquivos originais).
 - **Paletas:** docker próprio com templates `.gpl`.
 - Licença MIT; docs em `.md` na pasta do projeto (regra de documentação).
 
-## Estado (v0.4.0)
+## Estado (v0.5.0)
 
 Feito:
 
-- v0.1.0 a v0.3.1 completas (ver CHANGELOG).
-- **Auditoria (v0.3.2)**: 3 especialistas (Python, API do Krita × krita.pyi,
-  arquitetura); 0 críticos no 5.3.4; corrigidos 4 bugs de PyQt6 (Krita 6),
-  numeração de página, máscara vazia da retícula, espessura das linhas de
-  efeito (DPI), encoding do CPMT, manual dentro do pacote, `.action` no ZIP,
-  build-zip sem `zip` externo; docs atualizadas.
-- **Pacote fácil (v0.4.0)**: guias de margem automáticas na página nova;
-  diálogo de nova página (A4/A5/A3/tirinha/americano/tankobon/quadrado/livre
-  em mm, DPI, painéis da tirinha 3 padrão); "Definir modelo de página"
-  (página atual ou template de HQ do Krita localizado via `QLibraryInfo`,
-  copiado para `~/.local/share/krita/hq_tools/modelos/`); adaptação do modelo
-  (A3 redimensiona via `scaleImage`, tirinha vira tira horizontal); "Camada de
-  referência" (rótulo, trava, opacidade) e "Importar referência (PNG)"
-  (camada de arquivo travada no grupo ativo).
-- **Validação no Krita (26/09): tudo OK** — diálogo de nova página, modelo com
-  template do Krita (QLibraryInfo), tirinha, A3, guias automáticas e
-  referências confirmados pelo Ricardo.
-- Testes do núcleo: 58 passando.
+- v0.1.0 a v0.4.0 completas (ver CHANGELOG).
+- **Kit de pincéis da comunidade (v0.5.0)**: curadoria com licença verificada
+  na fonte; inclusos Deevad v8.2 (David Revoy, CC-BY 4.0, 64 presets + brushes/
+  patterns/palettes) e Krita Watercolor Set (Vasco Basqué, CC-0, 13 presets +
+  11 brushes) em `hq_tools/resources/brushes/`, cada um com `LICENSE.txt` e
+  `FONTE.md`; aba "Packs" no docker de pincéis (instalar com um clique,
+  ver licença, marca "[instalado]"); `modules/brushes/packs.py` puro com 6
+  testes; CREDITS.md com atribuições e a lista de candidatos excluídos por
+  falta de licença (Cityscape, Pesi's, portnov, Lilly_Mist, InkP).
+- Testes do núcleo: 64 passando.
 
 Pendente (validação dentro do Krita):
 
-- Rodar o roteiro de `docs/VALIDACAO.md` (item 5 atualizado: diálogo de nova
-  página, modelo com template do Krita, tirinha, referências).
-- Confirmar: `QLibraryInfo.PrefixPath` achando os templates de comics no
-  AppImage; `scaleImage` e a troca de painéis da tirinha; `createFileLayer`
-  com "KeepAspectRatio"/"Bilinear".
+- Rodar o roteiro de `docs/VALIDACAO.md` (item 7b): instalar os dois packs,
+  reiniciar e conferir os presets nos conjuntos e no docker de presets.
 
 ## Comandos
 

@@ -172,6 +172,16 @@ registrados no plugin.
 - "Instalar bundle...": escolher um `.bundle` (ex.: Cityscape Brushes em
   APP/Plugins/Krita), reiniciar e conferir os presets novos no Krita.
 
+### 7b. Packs da comunidade (aba Packs)
+
+- A aba "Packs" lista Deevad v8.2 (David Revoy, CC-BY 4.0) e Krita Watercolor
+  Set (Vasco Basqué, CC-0), com origem no tooltip.
+- "Ver licença" mostra o LICENSE.txt do pack; os créditos estão no CREDITS.md.
+- "Instalar pack selecionado" copia os arquivos para as pastas de recursos do
+  Krita (paintoppresets/brushes/patterns/palettes) e marca "[instalado]".
+- Após reiniciar o Krita, os presets aparecem no docker de presets e nos
+  conjuntos (nomes como "Ink ..." do Deevad e "PW ..." do Watercolor Set).
+
 ## Problemas conhecidos e tratamento
 
 - Texto de SVG pode chegar como shape não editável por texto na 5.3.4 (bloco
