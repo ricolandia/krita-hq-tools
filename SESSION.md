@@ -1,6 +1,6 @@
 # SESSION — HQ Tools (Krita-Comics-Plugin)
 
-Fonte da verdade do projeto. Atualizado em 2026-09-26 (v0.5.4).
+Fonte da verdade do projeto. Atualizado em 2026-09-26 (v0.6.0).
 
 ## Contexto
 
@@ -54,6 +54,12 @@ Feito:
   sobrescreve buracos; referência PNG usa "ToImageSize"; API pública no
   generator (panels_svg/build_page_document/save_page); Chewy (404) removido
   do kit; cache de aliases e validação de PNG no parser. 67 testes passando.
+- **Kit ampliado (v0.6.0)**: 11 padrões/texturas próprios (papéis, retículas
+  extras, trama de manga, hachuras, granulado) com botão de instalação no
+  docker de retículas; modelos de página gerados no Krita (A4, A3, tirinhas
+  1-3, grades 2x2/3x3) no "Definir modelo"; família Londrina completa nas
+  fontes (12 famílias); paletas art-valores e art-carta-reticula. 77 testes
+  passando.
 
 Pendente (validação dentro do Krita):
 

@@ -25,10 +25,16 @@ Os quatro documentos originais de contexto do projeto estão em
 O plugin acompanha um kit com licenças documentadas em `CREDITS.md`:
 
 - **Fontes** (SIL OFL 1.1): Bangers, Comic Relief (Regular/Bold), Patrick
-  Hand, Comic Neue (Regular/Bold), Londrina Solid, Nanum Pen Script, Gaegu e
-  Boogaloo, instaláveis com um clique no docker de balões;
+  Hand, Comic Neue (Regular/Bold), família Londrina completa (Solid, Shadow,
+  Outline, Sketch), Nanum Pen Script, Gaegu e Boogaloo, instaláveis com um
+  clique no docker de balões;
 - **Balões** de domínio público (CC0/PD): copiados para a pasta padrão na
   primeira execução;
+- **Padrões e texturas** próprios (11 tiles: papéis, retículas extras, trama
+  de manga, hachuras, granulado), instaláveis no docker de retículas e usados
+  pelo modo "tom com padrão";
+- **Modelos de página** gerados pelo plugin (A4, A3, tirinhas 1-3, grades 2x2
+  e 3x3) no "Definir modelo de página";
 - **Pincéis da comunidade** (aba "Packs" no docker de pincéis): Deevad v8.2
   (David Revoy, CC-BY 4.0) e Krita Watercolor Set (Vasco Basqué, CC-0),
   instaláveis com um clique, cada um com licença e créditos.

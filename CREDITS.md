@@ -17,6 +17,9 @@ Instaláveis pelo botão "Instalar fontes de HQ" no docker de balões
 | Patrick Hand | Patrick Wagesreiter | SIL OFL 1.1 (`OFL-PatrickHand.txt`) |
 | Comic Neue (Regular e Bold) | The Comic Neue Project Authors (crozynski/comicneue) | SIL OFL 1.1 (`OFL-Comicneue.txt`) |
 | Londrina Solid | The Londrina Solid Authors (marcelommp/Londrina-Typeface) | SIL OFL 1.1 (`OFL-Londrinasolid.txt`) |
+| Londrina Shadow | The Londrina Shadow Authors (marcelommp/Londrina-Typeface) | SIL OFL 1.1 (`OFL-LondrinaShadow.txt`) |
+| Londrina Outline | The Londrina Outline Authors (marcelommp/Londrina-Typeface) | SIL OFL 1.1 (`OFL-LondrinaOutline.txt`) |
+| Londrina Sketch | The Londrina Sketch Authors (marcelommp/Londrina-Typeface) | SIL OFL 1.1 (`OFL-LondrinaSketch.txt`) |
 | Nanum Pen Script | NHN Corporation | SIL OFL 1.1 (`OFL-Nanumpenscript.txt`) |
 | Gaegu | The Gaegu Project Authors | SIL OFL 1.1 (`OFL-Gaegu.txt`) |
 | Boogaloo | John Vargas Beltrán | SIL OFL 1.1 (`OFL-Boogaloo.txt`) |
@@ -81,6 +84,16 @@ entrar após contato com o autor ou como link): Cityscape Brushes e Pesi's
 Watercolors (packs locais do autor do plugin), packs do repo portnov/krita-brushes
 (comics de Animtim, Ramon de Ramon Miranda, Gouache, pencils), Lilly_Mist
 Comics pack e InkP/Expressive Inks.
+
+## Itens próprios do plugin (MIT)
+
+- Padrões e texturas (`hq_tools/resources/patterns/`): 11 tiles gerados por
+  código (papéis, retículas de estrelas/corações/ruído, trama de manga,
+  hachuras 45°/135° e granulado de nanquim), criados para o projeto.
+- Modelos de página gerados pelo plugin (A4, A3, tirinhas 1-3, grades 2x2 e
+  3x3), criados para o projeto.
+- Paletas, presets de retícula, amostras de balões e onomatopeias: criadas
+  para o projeto.
 
 ## Projeto e contato
 

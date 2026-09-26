@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.6.0] — 2026-09-26
+
+### Adicionado
+
+- Kit de padrões e texturas próprios (11 tiles gerados por código, MIT):
+  papéis (liso, gramatura, trama), aguado, retículas extras (estrelas,
+  corações, ruído), trama de manga, hachuras 45°/135° e granulado de nanquim;
+  botão "Instalar padrões e texturas (kit)" no docker de retículas; os tiles
+  entram no modo "tom com padrão" do Halftone.
+- Modelos de página gerados pelo plugin (botão "Gerar modelos padrão do HQ
+  Tools" no "Definir modelo de página"): A4, A3, tirinhas 1-3 tiras e grades
+  2x2/3x3, com guias de margem e camadas.
+- Família Londrina completa (Shadow, Outline e Sketch) nas fontes OFL do kit
+  (12 famílias no total).
+- Paletas novas: art-valores (escala de cinzas) e art-carta-reticula (tons com
+  LPI sugerido).
+
+### Corrigido
+
+- Nada quebrado; 77 testes passando (10 novos: tiles e specs de modelos).
+
 ## [0.5.4] — 2026-09-26
 
 Auditoria focada nas mudanças pós-v0.3.2 (manager, brushes, compat,

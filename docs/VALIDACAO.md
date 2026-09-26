@@ -63,6 +63,8 @@ Diferenças entre o dump do bloco 2/3 e o que o plugin gera (ver
 - **Tom por padrão**: marcar "Usar padrão do Krita" e escolher um padrão
   (ex.: Stripes02.pat): camada de preenchimento com o padrão. E no meio-tom
   com o mesmo padrão: a tela usa o padrão (ex.: listras virando meio-tom).
+  Após "Instalar padrões e texturas (kit)", os tiles próprios (papéis,
+  estrelas, corações, hachuras...) aparecem na lista de padrões.
 - **CMYK**: em documento CMYKA, aplicar "Cores por canal": a máscara gera
   meios-tons por canal; conferir os 4 ângulos (15/75/0/45) e a ausência de
   moiré em zoom.
@@ -90,10 +92,10 @@ Diferenças entre o dump do bloco 2/3 e o que o plugin gera (ver
 
 - Primeira execução: a pasta padrão de balões recebe as amostras do plugin e
   os 2 balões CC0/PD (`balao-fala-amada44.svg`, `balao-talk-to-me-cc0.svg`).
-- "Instalar fontes de HQ": as 9 famílias (Bangers, Comic Relief, Patrick Hand,
-  Comic Neue, Londrina Solid, Nanum Pen Script, Gaegu, Boogaloo) vão para
-  `~/.local/share/fonts/hq_tools`; após reiniciar o Krita, aparecem na
-  ferramenta de texto. Conferir créditos em `CREDITS.md`.
+- "Instalar fontes de HQ": as 12 famílias (Bangers, Comic Relief, Patrick Hand,
+  Comic Neue, Londrina Solid/Shadow/Outline/Sketch, Nanum Pen Script, Gaegu,
+  Boogaloo) vão para `~/.local/share/fonts/hq_tools`; após reiniciar o Krita,
+  aparecem na ferramenta de texto. Conferir créditos em `CREDITS.md`.
 
 ### 3d. Onomatopeias
 
@@ -135,10 +137,12 @@ Diferenças entre o dump do bloco 2/3 e o que o plugin gera (ver
   já aplicadas. Formatos: A4/A5/A3/tirinha/americano/tankobon/quadrado/livre
   (largura e altura em mm). Em projeto CPMT, a página é registrada no
   `comicConfig.json`.
-- "Definir modelo de página...": usar a página atual salva ou um template de
-  HQ do Krita (BD Europeu, EUA, Mangá, Tsukirino, Waffle). Ao criar a página
-  com modelo: formato igual = cópia direta; A3 = redimensiona; tirinha =
-  substitui os painéis por uma tira horizontal (3 por padrão).
+- "Definir modelo de página...": usar a página atual salva, um template de HQ
+  do Krita (BD Europeu, EUA, Mangá, Tsukirino, Waffle) ou os modelos gerados
+  pelo botão "Gerar modelos padrão do HQ Tools" (A4, A3, tirinhas 1-3, grades
+  2x2 e 3x3, com guias). Ao criar a página com modelo: formato igual = cópia
+  direta; A3 = redimensiona; tirinha = substitui os painéis por uma tira
+  horizontal (3 por padrão).
 - "Guias de margem": no documento ativo, criam-se 12 guias (0,5 / 1 / 1,5 cm
   por lado); conferir posições: 59/118/177 px a 300 dpi a partir de cada borda.
   Atenção: substitui as guias existentes.
