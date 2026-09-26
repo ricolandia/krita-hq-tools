@@ -129,13 +129,22 @@ Diferenças entre o dump do bloco 2/3 e o que o plugin gera (ver
   diálogo e continua o fluxo com a pasta escolhida.
 - "Abrir projeto...": abrir o `comicConfig.json` de um projeto criado pelo
   CPMT ou pelo próprio fluxo acima.
-- "Criar próxima página": gera a página (A4 300 dpi por padrão, configurável
-  em `pages.format`/`pages.dpi`), com fundo branco, grupo PageNN, painel com
-  margem, Sketch/Color/Ink e contorno; a miniatura aparece na grade. Em
-  projeto CPMT, a página é registrada no `comicConfig.json`.
+- "Criar próxima página": abre o diálogo de nova página (formato, DPI,
+  painéis da tirinha). A página nasce com as guias de margem (0,5/1/1,5 cm)
+  já aplicadas. Formatos: A4/A5/A3/tirinha/americano/tankobon/quadrado/livre
+  (largura e altura em mm). Em projeto CPMT, a página é registrada no
+  `comicConfig.json`.
+- "Definir modelo de página...": usar a página atual salva ou um template de
+  HQ do Krita (BD Europeu, EUA, Mangá, Tsukirino, Waffle). Ao criar a página
+  com modelo: formato igual = cópia direta; A3 = redimensiona; tirinha =
+  substitui os painéis por uma tira horizontal (3 por padrão).
 - "Guias de margem": no documento ativo, criam-se 12 guias (0,5 / 1 / 1,5 cm
   por lado); conferir posições: 59/118/177 px a 300 dpi a partir de cada borda.
   Atenção: substitui as guias existentes.
+- Referências: "Camada de referência" marca a camada selecionada (rótulo,
+  trava, opacidade reduzida); "Importar referência (PNG)" insere o PNG como
+  camada de arquivo travada no grupo ativo (usado para renders do Blender ou
+  poses de ferramentas web).
 - Duplo clique abre a página; arrastar reordena e grava no `comicConfig.json`
   (abrir o arquivo e conferir a ordem da lista `pages`).
 

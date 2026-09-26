@@ -1,6 +1,6 @@
 # SESSION — HQ Tools (Krita-Comics-Plugin)
 
-Fonte da verdade do projeto. Atualizado em 2026-09-26 (v0.3.2).
+Fonte da verdade do projeto. Atualizado em 2026-09-26 (v0.4.0).
 
 ## Contexto
 
@@ -25,33 +25,33 @@ conclusão da pesquisa está em `docs/contexto/` (os 4 arquivos originais).
 - **Paletas:** docker próprio com templates `.gpl`.
 - Licença MIT; docs em `.md` na pasta do projeto (regra de documentação).
 
-## Estado (v0.3.1)
+## Estado (v0.4.0)
 
 Feito:
 
-- v0.1.0, v0.2.0 e v0.3.0 completas (ver CHANGELOG).
-- **Novo projeto (v0.3.1)**: usa a pasta da página atual salva; sem página ou
-  sem save, aviso modal "Salve a página atual em uma pasta. Essa pasta será a
-  pasta do projeto."; cria `comicConfig.json` (CPMT, UTF-16), subpastas de
-  biblioteca (`biblioteca/{baloes,paineis,onomatopeias}`), `export`,
-  `templates`, `translations`, e aponta o docker de biblioteca para a pasta.
-- **Biblioteca v2**: recursos vetoriais (SVG via `toSvg`) ou de pintura (PNG
-  transparente recortado pela camada ativa via `pixelData` + `QImage`);
-  inserção de PNG como camada de pintura (`setPixelData`, fallback camada de
-  arquivo); lista com `.svg` e `.png`.
-- **Avisos mistos**: modais para fluxos/decisões (`helpers.show_info` com
-  `QMessageBox`), toast para sucessos rápidos.
-- **Polimento de UI**: `QGroupBox` (Projeto, Página, Recursos, Recurso novo),
-  ícones de tema via `compat.standard_icon`, tooltips e alinhamento uniforme.
-- Testes do núcleo: 55 passando.
+- v0.1.0 a v0.3.1 completas (ver CHANGELOG).
+- **Auditoria (v0.3.2)**: 3 especialistas (Python, API do Krita × krita.pyi,
+  arquitetura); 0 críticos no 5.3.4; corrigidos 4 bugs de PyQt6 (Krita 6),
+  numeração de página, máscara vazia da retícula, espessura das linhas de
+  efeito (DPI), encoding do CPMT, manual dentro do pacote, `.action` no ZIP,
+  build-zip sem `zip` externo; docs atualizadas.
+- **Pacote fácil (v0.4.0)**: guias de margem automáticas na página nova;
+  diálogo de nova página (A4/A5/A3/tirinha/americano/tankobon/quadrado/livre
+  em mm, DPI, painéis da tirinha 3 padrão); "Definir modelo de página"
+  (página atual ou template de HQ do Krita localizado via `QLibraryInfo`,
+  copiado para `~/.local/share/krita/hq_tools/modelos/`); adaptação do modelo
+  (A3 redimensiona via `scaleImage`, tirinha vira tira horizontal); "Camada de
+  referência" (rótulo, trava, opacidade) e "Importar referência (PNG)"
+  (camada de arquivo travada no grupo ativo).
+- Testes do núcleo: 58 passando.
 
 Pendente (validação dentro do Krita):
 
-- Rodar o roteiro de `docs/VALIDACAO.md` (itens 3e com pintura/PNG, 5 com o
-  fluxo novo de projeto, 5b).
-- Confirmar: `pixelData` + `QImage(RGBA8888)` para exportar pintura com
-  transparência; `setPixelData` inserindo PNG; `QMessageBox` com o
-  `Window.qwindow()` como pai.
+- Rodar o roteiro de `docs/VALIDACAO.md` (item 5 atualizado: diálogo de nova
+  página, modelo com template do Krita, tirinha, referências).
+- Confirmar: `QLibraryInfo.PrefixPath` achando os templates de comics no
+  AppImage; `scaleImage` e a troca de painéis da tirinha; `createFileLayer`
+  com "KeepAspectRatio"/"Bilinear".
 
 ## Comandos
 
@@ -75,8 +75,6 @@ bash scripts/build-zip.sh                  # gerar ZIP instalável
 - Exportação e renomeação em lote no manager (segue no CPMT).
 - Hachura desenhada à mão via presets de pincel específicos.
 - Atualizar textos das páginas geradas e camada de referência.
-- Página criada por "Criar próxima página" com guias de margem já aplicadas
-  (hoje as guias são um botão separado).
 - Balde com fechamento de falhas (proposta avaliada em `Novas_ideias/`, ver
   `docs/IDEIAS-FUTURAS.md`): núcleo sem numpy, canais RGBA, camada nova
   transparente; UX com seleção + X/Y manual; PoC de clique no canvas como

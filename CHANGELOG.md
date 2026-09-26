@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.4.0] — 2026-09-26
+
+### Adicionado
+
+- "Criar próxima página" com diálogo: formato (A4, A5, A3, tirinha, americano,
+  tankobon, quadrado ou livre em mm), DPI e painéis da tirinha (3 padrão,
+  ajustável); a página nasce com as guias de margem (0,5 / 1 / 1,5 cm por
+  lado) já aplicadas.
+- "Definir modelo de página...": usa a página atual salva ou um template de HQ
+  do Krita (BD Europeu, EUA, Mangá, Tsukirino, Waffle), localizado via
+  `QLibraryInfo.PrefixPath` e copiado para `~/.local/share/krita/hq_tools/modelos/`.
+- Adaptação do modelo ao criar a página: formato igual = cópia direta; A3 =
+  redimensiona (`scaleImage`); tirinha = substitui os painéis por uma tira
+  horizontal de N painéis.
+- "Camada de referência": marca a camada selecionada (rótulo, trava e
+  opacidade reduzida).
+- "Importar referência (PNG)...": insere o PNG como camada de arquivo travada
+  no grupo ativo (renders do Blender ou poses de ferramentas web).
+- `roteiro.FORMATS` ganhou A3 (297 x 420) e tirinha (297 x 210) e
+  `build_strip_panels` para o layout da tira.
+
+### Corrigido
+
+- Nada quebrado; 58 testes passando (3 novos: formatos A3/tirinha e tira).
+
 ## [0.3.2] — 2026-09-26
 
 Auditoria completa (especialistas em Python, API do Krita e arquitetura).
