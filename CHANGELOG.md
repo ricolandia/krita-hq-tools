@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.5.4] — 2026-09-26
+
+Auditoria focada nas mudanças pós-v0.3.2 (manager, brushes, compat,
+empacotamento). 66 testes passando antes e 67 depois.
+
+### Corrigido
+
+- Página criada a partir de modelo nunca era salva adaptada (faltava
+  `saveAs` antes de fechar): formato/DPI, guias e tirinha não iam para o
+  disco; agora a página adaptada é gravada.
+- Regex do nome interno do `.kpp` não casava o formato real (`<Preset
+  name=...>` na raiz, não `<param name="name" value=...>`): o pack do Vasco
+  Basqué continuava oculto na aba Comunidade; corrigida com teste de
+  integração contra um `.kpp` real do kit.
+- Tirinha a partir de template: o contorno antigo (ex.: "Mask clone-outline")
+  vazava sobre a tira; agora clones/outlines do template são escondidos e a
+  tira entra acima de Ink.
+- Numeração sem projeto (pasta avulsa): buracos na sequência sobrescreviam
+  páginas existentes; agora busca o próximo índice livre.
+- Referência PNG importada com "KeepAspectRatio" (valor inválido = sem
+  escala); agora usa "ToImageSize".
+- `generator` ganhou API pública estável (`panels_svg`, `build_page_document`,
+  `save_page`); o docker de páginas não usa mais nomes privados.
+- Chewy (arquivos 404 baixados por engano) removido do kit de fontes.
+- Parser de `.kpp` valida a assinatura PNG e cacheia os aliases por mtime.
+
 ## [0.5.3] — 2026-09-26
 
 ### Corrigido

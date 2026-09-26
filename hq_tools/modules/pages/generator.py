@@ -204,3 +204,11 @@ def generate(script_text, target_dir=None, project=None, format_override=None,
     if project is not None and relatives:
         project.register_pages(relatives)
     return created
+
+
+# API pública estável (usada pelo docker de páginas): os nomes privados
+# históricos continuam como aliases para não quebrar importações externas.
+panels_svg = _panels_svg
+text_svg = _text_svg
+build_page_document = _build_document
+save_page = _save_document

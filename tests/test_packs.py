@@ -19,7 +19,7 @@ def png_com_preset(nome_interno):
         parte += struct.pack(">I", zlib.crc32(tipo + payload) & 0xFFFFFFFF)
         return parte
 
-    xml = '<param name="name" value="{0}"/>'.format(nome_interno).encode()
+    xml = '<Preset paintopid="paintbrush" name="{0}"/>'.format(nome_interno).encode()
     dados += chunk(b"tEXt", b"preset\0" + xml)
     dados += chunk(b"IEND", b"")
     return bytes(dados)
@@ -103,6 +103,19 @@ class TestPacks(unittest.TestCase):
         self.assertEqual(aliases["X9AA_WC_Basic"], "X9AA - WC Basic")
         self.assertEqual(aliases["SemNome"], "SemNome")
         self.assertEqual(aliases["A-Teste"], "A-Teste")
+
+    def test_aliases_kpp_real_do_kit(self):
+        real = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "hq_tools",
+            "resources",
+            "brushes",
+            "vasco-basque-watercolor",
+            "paintoppresets",
+            "X9AA_WC_Basic.kpp",
+        )
+        self.assertTrue(os.path.isfile(real), "kpp real do kit esperado no repo")
+        self.assertEqual(packs._preset_internal_name(real), "X9AA - WC Basic")
 
 
 if __name__ == "__main__":

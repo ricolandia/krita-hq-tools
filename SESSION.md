@@ -1,6 +1,6 @@
 # SESSION — HQ Tools (Krita-Comics-Plugin)
 
-Fonte da verdade do projeto. Atualizado em 2026-09-26 (v0.5.2).
+Fonte da verdade do projeto. Atualizado em 2026-09-26 (v0.5.4).
 
 ## Contexto
 
@@ -46,6 +46,14 @@ Feito:
   Comic Relief, Patrick Hand, Comic Neue, Londrina Solid, Nanum Pen Script,
   Gaegu, Boogaloo) com créditos no CREDITS.md; miniaturas da aba "Comunidade"
   em grade 72 px (mesmo tamanho dos conjuntos).
+- **Ajuste (v0.5.3)**: aba Comunidade casa presets pelo nome interno do .kpp.
+- **Auditoria focada + correções (v0.5.4)**: página com modelo agora é salva
+  adaptada (faltava `saveAs` antes de fechar); regex do nome interno corrigida
+  para o formato real (`<Preset name=...>`); tirinha esconde clones/outlines
+  do template e insere painéis acima de Ink; numeração sem projeto não
+  sobrescreve buracos; referência PNG usa "ToImageSize"; API pública no
+  generator (panels_svg/build_page_document/save_page); Chewy (404) removido
+  do kit; cache de aliases e validação de PNG no parser. 67 testes passando.
 
 Pendente (validação dentro do Krita):
 
@@ -66,6 +74,8 @@ bash scripts/build-zip.sh                  # gerar ZIP instalável
   **painéis** (estilos próprios), para substituir as amostras atuais.
 - Criar modelos de **página**: **tirinha (strip**, 1-3 tiras) e **página A3**,
   para o "Criar próxima página" e os formatos do plugin.
+- Verificar a visibilidade do botão "Instalar bundle..." no docker de pincéis
+  (sugestão: mover para a aba "Packs").
 
 ## Pendências futuras (fora de escopo por ora)
 

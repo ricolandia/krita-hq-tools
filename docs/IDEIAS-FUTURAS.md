@@ -101,3 +101,9 @@ Trabalhar no Blender, renderizar a referência por painel e importar no quadro
 (plano original, convenção `pXX_qYY_*.png` como camada de referência travada).
 O botão "Camada de referência" do HQ Tools (marca com rótulo de cor, trava e
 baixa opacidade) foi aprovado para entrar nesse fluxo.
+
+## Pendência de verificação do autor (26/09)
+
+- Botão "Instalar bundle..." pouco visível no docker de pincéis (fileira
+  inferior, junto de "Atualizar presets"/"Preencher slots"). O autor vai
+  verificar; sugestão registrada: mover para a aba "Packs" com ícone próprio.

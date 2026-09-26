@@ -95,6 +95,8 @@ def _preset_chunk_xml(caminho):
             dados = handle.read()
     except OSError:
         return None
+    if dados[:8] != b"\x89PNG\r\n\x1a\n":
+        return None
     offset = 8
     while offset + 8 <= len(dados):
         tamanho = int.from_bytes(dados[offset:offset + 4], "big")
@@ -110,25 +112,46 @@ def _preset_chunk_xml(caminho):
 
 
 def _preset_internal_name(caminho):
-    """Nome interno do preset (do XML dentro do .kpp), ou None."""
+    """Nome interno do preset (atributo da raiz <Preset> do XML), ou None."""
     xml = _preset_chunk_xml(caminho)
     if not xml:
         return None
-    match = re.search(r'<param name="name" value="([^"]*)"', xml)
+    match = re.search(r'<Preset\b[^>]*\bname="([^"]*)"', xml, re.IGNORECASE)
     if match:
         return match.group(1)
     return None
 
 
+_ALIASES_CACHE = {}
+
+
+def _pasta_mtime(pasta):
+    melhor = 0.0
+    try:
+        for nome in os.listdir(pasta):
+            caminho = os.path.join(pasta, nome)
+            try:
+                melhor = max(melhor, os.path.getmtime(caminho))
+            except OSError:
+                pass
+    except OSError:
+        pass
+    return melhor
+
+
 def preset_aliases(pack_dir):
     """Aliases por preset: ``(nome do arquivo, nome interno)``.
 
-    O Krita lista os presets pelo nome interno (que pode diferir do nome do
-    arquivo); este par permite casar os dois no ``resources("preset")``.
+    O Krita lista os presets pelo nome interno (atributo da raiz ``<Preset>``,
+    que pode diferir do nome do arquivo); este par permite casar os dois no
+    ``resources("preset")``. Cacheado por mtime da pasta de presets.
     """
     pasta = os.path.join(pack_dir, "paintoppresets")
     if not os.path.isdir(pasta):
         return []
+    chave = (pack_dir, _pasta_mtime(pasta))
+    if chave in _ALIASES_CACHE:
+        return _ALIASES_CACHE[chave]
     aliases = []
     for nome in sorted(os.listdir(pasta)):
         if not nome.lower().endswith((".kpp", ".myb")):
@@ -136,6 +159,7 @@ def preset_aliases(pack_dir):
         nome_arquivo = os.path.splitext(nome)[0]
         interno = _preset_internal_name(os.path.join(pasta, nome))
         aliases.append((nome_arquivo, interno or nome_arquivo))
+    _ALIASES_CACHE[chave] = aliases
     return aliases
 
 

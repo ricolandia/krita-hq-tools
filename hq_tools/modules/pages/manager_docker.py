@@ -413,15 +413,7 @@ class PagesDocker(DockWidget):
                 relative = filename
             titulo = "{0} - pagina {1}".format(self.project.project_name, numero)
         else:
-            try:
-                existentes = [
-                    name
-                    for name in os.listdir(self.folder)
-                    if name.lower().endswith(".kra")
-                ]
-            except OSError:
-                existentes = []
-            numero = len(existentes) + 1
+            numero = self._proximo_indice_livre()
             filename = "pagina_{0:03d}.kra".format(numero)
             path = os.path.join(self.folder, filename)
             relative = filename
@@ -438,6 +430,8 @@ class PagesDocker(DockWidget):
                     document, fmt, width_px, height_px, dpi, opcoes["strip_panels"]
                 )
                 self.apply_margin_guides(document)
+                if not document.saveAs(path):
+                    raise RuntimeError("não foi possível salvar a página adaptada")
                 document.setModified(False)
                 document.close()
             except (OSError, RuntimeError) as error:
@@ -457,13 +451,13 @@ class PagesDocker(DockWidget):
             }
             if fmt == "tirinha":
                 page["panels"] = roteiro.build_strip_panels(opcoes["strip_panels"])
-            panel_svg = generator._panels_svg(page, width_px, height_px, dpi)
+            panel_svg = generator.panels_svg(page, width_px, height_px, dpi)
             try:
-                document = generator._build_document(
+                document = generator.build_page_document(
                     page, titulo, panel_svg, "", width_px, height_px, dpi
                 )
                 self.apply_margin_guides(document)
-                generator._save_document(document, path)
+                generator.save_page(document, path)
             except (RuntimeError, OSError) as error:
                 helpers.show_info("Nova página", "Falha ao criar a página: {0}".format(error))
                 return
@@ -472,6 +466,24 @@ class PagesDocker(DockWidget):
             self.project.register_pages([relative])
         self.refresh()
         helpers.show_info("Nova página", "Página criada: {0}".format(filename))
+
+    def _proximo_indice_livre(self):
+        """Próximo número de página livre (sem sobrescrever buracos)."""
+        import re as _re
+
+        numeros = []
+        try:
+            nomes = os.listdir(self.folder)
+        except OSError:
+            nomes = []
+        for nome in nomes:
+            match = _re.search(r"pagina_(\d+)\.kra$", nome)
+            if match:
+                numeros.append(int(match.group(1)))
+        numero = 1
+        while numero in numeros:
+            numero += 1
+        return numero
 
     def _adaptar_modelo(self, document, fmt, width_px, height_px, dpi, strip_panels):
         """Redimensiona e/ou adapta o modelo ao formato pedido."""
@@ -483,25 +495,53 @@ class PagesDocker(DockWidget):
 
     def _aplicar_tira(self, document, count, width_px, height_px, dpi):
         """Substitui os painéis do documento por uma tira horizontal."""
-        target = None
+        ocultar = []
         for node in document.rootNode().findChildNodes(recursive=True):
-            if node.type() == "grouplayer" and node.name().lower().startswith("page"):
-                target = node
+            nome = node.name().lower()
+            if node.type() == "vectorlayer" and nome in ("panels", "mask"):
+                ocultar.append(node)
+            elif node.type() == "clonelayer" and any(
+                parte in nome for parte in ("outline", "contorno", "clone")
+            ):
+                ocultar.append(node)
+            elif node.type() == "vectorlayer" and any(
+                parte in nome for parte in ("outline", "contorno")
+            ):
+                ocultar.append(node)
+
+        target = None
+        for node in ocultar:
+            pai = node.parentNode()
+            if pai is not None and pai.type() == "grouplayer":
+                target = pai
                 break
         if target is None:
+            for node in document.rootNode().findChildNodes(recursive=True):
+                if node.type() == "grouplayer" and node.name().lower().startswith("page"):
+                    target = node
+                    break
+        if target is None:
             target = document.rootNode()
-        for child in list(target.childNodes()):
-            if child.type() == "vectorlayer" and child.name().lower() in ("panels", "mask"):
-                child.setVisible(False)
+
+        for node in ocultar:
+            if node.parentNode() == target:
+                node.setVisible(False)
+
+        acima = None
+        for child in target.childNodes():
+            if child.name() == "Ink":
+                acima = child
+                break
+
         page = {"panels": roteiro.build_strip_panels(count), "format": "tirinha", "dpi": dpi}
-        svg = generator._panels_svg(page, width_px, height_px, dpi)
+        svg = generator.panels_svg(page, width_px, height_px, dpi)
         nova = document.createVectorLayer("panels")
-        target.addChildNode(nova, None)
+        target.addChildNode(nova, acima)
         nova.addShapesFromSvg(svg)
         clone = document.createCloneLayer("panels contorno", nova)
         if clone is not None:
             clone.setBlendingMode("multiply")
-            target.addChildNode(clone, None)
+            target.addChildNode(clone, nova)
 
     def apply_margin_guides(self, document):
         """Cria 12 guias no documento: 0,5 / 1 / 1,5 cm por lado."""
@@ -653,7 +693,7 @@ class PagesDocker(DockWidget):
             return
         parent, above = helpers.target_container(document)
         nome = helpers.unique_layer_name(document, "Referência")
-        layer = document.createFileLayer(nome, path, "KeepAspectRatio", "Bilinear")
+        layer = document.createFileLayer(nome, path, "ToImageSize", "Bilinear")
         if layer is None:
             helpers.show_info("Referência", "Não foi possível criar a camada.")
             return
