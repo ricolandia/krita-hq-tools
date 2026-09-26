@@ -43,6 +43,9 @@ Feito:
   (A3 redimensiona via `scaleImage`, tirinha vira tira horizontal); "Camada de
   referência" (rótulo, trava, opacidade) e "Importar referência (PNG)"
   (camada de arquivo travada no grupo ativo).
+- **Validação no Krita (26/09): tudo OK** — diálogo de nova página, modelo com
+  template do Krita (QLibraryInfo), tirinha, A3, guias automáticas e
+  referências confirmados pelo Ricardo.
 - Testes do núcleo: 58 passando.
 
 Pendente (validação dentro do Krita):
