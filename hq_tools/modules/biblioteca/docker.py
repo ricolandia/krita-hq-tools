@@ -63,12 +63,7 @@ def render_png_thumbnail(path, size=120):
 
 
 def _qimage_bytes(image):
-    bits = image.constBits()
-    size = image.sizeInBytes()
-    try:
-        return bytes(bits.asstring(size))
-    except AttributeError:
-        return bits.tobytes()
+    return bytes(image.constBits().asstring(image.sizeInBytes()))
 
 
 class BibliotecaDocker(DockWidget):

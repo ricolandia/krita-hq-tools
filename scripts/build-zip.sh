@@ -11,10 +11,25 @@ mkdir -p "$DIST"
 rm -f "$DIST/$NAME"
 
 cd "$REPO"
-zip -r "$DIST/$NAME" \
-    hq_tools \
-    hq_tools.desktop \
-    hq_tools_manual.html \
-    -x '*/__pycache__/*' '*.pyc' >/dev/null
+python3 - "$DIST/$NAME" <<'PY'
+import os
+import sys
+import zipfile
+
+out = sys.argv[1]
+itens = ["hq_tools", "hq_tools.desktop", "hq_tools.action"]
+with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as arquivo:
+    for item in itens:
+        if os.path.isfile(item):
+            arquivo.write(item, item)
+            continue
+        for raiz, dirs, nomes in os.walk(item):
+            dirs[:] = [d for d in dirs if d != "__pycache__"]
+            for nome in nomes:
+                if nome.endswith((".pyc", ".pyo")):
+                    continue
+                caminho = os.path.join(raiz, nome)
+                arquivo.write(caminho, caminho)
+PY
 
 echo "ZIP gerado: $DIST/$NAME"

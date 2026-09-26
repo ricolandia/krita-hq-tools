@@ -9,6 +9,11 @@ roteiro e atalhos de pincel.</p>
 <p>Pelo Krita: <b>Ferramentas &gt; Scripts &gt; Importar plugin Python</b> e escolha o
 arquivo ZIP. Depois ative o plugin em <b>Configurar Krita &gt; Gerenciador de
 plugins Python</b> e reinicie o Krita.</p>
+<p>Se instalou pelo ZIP, copie também o <code>hq_tools.action</code> (que vem
+dentro do ZIP) para <code>~/.local/share/krita/actions/</code> para que os
+atalhos padrão dos pincéis apareçam em Configurar Krita &gt; Atalhos. Em modo
+de desenvolvimento, o script <code>scripts/install-dev.sh</code> faz isso
+automaticamente.</p>
 <p>Os dockers aparecem em <b>Configurações &gt; Dockers</b> com o prefixo
 "HQ Tools".</p>
 
@@ -66,9 +71,10 @@ substituindo as guias existentes. A opção de nomear a camada do balão como
 <code>text</code> faz o CPMT usar o conteúdo na exportação ACBF/EPUB.</p>
 
 <h2>Pincéis</h2>
-<p>Doze slots que ativam presets instalados no Krita. Escolha o preset de cada
-slot no docker e defina os atalhos em <b>Configurar Krita &gt; Atalhos &gt;
-Scripts &gt; HQ Tools</b> (ações "HQ Tools: pincel 1" a "pincel 12").</p>
+<p>Dezesseis slots que ativam presets instalados no Krita. Escolha o preset de
+cada slot no docker (clique com o botão direito no cartão do pincel) e defina
+os atalhos em <b>Configurar Krita &gt; Atalhos &gt; Scripts &gt; HQ Tools</b>
+(ações "HQ Tools: pincel 1" a "pincel 16").</p>
 
 <h2>Configuração</h2>
 <p>As preferências ficam em <code>~/.local/share/krita/hq_tools/config.json</code>
