@@ -41,11 +41,14 @@ Distribuição (ZIP para Ferramentas > Scripts > Importar plugin Python):
 
 ```bash
 bash scripts/build-zip.sh
-# resultado em dist/hq_tools-0.1.0.zip
+# resultado em dist/hq_tools-0.3.2.zip
 ```
 
 Depois: ative **HQ Tools** no Gerenciador de plugins Python e reinicie o
-Krita. Os dockers ficam em Configurações > Dockers com o prefixo "HQ Tools".
+Krita. Se instalou pelo ZIP, copie o `hq_tools.action` (dentro do ZIP) para
+`~/.local/share/krita/actions/` para ter os atalhos padrão de pincel em
+Configurar Krita > Atalhos (o `install-dev.sh` faz isso sozinho). Os dockers
+ficam em Configurações > Dockers com o prefixo "HQ Tools".
 
 ## Uso rápido
 

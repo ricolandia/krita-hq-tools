@@ -1,6 +1,6 @@
 # SESSION — HQ Tools (Krita-Comics-Plugin)
 
-Fonte da verdade do projeto. Atualizado em 2026-09-25 (v0.3.1).
+Fonte da verdade do projeto. Atualizado em 2026-09-26 (v0.3.2).
 
 ## Contexto
 
@@ -12,11 +12,13 @@ conclusão da pesquisa está em `docs/contexto/` (os 4 arquivos originais).
 
 - **Alvo:** Krita 5.3.4 (AppImage atual, Qt5/PyQt5/Python 3.13). Krita 6.0.4
   (Qt6/PyQt6) fica para depois; `core/compat.py` centraliza a compatibilidade.
-- **Escopo:** plugin único `hq_tools` com 5 módulos habilitáveis: retículas e
-  hachuras, balões, paletas, páginas, pincéis.
+- **Escopo:** plugin único `hq_tools` com 7 módulos habilitáveis: retículas e
+  hachuras, balões, onomatopeias, paletas, páginas, pincéis e biblioteca do
+  projeto.
 - **Ordem das fases:** retículas → balões + paletas → páginas → pincéis.
 - **Roteiro:** sintaxe própria (ver `docs/ROTEIRO-SINTAXE.md`).
-- **Integração:** só CPMT (comicsConfig.json); sem renders do Blender por ora.
+- **Integração:** só CPMT (comicConfig.json, sem "s", UTF-16); sem renders do
+  Blender por ora.
 - **Manager de páginas:** ver, abrir e reordenar (exportação/lote ficam no CPMT).
 - **Pincéis:** módulo próprio com slots e atalhos (não Ten Brushes/Shortcut
   Composer).
@@ -58,6 +60,13 @@ python3 -m unittest discover -s tests -v   # testes
 bash scripts/install-dev.sh                # instalar em dev
 bash scripts/build-zip.sh                  # gerar ZIP instalável
 ```
+
+## Pendências do autor (Ricardo)
+
+- Criar os modelos vetoriais melhorados: **balões**, **onomatopeias** e
+  **painéis** (estilos próprios), para substituir as amostras atuais.
+- Criar modelos de **página**: **tirinha (strip**, 1-3 tiras) e **página A3**,
+  para o "Criar próxima página" e os formatos do plugin.
 
 ## Pendências futuras (fora de escopo por ora)
 

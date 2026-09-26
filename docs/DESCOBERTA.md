@@ -2,7 +2,7 @@
 
 Registro do que foi confirmado sobre a API e os recursos do Krita 5.3.4 durante
 a construção do HQ Tools. Fonte primária: código-fonte do Krita (branch master
-do repo KDE/krita, via espelho GitHub, dezembro de 2026) e inspeção do
+do repo KDE/krita, via espelho GitHub, setembro de 2026) e inspeção do
 AppImage `krita-6.0.x`/`5.3.4` (conteúdo de `usr/lib/kritaplugins` e
 `usr/lib/krita-python-libs/PyKrita/krita.pyi`).
 
@@ -96,7 +96,7 @@ AppImage `krita-6.0.x`/`5.3.4` (conteúdo de `usr/lib/kritaplugins` e
 - `Filter.configuration()` / `setConfiguration(InfoObject)`; `Krita.instance().filter(name)`
   e `.filters()`.
 
-## CPMT (comicsConfig.json)
+## CPMT (comicConfig.json)
 
 - Chaves usadas: `projectName`, `pagesLocation`, `pages` (lista de caminhos
   relativos), `pageNumber` (contador), além de `exportLocation`,

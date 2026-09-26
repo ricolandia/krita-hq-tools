@@ -12,24 +12,28 @@ Krita-Comics-Plugin/
 ├── hq_tools/                    # pasta do plugin (pykrita)
 │   ├── __init__.py              # importa plugin.py; falha sem críticas fora do Krita
 │   ├── plugin.py                # Extension: registra dockers e ações de pincel
+│   ├── hq_tools_manual.html     # manual mostrado no gerenciador de plugins
 │   ├── core/                    # núcleo compartilhado
 │   │   ├── compat.py            # PyQt5/PyQt6 e constantes de enum
 │   │   ├── config.py            # config.json do usuário (caminho com pontos)
 │   │   ├── paths.py             # pastas do plugin e do usuário
 │   │   ├── krita_helpers.py     # documento/seleção/grupo/inserção/mensagens
-│   │   ├── cpmt.py              # leitura/escrita do comicsConfig.json
-│   │   ├── thumbs.py            # preview interno dos .kra
+│   │   ├── cpmt.py              # leitura/escrita do comicConfig.json
 │   │   ├── gpl.py               # paletas GIMP (.gpl)
 │   │   └── version.py           # __version__
+│   ├── resources/               # kit: fontes OFL e balões CC0/PD
+│   │   ├── fonts/               # Bangers, Comic Relief, Patrick Hand + OFL
+│   │   └── balloons-cc0/        # 2 balões de domínio público
 │   └── modules/
-│       ├── screentone/          # retículas e hachuras
-│       ├── balloons/            # balões vetoriais
+│       ├── screentone/          # retículas e hachuras (+ linhas de efeito)
+│       ├── balloons/            # balões (+ botão do docker de símbolos do Krita)
+│       ├── onomatopeias/        # onomatopeias
 │       ├── palettes/            # paletas e templates
-│       ├── pages/               # gerenciador + gerador de roteiro
-│       └── brushes/             # slots de pincel com atalhos
+│       ├── pages/               # gerenciador de páginas
+│       ├── brushes/             # slots de pincel com atalhos
+│       └── biblioteca/          # biblioteca do projeto (balões, painéis, onomatopeias)
 ├── hq_tools.desktop             # registro do plugin
-├── hq_tools.action              # atalhos das 12 ações de pincel
-├── hq_tools_manual.html         # manual mostrado no gerenciador de plugins
+├── hq_tools.action              # atalhos das 16 ações de pincel
 ├── scripts/                     # install-dev, build-zip, snippets de validação
 ├── tests/                       # testes do núcleo (fora do Krita)
 └── docs/                        # arquitetura, sintaxe, descoberta, validação
@@ -48,7 +52,7 @@ Krita-Comics-Plugin/
   execução.
 - Paletas: templates `.gpl` no pacote; "Instalar no Krita" copia para
   `~/.local/share/krita/palettes/`.
-- Páginas: o gerenciador lê `comicsConfig.json` (lista `pages` de caminhos
+- Páginas: o gerenciador lê `comicConfig.json` (lista `pages` de caminhos
   relativos, `pageNumber`); o gerador grava os `.kra` e registra as páginas.
 
 ## Como cada módulo usa a API do Krita

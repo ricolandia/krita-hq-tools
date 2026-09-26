@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.3.2] — 2026-09-26
+
+Auditoria completa (especialistas em Python, API do Krita e arquitetura).
+55 testes passando antes e depois.
+
+### Corrigido
+
+- Compatibilidade PyQt6 (Krita 6): enums crus em `brushes/docker.py`
+  (CustomContextMenu, UserRole, QSizePolicy) e `screentone/docker.py`
+  (QMessageBox.Yes/No) trocados pelas constantes do `core/compat.py`.
+- Numeração de página em "Criar próxima página": passava `offset=contagem+1`
+  ao `next_page_name` e pulava números de forma crescente; agora usa
+  `offset=1` com `pageNumber+1` (sequência correta, igual ao CPMT) e caminhos
+  relativos normalizados (sem `./`).
+- Modo "Máscara vazia (revelar pintando)" da retícula: nascia invisível sem
+  máscara editável; agora cria a camada com seleção total e anexa uma
+  `SelectionMask` vazia, pintável para revelar.
+- Espessura das linhas de efeito: não era convertida de px para pt (ficava
+  ~4x mais grossa a 300 dpi); agora escala com o DPI.
+- `cpmt.save()` reescrevia config legado em UTF-8 como UTF-16; agora preserva
+  o encoding detectado (BOM).
+- Empacotamento: manual movido para dentro de `hq_tools/` (o Krita só carrega
+  `X-Krita-Manual` de dentro da pasta do módulo); `hq_tools.action` incluído
+  no ZIP; `build-zip.sh` não depende mais do binário externo `zip`.
+- Limpezas: fallback morto em `_qimage_bytes`, dupla chamada em
+  `unique_layer_name`, variável morta em `halftone_cmyk_properties`, duplicata
+  no regex do roteiro.
+- Atalhos de pincel agora funcionam com o docker fechado (fallback direto
+  pelo slot configurado).
+
+### Documentado
+
+- `docs/ARQUITETURA.md`, `README.md`, `SESSION.md`, `docs/DESCOBERTA.md` e o
+  manual atualizados (7 módulos, 16 slots, `comicConfig.json`, kit).
+- SESSION ganhou a seção "Pendências do autor": modelos de balões,
+  onomatopeias, painéis e páginas (tirinha/strip e A3).
+
 ## [0.3.1] — 2026-09-25
 
 ### Adicionado
