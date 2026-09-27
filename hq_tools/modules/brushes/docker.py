@@ -21,6 +21,7 @@ from ...core.compat import (
     NO_ITEM_FLAGS,
     SIZE_EXPANDING,
     SIZE_FIXED,
+    SINGLE_SELECTION,
     TOOL_BUTTON_TEXT_BESIDE_ICON,
     USER_ROLE,
     QIcon,
@@ -151,7 +152,7 @@ class BrushesDocker(DockWidget):
         layout = widgets.QVBoxLayout(tab)
 
         self.list_packs = widgets.QListWidget()
-        self.list_packs.setSelectionMode(widgets.QAbstractItemView.SingleSelection)
+        self.list_packs.setSelectionMode(SINGLE_SELECTION)
         layout.addWidget(self.list_packs, 1)
 
         buttons = widgets.QHBoxLayout()
@@ -342,7 +343,7 @@ class BrushesDocker(DockWidget):
             )
             action.setCheckable(True)
             action.setChecked(current == preset)
-        chosen = menu.exec_(list_widget.viewport().mapToGlobal(position))
+        chosen = menu.exec(list_widget.viewport().mapToGlobal(position))
         if chosen is None:
             return
         if chosen == activate:

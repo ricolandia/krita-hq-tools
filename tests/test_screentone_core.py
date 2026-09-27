@@ -93,6 +93,14 @@ class TestScreentoneCore(unittest.TestCase):
         self.assertNotEqual(core.tone_fingerprint(a), core.tone_fingerprint(c))
         d = core.screentone_properties(core.normalize_preset({"lpi": 60.0}), 600)
         self.assertEqual(core.tone_fingerprint(a), core.tone_fingerprint(d))
+        e = core.screentone_properties(
+            core.normalize_preset({"lpi": 60.0, "position_x": 120.0}), 300
+        )
+        self.assertNotEqual(core.tone_fingerprint(a), core.tone_fingerprint(e))
+        f = core.screentone_properties(
+            core.normalize_preset({"lpi": 60.0, "position_y": 45.0}), 300
+        )
+        self.assertNotEqual(core.tone_fingerprint(a), core.tone_fingerprint(f))
 
     def test_color_xml_para_hex(self):
         xml = '<color channeldepth="U8" colorspace="RGBA" r="0" g="0" b="0" a="255"/>'

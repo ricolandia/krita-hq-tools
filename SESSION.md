@@ -1,6 +1,6 @@
 # SESSION — HQ Tools (Krita-Comics-Plugin)
 
-Fonte da verdade do projeto. Atualizado em 2026-09-26 (v0.6.1).
+Fonte da verdade do projeto. Atualizado em 2026-09-27 (v0.6.2).
 
 ## Contexto
 
@@ -25,7 +25,7 @@ conclusão da pesquisa está em `docs/contexto/` (os 4 arquivos originais).
 - **Paletas:** docker próprio com templates `.gpl`.
 - Licença MIT; docs em `.md` na pasta do projeto (regra de documentação).
 
-## Estado (v0.5.0)
+## Estado (v0.6.2)
 
 Feito:
 
@@ -63,7 +63,19 @@ Feito:
 - **Fix crítico (v0.6.1)**: `paths.py` usava `HOME` antes da definição e
   quebrava o import do plugin (dockers sumiam da listagem); corrigido com
   teste de regressão (`test_paths.py`); import validado com stub do krita;
-  79 testes passando.
+  80 testes passando.
+- **Auditoria completa + correções (v0.6.2)**: import ausente de
+  `DIALOG_YES/NO` no docker de retículas (excluir preset derrubava o Krita em
+  PyQt5) com novo teste estático (`test_static.py`, symtable); "Editar
+  selecionada" agora atualiza a mesma camada (`setGenerator`) e a mesma
+  máscara (`setFilter`) em vez de criar outra; `biblioteca` com
+  `"ToImageSize"` no fallback de PNG; PyQt6: `SINGLE_SELECTION` no compat e
+  `menu.exec`; posição no fingerprint de tom idêntico; modo "máscara vazia"
+  não reutiliza tom; `new_project` preserva `comicConfig.json` existente;
+  "Criar próxima página" não sobrescreve arquivo com `pageNumber` defasado;
+  `symbols.py`/`test_symbols.py` e `paths.module_dir` removidos (código morto);
+  docs atualizadas (CHANGELOG 0.6.1/0.6.2, README, ARQUITETURA, desktop).
+  76 testes passando.
 - **Decisão (26/09)**: dockers mantidos separados (7 módulos). Integrar tudo
   num único docker pioraria o workspace; o agrupamento em abas fica a cargo
   do próprio Krita (arrastar um docker sobre o outro em Configurações >
@@ -75,6 +87,9 @@ Pendente (validação dentro do Krita):
 - Rodar o roteiro de `docs/VALIDACAO.md` (itens 2b, 3c, 5, 7b): padrões
   instalados, modelos gerados, fontes novas e abas Packs/Comunidade.
 - Confirmar após o fix v0.6.1: os 7 dockers de volta na listagem do Krita.
+- Itens novos da v0.6.2: excluir um preset do usuário (sem derrubar o Krita),
+  "Editar selecionada" + Aplicar atualizando a mesma retícula/máscara, e
+  "Novo projeto..." em pasta com `comicConfig.json` existente (não sobrescreve).
 
 ## Comandos
 

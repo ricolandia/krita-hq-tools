@@ -145,8 +145,8 @@ def screentone_properties(preset, dpi):
         "frequency_x": frequency,
         "frequency_y": frequency,
         "constrain_frequency": preset["constrain_frequency"],
-        "position_x": 0.0,
-        "position_y": 0.0,
+        "position_x": float(preset.get("position_x", 0.0)),
+        "position_y": float(preset.get("position_y", 0.0)),
         "keep_size_square": True,
         "shear_x": 0.0,
         "shear_y": 0.0,
@@ -238,6 +238,8 @@ TONE_FINGERPRINT_KEYS = (
     "foreground_opacity",
     "background_opacity",
     "align_to_pixel_grid",
+    "position_x",
+    "position_y",
 )
 
 

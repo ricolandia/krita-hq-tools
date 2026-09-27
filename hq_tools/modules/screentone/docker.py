@@ -11,7 +11,7 @@ import os
 from krita import DockWidget, Krita, Selection
 
 from ...core import krita_helpers as helpers
-from ...core.compat import QtWidgets
+from ...core.compat import DIALOG_NO, DIALOG_YES, QtWidgets
 from ...core.config import Config
 from ...core.paths import USER_DIR
 from . import core
@@ -35,6 +35,8 @@ class ScreentoneDocker(DockWidget):
         self.user_presets = core.load_presets(USER_PRESETS_PATH)
         self._fg = "#000000"
         self._bg = "#ffffff"
+        self._edit_fill_id = None
+        self._edit_mask_id = None
         self._build_ui()
         self._reload_presets()
         self._reload_patterns()
@@ -481,6 +483,63 @@ class ScreentoneDocker(DockWidget):
         mask.setSelection(selection)
         return mask
 
+    def _node_id(self, node):
+        """Identificador estável do nó (para reencontrá-lo depois)."""
+        try:
+            return str(node.uniqueId())
+        except (AttributeError, RuntimeError):
+            return None
+
+    def _find_node_by_id(self, document, node_id):
+        """Nó do documento com o id dado, ou None (camada apagada/movida)."""
+        if not node_id:
+            return None
+        for node in document.rootNode().findChildNodes(recursive=True):
+            if self._node_id(node) == node_id:
+                return node
+        return None
+
+    def _update_selection(self, document):
+        """Seleção para atualizar um tom em edição.
+
+        Sem seleção ativa (e sem o modo "máscara vazia"), devolve None para
+        manter a máscara existente em vez de cobrir a página inteira.
+        """
+        if self.cmb_mask.currentData() == "empty":
+            return Selection()
+        if self.chk_selection.isChecked() and document.selection() is not None:
+            return document.selection()
+        return None
+
+    def _update_fill_layer(self, document, layer, generator, properties):
+        """Atualiza uma camada de preenchimento em edição (mesma camada)."""
+        try:
+            info = helpers.make_info_object(properties)
+            if not layer.setGenerator(generator, info):
+                return False
+        except (AttributeError, RuntimeError, TypeError):
+            return False
+        document.refreshProjection()
+        document.setActiveNode(layer)
+        return True
+
+    def _update_filter_mask(self, document, mask, properties):
+        """Atualiza a configuração da máscara de meio-tom em edição."""
+        try:
+            halftone = mask.filter()
+            if halftone is None:
+                return False
+            configuration = halftone.configuration()
+            if configuration is None:
+                configuration = helpers.make_info_object({})
+            configuration.setProperties(properties)
+            halftone.setConfiguration(configuration)
+            mask.setFilter(halftone)
+        except (AttributeError, RuntimeError, TypeError):
+            return False
+        document.refreshProjection()
+        return True
+
     def apply_fill(self):
         document = helpers.active_document()
         if document is None:
@@ -494,20 +553,28 @@ class ScreentoneDocker(DockWidget):
             properties = core.pattern_fill_properties(pattern_name)
         else:
             properties = core.screentone_properties(preset, dpi)
-            properties["position_x"] = preset["position_x"]
-            properties["position_y"] = preset["position_y"]
+
+        target = self._find_node_by_id(document, self._edit_fill_id)
+        self._edit_fill_id = None
+        if target is not None and target.type() == "filllayer":
+            if self._update_fill_layer(document, target, generator, properties):
+                selection = self._update_selection(document)
+                if selection is not None:
+                    self._set_selection_mask(document, target, selection)
+                helpers.show_message("Retícula atualizada: {0}.".format(target.name()))
+                return
 
         selection = self._apply_selection(document)
         fingerprint = None
-        if self.chk_reuse.isChecked() and generator == core.PATTERN_GENERATOR_ID:
-            fingerprint = pattern_name
-        elif self.chk_reuse.isChecked():
-            fingerprint = core.tone_fingerprint(properties)
+        if self.cmb_mask.currentData() != "empty":
+            if self.chk_reuse.isChecked() and generator == core.PATTERN_GENERATOR_ID:
+                fingerprint = pattern_name
+            elif self.chk_reuse.isChecked():
+                fingerprint = core.tone_fingerprint(properties)
         if fingerprint is not None:
             existing = self._find_same_tone(document, generator, fingerprint)
             if existing is not None:
-                mask_target = Selection() if self.cmb_mask.currentData() == "empty" else selection
-                self._set_selection_mask(document, existing, mask_target)
+                self._set_selection_mask(document, existing, selection)
                 document.refreshProjection()
                 helpers.show_message("Retícula idêntica reutilizada em '{0}'.".format(existing.name()))
                 return
@@ -549,6 +616,13 @@ class ScreentoneDocker(DockWidget):
                 preset, document.colorModel(), dpi,
                 mode=mode, generator=generator, pattern_name=pattern_name,
             )
+
+        target = self._find_node_by_id(document, self._edit_mask_id)
+        self._edit_mask_id = None
+        if target is not None and target.type() == "filtermask":
+            if self._update_filter_mask(document, target, properties):
+                helpers.show_message("Meio-tom atualizado.")
+                return
 
         configuration = halftone.configuration()
         if configuration is None:
@@ -688,9 +762,11 @@ class ScreentoneDocker(DockWidget):
             helpers.show_message("Selecione a camada de retícula ou a máscara de meio-tom.")
             return
         if node.type() == "filllayer":
+            self._edit_fill_id = self._node_id(node)
             self._populate_fill(node)
-            helpers.show_message("Opções carregadas; use Aplicar para atualizar.")
+            helpers.show_message("Opções carregadas; use Aplicar retícula para atualizar.")
         elif node.type() == "filtermask":
+            self._edit_mask_id = self._node_id(node)
             self._populate_mask(node)
             helpers.show_message("Opções carregadas; use Aplicar meio-tom para atualizar.")
         else:

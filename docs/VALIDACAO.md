@@ -49,8 +49,14 @@ Diferenças entre o dump do bloco 2/3 e o que o plugin gera (ver
 
 - **Editar selecionada**: aplicar uma retícula, selecionar a camada e clicar
   "Editar selecionada": os campos carregam os valores; mudar LPI/ângulo e
-  "Aplicar" atualiza a mesma camada. Repetir com uma máscara de meio-tom
-  (intensity e cmyk).
+  "Aplicar retícula" **atualiza a mesma camada** (contar camadas antes e
+  depois: não cresce). Sem seleção ativa, a máscara da camada é preservada;
+  com seleção ativa, a área muda para a seleção. Repetir com uma máscara de
+  meio-tom (intensity e cmyk): "Aplicar meio-tom" atualiza a máscara
+  selecionada (contar máscaras: não cresce).
+- **Excluir preset**: salvar um preset do usuário ("Salvar como..."), clicar
+  "Excluir" e confirmar: o preset some da lista e o Krita continua aberto
+  (regressão da v0.6.2; antes derrubava o programa).
 - **Máscara vazia**: aplicar com "Máscara vazia (revelar pintando)": a camada
   nasce sem retícula visível; pintar branco na máscara (camada de seleção)
   revela o tom.
@@ -128,6 +134,8 @@ Diferenças entre o dump do bloco 2/3 e o que o plugin gera (ver
 - "Novo projeto...": com a página atual salva, a pasta dela vira o projeto:
   subpastas `biblioteca/{baloes,paineis,onomatopeias}`, `export`, `templates`,
   `translations` e `comicConfig.json` (UTF-16) com a página em `pages`.
+  Em pasta que já tem `comicConfig.json`, o projeto existente é aberto e a
+  página atual entra na lista (o config não é recriado do zero).
 - Sem documento ativo ou página não salva: aviso modal; "Salvar agora" abre o
   diálogo e continua o fluxo com a pasta escolhida.
 - "Abrir projeto...": abrir o `comicConfig.json` de um projeto criado pelo

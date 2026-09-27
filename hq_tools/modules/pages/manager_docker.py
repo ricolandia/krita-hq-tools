@@ -248,20 +248,35 @@ class PagesDocker(DockWidget):
                     "Não foi possível criar a biblioteca: {0}".format(error),
                 )
                 return
-        try:
-            create_project_with_page(folder, page_name, os.path.basename(folder))
-        except OSError as error:
-            helpers.show_info(
-                "Novo projeto",
-                "Não foi possível gravar o projeto: {0}".format(error),
-            )
-            return
+        if CPMTProject.is_project(folder):
+            try:
+                project = CPMTProject(folder)
+                relatives = [os.path.normpath(item) for item in project.page_relatives()]
+                if os.path.normpath(page_name) not in relatives:
+                    project.register_pages([page_name])
+            except (OSError, ValueError) as error:
+                helpers.show_info(
+                    "Novo projeto",
+                    "Não foi possível abrir o projeto existente: {0}".format(error),
+                )
+                return
+            aviso = "Projeto existente atualizado em {0}."
+        else:
+            try:
+                create_project_with_page(folder, page_name, os.path.basename(folder))
+            except OSError as error:
+                helpers.show_info(
+                    "Novo projeto",
+                    "Não foi possível gravar o projeto: {0}".format(error),
+                )
+                return
+            aviso = "Projeto criado em {0}."
         self.config.set("biblioteca.folder", biblio)
         self._load_project(os.path.join(folder, "comicConfig.json"))
         helpers.show_info(
             "Novo projeto",
-            "Projeto criado em {0}.\n\nA biblioteca (balões, painéis e "
-            "onomatopeias) fica na subpasta 'biblioteca'.".format(folder),
+            aviso.format(folder) + "\n\nA biblioteca (balões, painéis e "
+            "onomatopeias) fica na subpasta 'biblioteca'.",
         )
 
     def pick_project(self):
@@ -405,6 +420,12 @@ class PagesDocker(DockWidget):
             numero = self.project.page_number + 1
             filename = self.project.next_page_name(offset=1)
             path = os.path.join(self.project.pages_dir(), filename)
+            while os.path.exists(path):
+                numero += 1
+                filename = self.project.next_page_name(
+                    offset=numero - self.project.page_number
+                )
+                path = os.path.join(self.project.pages_dir(), filename)
             if self.project.pages_location:
                 relative = os.path.normpath(
                     os.path.join(self.project.pages_location, filename)

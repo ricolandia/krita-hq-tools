@@ -96,6 +96,7 @@ if QT_VERSION == 6:
     SIZE_EXPANDING = QtWidgets.QSizePolicy.Policy.Expanding
     SIZE_FIXED = QtWidgets.QSizePolicy.Policy.Fixed
     NO_ITEM_FLAGS = QtCore.Qt.ItemFlag.NoItemFlags
+    SINGLE_SELECTION = QtWidgets.QAbstractItemView.SelectionMode.SingleSelection
 else:
     IMAGE_FORMAT_ARGB32 = QtGui.QImage.Format_ARGB32
     TRANSPARENT = QtCore.Qt.transparent
@@ -109,6 +110,7 @@ else:
     SIZE_EXPANDING = QtWidgets.QSizePolicy.Expanding
     SIZE_FIXED = QtWidgets.QSizePolicy.Fixed
     NO_ITEM_FLAGS = QtCore.Qt.NoItemFlags
+    SINGLE_SELECTION = QtWidgets.QAbstractItemView.SingleSelection
 
 __all__ = [
     "QtCore",
@@ -138,6 +140,7 @@ __all__ = [
     "SIZE_EXPANDING",
     "SIZE_FIXED",
     "NO_ITEM_FLAGS",
+    "SINGLE_SELECTION",
     "ICON_MODE",
     "ADJUST_IGNORED",
     "ALIGN_CENTER",

@@ -140,11 +140,13 @@ AppImage `krita-6.0.x`/`5.3.4` (conteúdo de `usr/lib/kritaplugins` e
   pontuação) casa cada conjunto com o que está instalado.
 - **Bibliotecas de símbolos**: SVG na pasta `symbols` dos recursos; cada
   símbolo é `<symbol id="...">` ou `<g id="...">`. O Krita 5.3.4 não expõe
-  símbolos pela API Python, então o plugin faz a extração por XML
-  (`xml.etree`) e insere via `addShapesFromSvg`, com viewBox calculada por
-  `QSvgRenderer.boundsOnElement`. Bibliotecas que vêm com o Krita:
-  `BalloonSymbols.svg` (8 balões, domínio público de Martin Owens e Tavmjong
-  Bah) e `pepper_carrot_speech_bubbles.svg` (CC-BY-SA 4.0, David Revoy).
+  símbolos pela API Python; a v0.2 chegou a extrair por XML (`xml.etree`) e
+  inserir via `addShapesFromSvg`, mas a renderização própria não cobria todos
+  os formatos e o fluxo passou a abrir o docker nativo "Bibliotecas de
+  símbolos" (botão nos balões); o módulo de extração foi removido na v0.6.2.
+  Bibliotecas que vêm com o Krita: `BalloonSymbols.svg` (8 balões, domínio
+  público de Martin Owens e Tavmjong Bah) e
+  `pepper_carrot_speech_bubbles.svg` (CC-BY-SA 4.0, David Revoy).
 - **Bundles de pincel**: arquivos `.bundle` na pasta de recursos do Krita são
   carregados na inicialização; o instalador do plugin copia o arquivo e pede
   reinício.

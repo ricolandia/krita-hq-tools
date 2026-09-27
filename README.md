@@ -51,7 +51,7 @@ Distribuição (ZIP para Ferramentas > Scripts > Importar plugin Python):
 
 ```bash
 bash scripts/build-zip.sh
-# resultado em dist/hq_tools-0.3.2.zip
+# resultado em dist/hq_tools-0.6.2.zip
 ```
 
 Depois: ative **HQ Tools** no Gerenciador de plugins Python e reinicie o

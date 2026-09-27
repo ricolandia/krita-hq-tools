@@ -1,5 +1,66 @@
 # Changelog
 
+## [0.6.2] — 2026-09-27
+
+Auditoria completa do estado v0.6.1 (delta pós-v0.5.4 + varredura geral).
+76 testes passando (5 de símbolos removidos junto do código morto, 1 de
+checagem estática e 3 asserções novas no fingerprint).
+
+### Corrigido
+
+- **Crítico**: `screentone/docker.py` usava `DIALOG_YES`/`DIALOG_NO` sem
+  importar; excluir um preset do usuário levantava NameError e, em PyQt5,
+  exceção não tratada em slot derruba o Krita (qFatal). Import corrigido e
+  cobertura nova: `tests/test_static.py` varre o pacote com `symtable` e falha
+  em qualquer nome global usado sem definição (pegaria o bug original).
+- **Editar retícula**: "Editar selecionada" agora atualiza a mesma camada.
+  "Aplicar retícula" com a camada em edição troca o gerador no lugar
+  (`setGenerator`) e só substitui a máscara quando há seleção ativa (ou modo
+  "máscara vazia"); "Aplicar meio-tom" com a máscara em edição atualiza a
+  configuração do filtro no lugar (`setFilter`). Antes cada aplicação criava
+  uma camada/máscara nova e o texto do botão prometia atualizar.
+- `biblioteca/docker.py`: fallback de inserção de PNG usava
+  `"KeepAspectRatio"` (valor inválido no libkis, caía em "sem escala"); agora
+  usa `"ToImageSize"` como no gerenciador de páginas.
+- PyQt6 (preparo para o Krita 6): enum cru `QAbstractItemView.SingleSelection`
+  e `menu.exec_` (removido no PyQt6) em `brushes/docker.py`; constantes
+  centralizadas (`compat.SINGLE_SELECTION`, `menu.exec`).
+- Posição do padrão agora participa do fingerprint de tom idêntico: aplicar o
+  mesmo preset em posição diferente cria camada nova em vez de reutilizar e
+  ignorar a posição. `screentone_properties` passou a ler `position_x/y` do
+  preset (antes fixava 0 e o docker sobrescrevia por fora).
+- Modo "Máscara vazia (revelar pintando)" não reutiliza tom idêntico: a
+  reutilização esvaziaria a máscara de um tom visível existente; agora o modo
+  sempre cria camada nova com máscara vazia.
+- `new_project` não sobrescreve mais um `comicConfig.json` existente na pasta:
+  abre o projeto e registra a página atual se ainda não estiver na lista.
+- "Criar próxima página" em modo projeto evita sobrescrever arquivo existente
+  quando o `pageNumber` está defasado (avança o número até achar nome livre).
+
+### Limpeza
+
+- `modules/balloons/symbols.py` removido (sem uso desde a v0.2, quando a aba
+  de símbolos passou a abrir o docker nativo do Krita) junto de
+  `tests/test_symbols.py`; histórico preservado no git. `paths.module_dir`
+  removido (sem uso).
+
+### Documentado
+
+- Entrada 0.6.1 (fix do `paths.py`) que faltava no changelog; README com a
+  versão atual do ZIP; ARQUITETURA com os 7 módulos e a árvore de recursos
+  atualizada; SESSION com o estado v0.6.2; comentário do `.desktop` com os
+  7 módulos; DESCOBERTA com o fim da extração própria de símbolos.
+- `docs/VALIDACAO.md`: itens novos para validar a exclusão de preset, a
+  atualização da retícula/máscara em edição e a proteção do comicConfig.
+
+## [0.6.1] — 2026-09-26
+
+### Corrigido
+
+- `core/paths.py` usava `HOME` antes da definição e quebrava o import do
+  plugin (dockers sumiam da listagem); corrigido com teste de regressão. 79 testes
+  passando.
+
 ## [0.6.0] — 2026-09-26
 
 ### Adicionado

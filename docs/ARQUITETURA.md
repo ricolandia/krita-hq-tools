@@ -1,6 +1,6 @@
 # Arquitetura do HQ Tools
 
-Plugin do Krita (Python) para produção de quadrinhos, com cinco módulos
+Plugin do Krita (Python) para produção de quadrinhos, com sete módulos
 habilitáveis e um núcleo compartilhado. Alvo: Krita 5.3.4 (AppImage, PyQt5,
 Python 3.13); o núcleo de compatibilidade prepara a migração para o Krita 6
 (PyQt6).
@@ -20,10 +20,13 @@ Krita-Comics-Plugin/
 │   │   ├── krita_helpers.py     # documento/seleção/grupo/inserção/mensagens
 │   │   ├── cpmt.py              # leitura/escrita do comicConfig.json
 │   │   ├── gpl.py               # paletas GIMP (.gpl)
+│   │   ├── thumbs.py            # miniaturas internas dos .kra
 │   │   └── version.py           # __version__
-│   ├── resources/               # kit: fontes OFL e balões CC0/PD
-│   │   ├── fonts/               # Bangers, Comic Relief, Patrick Hand + OFL
-│   │   └── balloons-cc0/        # 2 balões de domínio público
+│   ├── resources/               # kit do plugin
+│   │   ├── fonts/               # 12 famílias OFL de HQ + licenças
+│   │   ├── balloons-cc0/        # 2 balões de domínio público
+│   │   ├── patterns/            # 11 padrões/texturas próprios (MIT)
+│   │   └── brushes/             # packs da comunidade (Deevad, Vasco Basqué)
 │   └── modules/
 │       ├── screentone/          # retículas e hachuras (+ linhas de efeito)
 │       ├── balloons/            # balões (+ botão do docker de símbolos do Krita)

@@ -411,7 +411,7 @@ class BibliotecaDocker(DockWidget):
         data = _qimage_bytes(rgba)
         if not layer.setPixelData(data, 0, 0, width, height):
             file_layer = document.createFileLayer(
-                name, path, "KeepAspectRatio", "Bilinear"
+                name, path, "ToImageSize", "Bilinear"
             )
             if file_layer is None:
                 helpers.show_message("Não foi possível inserir o PNG.")

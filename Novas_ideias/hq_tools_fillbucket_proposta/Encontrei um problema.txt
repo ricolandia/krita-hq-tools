@@ -1,0 +1,31 @@
+Encontrei um problema real ao testar: meu primeiro algoritmo (fechamento morfológico clássico, dilatar-depois-erodir) **não funciona** para fechar falhas em linhas de 1 pixel de espessura — a erosão desfaz exatamente a ponte que a dilatação criou, porque o elemento estruturante em cruz não "sobrevive" à erosão numa linha fina. Os testes pegaram isso. Corrigi para a técnica certa: dilatar a tinta só para **conter** o flood fill (sem erodir depois), e usar a máscara original (não dilatada) para decidir onde a tinta de verdade impede a pintura.Agora ajusto o docstring do módulo e corrijo os testes para a nova semântica (a área de pintura exclui a tinta original, não a parede dilatada):Agora corrijo os testes para essa semântica (o teste antigo assumia que `region_mask` sozinho já era a área final de pintura, e que a erosão fechava a falha — os dois pressupostos mudaram):Agora corrijo o teste de preenchimento para excluir a tinta original, conforme a nova semântica:Também ajusto a mensagem de asserção do teste de falha grande, já que agora `close_gaps` só dilata (comportamento mais previsível):Agora os 7 testes passam de verdade, com o algoritmo corrigido. Agora escrevo o docker de integração com o Krita, deixando claro o que é validado e o que ainda precisa ser testado no Scripter:# Módulo de fechamento de falhas + preenchimento
+
+Segue no mesmo padrão `core/` + `modules/<nome>/docker.py` + `tests/` que você já usa.
+
+## O núcleo (`core/gapclose.py`) — testado de verdade
+
+Fiz um teste em bancada e apanhei num detalhe que valia a pena registrar: minha primeira ideia (fechamento morfológico clássico — dilatar e depois erodir) **não funciona** para fechar falhas numa linha de 1 pixel de espessura. A erosão desfaz exatamente a ponte que a dilatação criou, porque o elemento em cruz não sobra o suficiente na direção perpendicular à linha para sobreviver à erosão. Rodei os testes, vi 3 falharem, e troquei de abordagem:
+
+- **`close_gaps`** agora só dilata a tinta (sem erodir depois) e devolve isso como uma "parede" — usada exclusivamente para conter o flood fill, nunca como tinta visível.
+- **`label_regions`** rotula as regiões do fundo separadas por essa parede.
+- **`region_mask(...) & ~ink`** — a área final de pintura sempre exclui a tinta *original* (não a parede dilatada), então a linha de arte de verdade nunca é sobrescrita.
+
+Efeito colateral honesto: os pixels da própria falha ficam sem pintar (uma costura fina do tamanho da falha). Para falhas de 1-3 px isso deve ser imperceptível a distância normal de leitura; se incomodar, o próximo passo seria "vazar tinta para dentro da falha", que deixei fora desta primeira versão.
+
+7 testes, todos passando (`PYTHONPATH=. python3 -m unittest discover -s tests -v`), cobrindo: dilatação/erosão isoladas, falha pequena que fecha com raio suficiente, falha pequena que vaza sem raio, falha grande que não fecha com raio pequeno, preenchimento restrito à região certa e erro ao clicar em cima da tinta.
+
+## O docker (`modules/fillbucket/docker.py`) — não validado, e digo onde
+
+Diferente do núcleo, não tenho uma instalação do Krita para testar isso no Scripter, então travei três decisões de design justamente para reduzir a superfície de risco, e deixei marcado `VALIDAR NO KRITA` nos três pontos que restaram incertos:
+
+1. **Ordem de canais do `pixelData`**: assumi BGRA (mais comum internamente no Krita), com a conversão isolada em duas funções (`bytes_para_rgba`/`rgba_para_bytes`) para trocar em um lugar só se estiver errado.
+2. **Cor de frente em profundidades >8 bits**: a conversão assume 8 bits; é o ponto mais provável de quebrar num documento de 16/32 bits.
+3. **Captura de clique no canvas**: esta é a decisão mais importante. Uma `DockWidget` em Python não tem, até onde sei, a mesma capacidade de interceptar cliques no canvas que uma `KisTool` nativa (C++) tem — não achei confirmação de um caminho confiável para isso na API pública. Em vez de arriscar um design que dependesse disso, fiz o docker trabalhar com a **seleção ativa** (que sua arquitetura já usa em outros módulos) mais um ponto X/Y digitado manualmente. É mais braçal que um clique direto, mas usa só API que sua própria `DESCOBERTA.md` já confirmou (`Document.selection()`).
+
+Se você quiser mesmo o clique direto no canvas, o caminho mais promissor que eu enxergo — mas que também não validei — seria registrar um *event filter* do Qt sobre o widget do canvas (`view.canvas().canvasWidget()`) e converter a posição do mouse para coordenadas de documento via as transformações do `Canvas`. Vale testar isso separado, como uma prova de conceito de 20 linhas, antes de acoplar ao resto do módulo.
+
+## Antes de usar de verdade
+
+1. Instale como módulo dentro do seu `hq_tools` (ele espera achar `core.gapclose`, então provavelmente é só copiar os dois arquivos para dentro do seu repositório real, não instalar como plugin solto).
+2. Rode os testes do núcleo — já vêm prontos e passam fora do Krita.
+3. Abra o Scripter no Krita e teste isoladamente `bytes_para_rgba` numa camada com um pixel de cor conhecida, para confirmar a ordem de canais, antes de confiar no restante.

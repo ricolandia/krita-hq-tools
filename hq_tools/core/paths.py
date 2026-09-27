@@ -32,8 +32,3 @@ def ensure_user_dirs():
         MODELOS_DIR,
     ):
         os.makedirs(path, exist_ok=True)
-
-
-def module_dir(*parts):
-    """Retorna um caminho dentro da pasta ``modules`` do plugin."""
-    return os.path.join(MODULES_DIR, *parts)
