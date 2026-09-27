@@ -723,7 +723,11 @@ class PagesDocker(DockWidget):
                 helpers.show_info("Modelo de página", "Modelo não encontrado.")
                 return
         os.makedirs(MODELOS_DIR, exist_ok=True)
-        destino = os.path.join(MODELOS_DIR, "modelo-{0}".format(os.path.basename(origem)))
+        base = os.path.basename(origem)
+        if base.startswith("modelo-"):
+            destino = os.path.join(MODELOS_DIR, base)
+        else:
+            destino = os.path.join(MODELOS_DIR, "modelo-{0}".format(base))
         try:
             shutil.copy2(origem, destino)
         except OSError as error:

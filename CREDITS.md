@@ -97,5 +97,6 @@ Comics pack e InkP/Expressive Inks.
 
 ## Projeto e contato
 
-HQ Tools, por Ricardo Graça. Repositório:
-`31_APPS_GITHUB/Krita-Comics-Plugin` (pasta de projetos locais).
+HQ Tools, por Ricardo Graça. Repositório público a publicar (por ora na
+pasta local `31_APPS_GITHUB/Krita-Comics-Plugin`; o endereço entra aqui na
+publicação).

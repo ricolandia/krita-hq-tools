@@ -109,10 +109,13 @@ bash scripts/build-zip.sh                  # gerar ZIP instalável
   (sugestão: mover para a aba "Packs").
 - **Publicar no GitHub (aguardando as bibliotecas do Ricardo)**: guia do
   usuário pronto em `INSTALL.md` (aponta para o ZIP da release
-  `hq_tools-<versão>.zip`); na publicação, subir o repositório com README +
-  INSTALL + CREDITS, criar a release com o ZIP gerado por `build-zip.sh`
-  (inclui `hq_tools.action` e `hq_tools.desktop`) e decidir tags (ex.: v0.6.2).
-  O ZIP atual está em `dist/hq_tools-0.6.2.zip` (não versionado).
+  `hq_tools-<versão>.zip`); CI pronta em `.github/workflows/` (tests em push/PR
+  com Python 3.11/3.13 + checagem do ZIP; release automática em tag `v*` com o
+  ZIP do `build-zip.sh`); manual interno (`hq_tools_manual.html`) alinhado à
+  v0.6.2; CREDITS com placeholder do repositório. Na publicação: subir o repo
+  (README + INSTALL + CREDITS + LICENSE), criar a tag v0.6.2 e conferir a
+  release (ZIP inclui `hq_tools.action` e `hq_tools.desktop`). O ZIP atual
+  está em `dist/hq_tools-0.6.2.zip` (não versionado).
 
 ## Pendências futuras (fora de escopo por ora)
 

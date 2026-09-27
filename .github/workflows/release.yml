@@ -1,0 +1,25 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Testes
+        run: python -m unittest discover -s tests
+      - name: Gerar ZIP instalável
+        run: bash scripts/build-zip.sh
+      - name: Publicar release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/hq_tools-*.zip
+          generate_release_notes: true

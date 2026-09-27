@@ -21,11 +21,23 @@ arrastando de volta quando quiser.</p>
 
 <h2>Retículas e hachuras</h2>
 <p>Aplica o gerador Screentone nativo como camada de preenchimento (não
-destrutiva), dentro do grupo ativo, opcionalmente limitado pela seleção. O botão
-de meio-tom aplica o filtro Halftone como máscara na camada ativa, convertendo o
-tom pintado em pontos ou linhas. A frequência é dada em linhas por polegada
-(LPI) e o plugin calcula o tamanho da célula pelo DPI do documento. Para
-cross-hatch, aplique o preset A e depois o B em ângulos complementares.</p>
+destrutiva), dentro do grupo ativo, opcionalmente limitado pela seleção. A
+frequência é dada em linhas por polegada (LPI) e o plugin calcula o tamanho
+da célula pelo DPI do documento; o campo de posição X/Y desloca a tela sem
+mover a camada. "Editar selecionada" carrega as opções da retícula ou da
+máscara selecionada; ao aplicar depois, a mesma camada/máscara é atualizada
+no lugar. O modo "Máscara vazia (revelar pintando)" cria o tom invisível e
+pintar na máscara revela. "Mostrar área" transforma a máscara em seleção.
+"Reutilizar retícula idêntica" evita duplicar tom igual (posição diferente
+conta como tom diferente). O botão "Instalar padrões e texturas (kit)" copia
+11 padrões próprios (papéis, retículas, trama de manga, hachuras, granulado)
+para o Krita; eles entram no modo "tom com padrão".</p>
+<p>O meio-tom aplica o filtro Halftone como máscara na camada ativa,
+convertendo o tom pintado em pontos ou linhas; em documento CMYK, o modo
+"Cores por canal" usa os ângulos de impressão (15/75/0/45). Para cross-hatch,
+aplique o preset A e depois o B em ângulos complementares.</p>
+<p>A aba "Linhas de efeito" insere linhas de velocidade (foco) ou paralelas
+como camada vetorial.</p>
 
 <h2>Balões</h2>
 <p>Mostra os modelos SVG de uma pasta (por padrão,
@@ -33,9 +45,9 @@ cross-hatch, aplique o preset A e depois o B em ângulos complementares.</p>
 domínio público na primeira execução). Clique duas vezes para inserir o balão
 no grupo ativo como camada vetorial. Você pode desenhar seus próprios balões e
 salvá-los nessa pasta. O botão "Símbolos do Krita" abre o docker nativo do
-Krita para as bibliotecas instaladas, e "Instalar fontes de HQ" instala as fontes inclusas (9 famílias OFL: Bangers,
-Comic Relief, Patrick Hand, Comic Neue, Londrina Solid, Nanum Pen Script,
-Gaegu e Boogaloo, com créditos no CREDITS.md).</p>
+Krita para as bibliotecas instaladas, e "Instalar fontes de HQ" instala as fontes inclusas (12 famílias OFL: Bangers,
+Comic Relief, Patrick Hand, Comic Neue, Londrina Solid/Shadow/Outline/Sketch,
+Nanum Pen Script, Gaegu e Boogaloo, com créditos no CREDITS.md).</p>
 
 <h2>Onomatopeias</h2>
 <p>Catálogo de efeitos sonoros (8 amostras) em
@@ -54,8 +66,10 @@ pode ser trocada; ao criar um projeto pelo gerenciador, a biblioteca fica na
 subpasta <code>biblioteca</code> da pasta do projeto.</p>
 
 <h2>Paletas</h2>
-<p>Templates de paleta de HQ (tons, nanquim, pele, céu, vegetação, cores
-chapadas) com aplicação direta na cor de frente ou de fundo. O botão
+<p>Templates de HQ e artísticos (tons, nanquim, pele, céu, vegetação, chapadas,
+Zorn, retrato, paisagem, amanhecer, noite, terra, pastel, aquarela, guache,
+acrílico, retrô, BD, super-herói, mangá, sépia, valores, carta de retícula)
+com aplicação direta na cor de frente ou de fundo. O botão
 "Instalar no Krita" copia os arquivos para a pasta de paletas do Krita
 (é preciso reiniciar o programa). A segunda aba mostra as paletas já instaladas
 no Krita.</p>
@@ -71,7 +85,9 @@ diálogo com formato (A4, A5, A3, tirinha, americano, tankobon, quadrado ou
 livre em mm), DPI e o número de painéis da tirinha; a página nasce com as
 guias de margem (0,5 / 1 / 1,5 cm por lado) já aplicadas. "Definir modelo de
 página..." usa a página atual ou um template de HQ do Krita como base para as
-próximas páginas (A3 redimensiona; tirinha vira uma tira horizontal).
+próximas páginas (A3 redimensiona; tirinha vira uma tira horizontal); o botão
+"Gerar modelos padrão do HQ Tools" cria na hora modelos próprios (A4, A3,
+tirinhas 1-3 e grades 2x2/3x3) com guias de margem.
 Referências: "Camada de referência" marca a camada selecionada e "Importar
 referência (PNG)" insere uma referência travada no grupo ativo. Mostra as
 miniaturas internas, abre com duplo clique e permite reordenar arrastando. A
@@ -79,13 +95,16 @@ opção de nomear a camada do balão como <code>text</code> faz o CPMT usar o
 conteúdo na exportação ACBF/EPUB.</p>
 
 <h2>Pincéis</h2>
-<p>Dezesseis slots que ativam presets instalados no Krita. Escolha o preset de
-cada slot no docker (clique com o botão direito no cartão do pincel) e defina
-os atalhos em <b>Configurar Krita &gt; Atalhos &gt; Scripts &gt; HQ Tools</b>
+<p>Os conjuntos (Rascunho, Contornos, Aquarela/Guache, Acrílico/Óleo,
+Retículas) montam cartões com os presets já instalados no seu Krita; clique
+no cartão para ativar e botão direito atribui a um dos dezesseis slots, com
+atalhos em <b>Configurar Krita &gt; Atalhos &gt; Scripts &gt; HQ Tools</b>
 (ações "HQ Tools: pincel 1" a "pincel 16"). A aba "Packs" traz pincéis da
 comunidade com licença verificada (Deevad v8.2, David Revoy, CC-BY 4.0; Krita
 Watercolor Set, Vasco Basqué, CC-0), instaláveis com um clique; cada pack tem
-licença e créditos em CREDITS.md. Após instalar um pack, reinicie o Krita.</p>
+licença e créditos em CREDITS.md. A aba "Comunidade" lista os presets desses
+packs depois de instalados. Após instalar um pack, reinicie o Krita. O botão
+"Instalar bundle..." copia um arquivo <code>.bundle</code> seu para o Krita.</p>
 
 <h2>Configuração</h2>
 <p>As preferências ficam em <code>~/.local/share/krita/hq_tools/config.json</code>
