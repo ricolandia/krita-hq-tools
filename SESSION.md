@@ -107,6 +107,12 @@ bash scripts/build-zip.sh                  # gerar ZIP instalável
   para o "Criar próxima página" e os formatos do plugin.
 - Verificar a visibilidade do botão "Instalar bundle..." no docker de pincéis
   (sugestão: mover para a aba "Packs").
+- **Publicar no GitHub (aguardando as bibliotecas do Ricardo)**: guia do
+  usuário pronto em `INSTALL.md` (aponta para o ZIP da release
+  `hq_tools-<versão>.zip`); na publicação, subir o repositório com README +
+  INSTALL + CREDITS, criar a release com o ZIP gerado por `build-zip.sh`
+  (inclui `hq_tools.action` e `hq_tools.desktop`) e decidir tags (ex.: v0.6.2).
+  O ZIP atual está em `dist/hq_tools-0.6.2.zip` (não versionado).
 
 ## Pendências futuras (fora de escopo por ora)
 

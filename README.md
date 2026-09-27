@@ -41,6 +41,9 @@ O plugin acompanha um kit com licenças documentadas em `CREDITS.md`:
 
 ## Instalação
 
+Guia completo para usuário final (ZIP, manual, Flatpak, desinstalação e
+solução de problemas): **`INSTALL.md`**.
+
 Modo desenvolvimento (editar e testar direto do repositório):
 
 ```bash
