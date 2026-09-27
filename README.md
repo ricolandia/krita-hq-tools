@@ -58,7 +58,9 @@ Depois: ative **HQ Tools** no Gerenciador de plugins Python e reinicie o
 Krita. Se instalou pelo ZIP, copie o `hq_tools.action` (dentro do ZIP) para
 `~/.local/share/krita/actions/` para ter os atalhos padrão de pincel em
 Configurar Krita > Atalhos (o `install-dev.sh` faz isso sozinho). Os dockers
-ficam em Configurações > Dockers com o prefixo "HQ Tools".
+ficam em Configurações > Dockers com o prefixo "HQ Tools"; para agrupá-los
+como abas de um mesmo painel, arraste um docker sobre o outro (o Krita junta
+automaticamente; você pode desagrupar quando quiser).
 
 ## Uso rápido
 

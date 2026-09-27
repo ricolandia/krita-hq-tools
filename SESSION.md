@@ -1,6 +1,6 @@
 # SESSION — HQ Tools (Krita-Comics-Plugin)
 
-Fonte da verdade do projeto. Atualizado em 2026-09-26 (v0.6.0).
+Fonte da verdade do projeto. Atualizado em 2026-09-26 (v0.6.1).
 
 ## Contexto
 
@@ -60,11 +60,21 @@ Feito:
   1-3, grades 2x2/3x3) no "Definir modelo"; família Londrina completa nas
   fontes (12 famílias); paletas art-valores e art-carta-reticula. 77 testes
   passando.
+- **Fix crítico (v0.6.1)**: `paths.py` usava `HOME` antes da definição e
+  quebrava o import do plugin (dockers sumiam da listagem); corrigido com
+  teste de regressão (`test_paths.py`); import validado com stub do krita;
+  79 testes passando.
+- **Decisão (26/09)**: dockers mantidos separados (7 módulos). Integrar tudo
+  num único docker pioraria o workspace; o agrupamento em abas fica a cargo
+  do próprio Krita (arrastar um docker sobre o outro em Configurações >
+  Dockers). Avaliado e descartado: fundir catálogos num "HQ Tools: catálogos"
+  e "hub único com abas". Dica documentada no README e no manual.
 
 Pendente (validação dentro do Krita):
 
-- Rodar o roteiro de `docs/VALIDACAO.md` (itens 3c e 7b): instalar os packs e
-  as fontes, reiniciar e conferir a aba "Comunidade" e o seletor de fontes.
+- Rodar o roteiro de `docs/VALIDACAO.md` (itens 2b, 3c, 5, 7b): padrões
+  instalados, modelos gerados, fontes novas e abas Packs/Comunidade.
+- Confirmar após o fix v0.6.1: os 7 dockers de volta na listagem do Krita.
 
 ## Comandos
 
