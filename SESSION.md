@@ -2,6 +2,10 @@
 
 Fonte da verdade do projeto. Atualizado em 2026-09-27 (v0.6.2).
 
+Espelho no Trilium (VPS): nota **"HQ Tools - Plugin Krita"** (`JVRkycXWq0KN`,
+em Apps e Jogos), com as subnotas Estado e decisões, Instalação e uso,
+Publicação (GitHub), Validação no Krita (pendente) e Resumo visual (Mermaid).
+
 ## Contexto
 
 Ricardo quer produzir páginas de quadrinhos no Krita (Debian, AppImage) e
@@ -101,21 +105,51 @@ bash scripts/build-zip.sh                  # gerar ZIP instalável
 
 ## Pendências do autor (Ricardo)
 
-- Criar os modelos vetoriais melhorados: **balões**, **onomatopeias** e
-  **painéis** (estilos próprios), para substituir as amostras atuais.
-- Criar modelos de **página**: **tirinha (strip**, 1-3 tiras) e **página A3**,
-  para o "Criar próxima página" e os formatos do plugin.
+Espelho no Trilium: subnota "Lista do autor (a criar)" (`FoIRvo2ztN0D`).
+
+**Balões (SVG na biblioteca)**
+- Jogo próprio de balões para substituir as amostras: fala redondo, fala
+  oval, grito, pensamento, sussurro, narração e legenda.
+- Variantes de cauda (esquerda, direita, embaixo) para os tipos de fala.
+- Estilo consistente entre si (traço, cantos, sombra opcional).
+
+**Onomatopeias (SVG)**
+- Conjunto próprio para substituir as 8 amostras: impacto, velocidade, som
+  pequeno e sons de ação.
+- Versões com contorno e com preenchimento, para combinar com o nanquim.
+
+**Painéis e páginas (modelos)**
+- Tirinha de 1 a 3 tiras, para o "Criar próxima página" e o "Definir modelo".
+- Página A3 com guias.
+- Modelo vetorial de painéis com o seu traço (contorno e sarjetas próprios).
+- Avaliar modelos para americano e tankobon (os formatos já existem no diálogo).
+
+**Pincéis e traço**
+- Presets próprios de hachura à mão (pincel para hachurar por cima da retícula).
+- Avaliar conjuntos de pincéis próprios para os slots, além dos nativos e dos
+  packs.
 - Verificar a visibilidade do botão "Instalar bundle..." no docker de pincéis
   (sugestão: mover para a aba "Packs").
-- **Publicar no GitHub (aguardando as bibliotecas do Ricardo)**: guia do
-  usuário pronto em `INSTALL.md` (aponta para o ZIP da release
-  `hq_tools-<versão>.zip`); CI pronta em `.github/workflows/` (tests em push/PR
-  com Python 3.11/3.13 + checagem do ZIP; release automática em tag `v*` com o
-  ZIP do `build-zip.sh`); manual interno (`hq_tools_manual.html`) alinhado à
-  v0.6.2; CREDITS com placeholder do repositório. Na publicação: subir o repo
-  (README + INSTALL + CREDITS + LICENSE), criar a tag v0.6.2 e conferir a
-  release (ZIP inclui `hq_tools.action` e `hq_tools.desktop`). O ZIP atual
-  está em `dist/hq_tools-0.6.2.zip` (não versionado).
+
+**Divulgação**
+- Ícone do plugin para o gerenciador do Krita e para o repositório.
+- Banner ou capa para o repositório e redes.
+- Capturas e GIFs curtos: aplicar retícula, criar página, editar retícula,
+  pincéis.
+- Página de exemplo (uma HQ curta) mostrando o fluxo completo, para o README
+  e a release.
+
+**Publicação**
+- Criar o repositório no GitHub e subir o main (aguardando as bibliotecas).
+- Criar a tag v0.6.2 (a release sai com o ZIP automaticamente).
+- Trocar o endereço do repositório no CREDITS.md e no SESSION.md.
+- Revisar README e INSTALL antes de abrir o repositório.
+
+Pronto para a publicação: `INSTALL.md` (guia do usuário), CI em
+`.github/workflows/` (tests em push/PR com Python 3.11/3.13 + checagem do ZIP;
+release automática em tag `v*`), manual interno alinhado à v0.6.2 e CREDITS
+com placeholder do repositório. O ZIP atual está em `dist/hq_tools-0.6.2.zip`
+(não versionado; inclui `hq_tools.action` e `hq_tools.desktop`).
 
 ## Pendências futuras (fora de escopo por ora)
 
