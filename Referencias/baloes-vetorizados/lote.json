@@ -1,0 +1,156 @@
+{
+  "balao-02a": {
+    "prancha": "Refer_ball_02.png",
+    "recorte": [
+      225,
+      7,
+      185,
+      216
+    ],
+    "traco_px": 6.0,
+    "corte": "113,154,89,153"
+  },
+  "balao-02b": {
+    "prancha": "Refer_ball_02.png",
+    "recorte": [
+      652,
+      21,
+      193,
+      193
+    ],
+    "traco_px": 6.0,
+    "corte": "auto"
+  },
+  "balao-02c": {
+    "prancha": "Refer_ball_02.png",
+    "recorte": [
+      240,
+      291,
+      176,
+      133
+    ],
+    "traco_px": 6.0,
+    "corte": "auto"
+  },
+  "balao-02d": {
+    "prancha": "Refer_ball_02.png",
+    "recorte": [
+      439,
+      39,
+      185,
+      157
+    ],
+    "traco_px": 6.0,
+    "corte": "auto"
+  },
+  "balao-03a": {
+    "prancha": "Refer_ball_03.png",
+    "recorte": [
+      344,
+      181,
+      176,
+      120
+    ],
+    "traco_px": 5.0,
+    "corte": "auto"
+  },
+  "balao-03b": {
+    "prancha": "Refer_ball_03.png",
+    "recorte": [
+      691,
+      341,
+      129,
+      113
+    ],
+    "traco_px": 5.0,
+    "corte": "auto"
+  },
+  "balao-04a": {
+    "prancha": "Refer_ball_04.png",
+    "recorte": [
+      503,
+      99,
+      119,
+      99
+    ],
+    "traco_px": 4.0,
+    "corte": "auto"
+  },
+  "balao-04b": {
+    "prancha": "Refer_ball_04.png",
+    "recorte": [
+      123,
+      185,
+      95,
+      87
+    ],
+    "traco_px": 4.0,
+    "corte": "auto"
+  },
+  "balao-05b": {
+    "prancha": "Refer_ball_05.png",
+    "recorte": [
+      752,
+      345,
+      223,
+      129
+    ],
+    "traco_px": 5.0,
+    "corte": "auto"
+  },
+  "balao-05c": {
+    "prancha": "Refer_ball_05.png",
+    "recorte": [
+      38,
+      190,
+      133,
+      189
+    ],
+    "traco_px": 5.0,
+    "corte": "auto"
+  },
+  "balao-05d": {
+    "prancha": "Refer_ball_05.png",
+    "recorte": [
+      191,
+      210,
+      163,
+      121
+    ],
+    "traco_px": 5.0,
+    "corte": "auto"
+  },
+  "balao-06a": {
+    "prancha": "Refer_ball_06.png",
+    "recorte": [
+      415,
+      281,
+      110,
+      178
+    ],
+    "traco_px": 5.0,
+    "corte": "auto"
+  },
+  "balao-06b": {
+    "prancha": "Refer_ball_06.png",
+    "recorte": [
+      557,
+      246,
+      154,
+      90
+    ],
+    "traco_px": 5.0,
+    "corte": "auto"
+  },
+  "balao-06c": {
+    "prancha": "Refer_ball_06.png",
+    "recorte": [
+      714,
+      457,
+      144,
+      94
+    ],
+    "traco_px": 5.0,
+    "corte": "auto"
+  }
+}
