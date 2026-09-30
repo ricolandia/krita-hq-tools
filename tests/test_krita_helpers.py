@@ -1,12 +1,15 @@
-"""Testes dos utilitários de Krita que não dependem de Qt.
+"""Testes dos utilitários de Krita que não dependem do Krita de verdade.
 
-``krita_helpers`` importa ``krita`` no topo, então este arquivo instala um
-módulo falso antes de importá-lo, como o ``test_plugin_registro`` faz.
+``krita_helpers`` importa ``krita`` e o ``compat`` (que precisa de Qt) no topo,
+então este arquivo instala um ``krita`` falso e usa o Qt falso de
+``tests/qt_falso.py``, instalado em ``tests/__init__.py``.
 """
 
 import sys
 import types
 import unittest
+
+import qt_falso
 
 
 class DocumentoFalso:
@@ -25,6 +28,7 @@ class DocumentoFalso:
 
 
 def importar_helpers():
+    qt_falso.instalar()
     if "krita" not in sys.modules:
         modulo = types.ModuleType("krita")
         modulo.Krita = type("K", (), {"instance": staticmethod(lambda: None)})
@@ -89,8 +93,11 @@ class TestMacro(unittest.TestCase):
 class TestCursorEspera(unittest.TestCase):
     def setUp(self):
         self.helpers = importar_helpers()
+        self.app = self.helpers.QtWidgets.QApplication
+        self.app.pilha[:] = []
 
     def tearDown(self):
+        self.app.pilha[:] = []
         sys.modules.pop("krita", None)
 
     def test_roda_a_acao(self):
@@ -99,23 +106,20 @@ class TestCursorEspera(unittest.TestCase):
 
     def test_desativa_passa_direto(self):
         with self.helpers.cursor_espera(ativo=False):
-            pass
+            self.assertEqual([], self.app.pilha)
+
+    def test_marca_e_desmarca_o_cursor(self):
+        with self.helpers.cursor_espera():
+            self.assertEqual(1, len(self.app.pilha))
+        self.assertEqual([], self.app.pilha)
 
     def test_nao_trava_quando_a_acao_erra(self):
-        # Sem o finally, o cursor de espera ficavaLigado e o Krita inteiro
+        # Sem o finally, o cursor de espera ficava ligado e o Krita inteiro
         # continuava travado até reiniciar.
         with self.assertRaises(ValueError):
             with self.helpers.cursor_espera():
                 raise ValueError("deu ruim")
-
-    def test_seta_e_restaura_o_cursor(self):
-        app = self.helpers.QtWidgets.QApplication.instance()
-        if app is None:
-            self.skipTest("sem QApplication: o caso de degrade já é coberto acima")
-        antes = app.overrideCursor()
-        with self.helpers.cursor_espera():
-            self.assertIsNotNone(app.overrideCursor())
-        self.assertIs(app.overrideCursor(), antes)
+        self.assertEqual([], self.app.pilha)
 
 
 class TestLeituraDeTexto(unittest.TestCase):

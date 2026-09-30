@@ -10,6 +10,8 @@ import sys
 import types
 import unittest
 
+import qt_falso
+
 
 class _Sinal:
     def connect(self, *args, **kwargs):
@@ -80,6 +82,9 @@ def instalar_stub():
 class TestRegistroDoPlugin(unittest.TestCase):
     def setUp(self):
         self.instancia = instalar_stub()
+        # Antes do recarregamento: o compat escolhe o PyQt na importação, e sem
+        # o falso o plugin não importa na máquina de CI.
+        qt_falso.instalar()
         # Recarrega o pacote a cada teste: hq_tools/__init__.py importa o
         # plugin, que registra a extensão no import, então o estado do registro
         # vive em sys.modules.

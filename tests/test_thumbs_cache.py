@@ -1,131 +1,30 @@
 """Testes do cache de miniaturas dos ``.kra``.
 
-O ``QPixmap`` vem do Qt, que não está instalado na máquina de teste. Estes
-casos cobrem a parte que decide: a chave (mtime/tamanho), o descarte do limite
-e a leitura do zip, com o ``QPixmap`` de mentira.
+O ``QPixmap`` vem do Qt, então o teste instala o falso de ``tests/qt_falso.py``
+e cobre a parte que decide: a chave (mtime/tamanho), o descarte do limite, a
+leitura do zip e a devolução do mesmo objeto na segunda chamada.
 """
 
-import io
 import os
 import shutil
 import sys
 import tempfile
-import types
 import unittest
 import zipfile
 
-
-class _Pixmap:
-    def __init__(self, nome):
-        self.nome = nome
-
-    def scaled(self, *args, **kwargs):
-        return self
-
-    def __repr__(self):
-        return "Pixmap({0})".format(self.nome)
+from tests import qt_falso
+from tests.qt_falso import instalar as instalar_qt
 
 
-class _QImage:
-    @staticmethod
-    def fromData(data):
-        return _QImage()
+def instalar_thumbs():
+    """Qt falso + hq_tools.core.thumbs recién importado com ele."""
+    restaurar = instalar_qt()
+    from hq_tools.core import thumbs
 
-    def isNull(self):
-        return False
-
-
-class _MetaQt(type):
-    """Enum do Qt falso: ``QImage.Format_RGBA8888`` precisa existir."""
-
-    def __getattr__(cls, nome):
-        return _Qualquer()
-
-
-class _Qualquer(metaclass=_MetaQt):
-    """Objeto que aceita qualquer atributo, para o PyQt falso."""
-
-    def __getattr__(self, nome):
-        return _Qualquer()
-
-    def __call__(self, *args, **kwargs):
-        return _Qualquer()
-
-    def __repr__(self):
-        return "<qt-falso>"
-
-
-def instalar_qt_falso():
-    """Registra PyQt5 e PyQt6 falsos, com QPixmap observável.
-
-    ``compat`` importa PyQt de verdade no topo, então o jeito de testar a
-    miniatura fora do Krita é dar a ele um Qt falso. O QPixmap precisa
-    devolver objetos comparáveis, por isso sai do genérico.
-
-    Os dois nomes são registrados porque ``qt_probe`` escolhe PyQt6 sempre que
-    ele já estiver carregado no processo (é o que a suíte faz ao rodar outros
-    testes antes): se só o PyQt5 fosse falso, o compat usaria o PyQt6 de
-    verdade, leria bytes que não são PNG e devolveria None.
-    """
-    qtcore = types.ModuleType("QtCore")
-    qtgui = types.ModuleType("QtGui")
-    qtwidgets = types.ModuleType("QtWidgets")
-    qtsvg = types.ModuleType("QtSvg")
-
-    for modulo in (qtcore, qtgui, qtwidgets, qtsvg):
-        modulo.__getattr__ = lambda nome: _Qualquer()
-
-    class QPixmap(_Qualquer):
-        def __init__(self, nome="imagem"):
-            self.nome = nome
-
-        def scaled(self, *args, **kwargs):
-            return self
-
-    class QImage(_Qualquer):
-        @staticmethod
-        def fromData(data):
-            return QImage()
-
-        def isNull(self):
-            return False
-
-    qtgui.QPixmap = QPixmap
-    qtgui.QImage = QImage
-    qtcore.QImage = QImage
-
-    def limpar():
-        for nome in list(sys.modules):
-            if nome == "PyQt5" or nome == "PyQt6" or nome.startswith("PyQt5."):
-                del sys.modules[nome]
-            elif nome.startswith("PyQt6."):
-                del sys.modules[nome]
-
-    for raiz_nome in ("PyQt5", "PyQt6"):
-        raiz = types.ModuleType(raiz_nome)
-        raiz.__getattr__ = lambda nome: _Qualquer()
-        raiz.QtCore = qtcore
-        raiz.QtGui = qtgui
-        raiz.QtWidgets = qtwidgets
-        raiz.QtSvg = qtsvg
-        sys.modules[raiz_nome] = raiz
-        for parte, modulo in (
-            ("QtCore", qtcore),
-            ("QtGui", qtgui),
-            ("QtWidgets", qtwidgets),
-            ("QtSvg", qtsvg),
-        ):
-            sys.modules["{0}.{1}".format(raiz_nome, parte)] = modulo
-
-    for nome in list(sys.modules):
-        if nome.startswith("hq_tools"):
-            del sys.modules[nome]
-    import hq_tools.core.thumbs as thumbs
-
-    assert sys.modules["hq_tools.core.compat"].QPixmap is QPixmap, (
-        "o compat não pegou o Qt falso; o teste ia passar/failar por acaso"
+    assert sys.modules["hq_tools.core.compat"].QPixmap is qt_falso.QPixmap, (
+        "o compat não pegou o Qt falso; o teste ia passar ou falhar por acaso"
     )
-    return thumbs, limpar
+    return thumbs, restaurar
 
 
 def kra_com_preview(caminho, conteudo=b"png-de-mentira", nome="preview.png"):
@@ -136,7 +35,7 @@ def kra_com_preview(caminho, conteudo=b"png-de-mentira", nome="preview.png"):
 
 class TestCacheDeMiniaturas(unittest.TestCase):
     def setUp(self):
-        self.thumbs, restaurar = instalar_qt_falso()
+        self.thumbs, restaurar = instalar_thumbs()
         self.pasta = tempfile.mkdtemp(prefix="hq_tools_thumbs_")
         self.abertos = []
         real = zipfile.ZipFile
