@@ -10,7 +10,10 @@ import sys
 import types
 import unittest
 
-import qt_falso
+try:  # como pacote (unittest discover, pytest)
+    from . import qt_falso
+except ImportError:  # rodando o arquivo direto: python3 tests/test_x.py
+    import qt_falso
 
 
 class _Sinal:

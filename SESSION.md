@@ -138,6 +138,8 @@ Duas descobertas que valem lembrar:
 
 ```bash
 python3 -m unittest discover -s tests -v   # testes
+python3 -m unittest tests.test_tiles -v    # um arquivo só (a partir da raiz)
+PYTHONPATH=. python3 tests/test_tiles.py    # um arquivo direto
 PYTHONPATH=/tmp/semqt python3 -m unittest discover -s tests   # simular o CI (sem PyQt)
 bash scripts/install-dev.sh                # instalar em dev
 bash scripts/build-zip.sh                  # gerar ZIP instalável
