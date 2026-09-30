@@ -1,6 +1,7 @@
 # SESSION — HQ Tools (Krita-Comics-Plugin)
 
-Fonte da verdade do projeto. Atualizado em 2026-09-27 (v0.6.2).
+Fonte da verdade do projeto. Atualizado em 2026-09-30 (v0.6.2 + auditoria
+em 4 lotes, ainda sem release).
 
 Espelho no Trilium (VPS): nota **"HQ Tools - Plugin Krita"** (`JVRkycXWq0KN`,
 em Apps e Jogos), com as subnotas Estado e decisões, Instalação e uso,
