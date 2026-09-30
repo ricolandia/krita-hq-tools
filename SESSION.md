@@ -130,13 +130,19 @@ Duas descobertas que valem lembrar:
   refactor "óbvia" no `vetorizar-baloes.py` (cortar o pescoço antes de suavizar)
   mudava a cauda de 9 para 37 segmentos em `balao-04b` sem erro nenhum.
 
-- **Packs de pincéis: 3 arquivos citados e ausentes** (`deevad_bristle.png`,
-  `flat-tip-dirty.gbr`, `T_Texture_7.gih`), medidos com
-  `scripts/auditar-packs.py`. Os 3 presets instalam, mas o pincel não carrega.
-  Pendente de decisão: buscar o original ou remover os presets.
-  `tests/test_packs_recursos.py` trava a lista. Cuidado ao ler os .kpp: 4 usam
-  chunk `zTXt` (comprimido) e 32 têm o pincel embutido, sem arquivo externo;
-  sem tratar isso, a auditoria acusa problema onde não há.
+- **Packs de pincéis: os 3 presets com textura ausente foram removidos**
+  (`deevad 2d expressive thin`, `deevad 6n stamp floor particles`,
+  `X9AI_WC_Scattered_Sharp`). A hipótese era que faltassem no pacote de origem;
+  medido o histórico inteiro dos dois repositórios, **nunca existiram**:
+  `Deevad/deevad-krita-brushpresets` (103 arquivos, `master` e tag `8.2`) e
+  `vascoalexander/krita-watercolor-set` (42 arquivos, Krita 2.7 e 2.8) não têm
+  nenhum dos 3. Sem a textura o preset instala, aparece na lista e o pincel não
+  carrega; reapontar trocaria o pincel do autor. Cada `FONTE.md` registra a
+  remoção e corrige a contagem (64 → 62, 13 → 12), e
+  `tests/test_packs_recursos.py` agora exige zero referências quebradas.
+  Cuidado ao ler os .kpp: 4 usam chunk `zTXt` (comprimido) e 32 têm o pincel
+  embutido, sem arquivo externo; sem tratar isso, a auditoria acusa problema
+  onde não há.
 
 ## Comandos
 

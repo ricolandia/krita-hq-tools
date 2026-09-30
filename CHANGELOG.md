@@ -72,7 +72,31 @@ validação rodar dentro do Krita 5 e 6.
   passa a falhar.
 - Novo `tests/test_packs_recursos.py` e `scripts/auditar-packs.py`: acham preset
   que cita arquivo de pincel que não vem no pack (o preset instala e o pincel
-  não carrega). A lista atual tem 3 arquivos, que dependem de decisão do autor.
+  não carrega). A medição achou 3 casos, resolvidos no mesmo dia (seção
+  abaixo): o teste agora exige **zero** referências quebradas.
+
+### Packs de pincéis da comunidade
+
+- **3 presets removidos do kit** por citarem uma textura que os autores dos
+  packs nunca distribuiram. Medido em 2026-09-30 em todo o histórico dos dois
+  repositórios de origem (`Deevad/deevad-krita-brushpresets`, 103 arquivos, do
+  `master` e da tag `8.2`; `vascoalexander/krita-watercolor-set`, 42 arquivos,
+  com as duas versões de preset, Krita 2.7 e 2.8): nenhum dos três arquivos
+  existe em versão alguma, então não há o que buscar:
+
+  | Preset removido | Textura citada | Pack |
+  |---|---|---|
+  | `deevad 2d expressive thin` | `deevad_bristle.png` | Deevad v8.2 |
+  | `deevad 6n stamp floor particles` | `flat-tip-dirty.gbr` | Deevad v8.2 |
+  | `X9AI_WC_Scattered_Sharp` | `T_Texture_7.gih` | Watercolor Set |
+
+  Sem o arquivo, o preset instala e aparece na lista, e o pincel não carrega
+  (o Krita cai no padrão) — o que faz o usuário perder tempo achando que o
+  preset veio quebrado. Reapontar para a textura de outro preset mudaria o
+  pincel que o autor escolheu, e os três `.kpp` são arquivos originais sem
+  modificação declarada no `FONTE.md`. Cada pack documenta agora a remoção no
+  próprio `FONTE.md`, com a contagem corrigida (Deevad 64 → **62** presets,
+  Watercolor 13 → **12**).
 
 ### Empacotamento
 

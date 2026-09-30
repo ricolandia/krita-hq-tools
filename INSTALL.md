@@ -108,6 +108,12 @@ programa para aparecer.
 - **Pincel dos packs não aparece**: confira se a aba "Packs" marca
   "[instalado]" e reinicie; os presets ficam na lista de pincéis do Krita
   com o nome interno do pack.
+- **Um preset que estava na lista sumiu**: três presets foram retirados do kit
+  (`deevad 2d expressive thin`, `deevad 6n stamp floor particles` e
+  `X9AI_WC_Scattered_Sharp`). Os três apontavam para texturas que os autores
+  dos packs não distribuíram, então o preset instalava e o pincel não carregava.
+  Quem instalou uma versão anterior pode apagá-los da pasta de pincéis do
+  plugin; o motivo está no `FONTE.md` de cada pack.
 - **Projeto do CPMT não abre**: o plugin lê o `comicConfig.json` (sem "s")
   em UTF-16, o padrão do Comics Project Management Tools embutido no Krita;
   a variante antiga `comicsConfig.json` (UTF-8) também é aceita.

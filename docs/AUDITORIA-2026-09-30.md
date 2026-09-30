@@ -175,21 +175,31 @@ Tudo acima foi verificado fora do Krita. Falta, com o app aberto:
 - **Origem das referências** em `Referencias/baloes/` e
   `Referencias/vetores-teste/`: não confirmada pelo autor. Não declarar IA,
   terceiros ou desenho próprio até ele dizer.
-- **3 arquivos de pincel** citados por presets do kit não vêm no kit (medido com
-  `python3 scripts/auditar-packs.py`):
+- **3 presets que citavam textura de pincel inexistente — resolvido no mesmo
+  dia.** A medição (`python3 scripts/auditar-packs.py`) achou 3 arquivos citados
+  que não vinham no pack:
 
-  | Arquivo citado | Preset que depende dele |
-  |---|---|
-  | `deevad_bristle.png` | `deevad 2d expressive thin.kpp` (Deevad v8.2) |
-  | `flat-tip-dirty.gbr` | `deevad 6n stamp floor particles.kpp` (Deevad v8.2) |
-  | `T_Texture_7.gih` | `X9AI_WC_Scattered_Sharp.kpp` (Watercolor Set) |
+  | Arquivo citado | Preset que dependia dele | Destino |
+  |---|---|---|
+  | `deevad_bristle.png` | `deevad 2d expressive thin.kpp` (Deevad v8.2) | removido |
+  | `flat-tip-dirty.gbr` | `deevad 6n stamp floor particles.kpp` (Deevad v8.2) | removido |
+  | `T_Texture_7.gih` | `X9AI_WC_Scattered_Sharp.kpp` (Watercolor Set) | removido |
 
-  Esses presets instalam e aparecem na lista, mas o pincel não carrega: o Krita
-  cai no padrão. Não dá para gerar o arquivo (é arte de terceiro) nem editar o
-  preset sem perder o que o autor definiu. Decisão do autor: buscar o original
-  no pacote de origem ou remover o preset do kit. `tests/test_packs_recursos.py`
-  trava a lista: um preset novo com referência quebrada falha, e resolver uma
-  das três também pede a atualização (a lista é a documentação).
+  A hipótese inicial era que o pacote de origem tivesse escapado. Não é o caso:
+  em 2026-09-30 foi medido o histórico inteiro dos dois repositórios
+  (`Deevad/deevad-krita-brushpresets`, 103 arquivos, no `master` e na tag
+  `8.2`; `vascoalexander/krita-watercolor-set`, 42 arquivos, com as duas versões
+  de preset, Krita 2.7 e 2.8) e **nenhum dos três arquivos existe em versão
+  alguma** — estão quebrados desde a origem. Os três `.kpp` são ponteiro puro
+  para a textura (nem pincel nem textura embutidos), e reapontar para a textura
+  de outro preset trocaria o pincel que o autor escolheu.
+
+  Decisão do autor: remover os 3 presets do kit, com o motivo registrado no
+  `FONTE.md` de cada pack (que passa a declarar a alteração, em vez de
+  "nenhuma"). Cada pack corrigiu a contagem: Deevad 64 → 62 presets, Watercolor
+  13 → 12. `tests/test_packs_recursos.py` não trava mais uma lista de
+  pendência: passa a exigir **zero** referências quebradas, e a constante
+  `PRESETS_REMOVIDOS` fica só como documentação do caso.
 
   A primeira medição tinha falhado por dois motivos, ambos corrigidos no
   `scripts/auditar-packs.py`: 4 presets do Deevad gravam o XML em chunk `zTXt`

@@ -5,10 +5,11 @@ o recurso de que precisa (``filename=`` no ``brush_definition`` e
 ``requiredBrushFile``). Se o arquivo citado não estiver no pack, o preset
 instala e o pincel não aparece.
 
-Este teste trava o estado atual: os 3 arquivos órfãos que já foram
-identificados. Se alguém acrescentar um preset com referência quebrada, o
-teste falha com o nome do arquivo. Se alguém resolver uma das três, o teste
-falha pedindo para atualizar a lista (que é o ponto: a lista é documentação).
+Este teste trava o estado atual: nenhum preset do kit cita uma textura que não
+venha no pack. Em 2026-09-30 foram medidos 3 casos assim, e os 3 presets foram
+removidos do kit porque os autores dos packs nunca distribuíram as texturas
+citadas, em nenhuma versão dos repositórios. Eles estão registrados em
+PRESETS_REMOVIDOS, que serve de documentação do motivo.
 """
 
 import importlib.util
@@ -32,10 +33,12 @@ def carregar_auditor():
 
 aud = carregar_auditor()
 
-# Arquivos citados pelos presets e que NÃO estão em nenhum pack. São do autor
-# dos packs (Deevad e Vasco Basqué): não dá para "consertar" gerando arquivo,
-# é preciso buscar o original ou remover o preset que depende dele.
-ORFAS_CONHECIDAS = {
+# Os 3 presets que citavam uma textura inexistente foram removidos do kit em
+# 2026-09-30. Não dá para "consertar" gerando arquivo (é arte de terceiro), e
+# os repositórios de origem não têm a textura em nenhuma versão. Ficam aqui para
+# documentar o motivo da remoção, não como lista de exceções: o teste exige
+# zero referências órfãs.
+PRESETS_REMOVIDOS = {
     "deevad_bristle.png": "deevad 2d expressive thin.kpp",
     "flat-tip-dirty.gbr": "deevad 6n stamp floor particles.kpp",
     "T_Texture_7.gih": "X9AI_WC_Scattered_Sharp.kpp",
@@ -163,32 +166,38 @@ class TestEstadoDosPacks(unittest.TestCase):
                 self.assertTrue((pack / "LICENSE.txt").is_file())
                 self.assertTrue((pack / "FONTE.md").is_file())
 
-    def test_orfas_sao_exatamente_as_conhecidas(self):
-        # Documenta o estado: enquanto não houver decisão do autor (buscar o
-        # arquivo original ou remover o preset), esta é a lista de pendência.
-        encontradas = {}
+    def test_nenhum_pack_deixa_referencia_quebrada(self):
+        # Invariante: se alguém acrescentar um preset que cita um arquivo de
+        # fora do pack, o teste falha com o nome do arquivo e do preset.
+        orfas = {}
         for pack in sorted(p for p in self.brushes_dir.iterdir() if p.is_dir()):
-            orfas, _embutidos, _especiais, sem_xml = aud.auditar(pack)
+            encontradas, _embutidos, _especiais, sem_xml = aud.auditar(pack)
             self.assertEqual([], sem_xml, "{0} tem preset sem XML legível".format(pack.name))
-            encontradas.update(orfas)
-        iguais = set(encontradas) == set(ORFAS_CONHECIDAS)
-        self.assertTrue(
-            iguais,
-            "as referências órfãs mudaram.\n"
-            "  esperadas: {0}\n"
-            "  encontradas: {1}\n"
-            "Se você resolveu uma delas, atualize ORFAS_CONHECIDAS no teste e o "
-            "relatório da auditoria.".format(sorted(ORFAS_CONHECIDAS), sorted(encontradas)),
+            orfas.update(encontradas)
+        self.assertEqual(
+            {},
+            orfas,
+            "presets citaram recursos que não vêm no pack: {0}. Ou o arquivo "
+            "sumiu, ou o preset aponta para a textura de outro preset.".format(
+                {nome: sorted(ps) for nome, ps in sorted(orfas.items())}
+            ),
         )
 
-    def test_todo_preset_que_depende_de_arquivo_tem_o_arquivo_ou_esta_na_lista(self):
-        # Cobertura mais estrita: se um preset novo citar algo fora do pacote,
-        # a falha aparece com o nome do preset.
+    def test_referencia_quebrada_seria_preset_removido(self):
+        # Se uma referência quebrada aparecer de novo, ela só pode ser uma das
+        # 3 que tiramos do kit: ou um preset voltou por engano, ou alguém criou
+        # um arquivo com o nome errado. Nos dois casos a mensagem diz o que
+        # aconteceu.
         for pack in sorted(p for p in self.brushes_dir.iterdir() if p.is_dir()):
             orfas, _e, _s, _sx = aud.auditar(pack)
             for nome, presets in orfas.items():
                 with self.subTest(pack=pack.name, arquivo=nome):
-                    self.assertIn(presets[0], ORFAS_CONHECIDAS[nome])
+                    self.assertIn(
+                        nome,
+                        PRESETS_REMOVIDOS,
+                        "referência quebrada que não é dos presets removidos",
+                    )
+                    self.assertIn(presets[0], PRESETS_REMOVIDOS[nome])
 
 
 if __name__ == "__main__":

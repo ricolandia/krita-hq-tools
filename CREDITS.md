@@ -76,8 +76,18 @@ O plugin configura recursos nativos do Krita, de autoria do projeto Krita:
 | Krita Watercolor Set | Vasco Basqué | https://github.com/vascoalexander/krita-watercolor-set | CC-0 (ícones de David Revoy/MyPaint também CC-0) |
 
 Regra do kit: só entram packs com licença explícita que permita redistribuição;
-os arquivos são os originais do autor, sem alteração; cada pack traz
-`LICENSE.txt` e `FONTE.md` (autor, origem, licença, alterações).
+os arquivos são os originais do autor, sem alteração, salvo registro no
+`FONTE.md` do pack; cada pack traz `LICENSE.txt` e `FONTE.md` (autor, origem,
+licença, alterações).
+
+A única alteração já feita é a remoção de três presets que citavam uma textura
+que os autores nunca distribuíram: `deevad 2d expressive thin` e `deevad 6n
+stamp floor particles` (Deevad v8.2) e `X9AI_WC_Scattered_Sharp` (Watercolor
+Set). Conferido em 2026-09-30 no histórico inteiro dos dois repositórios acima:
+os arquivos citados (`deevad_bristle.png`, `flat-tip-dirty.gbr`,
+`T_Texture_7.gih`) não existem em versão alguma, então não há o que
+redistribuir. O `FONTE.md` de cada pack registra a remoção e a contagem
+corrigida.
 
 Candidatos avaliados e **não incluídos** por falta de licença clara (podem
 entrar após contato com o autor ou como link): Cityscape Brushes e Pesi's
