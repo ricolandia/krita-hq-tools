@@ -32,3 +32,23 @@ def ensure_user_dirs():
         MODELOS_DIR,
     ):
         os.makedirs(path, exist_ok=True)
+
+
+def mesma_copia(origem, destino):
+    """Diz se o destino já é esta mesma cópia do arquivo.
+
+    Mesmo tamanho e mtime. Serve para as instalações repetidas: recopiar o kit
+    inteiro a cada clique não instala nada novo e obriga a refazer o cache do
+    sistema (no caso das fontes, o ``fc-cache`` leva segundos com a interface
+    travada). O mtime só é confiável porque quem copia é o ``shutil.copy2``,
+    que preserva os metadados.
+    """
+    try:
+        info_origem = os.stat(origem)
+        info_destino = os.stat(destino)
+    except OSError:
+        return False
+    return (
+        info_origem.st_size == info_destino.st_size
+        and int(info_origem.st_mtime) == int(info_destino.st_mtime)
+    )

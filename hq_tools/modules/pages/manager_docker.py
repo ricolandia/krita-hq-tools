@@ -654,14 +654,15 @@ class PagesDocker(DockWidget):
             }
             panel_svg = generator.panels_svg(page, width_px, height_px, dpi)
             try:
-                document = generator.build_page_document(
-                    page, nome, panel_svg, "", width_px, height_px, dpi
-                )
-                self.apply_margin_guides(document)
-                destino = os.path.join(
-                    MODELOS_DIR, "modelo-{0}.kra".format(modelos_lib.slug(nome))
-                )
-                generator.save_page(document, destino)
+                with helpers.cursor_espera():
+                    document = generator.build_page_document(
+                        page, nome, panel_svg, "", width_px, height_px, dpi
+                    )
+                    self.apply_margin_guides(document)
+                    destino = os.path.join(
+                        MODELOS_DIR, "modelo-{0}.kra".format(modelos_lib.slug(nome))
+                    )
+                    generator.save_page(document, destino)
                 gerados.append((nome, destino))
             except (RuntimeError, OSError):
                 continue

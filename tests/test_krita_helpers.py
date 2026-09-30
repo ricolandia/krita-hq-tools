@@ -86,6 +86,38 @@ class TestMacro(unittest.TestCase):
             self.helpers.run_in_macro(Ruim(), explode)
 
 
+class TestCursorEspera(unittest.TestCase):
+    def setUp(self):
+        self.helpers = importar_helpers()
+
+    def tearDown(self):
+        sys.modules.pop("krita", None)
+
+    def test_roda_a_acao(self):
+        with self.helpers.cursor_espera():
+            self.assertEqual(1, 1)
+
+    def test_desativa_passa_direto(self):
+        with self.helpers.cursor_espera(ativo=False):
+            pass
+
+    def test_nao_trava_quando_a_acao_erra(self):
+        # Sem o finally, o cursor de espera ficavaLigado e o Krita inteiro
+        # continuava travado até reiniciar.
+        with self.assertRaises(ValueError):
+            with self.helpers.cursor_espera():
+                raise ValueError("deu ruim")
+
+    def test_seta_e_restaura_o_cursor(self):
+        app = self.helpers.QtWidgets.QApplication.instance()
+        if app is None:
+            self.skipTest("sem QApplication: o caso de degrade já é coberto acima")
+        antes = app.overrideCursor()
+        with self.helpers.cursor_espera():
+            self.assertIsNotNone(app.overrideCursor())
+        self.assertIs(app.overrideCursor(), antes)
+
+
 class TestLeituraDeTexto(unittest.TestCase):
     def setUp(self):
         self.helpers = importar_helpers()

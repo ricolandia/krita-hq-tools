@@ -28,7 +28,7 @@ from ...core.compat import (
     QtWidgets,
 )
 from ...core.config import Config
-from ...core.paths import BALLOONS_DIR
+from ...core.paths import BALLOONS_DIR, mesma_copia
 
 SAMPLES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "samples")
 KIT_CC0_DIR = os.path.join(
@@ -281,7 +281,13 @@ class BalloonsDocker(DockWidget):
         )
 
     def install_kit_fonts(self):
-        """Instala as fontes de HQ (OFL) inclusas no plugin."""
+        """Instala as fontes de HQ (OFL) inclusas no plugin.
+
+        Copia só o que mudou e só roda o ``fc-cache`` quando houve mudança: a
+        versão anterior recopiaria o kit inteiro e forçaria a reconstrução
+        completa do cache de fontes toda vez que o botão fosse clicado, com a
+        interface travada nos segundos do ``fc-cache -f``.
+        """
         if not os.path.isdir(KIT_FONTS_DIR):
             helpers.show_message("Pasta de fontes não encontrada no plugin.")
             return
@@ -290,26 +296,47 @@ class BalloonsDocker(DockWidget):
         except OSError as error:
             helpers.show_message("Falha ao criar a pasta de fontes: {0}".format(error))
             return
-        installed = 0
+        instaladas = []
+        ignoradas = 0
         for name in sorted(os.listdir(KIT_FONTS_DIR)):
-            if name.lower().endswith((".ttf", ".otf")):
-                try:
-                    shutil.copy2(
-                        os.path.join(KIT_FONTS_DIR, name),
-                        os.path.join(FONTS_TARGET, name),
-                    )
-                    installed += 1
-                except OSError:
+            if not name.lower().endswith((".ttf", ".otf")):
+                continue
+            origem = os.path.join(KIT_FONTS_DIR, name)
+            destino = os.path.join(FONTS_TARGET, name)
+            try:
+                if mesma_copia(origem, destino):
+                    ignoradas += 1
                     continue
-        try:
-            subprocess.run(
-                ["fc-cache", "-f", FONTS_TARGET],
-                timeout=60,
-                capture_output=True,
+                shutil.copy2(origem, destino)
+                instaladas.append(name)
+            except OSError:
+                continue
+        if instaladas:
+            self._atualizar_cache_de_fontes()
+        if not instaladas:
+            helpers.show_message(
+                "As {0} fonte(s) do kit já estão instaladas.".format(ignoradas)
             )
-        except (OSError, subprocess.SubprocessError):
-            pass
+            return
         helpers.show_message(
-            "{0} fonte(s) instalada(s). Reinicie o Krita para listá-las na "
-            "ferramenta de texto.".format(installed)
+            "{0} fonte(s) instalada(s) ({1} já estavam). Reinicie o Krita para "
+            "listá-las na ferramenta de texto.".format(len(instaladas), ignoradas)
         )
+
+    @staticmethod
+    def _atualizar_cache_de_fontes():
+        """Roda o ``fc-cache`` só na pasta do kit, sem ``-f``.
+
+        ``-f`` reconstrói o cache inteiro do sistema, o que numa máquina com
+        muitas fontes leva dezenas de segundos. Como as fontes acabou de
+        mudar, o cache incremental da pasta já basta.
+        """
+        with helpers.cursor_espera():
+            try:
+                subprocess.run(
+                    ["fc-cache", FONTS_TARGET],
+                    timeout=60,
+                    capture_output=True,
+                )
+            except (OSError, subprocess.SubprocessError):
+                pass

@@ -1,10 +1,11 @@
 """Funções utilitárias sobre a API do Krita usadas por todos os módulos."""
 
+import contextlib
 import sys
 
 from krita import InfoObject, Krita, Selection
 
-from .compat import QIcon
+from .compat import WAIT_CURSOR, QIcon, QtCore, QtWidgets
 
 
 def app():
@@ -120,6 +121,34 @@ def run_in_macro(document, action):
     finally:
         try:
             document.endMacro()
+        except (AttributeError, RuntimeError):
+            pass
+
+
+@contextlib.contextmanager
+def cursor_espera(ativo=True):
+    """Cursor de espera durante uma operação lenta, sempre restaurado.
+
+    Gerar as páginas de um roteiro inteiro, instalar as fontes do kit ou
+    aplicar retícula em um documento grande leva segundos rodando na thread da
+    interface: sem o cursor, o Krita parece travado e o autor clica de novo,
+    o que duplica o trabalho. O ``finally`` é obrigatório: cursor de espera
+    esquecido deixa o Krita inteiro travado até reiniciar.
+    """
+    if not ativo:
+        yield
+        return
+    try:
+        QtWidgets.QApplication.setOverrideCursor(QtCore.QCursor(WAIT_CURSOR))
+    except (AttributeError, RuntimeError, TypeError):
+        # Sem QApplication (testes, script avulso), segue sem cursor.
+        yield
+        return
+    try:
+        yield
+    finally:
+        try:
+            QtWidgets.QApplication.restoreOverrideCursor()
         except (AttributeError, RuntimeError):
             pass
 
