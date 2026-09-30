@@ -95,10 +95,41 @@ Pendente (validação dentro do Krita):
   "Editar selecionada" + Aplicar atualizando a mesma retícula/máscara, e
   "Novo projeto..." em pasta com `comicConfig.json` existente (não sobrescreve).
 
+## Auditoria de 2026-09-30 (4 lotes, sem release ainda)
+
+Auditoria por quatro frentes (correção, desempenho, robustez, testes/docs),
+aplicada em quatro commits. Relatório completo em
+**`docs/AUDITORIA-2026-09-30.md`**; changelog na seção `[Não publicado]`.
+**147 testes verdes, com e sem PyQt instalado.** A versão continua 0.6.2: nada
+foi validado dentro do Krita ainda, e a checklist de validação está no fim do
+relatório.
+
+| Lote | Commit | O que era |
+|---|---|---|
+| A | `e7da031` | dado do autor sobrescrito (projeto, `.cpmt`, presets, packs, páginas) |
+| B | `e3142c3` | um docker quebrado derrubava os sete; ações fora do Ctrl+Z; `compat` sem escolha de binding |
+| C | `33fb020` | miniatura decodificada por item a cada refresh; fontes recopravam tudo com `fc-cache -f` |
+| D | `0e01706` | ZIP saía sem licença/créditos (só aviso); release sem conferir a tag; scripts de apoio |
+
+Follow-ups: `97106bb` (não sobrescrever `comicConfig.json`) e `e738ba8`
+(isolar o Qt da suíte, que não rodava no CI e rodava diferente na máquina).
+
+Duas descobertas que valem lembrar:
+
+- **A suíte nunca rodou no CI**: sem PyQt, 18 testes quebravam com `ImportError`.
+  E na máquina do autor, com PyQt6 instalado, o teste do cache de miniaturas
+  pegava o Qt de verdade e comparava `None` com `None` — passava por acaso. O
+  falso está em `tests/qt_falso.py`, registrado como PyQt5 e PyQt6.
+- **O lote de balões é reproduzível byte a byte** por
+  `scripts/vetorizar-lote.py`, e `tests/test_vetorizacao.py` trava isso. Uma
+  refactor "óbvia" no `vetorizar-baloes.py` (cortar o pescoço antes de suavizar)
+  mudava a cauda de 9 para 37 segmentos em `balao-04b` sem erro nenhum.
+
 ## Comandos
 
 ```bash
 python3 -m unittest discover -s tests -v   # testes
+PYTHONPATH=/tmp/semqt python3 -m unittest discover -s tests   # simular o CI (sem PyQt)
 bash scripts/install-dev.sh                # instalar em dev
 bash scripts/build-zip.sh                  # gerar ZIP instalável
 ```
