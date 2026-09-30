@@ -117,6 +117,10 @@ Follow-ups: `97106bb` (não sobrescrever `comicConfig.json`) e `e738ba8`
 
 Duas descobertas que valem lembrar:
 
+- **O CI não rodava o teste dos balões**: `test_vetorizacao.py` exige numpy e
+  Pillow e pulava em silêncio (5 de 7 testes, inclusive a reprodução byte a byte
+  dos 15 SVGs). O workflow agora instala as dependências e falha se aparecer
+  `skipped`.
 - **A suíte nunca rodou no CI**: sem PyQt, 18 testes quebravam com `ImportError`.
   E na máquina do autor, com PyQt6 instalado, o teste do cache de miniaturas
   pegava o Qt de verdade e comparava `None` com `None` — passava por acaso. O

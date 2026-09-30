@@ -121,7 +121,11 @@ De 76 para 161. Duas descobertas sobre a própria suíte:
 1. **A suíte não rodava no CI.** Sem PyQt instalado, 18 testes quebravam com
    `ImportError` — o `compat` importa PyQt no topo. O CI nunca tinha rodado
    verde com esta suíte.
-2. **A suíte rodava diferente na máquina do autor.** Com PyQt6 instalado, o
+2. **O CI não conferia o lote de balões.** `test_vetorizacao.py` precisa de
+   numpy e Pillow e pulava em silêncio: 5 dos 7 testes, incluindo a conferência
+   de que os 15 SVGs continuam reproduzíveis byte a byte. O CI agora instala as
+   duas dependências e quebra se aparecer `skipped`.
+3. **A suíte rodava diferente na máquina do autor.** Com PyQt6 instalado, o
    `qt_probe` escolhe o binding já carregado, e o teste do cache de miniaturas
    pegava o PyQt6 de verdade: lia bytes que não eram PNG e recebia `None` — o
    teste "passava" porque comparava `None` com `None`.
