@@ -17,6 +17,40 @@ class TestScreentoneCore(unittest.TestCase):
         self.assertAlmostEqual(core.clamp_frequency(60, 300), 60.0)
         self.assertAlmostEqual(core.clamp_frequency(0.2, 300), 1.0)
 
+    def test_limite_respeita_a_unidade_lpc(self):
+        # 150 LPC a 300 dpi são 381 LPI, muito acima do limite. O limite é
+        # sempre calculado em LPI, mesmo quando o preset está em LPC.
+        limite_lpc = core.clamp_frequency(150.0, 300, core.UNITS_LPC)
+        self.assertAlmostEqual(limite_lpc, 150.0 / core.CM_POR_POLEGADA)
+        self.assertAlmostEqual(core.to_lpi(limite_lpc, core.UNITS_LPC), 150.0)
+        # 15 LPC ≈ 38 LPI: passa inteiro, como deve.
+        self.assertAlmostEqual(core.clamp_frequency(15.0, 300, core.UNITS_LPC), 15.0)
+        # Piso de 1 LPI, que em LPC são 0,39 (e não 1,0).
+        self.assertAlmostEqual(
+            core.clamp_frequency(0.1, 300, core.UNITS_LPC), 1.0 / core.CM_POR_POLEGADA
+        )
+
+    def test_conversao_lpi_lpc_preserva_a_densidade(self):
+        lpi = 60.0
+        lpc = core.from_lpi(lpi, core.UNITS_LPC)
+        self.assertAlmostEqual(lpc, 60.0 / 2.54)
+        self.assertAlmostEqual(core.to_lpi(lpc, core.UNITS_LPC), 60.0)
+        # Sem conversão, a densidade mudava por um fator de 2,54 ao clicar na
+        # combo de unidade.
+        self.assertAlmostEqual(
+            core.from_lpi(core.to_lpi(lpi, core.UNITS_LPI), core.UNITS_LPC), lpc
+        )
+
+    def test_properties_respeitam_a_unidade(self):
+        lpc = core.screentone_properties({"lpi": 200.0, "units": 1}, 300)
+        lpi = core.screentone_properties({"lpi": 200.0, "units": 0}, 300)
+        self.assertEqual(lpc["units"], 1)
+        # Mesmo limite físico nas duas unidades: 150 LPI.
+        self.assertAlmostEqual(
+            core.to_lpi(lpc["frequency_x"], core.UNITS_LPC), 150.0, places=4
+        )
+        self.assertAlmostEqual(lpi["frequency_x"], 150.0, places=4)
+
     def test_normalize_preset_preenche_padroes(self):
         preset = core.normalize_preset({"name": "Teste", "lpi": "45"})
         self.assertEqual(preset["name"], "Teste")

@@ -838,17 +838,24 @@ class PagesDocker(DockWidget):
         return [(name, os.path.join(self.folder, name)) for name in names]
 
     def refresh(self):
+        # O try/finally importa: `_loading` desligado é o que impede o Qt de
+        # disparar `_on_order_changed` ao remontar a lista, o que gravaria uma
+        # ordem pela metade. Se a montagem falhasse no meio, a flag ficava
+        # ligada e nenhuma reordenação manual voltaria a funcionar na sessão,
+        # sem aviso nenhum.
         self._loading = True
-        self.list_pages.clear()
-        for relative, path in self._page_paths():
-            item = QtWidgets.QListWidgetItem(os.path.basename(path))
-            item.setData(USER_ROLE, relative)
-            item.setToolTip(path)
-            pixmap = thumbnail_pixmap(path)
-            if pixmap is not None:
-                item.setIcon(QtGui.QIcon(pixmap))
-            self.list_pages.addItem(item)
-        self._loading = False
+        try:
+            self.list_pages.clear()
+            for relative, path in self._page_paths():
+                item = QtWidgets.QListWidgetItem(os.path.basename(path))
+                item.setData(USER_ROLE, relative)
+                item.setToolTip(path)
+                pixmap = thumbnail_pixmap(path)
+                if pixmap is not None:
+                    item.setIcon(QtGui.QIcon(pixmap))
+                self.list_pages.addItem(item)
+        finally:
+            self._loading = False
         if self.project is not None:
             self.lbl_project.setText(
                 "Projeto: {0} ({1} páginas)".format(

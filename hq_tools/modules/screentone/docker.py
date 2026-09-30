@@ -37,6 +37,9 @@ class ScreentoneDocker(DockWidget):
         self._bg = "#ffffff"
         self._edit_fill_id = None
         self._edit_mask_id = None
+        # Unidade que o valor da caixa de frequência representa agora; None
+        # enquanto nenhum preset foi carregado (evita converter o valor inicial).
+        self._unidades_ativas = None
         self._build_ui()
         self._reload_presets()
         self._reload_patterns()
@@ -107,6 +110,7 @@ class ScreentoneDocker(DockWidget):
         self.cmb_units = widgets.QComboBox()
         for label, value in core.UNITS:
             self.cmb_units.addItem(label, value)
+        self.cmb_units.currentIndexChanged.connect(self._on_units_changed)
         frequency_row.addWidget(self.cmb_units, 1)
         form.addRow("Frequência:", frequency_row)
 
@@ -373,6 +377,7 @@ class ScreentoneDocker(DockWidget):
         index = self.cmb_equalization.findData(preset["equalization"])
         if index >= 0:
             self.cmb_equalization.setCurrentIndex(index)
+        self._unidades_ativas = int(preset["units"])
         self.spin_lpi.setValue(preset["lpi"])
         index = self.cmb_units.findData(preset["units"])
         if index >= 0:
@@ -415,12 +420,38 @@ class ScreentoneDocker(DockWidget):
     def _update_info(self):
         document = helpers.active_document()
         dpi = helpers.document_dpi(document) if document else 300.0
-        cell = core.lpi_to_cell_px(self.spin_lpi.value(), dpi)
-        limit = core.max_frequency(dpi)
-        text = "Célula: {0:.2f} px a {1:.0f} dpi (máx. {2:.0f} LPI)".format(cell, dpi, limit)
+        units = self.cmb_units.currentData() or core.UNITS_LPI
+        lpi = core.to_lpi(self.spin_lpi.value(), units)
+        cell = core.lpi_to_cell_px(lpi, dpi)
+        limit = core.from_lpi(core.max_frequency(dpi), units)
+        unidade = core.rotulo_unidade(units)
+        text = "Célula: {0:.2f} px a {1:.0f} dpi (máx. {2:.0f} {3})".format(
+            cell, dpi, limit, unidade
+        )
         if self.spin_lpi.value() > limit:
             text += " — frequência acima do limite, será reduzida ao aplicar"
         self.lbl_info.setText(text)
+
+    def _on_units_changed(self, _index):
+        """Trocar LPI por LPC converte o valor, para a densidade não mudar 2,5x."""
+        novo = self.cmb_units.currentData()
+        if novo is None:
+            return
+        origem = self._unidades_ativas
+        self._unidades_ativas = novo
+        if origem is not None and origem != novo:
+            self.spin_lpi.blockSignals(True)
+            self.spin_lpi.setValue(
+                min(
+                    self.spin_lpi.maximum(),
+                    max(
+                        self.spin_lpi.minimum(),
+                        core.from_lpi(core.to_lpi(self.spin_lpi.value(), origem), novo),
+                    ),
+                )
+            )
+            self.spin_lpi.blockSignals(False)
+        self._update_info()
 
     def _sync_colors(self):
         self.btn_fg.setStyleSheet("background-color: {0}; border: 1px solid #666;".format(self._fg))
@@ -451,8 +482,12 @@ class ScreentoneDocker(DockWidget):
         mode = self.cmb_mask.currentData()
         if mode == "empty":
             return helpers.full_selection(document)
-        if self.chk_selection.isChecked() and document.selection() is not None:
-            return document.selection()
+        if self.chk_selection.isChecked():
+            # Só a seleção com pixels vale: uma seleção vazia geraria máscara
+            # de 0 px e o filtro não faria nada, sem aviso.
+            selecao = helpers.active_selection(document)
+            if selecao is not None:
+                return selecao
         return helpers.full_selection(document)
 
     def _find_same_tone(self, document, generator, fingerprint):
@@ -507,8 +542,8 @@ class ScreentoneDocker(DockWidget):
         """
         if self.cmb_mask.currentData() == "empty":
             return Selection()
-        if self.chk_selection.isChecked() and document.selection() is not None:
-            return document.selection()
+        if self.chk_selection.isChecked():
+            return helpers.active_selection(document)
         return None
 
     def _update_fill_layer(self, document, layer, generator, properties):
@@ -541,6 +576,11 @@ class ScreentoneDocker(DockWidget):
         return True
 
     def apply_fill(self):
+        """Aplica a retícula numa macro: um Ctrl+Z desfaz tudo."""
+        document = helpers.active_document()
+        helpers.run_in_macro(document, self._apply_fill)
+
+    def _apply_fill(self):
         document = helpers.active_document()
         if document is None:
             helpers.show_message("Abra um documento para aplicar a retícula.")
@@ -592,6 +632,11 @@ class ScreentoneDocker(DockWidget):
         helpers.show_message("Retícula aplicada: {0} a {1} LPI.".format(preset["name"], preset["lpi"]))
 
     def apply_halftone(self):
+        """Aplica o meio-tom numa macro: um Ctrl+Z desfaz tudo."""
+        document = helpers.active_document()
+        helpers.run_in_macro(document, self._apply_halftone)
+
+    def _apply_halftone(self):
         document = helpers.active_document()
         if document is None:
             helpers.show_message("Abra um documento para aplicar o meio-tom.")
@@ -630,9 +675,9 @@ class ScreentoneDocker(DockWidget):
         configuration.setProperties(properties)
         halftone.setConfiguration(configuration)
 
-        selection = document.selection()
-        if selection is not None and self.chk_selection.isChecked():
-            mask = document.createFilterMask("Meio-tom", halftone, selection)
+        selecao = helpers.active_selection(document) if self.chk_selection.isChecked() else None
+        if selecao is not None:
+            mask = document.createFilterMask("Meio-tom", halftone, selecao)
         else:
             mask = document.createFilterMask("Meio-tom", halftone, node)
         if mask is None:
@@ -670,6 +715,8 @@ class ScreentoneDocker(DockWidget):
                 if index >= 0:
                     self.cmb_equalization.setCurrentIndex(index)
             elif key == "units":
+                if key == "units":
+                    self._unidades_ativas = int(value)
                 index = self.cmb_units.findData(int(value))
                 if index >= 0:
                     self.cmb_units.setCurrentIndex(index)
@@ -761,6 +808,12 @@ class ScreentoneDocker(DockWidget):
         if node is None:
             helpers.show_message("Selecione a camada de retícula ou a máscara de meio-tom.")
             return
+        # Só uma edição pendente por vez. Sem limpar o outro id, editar uma
+        # máscara depois de uma camada deixava o alvo antigo no lugar, e o
+        # "Aplicar retícula" ia mexer numa camada que o autor não estava
+        # editando (ou nem existia mais no documento atual).
+        self._edit_fill_id = None
+        self._edit_mask_id = None
         if node.type() == "filllayer":
             self._edit_fill_id = self._node_id(node)
             self._populate_fill(node)
@@ -790,6 +843,11 @@ class ScreentoneDocker(DockWidget):
         helpers.show_message("A camada não tem máscara de seleção.")
 
     def insert_effect_lines(self):
+        """Insere as linhas de efeito numa macro: um Ctrl+Z desfaz tudo."""
+        document = helpers.active_document()
+        helpers.run_in_macro(document, self._insert_effect_lines)
+
+    def _insert_effect_lines(self):
         document = helpers.active_document()
         if document is None:
             helpers.show_message("Abra um documento para inserir as linhas.")

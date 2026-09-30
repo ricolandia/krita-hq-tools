@@ -32,15 +32,25 @@ SAMPLES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "samples"
 
 
 def ensure_default_folder(config):
+    """Pasta de onomatopeias, tolerando pasta configurada inacessível."""
     folder = config.get("onomatopeias.folder") or ONOMATOPEIAS_DIR
-    os.makedirs(folder, exist_ok=True)
-    if os.path.abspath(folder) == os.path.abspath(ONOMATOPEIAS_DIR):
-        if not any(name.lower().endswith(".svg") for name in os.listdir(folder)):
-            for name in sorted(os.listdir(SAMPLES_DIR)):
-                if name.lower().endswith(".svg"):
-                    shutil.copy2(
-                        os.path.join(SAMPLES_DIR, name), os.path.join(folder, name)
-                    )
+    try:
+        os.makedirs(folder, exist_ok=True)
+        if os.path.abspath(folder) == os.path.abspath(ONOMATOPEIAS_DIR):
+            if not any(name.lower().endswith(".svg") for name in os.listdir(folder)):
+                for name in sorted(os.listdir(SAMPLES_DIR)):
+                    if name.lower().endswith(".svg"):
+                        shutil.copy2(
+                            os.path.join(SAMPLES_DIR, name), os.path.join(folder, name)
+                        )
+    except OSError as erro:
+        helpers.log("pasta de onomatopeias inacessível ({0}): {1}".format(folder, erro))
+        if os.path.abspath(folder) != os.path.abspath(ONOMATOPEIAS_DIR):
+            try:
+                os.makedirs(ONOMATOPEIAS_DIR, exist_ok=True)
+                folder = ONOMATOPEIAS_DIR
+            except OSError:
+                pass
     return folder
 
 
@@ -131,8 +141,11 @@ class OnomatopoeiasDocker(DockWidget):
         self.list_items.clear()
         try:
             names = sorted(os.listdir(self.folder))
-        except OSError:
+        except OSError as erro:
             names = []
+            self.lbl_folder.setText(
+                "Pasta: {0} (não pôde ser lida: {1})".format(self.folder, erro)
+            )
         for name in names:
             if not name.lower().endswith(".svg"):
                 continue
@@ -146,6 +159,11 @@ class OnomatopoeiasDocker(DockWidget):
             self.list_items.addItem(item)
 
     def insert_effect(self):
+        """Insere a onomatopeia numa macro: um Ctrl+Z desfaz tudo."""
+        document = helpers.active_document()
+        helpers.run_in_macro(document, self._insert_effect)
+
+    def _insert_effect(self):
         document = helpers.active_document()
         if document is None:
             helpers.show_message("Abra um documento para inserir a onomatopeia.")
@@ -156,8 +174,7 @@ class OnomatopoeiasDocker(DockWidget):
             return
         path = item.data(USER_ROLE)
         try:
-            with open(path, "r", encoding="utf-8") as handle:
-                svg = handle.read()
+            svg = helpers.read_text_file(path)
         except OSError:
             helpers.show_message("Não foi possível ler o arquivo.")
             return
@@ -168,6 +185,12 @@ class OnomatopoeiasDocker(DockWidget):
             return
         shapes = layer.addShapesFromSvg(svg)
         if not shapes:
+            # A camada já foi criada no documento: um SVG ruim deixava uma
+            # camada vazia para o autor apagar à mão.
+            try:
+                document.removeNode(layer)
+            except (AttributeError, RuntimeError):
+                pass
             helpers.show_message(
                 "O SVG não gerou formas. Verifique o arquivo (use texto e formas)."
             )

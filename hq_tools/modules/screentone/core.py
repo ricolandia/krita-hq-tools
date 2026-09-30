@@ -42,6 +42,10 @@ UNITS = [
     ("Linhas por centímetro (LPC)", 1),
 ]
 
+UNITS_LPI = 0
+UNITS_LPC = 1
+CM_POR_POLEGADA = 2.54
+
 SIZE_MODE_RESOLUTION = 0
 SIZE_MODE_PIXEL = 1
 
@@ -90,14 +94,35 @@ def max_frequency(dpi):
     return float(dpi) / 2.0
 
 
-def clamp_frequency(frequency, dpi):
-    frequency = float(frequency)
-    limit = max_frequency(dpi)
-    if frequency > limit:
-        return limit
-    if frequency < 1.0:
-        return 1.0
-    return frequency
+def to_lpi(valor, units):
+    """Converte a frequência do preset para linhas por polegada."""
+    if int(units or 0) == UNITS_LPC:
+        return float(valor) * CM_POR_POLEGADA
+    return float(valor)
+
+
+def from_lpi(valor_lpi, units):
+    """Converte de linhas por polegada para a unidade do preset."""
+    if int(units or 0) == UNITS_LPC:
+        return float(valor_lpi) / CM_POR_POLEGADA
+    return float(valor_lpi)
+
+
+def rotulo_unidade(units):
+    return "LPC" if int(units or 0) == UNITS_LPC else "LPI"
+
+
+def clamp_frequency(frequency, dpi, units=0):
+    """Limita a frequência para uma célula de pelo menos 2 pixels.
+
+    O limite é sempre calculado em linhas por polegada, porque é a unidade em
+    que a resolução do documento é conhecida. Aplicar o limite sobre o valor
+    cru deixava passar frequência altíssima ao escolher LPC (o valor é
+    lido pelo Krita como linhas por centímetro) e a retícula virava serrilha.
+    """
+    lpi = to_lpi(frequency, units)
+    limitada = max(1.0, min(max_frequency(dpi), lpi))
+    return from_lpi(limitada, units)
 
 
 def _as_int(valor, padrao):
@@ -151,7 +176,7 @@ def normalize_preset(preset):
 def screentone_properties(preset, dpi):
     """Propriedades do gerador Screentone para a camada de preenchimento."""
     preset = normalize_preset(preset)
-    frequency = clamp_frequency(preset["lpi"], dpi)
+    frequency = clamp_frequency(preset["lpi"], dpi, preset["units"])
     properties = {
         "pattern": preset["pattern"],
         "shape": preset["shape"],

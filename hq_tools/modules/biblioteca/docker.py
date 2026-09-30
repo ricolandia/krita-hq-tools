@@ -386,8 +386,7 @@ class BibliotecaDocker(DockWidget):
 
     def _insert_vector(self, document, path, nome):
         try:
-            with open(path, "r", encoding="utf-8") as handle:
-                svg = handle.read()
+            svg = helpers.read_text_file(path)
         except OSError:
             helpers.show_message("Não foi possível ler o arquivo.")
             return

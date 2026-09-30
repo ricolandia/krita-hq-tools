@@ -9,7 +9,16 @@ class TestEffectLines(unittest.TestCase):
     def test_focus_conta_e_geometria(self):
         lines = effects.effect_lines_focus(1000, 800, 500, 400, count=8, inset=0.1)
         self.assertEqual(len(lines), 8)
-        radius = (1000 ** 2 + 800 ** 2) ** 0.5 * 1.15 / 2.0
+        # O raio tem de alcançar o canto mais distante do foco, senão as linhas
+        # saem do quadro antes da borda (era metade da diagonal,independente
+        # de onde o foco estivesse).
+        raio = effects.focus_radius(1000, 800, 500, 400)
+        canto = max(
+            ((x - 500) ** 2 + (y - 400) ** 2) ** 0.5
+            for x in (0, 1000)
+            for y in (0, 800)
+        )
+        self.assertGreaterEqual(raio, canto)
         for line in lines:
             self.assertAlmostEqual(line["width"], 2.0, delta=0.4)
             dx1 = line["x1"] - 500
@@ -18,8 +27,23 @@ class TestEffectLines(unittest.TestCase):
             dy2 = line["y2"] - 400
             cross = dx1 * dy2 - dy1 * dx2
             self.assertAlmostEqual(cross, 0.0, delta=0.001)
-            self.assertLessEqual(abs(line["x2"] - 500), radius + 0.01)
-            self.assertLessEqual(abs(line["y2"] - 400), radius + 0.01)
+            self.assertAlmostEqual((dx2 ** 2 + dy2 ** 2) ** 0.5, raio, delta=0.01)
+
+    def test_foco_deslocado_cobre_o_quadro(self):
+        # Foco no canto inferior direito: o raio da diagonal antiga deixava o
+        # facho cortado no lado esquerdo.
+        cx, cy = 900.0, 700.0
+        raio = effects.focus_radius(1000, 800, cx, cy)
+        linhas = effects.effect_lines_focus(1000, 800, cx, cy, count=16, inset=0.0)
+        # A ponta final de cada linha tem de sair do quadro (a inicial é o
+        # próprio foco, que fica dentro dele por definição).
+        for line in linhas:
+            x, y = line["x2"], line["y2"]
+            fora = x <= 0 or x >= 1000 or y <= 0 or y >= 800
+            self.assertTrue(
+                fora, "linha termina dentro do quadro: {0},{1}".format(x, y)
+            )
+        self.assertGreater(raio, 1200.0 * 0.9)
 
     def test_focus_inset_zero_passa_pelo_centro(self):
         lines = effects.effect_lines_focus(1000, 800, 100, 100, count=4, inset=0.0)

@@ -17,8 +17,21 @@ def _ray_circle(cx, cy, angle, inner, outer):
     return x1, y1, x2, y2
 
 
+def focus_radius(width, height, cx, cy, outer=1.05):
+    """Raio que garante que as linhas de velocidade saiam do documento.
+
+    Precisa ser a distância do foco até o canto mais distante, e não a
+    diagonal da página: com o foco deslocado para um canto, a diagonal não
+    chegava no lado oposto e o facho de linhas ficava cortado pela metade
+    dentro do quadro.
+    """
+    dx = max(float(cx), float(width) - float(cx), 0.0)
+    dy = max(float(cy), float(height) - float(cy), 0.0)
+    return math.hypot(dx, dy) * float(outer)
+
+
 def effect_lines_focus(width, height, cx, cy, count, inset=0.12, thickness=2.0,
-                       jitter=0.35, outer=1.15):
+                       jitter=0.35, outer=1.05):
     """Linhas radiais saindo de um foco até além das bordas do documento.
 
     ``cx``/``cy`` em pixels; ``inset`` é a fração da distância máxima que as
@@ -28,7 +41,7 @@ def effect_lines_focus(width, height, cx, cy, count, inset=0.12, thickness=2.0,
     count = max(2, int(count))
     thickness = max(0.2, float(thickness))
     jitter = max(0.0, min(1.0, float(jitter)))
-    max_distance = math.hypot(width, height) * float(outer) / 2.0
+    max_distance = focus_radius(width, height, cx, cy, outer)
     inner = max_distance * max(0.0, min(0.9, float(inset)))
 
     lines = []

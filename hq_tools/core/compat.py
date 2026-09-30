@@ -1,8 +1,27 @@
 """Imports de Qt com compatibilidade entre PyQt5 (Krita 5.x) e PyQt6 (Krita 6.x)."""
 
-try:  # Krita 6
-    from PyQt6 import QtCore, QtGui, QtWidgets
-    from PyQt6.QtCore import pyqtSignal, pyqtSlot
+import sys
+
+from .qt_probe import escolher as _escolher_qt
+from .qt_probe import versao_do_krita
+
+_KRITA_QT = versao_do_krita()
+_USAR_PYQT6 = _escolher_qt(_KRITA_QT) >= 6
+if _KRITA_QT is not None and not _USAR_PYQT6:
+    sys.stderr.write(
+        "[hq_tools] Krita {0} detectado: usando PyQt5\n".format(_KRITA_QT)
+    )
+
+if _USAR_PYQT6:  # Krita 6
+    try:
+        from PyQt6 import QtCore, QtGui, QtWidgets
+        from PyQt6.QtCore import pyqtSignal, pyqtSlot
+    except ImportError as _erro:  # pragma: no cover
+        sys.stderr.write(
+            "[hq_tools] Krita {0} pede PyQt6 e ele não está disponível: "
+            "{1}\n".format(_KRITA_QT, _erro)
+        )
+        raise
 
     try:
         from PyQt6.QtSvg import QSvgRenderer
@@ -25,7 +44,7 @@ try:  # Krita 6
     DIALOG_OK = QtWidgets.QMessageBox.StandardButton.Ok
     DIALOG_CANCEL = QtWidgets.QMessageBox.StandardButton.Cancel
     DIALOG_OPEN = QtWidgets.QFileDialog.Option.ShowDirsOnly
-except ImportError:  # Krita 5.x
+else:  # Krita 5.x
     from PyQt5 import QtCore, QtGui, QtWidgets
     from PyQt5.QtCore import pyqtSignal, pyqtSlot
 

@@ -20,6 +20,24 @@ def active_view():
     return window.activeView() if window is not None else None
 
 
+def read_text_file(path, encodings=("utf-8-sig", "cp1252", "latin-1")):
+    """Lê um arquivo de texto tentando as codificações usuais.
+
+    SVG exportado pelo Inkscape ou por um editor no Windows em português
+    costuma vir em Windows-1252, e ``open(..., encoding="utf-8")`` levantava
+    ``UnicodeDecodeError``: a exceção não é ``OSError``, então escapava do
+    ``except`` do docker e aparecia como erro do Python no meio da interface.
+    """
+    with open(path, "rb") as handle:
+        bruto = handle.read()
+    for encoding in encodings:
+        try:
+            return bruto.decode(encoding)
+        except (UnicodeDecodeError, LookupError):
+            continue
+    return bruto.decode("utf-8", errors="replace")
+
+
 def log(text):
     """Escreve no log do Krita (stderr capturado pelo plugin loader).
 
@@ -133,8 +151,32 @@ def find_filter(*names):
     return None
 
 
+def selection_vazia(selection):
+    """Diz se a seleção não tem pixels (ou não existe).
+
+    No Krita ``document.selection()`` devolve um objeto de seleção mesmo sem
+    nada selecionado. Só ``byteCount()`` diz se há área de verdade: testar
+    ``is not None`` fazia o plugin criar máscara de 0 px, e o filtro passava a
+    não fazer nada sem explicar por quê.
+    """
+    if selection is None:
+        return True
+    try:
+        return selection.byteCount() == 0
+    except (AttributeError, RuntimeError, TypeError):
+        return True
+
+
 def has_selection(document):
-    return document.selection() is not None
+    return not selection_vazia(document.selection())
+
+
+def active_selection(document):
+    """Seleção ativa com pixels, ou None."""
+    selection = document.selection()
+    if selection_vazia(selection):
+        return None
+    return selection
 
 
 def full_selection(document):

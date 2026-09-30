@@ -45,23 +45,37 @@ FONTS_TARGET = os.path.join(
 
 
 def ensure_default_folder(config):
-    """Define a pasta padrão de balões e copia as amostras na primeira execução."""
+    """Define a pasta padrão de balões e copia as amostras na primeira execução.
+
+    Tolera pasta inacessível: uma pasta configurada que não existe mais (HD
+    externo desmontado, pasta renomeada) levantava ``OSError`` dentro do
+    ``__init__`` e o docker não abria. Agora há aviso e a pasta padrão assume.
+    """
     folder = config.get("balloons.folder") or BALLOONS_DIR
-    os.makedirs(folder, exist_ok=True)
-    if os.path.abspath(folder) == os.path.abspath(BALLOONS_DIR):
-        if not any(name.lower().endswith(".svg") for name in os.listdir(folder)):
-            for name in sorted(os.listdir(SAMPLES_DIR)):
-                if name.lower().endswith(".svg"):
-                    shutil.copy2(
-                        os.path.join(SAMPLES_DIR, name), os.path.join(folder, name)
-                    )
-            if os.path.isdir(KIT_CC0_DIR):
-                for name in sorted(os.listdir(KIT_CC0_DIR)):
+    try:
+        os.makedirs(folder, exist_ok=True)
+        if os.path.abspath(folder) == os.path.abspath(BALLOONS_DIR):
+            if not any(name.lower().endswith(".svg") for name in os.listdir(folder)):
+                for name in sorted(os.listdir(SAMPLES_DIR)):
                     if name.lower().endswith(".svg"):
                         shutil.copy2(
-                            os.path.join(KIT_CC0_DIR, name),
-                            os.path.join(folder, name),
+                            os.path.join(SAMPLES_DIR, name), os.path.join(folder, name)
                         )
+                if os.path.isdir(KIT_CC0_DIR):
+                    for name in sorted(os.listdir(KIT_CC0_DIR)):
+                        if name.lower().endswith(".svg"):
+                            shutil.copy2(
+                                os.path.join(KIT_CC0_DIR, name),
+                                os.path.join(folder, name),
+                            )
+    except OSError as erro:
+        helpers.log("pasta de balões inacessível ({0}): {1}".format(folder, erro))
+        if os.path.abspath(folder) != os.path.abspath(BALLOONS_DIR):
+            try:
+                os.makedirs(BALLOONS_DIR, exist_ok=True)
+                folder = BALLOONS_DIR
+            except OSError:
+                pass
     return folder
 
 
@@ -179,8 +193,13 @@ class BalloonsDocker(DockWidget):
         self.list_balloons.clear()
         try:
             names = sorted(os.listdir(self.folder))
-        except OSError:
+        except OSError as erro:
+            # Lista vazia sem explicação é o pior desfecho: o autor conclui que
+            # o kit sumiu.
             names = []
+            self.lbl_folder.setText(
+                "Pasta: {0} (não pôde ser lida: {1})".format(self.folder, erro)
+            )
         for name in names:
             if not name.lower().endswith(".svg"):
                 continue
@@ -194,6 +213,11 @@ class BalloonsDocker(DockWidget):
             self.list_balloons.addItem(item)
 
     def insert_balloon(self):
+        """Insere o balão numa macro: um Ctrl+Z desfaz tudo."""
+        document = helpers.active_document()
+        helpers.run_in_macro(document, self._insert_balloon)
+
+    def _insert_balloon(self):
         document = helpers.active_document()
         if document is None:
             helpers.show_message("Abra um documento para inserir o balão.")
@@ -204,8 +228,7 @@ class BalloonsDocker(DockWidget):
             return
         path = item.data(USER_ROLE)
         try:
-            with open(path, "r", encoding="utf-8") as handle:
-                svg = handle.read()
+            svg = helpers.read_text_file(path)
         except OSError:
             helpers.show_message("Não foi possível ler o arquivo do balão.")
             return
@@ -217,6 +240,10 @@ class BalloonsDocker(DockWidget):
             return
         shapes = layer.addShapesFromSvg(svg)
         if not shapes:
+            # createVectorLayer já deixou a camada no documento: sem esta
+            # limpeza, um SVG ruim deixava uma camada vazia para o autor
+            # encontrar e apagar à mão.
+            self._descartar_camada(document, layer)
             helpers.show_message(
                 "O SVG não gerou formas. Verifique o arquivo (use formas e texto)."
             )
@@ -227,6 +254,13 @@ class BalloonsDocker(DockWidget):
             "balloons.insert_as_text_layer", self.chk_text_layer.isChecked()
         )
         helpers.show_message("Balão inserido: {0}".format(item.text()))
+
+    @staticmethod
+    def _descartar_camada(document, layer):
+        try:
+            document.removeNode(layer)
+        except (AttributeError, RuntimeError):
+            pass
 
     def open_native_symbols_docker(self, *args):
         """Mostra o docker nativo 'Bibliotecas de símbolos' do Krita."""
