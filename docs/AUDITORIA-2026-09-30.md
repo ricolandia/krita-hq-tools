@@ -5,7 +5,7 @@ robustez, testes/documentação), com os achados aplicados em quatro lotes. Este
 documento é o índice do que foi encontrado, do que foi corrigido e do que
 continua aberto. O changelog tem o detalhe por lote; aqui fica o mapa.
 
-**Estado:** 158 testes verdes, com e sem PyQt instalado. **Nenhuma correção foi
+**Estado:** 161 testes verdes, com e sem PyQt instalado. **Nenhuma correção foi
 validada dentro do Krita ainda** (ver *Validação pendente* no fim), então a
 versão não sobe de 0.6.2.
 
@@ -116,7 +116,7 @@ pontos. Foi medido nos 14 balões: a cauda mudava de 9 para até 37 segmentos em
 
 ## Testes
 
-De 76 para 158. Duas descobertas sobre a própria suíte:
+De 76 para 161. Duas descobertas sobre a própria suíte:
 
 1. **A suíte não rodava no CI.** Sem PyQt instalado, 18 testes quebravam com
    `ImportError` — o `compat` importa PyQt no topo. O CI nunca tinha rodado
@@ -137,6 +137,9 @@ arquivo também verde sozinho.
   preset dentro do PNG (tEXt, zTXt e iTXt). `--estrito` sai com erro se houver,
   `--detalhe` lista também os presets com pincel embutido.
 - `tests/test_packs_recursos.py` — trava o resultado atual (11 testes).
+- `tests/test_tiles.py` — os 11 PNGs do kit (`resources/patterns`) batem byte a
+  byte com o gerador (`TestTilesDoKit`), para tile editado no código não deixar
+  o arquivo defasado.
 
 ## Validação pendente (bloqueia a release)
 

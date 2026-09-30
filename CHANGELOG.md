@@ -58,7 +58,7 @@ validação rodar dentro do Krita 5 e 6.
 
 ### Testes
 
-- 76 → 158 testes. A suíte passou a rodar igual na máquina do autor e no CI:
+- 76 → 161 testes. A suíte passou a rodar igual na máquina do autor e no CI:
   sem PyQt instalado ela quebrava com `ImportError`, e com PyQt6 instalado o
   teste do cache de miniaturas passava por acaso (o `qt_probe` prefere o
   binding já carregado). O falso de Qt ficou em `tests/qt_falso.py`.
@@ -66,6 +66,10 @@ validação rodar dentro do Krita 5 e 6.
   `Referencias/baloes-vetorizados` tem que continuar sendo reproduzível pelo
   script, byte a byte, e cada SVG é parseado como XML (é o que o
   `addShapesFromSvg` do Krita faz).
+- Novo `tests/test_tiles.py` (classe `TestTilesDoKit`): os 11 PNGs de
+  `hq_tools/resources/patterns` têm que bater byte a byte com o que
+  `tiles.gerar_todos` produz; mexer numa função de tile sem regerar o arquivo
+  passa a falhar.
 - Novo `tests/test_packs_recursos.py` e `scripts/auditar-packs.py`: acham preset
   que cita arquivo de pincel que não vem no pack (o preset instala e o pincel
   não carrega). A lista atual tem 3 arquivos, que dependem de decisão do autor.

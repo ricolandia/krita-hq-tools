@@ -1,6 +1,7 @@
 """Testes dos tiles do kit (fora do Krita)."""
 
 import os
+import pathlib
 import struct
 import tempfile
 import unittest
@@ -61,6 +62,39 @@ class TestTiles(unittest.TestCase):
         """Tiles diferentes produzem bytes diferentes (sem colisão boba)."""
         bytes_por_nome = {nome: tiles.gerar_tile(nome) for nome, _, _ in tiles.TILES}
         self.assertEqual(len(set(bytes_por_nome.values())), len(tiles.TILES))
+
+
+class TestTilesDoKit(unittest.TestCase):
+    """Os PNGs embarcados em resources/patterns têm que refletir o gerador.
+
+    Mexer numa função de tile sem regerar os arquivos deixa o kit servindo a
+    versão antiga: o autor instala o padrão e ele sai diferente do que o
+    código gera.
+    """
+
+    KIT = pathlib.Path(__file__).resolve().parent.parent / "hq_tools" / "resources" / "patterns"
+
+    def test_kit_tem_um_png_por_tile_do_catalogo(self):
+        no_kit = sorted(p.name for p in self.KIT.glob("*.png"))
+        do_catalogo = sorted(nome + ".png" for nome, _, _ in tiles.TILES)
+        self.assertEqual(do_catalogo, no_kit)
+
+    def test_pngs_do_kit_batem_com_o_gerador(self):
+        for nome, _, _ in tiles.TILES:
+            with self.subTest(tile=nome):
+                caminho = self.KIT / (nome + ".png")
+                self.assertTrue(caminho.is_file(), "faltou {0}".format(caminho.name))
+                self.assertEqual(
+                    tiles.gerar_tile(nome),
+                    caminho.read_bytes(),
+                    "{0}.png está defasado; rode tiles.gerar_todos em "
+                    "hq_tools/resources/patterns".format(nome),
+                )
+
+    def test_nenhum_png_orfao_no_kit(self):
+        do_catalogo = {nome + ".png" for nome, _, _ in tiles.TILES}
+        orfaos = sorted(p.name for p in self.KIT.glob("*.png") if p.name not in do_catalogo)
+        self.assertEqual([], orfaos, "PNG no kit sem tile correspondente no catálogo")
 
 
 if __name__ == "__main__":

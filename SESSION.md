@@ -101,7 +101,7 @@ Pendente (validação dentro do Krita):
 Auditoria por quatro frentes (correção, desempenho, robustez, testes/docs),
 aplicada em quatro commits. Relatório completo em
 **`docs/AUDITORIA-2026-09-30.md`**; changelog na seção `[Não publicado]`.
-**158 testes verdes, com e sem PyQt instalado.** A versão continua 0.6.2: nada
+**161 testes verdes, com e sem PyQt instalado.** A versão continua 0.6.2: nada
 foi validado dentro do Krita ainda, e a checklist de validação está no fim do
 relatório.
 
