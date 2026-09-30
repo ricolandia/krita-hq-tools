@@ -15,6 +15,18 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      # numpy e Pillow são do script de vetorização de balões. Sem eles, o
+      # test_vetorizacao.py pulava em silêncio e o CI nunca conferia se o lote
+      # de 15 SVGs continua reproduzível byte a byte.
+      - name: Dependências do script de vetorização
+        run: python -m pip install --quiet numpy Pillow
+      - name: Conferir que o teste de vetorização não pulou
+        run: |
+          python -m unittest tests.test_vetorizacao -v 2>&1 | tee /tmp/vet.txt
+          if grep -q "skipped" /tmp/vet.txt; then
+            echo "::error::o teste de vetorização pulou; a dependência faltou"
+            exit 1
+          fi
       - name: Rodar testes do núcleo (fora do Krita)
         run: python -m unittest discover -s tests -v
       - name: Validar que o ZIP instala (estrutura mínima)
