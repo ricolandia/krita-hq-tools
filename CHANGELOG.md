@@ -1,5 +1,93 @@
 # Changelog
 
+## [Não publicado]
+
+Correções e melhorias da auditoria de 2026-09-30, ainda sem validar dentro do
+Krita (ver `docs/AUDITORIA-2026-09-30.md`). A versão só sobe quando o roteiro de
+validação rodar dentro do Krita 5 e 6.
+
+### Corrigido — dados do autor (Lote A)
+
+- **Crítico**: `create_project()` aceitava um projeto existente e escrevia por
+  cima do `comicConfig.json` do autor. Agora recusa com `CPMTError`.
+- **Crítico**: `CPMTManager` escrevia o `.cpmt` por cima e, se json.dump
+  falhasse no meio, deixava o arquivo pela metade. Passa a escrever em arquivo
+  temporário e trocar, com backup do anterior.
+- Presets, packs, páginas e recursos do autor: releitura antes de alterar,
+  escrita atômica e backup antes de sobrescrever. JSON ilegível não derruba mais
+  o plugin, e vira `.bak` em vez de ser apagado.
+- Falha ao escrever página não deixa mais um `.kra` órfão no disco.
+
+### Corrigido — isolamento, desfazer e frequência (Lote B)
+
+- Um docker com erro no import derrubava todos os outros: os sete módulos
+  passam a ser registrados um a um, e o que falhar é avisado no log. Os caminhos
+  do registro estavam errados (`screentone.docker` em vez de
+  `hq_tools.modules.screentone.docker`), o que impedia o registro de funcionar.
+- `screentone.docker` era importado no topo do plugin; agora é importado
+  quando as ações são criadas, protegido por try/except.
+- Retícula, linhas de efeito, balões e onomatopeias entram em macro de
+  desfazer (Ctrl+Z). Antes, cada aplicação era um passo irreversível.
+- `showFloatingMessage` recebe `0` no quarto argumento, que é o `priority`;
+  omitting deixava o aviso com a prioridade errada.
+- SVG que não gera formas deixava a camada vetorial vazia no documento.
+- LPI↔LPC: a conversão era feita duas vezes e o valor físico podia passar do
+  limite da resolução; a alternância entre retículas agora limpa os IDs de
+  edição do alvo.
+- Seleção vazia não era detectada (`byteCount()`), e pasta de preset
+  inacessível ou arquivo em Latin-1 derrubavam a ação.
+
+### Corrigido — PyQt5/PyQt6 e choice de binding
+
+- `compat.py` tentava PyQt5 e caía para o outro binding. Agora `qt_probe`
+  decide: versão do Krita primeiro, depois o binding já carregado no processo,
+  depois o que estiver instalado, e o erro final diz o que fazer.
+
+### Desempenho einterface (Lote C)
+
+- Cache de miniaturas de `.kra`: o gerenciador de páginas pedia uma miniatura
+  por item a cada refresh, e cada uma abria o arquivo e decodificava o
+  `preview.png` — 40 páginas viravam 40 zips por refresh, na thread da
+  interface. Agora os bytes e o `QPixmap` ficam em cache, com a chave
+  (caminho, mtime, tamanho) e limite de 256 entradas.
+- Instalar as fontes do kit não recopia mais o diretório inteiro nem roda
+  `fc-cache -f` (que reconstrói o cache do sistema e trava a interface por
+  segundos): copia só o que mudou e usa o `fc-cache` incremental.
+- Cursor de espera durante a geração dos modelos de página, com restauração no
+  `finally` — cursor de espera esquecido trava o Krita até reiniciar.
+
+### Testes
+
+- 76 → 147 testes. A suíte passou a rodar igual na máquina do autor e no CI:
+  sem PyQt instalado ela quebrava com `ImportError`, e com PyQt6 instalado o
+  teste do cache de miniaturas passava por acaso (o `qt_probe` prefere o
+  binding já carregado). O falso de Qt ficou em `tests/qt_falso.py`.
+- Novo `tests/test_vetorizacao.py`: o lote de balões em
+  `Referencias/baloes-vetorizados` tem que continuar sendo reproduzível pelo
+  script, byte a byte, e cada SVG é parseado como XML (é o que o
+  `addShapesFromSvg` do Krita faz).
+
+### Empacotamento
+
+- `scripts/build-zip.sh` agora **quebra** se `LICENSE`, `CREDITS.md` ou
+  `INSTALL.md` estiverem ausentes, e confere o conteúdo do ZIP depois de gerá-lo
+  (o `.desktop` e o `.action` na raiz, `__init__.py` no pacote, nada de
+  `__pycache__`). Antes, saía um aviso e o ZIP seguia sem a licença.
+- Workflow de release confere se a tag é a versão de `core/version.py` e publica
+  a entrada da versão no CHANGELOG, em vez das notas automáticas de commit.
+
+### Scripts
+
+- `vetorizar-baloes.py`: `dilatar`/`erodir` não vazam mais pela borda da imagem
+  (o `np.roll` trazia pixels do lado oposto); prancha inexistente ou recorte
+  fora da imagem dão mensagem em vez de traceback; e a cauda fica sem
+  suavização quando dá para usar os mesmos índices do corpo, com o comentário
+  do código agora correspondente ao que o script faz.
+- `servir-para-penpot.py`: reiniciar logo depois de parar não falha mais com
+  "Address already in use", e pasta inexistente dá erro claro.
+- `descoberta_scripter.py`: o bloco 7 descobre o binding do Qt em vez de
+  importar PyQt5 fixo, que não existe no Krita 6.
+
 ## [0.6.2] — 2026-09-27
 
 Auditoria completa do estado v0.6.1 (delta pós-v0.5.4 + varredura geral).

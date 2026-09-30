@@ -126,8 +126,18 @@ def bloco_6():
 
 # 7. Paleta em memória (não salva)
 def bloco_7():
-    from krita import Krita, ManagedColor, Palette, Swatch
-    from PyQt5.QtGui import QColor
+    import importlib
+    import os
+    import sys
+    # O binding do Qt muda entre Krita 5 e 6, então perguntar ao qt_probe do
+    # plugin é o que evita o ImportError do PyQt5 fixo aqui.
+    raiz = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if raiz not in sys.path:
+        sys.path.insert(0, raiz)
+    from hq_tools.core.qt_probe import escolher
+    qtgui = importlib.import_module(escolher() + ".QtGui")
+    from krita import ManagedColor, Palette, Swatch
+    QColor = qtgui.QColor
     palette = Palette(None)
     palette.addGroup("Teste")
     for name, hex_color in (("Preto", "#000000"), ("Cinza", "#808080"), ("Branco", "#ffffff")):

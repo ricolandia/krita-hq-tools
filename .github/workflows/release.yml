@@ -6,6 +6,9 @@ on:
       - "v*"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,12 +17,61 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
+      - name: Conferir que a tag é a versão do plugin
+        # Sem isto, dá para publicar v0.7.0 com o __version__ = 0.6.2 dentro do
+        # ZIP e o autor só descobre quando alguém instala.
+        run: |
+          set -euo pipefail
+          versao=$(sed -n 's/^__version__ = "\(.*\)"/\1/p' hq_tools/core/version.py)
+          if [ "$GITHUB_REF_NAME" = "" ]; then
+            tag=$(git describe --tags --exact-match 2>/dev/null || echo "v$versao")
+          else
+            tag="$GITHUB_REF_NAME"
+          fi
+          echo "tag: $tag | versão: $versao"
+          if [ "$tag" != "v$versao" ]; then
+            echo "::error::a tag ($tag) não bate com __version__ (v$versao). Atualize version.py e o CHANGELOG antes de marcar a tag."
+            exit 1
+          fi
       - name: Testes
         run: python -m unittest discover -s tests
       - name: Gerar ZIP instalável
         run: bash scripts/build-zip.sh
+      - name: Conferir o conteúdo do ZIP
+        run: |
+          python -m zipfile -t dist/hq_tools-*.zip
+          python - <<'PY'
+          import glob, zipfile
+          arquivo = glob.glob("dist/hq_tools-*.zip")[0]
+          with zipfile.ZipFile(arquivo) as z:
+              nomes = set(z.namelist())
+          for exigido in ("hq_tools/__init__.py", "hq_tools.desktop", "hq_tools/LICENSE", "hq_tools/CREDITS.md"):
+              if exigido not in nomes:
+                  raise SystemExit("faltou no ZIP: " + exigido)
+          if [n for n in nomes if "__pycache__" in n or n.endswith(".pyc")]:
+              raise SystemExit("cache de Python entrou no ZIP")
+          print("ZIP conferido:", len(nomes), "entradas")
+          PY
+      - name: Preparar o corpo da release a partir do CHANGELOG
+        # A release tem que sair com a entrada da versão no CHANGELOG: é o
+        # texto que o autor escreve para quem instala. Sem ele, saía o
+        # "generated release notes" automático (lista de commits).
+        run: |
+          python - <<'PY'
+          import re
+          import pathlib
+          import sys
+          versao = re.search(r'^__version__ = "(.*)"', pathlib.Path("hq_tools/core/version.py").read_text(encoding="utf-8"), re.M).group(1)
+          texto = pathlib.Path("CHANGELOG.md").read_text(encoding="utf-8")
+          partes = re.split(r'^## ', texto, flags=re.M)
+          alvo = [p for p in partes[1:] if p.startswith("[%s]" % versao) or p.startswith("%s " % versao)]
+          if not alvo:
+              sys.exit("::error::o CHANGELOG não tem entrada para %s" % versao)
+          pathlib.Path("/tmp/corpo.md").write_text("## " + alvo[0].strip() + "\n", encoding="utf-8")
+          print("corpo: %d caracteres" % len(alvo[0]))
+          PY
       - name: Publicar release
         uses: softprops/action-gh-release@v2
         with:
           files: dist/hq_tools-*.zip
-          generate_release_notes: true
+          body_path: /tmp/corpo.md

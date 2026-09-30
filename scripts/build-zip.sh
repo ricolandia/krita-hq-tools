@@ -26,9 +26,15 @@ itens = ["hq_tools", "hq_tools.desktop", "hq_tools.action"]
 documentos = ["LICENSE", "CREDITS.md", "README.md", "CHANGELOG.md", "INSTALL.md"]
 faltando = [nome for nome in documentos if not os.path.isfile(nome)]
 if faltando:
+    # Falha, e não aviso: o ZIP redistribui fontes de terceiros (13 fontes sob
+    # OFL, brushes de packs comunitários) e sair sem a licença e os créditos é
+    # distribuir sem declarar autoria. Melhor o build quebrar.
     sys.stderr.write(
-        "aviso: {0} não entrou no ZIP (licença/créditos).\n".format(", ".join(faltando))
+        "erro: {0} não existe; o ZIP não pode sair sem licença e créditos.\n".format(
+            ", ".join(faltando)
+        )
     )
+    sys.exit(1)
 with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as arquivo:
     for item in itens:
         if os.path.isfile(item):
@@ -42,8 +48,28 @@ with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as arquivo:
                 caminho = os.path.join(raiz, nome)
                 arquivo.write(caminho, caminho)
     for nome in documentos:
-        if os.path.isfile(nome):
-            arquivo.write(nome, os.path.join("hq_tools", nome))
+        arquivo.write(nome, os.path.join("hq_tools", nome))
+
+    # Confere o que o Krita vai encontrar depois de importar: o .desktop e o
+    # .action na raiz, o pacote com __init__.py e a licença dentro.
+    contigo = set(arquivo.namelist())
+    obrigatorios = {
+        "hq_tools/__init__.py",
+        "hq_tools.desktop",
+        "hq_tools.action",
+        "hq_tools/LICENSE",
+        "hq_tools/CREDITS.md",
+    }
+    faltando = sorted(obrigatorios - contigo)
+    if faltando:
+        sys.stderr.write("erro: faltou no ZIP: {0}\n".format(", ".join(faltando)))
+        sys.exit(1)
+    tem_cache = [n for n in contigo if "__pycache__" in n or n.endswith(".pyc")]
+    if tem_cache:
+        sys.stderr.write(
+            "erro: cache de Python entrou no ZIP ({0}).\n".format(tem_cache[0])
+        )
+        sys.exit(1)
 PY
 
 echo "ZIP gerado: $DIST/$NAME"

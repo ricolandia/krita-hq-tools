@@ -15,6 +15,7 @@ Requer PIL e numpy.
 """
 
 import argparse
+import os
 import sys
 
 import numpy as np
@@ -100,12 +101,22 @@ def interior_mask(escuro, semente, juntar_adjacentes=True):
 
 def dilatar(mask, vezes=1):
     for _ in range(vezes):
-        mask = mask | np.roll(mask, 1, 0) | np.roll(mask, -1, 0) | np.roll(mask, 1, 1) | np.roll(mask, -1, 1)
+        anterior = mask
+        mask = anterior.copy()
+        mask[1:, :] |= anterior[:-1, :]
+        mask[:-1, :] |= anterior[1:, :]
+        mask[:, 1:] |= anterior[:, :-1]
+        mask[:, :-1] |= anterior[:, 1:]
     return mask
 
 
 def erodir(mask):
-    return mask & np.roll(mask, 1, 0) & np.roll(mask, -1, 0) & np.roll(mask, 1, 1) & np.roll(mask, -1, 1)
+    erode = mask.copy()
+    erode[1:, :] &= mask[:-1, :]
+    erode[:-1, :] &= mask[1:, :]
+    erode[:, 1:] &= mask[:, :-1]
+    erode[:, :-1] &= mask[:, 1:]
+    return erode
 
 
 def espessura_estimada(escuro, interno):
@@ -370,6 +381,13 @@ def main():
     ap.add_argument("--debug", action="store_true")
     args = ap.parse_args()
 
+    if not os.path.isfile(args.imagem):
+        sys.stderr.write(
+            "não encontrei a prancha {0} (o caminho é relativo ao script?).\n".format(
+                args.imagem
+            )
+        )
+        return 1
     img = Image.open(args.imagem).convert("L")
     caixa = (
         max(0, args.x - args.margem),
@@ -378,6 +396,13 @@ def main():
         min(img.height, args.y + args.altura + args.margem),
     )
     recorte = np.array(img.crop(caixa))
+    if recorte.size == 0:
+        sys.stderr.write(
+            "o recorte {0},{1},{2},{3} ficou fora da prancha ({4}x{5}).\n".format(
+                args.x, args.y, args.largura, args.altura, img.width, img.height
+            )
+        )
+        return 1
     limiar = otsu(recorte)
     escuro = recorte < limiar
 
@@ -444,19 +469,21 @@ def main():
                     break
             i, j = sorted(candidatos)
 
-    def fatia(a, b):
+    def fatia(seq, a, b):
         if a <= b:
-            return simplificado[a:b + 1]
-        return simplificado[a:] + simplificado[:b + 1]
+            return seq[a:b + 1]
+        return seq[a:] + seq[:b + 1]
 
-    corpo = fatia(j, i)
-    cauda = fatia(i, j)
-    # a cauda usa o contorno bruto (sem suavizar): a média móvel achataria
-    # protuberâncias pequenas; o corpo pode ser suavizado à vontade
-    cauda_bruta = None
-    if args.suavizar > 1 and len(bruto) == len(simplificado):
-        cauda_bruta = (bruto[i:j + 1] if i <= j else bruto[i:] + bruto[:j + 1])
-        cauda = list(cauda_bruta)
+    # A cauda sai do contorno sem suavizar: a média móvel arredonda as pontas e
+    # o pescoço, que é justamente o que dá o formato do balão. Só dá para
+    # usar o mesmo índice nos dois quando o despur não removeu ponto; quando
+    # removeu, os índices não batem e a cauda sai suavizada (o caso raro, e
+    # sinal de que vale passar --corte na mão).
+    if len(bruto) == len(simplificado):
+        cauda = fatia(bruto, i, j)
+    else:
+        cauda = fatia(simplificado, i, j)
+    corpo = fatia(simplificado, j, i)
 
     # base da cauda empurrada para dentro do corpo (fica coberta pelo corpo,
     # como na biblioteca oficial de balões do Krita); corpo = silhueta inteira
