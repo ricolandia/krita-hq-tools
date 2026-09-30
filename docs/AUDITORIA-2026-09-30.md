@@ -5,7 +5,7 @@ robustez, testes/documentação), com os achados aplicados em quatro lotes. Este
 documento é o índice do que foi encontrado, do que foi corrigido e do que
 continua aberto. O changelog tem o detalhe por lote; aqui fica o mapa.
 
-**Estado:** 147 testes verdes, com e sem PyQt instalado. **Nenhuma correção foi
+**Estado:** 158 testes verdes, com e sem PyQt instalado. **Nenhuma correção foi
 validada dentro do Krita ainda** (ver *Validação pendente* no fim), então a
 versão não sobe de 0.6.2.
 
@@ -116,7 +116,7 @@ pontos. Foi medido nos 14 balões: a cauda mudava de 9 para até 37 segmentos em
 
 ## Testes
 
-De 76 para 147. Duas descobertas sobre a própria suíte:
+De 76 para 158. Duas descobertas sobre a própria suíte:
 
 1. **A suíte não rodava no CI.** Sem PyQt instalado, 18 testes quebravam com
    `ImportError` — o `compat` importa PyQt no topo. O CI nunca tinha rodado
@@ -130,6 +130,13 @@ O falso de Qt foi para `tests/qt_falso.py`, registrado nos dois nomes, com
 `QPixmap` comparável, `QImage` que sempre decodifica e `QApplication` que
 registra o cursor. A suíte agora dá o mesmo resultado com e sem PyQt, e cada
 arquivo também verde sozinho.
+
+## Ferramentas de auditoria
+
+- `scripts/auditar-packs.py` — acha referência órfã nos packs, lendo o XML do
+  preset dentro do PNG (tEXt, zTXt e iTXt). `--estrito` sai com erro se houver,
+  `--detalhe` lista também os presets com pincel embutido.
+- `tests/test_packs_recursos.py` — trava o resultado atual (11 testes).
 
 ## Validação pendente (bloqueia a release)
 
@@ -161,9 +168,31 @@ Tudo acima foi verificado fora do Krita. Falta, com o app aberto:
 - **Origem das referências** em `Referencias/baloes/` e
   `Referencias/vetores-teste/`: não confirmada pelo autor. Não declarar IA,
   terceiros ou desenho próprio até ele dizer.
-- **4 texturas** referenciadas por brushes do kit estão ausentes, e **5 PNGs**
-  em `patterns/` que o Krita não resolve a partir de `brushes/`. Recuperar os
-  arquivos ou ajustar as referências.
+- **3 arquivos de pincel** citados por presets do kit não vêm no kit (medido com
+  `python3 scripts/auditar-packs.py`):
+
+  | Arquivo citado | Preset que depende dele |
+  |---|---|
+  | `deevad_bristle.png` | `deevad 2d expressive thin.kpp` (Deevad v8.2) |
+  | `flat-tip-dirty.gbr` | `deevad 6n stamp floor particles.kpp` (Deevad v8.2) |
+  | `T_Texture_7.gih` | `X9AI_WC_Scattered_Sharp.kpp` (Watercolor Set) |
+
+  Esses presets instalam e aparecem na lista, mas o pincel não carrega: o Krita
+  cai no padrão. Não dá para gerar o arquivo (é arte de terceiro) nem editar o
+  preset sem perder o que o autor definiu. Decisão do autor: buscar o original
+  no pacote de origem ou remover o preset do kit. `tests/test_packs_recursos.py`
+  trava a lista: um preset novo com referência quebrada falha, e resolver uma
+  das três também pede a atualização (a lista é a documentação).
+
+  A primeira medição tinha falhado por dois motivos, ambos corrigidos no
+  `scripts/auditar-packs.py`: 4 presets do Deevad gravam o XML em chunk `zTXt`
+  (comprimido), e 32 presets têm o pincel inteiro embutido, sem arquivo
+  externo. Sem tratar isso, a auditoria acusa problema onde não há.
+
+- **Os PNGs em `patterns/` não são textura de pincel.** Na medição, nenhuma
+  definição de preset embute `<Pattern>`, e a instalação já manda cada tipo para
+  a pasta certa do Krita (`~/.local/share/krita/<tipo>`). Os `patterns/` são
+  tiles das retículas, não dependência dos presets.
 - **Penpot:** o plugin do Penpot deu timeout de 30 s na primeira grade, e pode
   ter ficado estado parcial. Retentar em lotes pequenos, conferindo antes se
   não duplicou.

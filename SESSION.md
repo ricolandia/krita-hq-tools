@@ -101,7 +101,7 @@ Pendente (validação dentro do Krita):
 Auditoria por quatro frentes (correção, desempenho, robustez, testes/docs),
 aplicada em quatro commits. Relatório completo em
 **`docs/AUDITORIA-2026-09-30.md`**; changelog na seção `[Não publicado]`.
-**147 testes verdes, com e sem PyQt instalado.** A versão continua 0.6.2: nada
+**158 testes verdes, com e sem PyQt instalado.** A versão continua 0.6.2: nada
 foi validado dentro do Krita ainda, e a checklist de validação está no fim do
 relatório.
 
@@ -125,6 +125,14 @@ Duas descobertas que valem lembrar:
   `scripts/vetorizar-lote.py`, e `tests/test_vetorizacao.py` trava isso. Uma
   refactor "óbvia" no `vetorizar-baloes.py` (cortar o pescoço antes de suavizar)
   mudava a cauda de 9 para 37 segmentos em `balao-04b` sem erro nenhum.
+
+- **Packs de pincéis: 3 arquivos citados e ausentes** (`deevad_bristle.png`,
+  `flat-tip-dirty.gbr`, `T_Texture_7.gih`), medidos com
+  `scripts/auditar-packs.py`. Os 3 presets instalam, mas o pincel não carrega.
+  Pendente de decisão: buscar o original ou remover os presets.
+  `tests/test_packs_recursos.py` trava a lista. Cuidado ao ler os .kpp: 4 usam
+  chunk `zTXt` (comprimido) e 32 têm o pincel embutido, sem arquivo externo;
+  sem tratar isso, a auditoria acusa problema onde não há.
 
 ## Comandos
 
