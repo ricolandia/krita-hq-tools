@@ -112,6 +112,37 @@ Espelho no Trilium: subnota "Lista do autor (a criar)" (`FoIRvo2ztN0D`).
   oval, grito, pensamento, sussurro, narração e legenda.
 - Variantes de cauda (esquerda, direita, embaixo) para os tipos de fala.
 - Estilo consistente entre si (traço, cantos, sombra opcional).
+- **Piloto (29/09):** 2 balões vetorizados a partir de `Referencias/baloes/`
+  (`02a` e `05a`), aprovados no QA de visão; SVGs e prévias em
+  `Referencias/vetores-teste/` (`balao-02a.svg`, `balao-05a.svg`, versões
+  `-sem-suavizar` para comparar, renders `v-com/v-sem-*.png` e comparações
+  `comparacao-*-3.png` com referência | sem suavizar | com suavizar).
+  Ajustes do dia: o corpo ficou **sem a cauda integrada** (só o arco do
+  balão, fechado no pescoço) e a cauda é uma forma única com a base por
+  baixo do corpo; a suavização (`--suavizar 5`) tira o tremido do contorno
+  mantendo as ondas maiores, e a cauda usa o contorno bruto (a média móvel
+  achatava protuberâncias pequenas); a moldura é a união das duas formas
+  mais a margem do traço (antes a cauda era cortada). Scripts novos e
+  reutilizáveis: `scripts/vetorizar-baloes.py` (opções `--corte`,
+  `--traco-px`, `--base-interna`, `--alargar-base`, `--suavizar`,
+  `--epsilon`, `--linhas`) e `scripts/servir-para-penpot.py` (HTTP com CORS
+  para o Penpot buscar arquivos). O autor desenhou a própria versão do `05a`
+  no Inkscape (`Versao_rico.svg`) e ela virou a escolhida do piloto
+  (`balao-05a-rico.svg`): canvas normalizado para a união das formas, cauda
+  com traço aberto na base (para unir no Krita depois) e traço de 3 mm,
+  escolhido no QA por casar com o peso da referência. Lição do dia: o SVG do
+  Inkscape tem `transform` no grupo; analisar sem aplicar o transform engana
+  (o arquivo original estava certo). O pipeline aceita arquivos do autor:
+  basta normalizar o canvas (considerando transforms), deixar a cauda aberta
+  e unificar o traço.
+- **Lote (29/09):** 15 SVGs em `Referencias/baloes-vetorizados/` (14 gerados
+  pelo `scripts/vetorizar-lote.py` + o `05a` do autor), com `previa.png`,
+  `INDEX.md` e `lote.json` (prancha, recorte, traço e pescoço de cada um).
+  QA de visão: corpos consistentes; caudas curtas de 02c, 03a, 03b, 04b,
+  05b, 05d e 06b, mais a 06a, ficaram marcadas para o autor revisar; `03c`
+  descartado (interior partido, precisa de corte manual fino). Ajuste fino
+  de uma cauda: `--corte X1,Y1,X2,Y2`, `--alargar-base`, `--base-interna`.
+  Pendente: revisão do autor, subir no Penpot e integrar no plugin.
 
 **Onomatopeias (SVG)**
 - Conjunto próprio para substituir as 8 amostras: impacto, velocidade, som
@@ -119,10 +150,15 @@ Espelho no Trilium: subnota "Lista do autor (a criar)" (`FoIRvo2ztN0D`).
 - Versões com contorno e com preenchimento, para combinar com o nanquim.
 
 **Painéis e páginas (modelos)**
-- Tirinha de 1 a 3 tiras, para o "Criar próxima página" e o "Definir modelo".
-- Página A3 com guias.
-- Modelo vetorial de painéis com o seu traço (contorno e sarjetas próprios).
-- Avaliar modelos para americano e tankobon (os formatos já existem no diálogo).
+- Já atendido pelo plugin: "Gerar modelos padrão do HQ Tools" cria A4, A3,
+  tirinha de 1 a 3 tiras e grades 2x2/3x3 com guias de margem; os templates
+  de HQ do próprio Krita (BD, EUA, mangá, Tsukirino, Waffle) entram direto no
+  "Definir modelo de página"; americano e tankobon já existem no diálogo de
+  nova página.
+- Opcional (identidade própria): página modelo com o seu traço, desenhada no
+  Krita e usada em "Página atual"; SVG de painel para a biblioteca.
+- Validar: os modelos gerados ainda não existem na máquina (pasta
+  `~/.local/share/krita/hq_tools/modelos/` vazia); clicar no botão do diálogo.
 
 **Pincéis e traço**
 - Presets próprios de hachura à mão (pincel para hachurar por cima da retícula).
@@ -130,14 +166,22 @@ Espelho no Trilium: subnota "Lista do autor (a criar)" (`FoIRvo2ztN0D`).
   packs.
 - Verificar a visibilidade do botão "Instalar bundle..." no docker de pincéis
   (sugestão: mover para a aba "Packs").
+- Como criar (ou pedir a adaptação de) pincéis: subnota do Trilium "Como
+  criar pincéis e traços (tutorial)" (`Z5UzRfufJAVV`).
 
 **Divulgação**
-- Ícone do plugin para o gerenciador do Krita e para o repositório.
-- Banner ou capa para o repositório e redes.
-- Capturas e GIFs curtos: aplicar retícula, criar página, editar retícula,
-  pincéis.
+- Ícone: **pronto** em `assets/` (mestre 512 claro/escuro mais a grade pequena
+  dedicada para 128/64/32/16, sem a gota por decisão do autor), aprovado no QA
+  de visão; editável nos 4 boards do Penpot e regras em `docs/DESIGN.md`.
+- Banner ou capa para o repositório e redes (próximo passo, mesmo fluxo).
+- Capturas e GIFs: roteiro pronto em `docs/ROTEIRO-CAPTURAS.md` (10 cenas com
+  formato e nomes de arquivo).
 - Página de exemplo (uma HQ curta) mostrando o fluxo completo, para o README
   e a release.
+- Fluxo (Open Design → Penpot → vision → publicação): subnota do Trilium
+  "Divulgação — fluxo (ícone, banner, página)" (`a6yFTPximC1C`).
+- Design system aprovado: `docs/DESIGN.md` (paleta nanquim e papel, display
+  Bangers/Londrina, regras de ícone e banner).
 
 **Publicação**
 - Criar o repositório no GitHub e subir o main (aguardando as bibliotecas).
