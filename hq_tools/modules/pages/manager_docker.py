@@ -279,7 +279,7 @@ class PagesDocker(DockWidget):
         else:
             try:
                 create_project_with_page(folder, page_name, os.path.basename(folder))
-            except OSError as error:
+            except (OSError, CPMTError) as error:
                 helpers.show_info(
                     "Novo projeto",
                     "Não foi possível gravar o projeto: {0}".format(error),

@@ -6,7 +6,7 @@ import shutil
 import tempfile
 import unittest
 
-from hq_tools.core.cpmt import CPMTProject, create_project_with_page
+from hq_tools.core.cpmt import CPMTError, CPMTProject, create_project_with_page
 
 
 def make_project(root, name="Meu Projeto", location="pages", legacy=False):
@@ -64,6 +64,30 @@ class TestCPMTProject(unittest.TestCase):
             self.assertEqual(project.next_page_name(1), "minha-hq002.kra")
             for sub in ("export", "templates", "translations"):
                 self.assertTrue(os.path.isdir(os.path.join(root, sub)), sub)
+        finally:
+            shutil.rmtree(root, ignore_errors=True)
+
+    def test_create_project_recusa_pasta_que_ja_e_projeto(self):
+        # Sobrescrever o comicConfig.json apagava a lista de páginas, a ordem
+        # e o UUID do projeto, sem perguntar nada.
+        antes = open(
+            os.path.join(self.root, "comicConfig.json"), "rb"
+        ).read()
+        with self.assertRaises(CPMTError) as contexto:
+            create_project_with_page(self.root, "pagina_999.kra", "outro")
+        self.assertIn("já tem um projeto", str(contexto.exception))
+        depois = open(
+            os.path.join(self.root, "comicConfig.json"), "rb"
+        ).read()
+        self.assertEqual(antes, depois)
+        self.assertEqual(CPMTProject(self.root).page_relatives(), [])
+
+    def test_create_project_recusa_projeto_legado_tambem(self):
+        root = tempfile.mkdtemp(prefix="hq_tools_cpmt_")
+        try:
+            make_project(root, legacy=True)
+            with self.assertRaises(CPMTError):
+                create_project_with_page(root, "pagina_002.kra")
         finally:
             shutil.rmtree(root, ignore_errors=True)
 

@@ -23,9 +23,27 @@ def create_project_with_page(folder, page_relative, project_name=None):
 
     Grava ``comicConfig.json`` (UTF-16, padrão do CPMT) com a página na lista
     ``pages`` e ``pageNumber`` em 1. Devolve o caminho do arquivo criado.
+
+    Recusa uma pasta que já tem projeto: sobrescrever o ``comicConfig.json``
+    apagaria a lista de páginas, a ordem e o UUID de um projeto inteiro sem
+    perguntar nada. Para acrescentar página a um projeto existente, use
+    :meth:`CPMTProject.register_pages`.
     """
     folder = os.path.abspath(folder)
     os.makedirs(folder, exist_ok=True)
+    existente = next(
+        (
+            name
+            for name in CONFIG_NAMES
+            if os.path.isfile(os.path.join(folder, name))
+        ),
+        None,
+    )
+    if existente is not None:
+        raise CPMTError(
+            "a pasta já tem um projeto ({0}); a página não foi registrada. "
+            "Abra o projeto existente para acrescentar a página.".format(existente)
+        )
     name = project_name or os.path.basename(folder) or "projeto"
     config = {
         "projectName": name,
