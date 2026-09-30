@@ -260,13 +260,14 @@ class BrushesDocker(DockWidget):
             helpers.show_info("Packs", "Escolha um pack na lista.")
             return
         pack_dir = item.data(USER_ROLE)
-        total = packs_lib.instalar_pack(pack_dir, self._pack_destinos())
+        relatorio = []
+        total = packs_lib.instalar_pack(pack_dir, self._pack_destinos(), relatorio)
         self._refresh_packs()
-        helpers.show_info(
-            "Packs",
-            "Pack instalado: {0} arquivos copiados para os recursos do Krita.\n\n"
-            "Reinicie o Krita para carregar os pincéis novos.".format(total),
-        )
+        texto = "Pack instalado: {0} arquivos copiados para os recursos do Krita.".format(total)
+        if relatorio:
+            texto += "\n\n" + "\n".join(sorted(set(relatorio)))
+        texto += "\n\nReinicie o Krita para carregar os pincéis novos."
+        helpers.show_info("Packs", texto)
 
     def view_pack_license(self):
         item = self.list_packs.currentItem()

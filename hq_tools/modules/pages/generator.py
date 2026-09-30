@@ -155,11 +155,33 @@ def _build_document(page, title, panel_svg, text_svg, width_px, height_px, dpi):
 
 
 def _save_document(document, path):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    if not document.saveAs(path):
-        raise RuntimeError("Não foi possível salvar {0}".format(path))
+    """Salva e fecha a página, sem deixar arquivo parcial nem aba aberta."""
+    directory = os.path.dirname(path)
+    if directory:
+        os.makedirs(directory, exist_ok=True)
+    # O saveAs pode escrever um .kra pela metade antes de falhar. Só é seguro
+    # apagar o arquivo se ele não existia antes, para não destruir uma página
+    # do autor quando o destino é um arquivo que já estava no lugar.
+    preexistente = os.path.isfile(path)
+    try:
+        if not document.saveAs(path):
+            raise RuntimeError("Não foi possível salvar {0}".format(path))
+    except (RuntimeError, OSError):
+        if not preexistente:
+            try:
+                if os.path.isfile(path):
+                    os.unlink(path)
+            except OSError as error:
+                helpers.log(
+                    "não foi possível remover o arquivo parcial {0}: {1}".format(
+                        path, error
+                    )
+                )
+        helpers.close_document(document)
+        raise
     document.setModified(False)
-    document.close()
+    helpers.close_document(document)
+    return path
 
 
 def generate(script_text, target_dir=None, project=None, format_override=None,
@@ -173,36 +195,54 @@ def generate(script_text, target_dir=None, project=None, format_override=None,
     created = []
     relatives = []
 
-    for page in pages:
-        dpi = float(dpi_override or page["dpi"])
-        width_px, height_px = roteiro.page_pixels(page, format_override, dpi)
-        panel_svg = _panels_svg(page, width_px, height_px, dpi)
-        text_svg = _text_svg(page, width_px, height_px, dpi)
+    try:
+        for page in pages:
+            dpi = float(dpi_override or page["dpi"])
+            width_px, height_px = roteiro.page_pixels(page, format_override, dpi)
+            panel_svg = _panels_svg(page, width_px, height_px, dpi)
+            text_svg = _text_svg(page, width_px, height_px, dpi)
 
-        if project is not None:
-            filename = project.next_page_name(offset=len(created) + 1)
-            path = os.path.join(project.pages_dir(), filename)
-            if project.pages_location:
-                relatives.append(os.path.join(project.pages_location, filename))
+            if project is not None:
+                filename = project.next_page_name(offset=len(created) + 1)
+                path = os.path.join(project.pages_dir(), filename)
+                if project.pages_location:
+                    relative = os.path.normpath(
+                        os.path.join(project.pages_location, filename)
+                    )
+                else:
+                    relative = filename
+                relatives.append(relative)
+                title = "{0} - pagina {1}".format(project.project_name, page["index"])
             else:
-                relatives.append(filename)
-            title = "{0} - pagina {1}".format(project.project_name, page["index"])
-        else:
-            if not target_dir:
-                raise ValueError("Informe uma pasta de destino ou um projeto CPMT.")
-            os.makedirs(target_dir, exist_ok=True)
-            filename = "{0}_{1:03d}.kra".format(name_prefix, len(created) + 1)
-            path = os.path.join(target_dir, filename)
-            title = "{0} - pagina {1}".format(name_prefix, page["index"])
+                if not target_dir:
+                    raise ValueError("Informe uma pasta de destino ou um projeto CPMT.")
+                os.makedirs(target_dir, exist_ok=True)
+                filename = "{0}_{1:03d}.kra".format(name_prefix, len(created) + 1)
+                path = os.path.join(target_dir, filename)
+                title = "{0} - pagina {1}".format(name_prefix, page["index"])
 
-        document = _build_document(
-            page, title, panel_svg, text_svg, width_px, height_px, dpi
-        )
-        _save_document(document, path)
-        created.append(path)
+            if os.path.exists(path):
+                raise FileExistsError(
+                    "{0} já existe. Renomeie ou apague o arquivo para não perder "
+                    "a página atual.".format(path)
+                )
 
-    if project is not None and relatives:
-        project.register_pages(relatives)
+            document = _build_document(
+                page, title, panel_svg, text_svg, width_px, height_px, dpi
+            )
+            _save_document(document, path)
+            created.append(path)
+    finally:
+        # Registra o que já saiu, mesmo quando a geração para no meio: as
+        # páginas criadas ficariam fora do comicsConfig.json e invisíveis para
+        # o CPMT.
+        if project is not None and relatives:
+            try:
+                project.register_pages(relatives)
+            except (OSError, ValueError) as error:
+                helpers.log(
+                    "páginas criadas, mas registro no CPMT falhou: {0}".format(error)
+                )
     return created
 
 

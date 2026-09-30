@@ -10,9 +10,29 @@ def register_docker(docker):
     _docker = docker
 
 
+def current_docker():
+    """Devolve o docker registrado, descartando ponteiro para objeto morto.
+
+    Fechar o docker pelo "x" da janela destrói o objeto C++ mas deixa o
+    wrapper Python vivo. Chamar um método nesse wrapper levanta ``RuntimeError``
+    e derrubava o atalho de slot, que é justamente o atalho que sobrevive ao
+    fechamento do docker. O acesso é testado uma vez e o ponteiro é limpo.
+    """
+    docker = _docker
+    if docker is None:
+        return None
+    try:
+        docker.activate_slot
+    except RuntimeError:
+        register_docker(None)
+        return None
+    return docker
+
+
 def activate_slot(index):
-    if _docker is not None:
-        _docker.activate_slot(index)
+    docker = current_docker()
+    if docker is not None:
+        docker.activate_slot(index)
         return
     _activate_without_docker(index)
 

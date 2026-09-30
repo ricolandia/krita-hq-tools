@@ -9,6 +9,7 @@ pixels e a montagem das configurações usadas em:
 
 import json
 import os
+import tempfile
 
 PATTERN_DOTS = 0
 PATTERN_LINES = 1
@@ -99,26 +100,50 @@ def clamp_frequency(frequency, dpi):
     return frequency
 
 
+def _as_int(valor, padrao):
+    try:
+        return int(valor)
+    except (TypeError, ValueError):
+        return padrao
+
+
+def _as_float(valor, padrao):
+    try:
+        return float(valor)
+    except (TypeError, ValueError):
+        return padrao
+
+
 def normalize_preset(preset):
-    """Completa e converte os campos de um preset vindo de JSON."""
+    """Completa e converte os campos de um preset vindo de JSON.
+
+    Cada campo tem conversão tolerante: um preset escrito à mão (ou editado por
+    outra ferramenta) com ``"lpi": "60"`` ou ``"rotation": null`` era
+    descartado junto com a exceção, e a exceção subia na hora de abrir o docker,
+    deixando o módulo inteiro sem carregar.
+    """
     result = dict(DEFAULT_PRESET)
     result.update(preset or {})
-    result["pattern"] = int(result["pattern"])
-    result["shape"] = int(result["shape"])
-    result["interpolation"] = int(result["interpolation"])
-    result["equalization"] = int(result["equalization"])
-    result["lpi"] = float(result["lpi"])
-    result["units"] = int(result["units"])
-    result["rotation"] = float(result["rotation"])
+    result["pattern"] = _as_int(result["pattern"], DEFAULT_PRESET["pattern"])
+    result["shape"] = _as_int(result["shape"], DEFAULT_PRESET["shape"])
+    result["interpolation"] = _as_int(
+        result["interpolation"], DEFAULT_PRESET["interpolation"]
+    )
+    result["equalization"] = _as_int(
+        result["equalization"], DEFAULT_PRESET["equalization"]
+    )
+    result["lpi"] = _as_float(result["lpi"], DEFAULT_PRESET["lpi"])
+    result["units"] = _as_int(result["units"], DEFAULT_PRESET["units"])
+    result["rotation"] = _as_float(result["rotation"], DEFAULT_PRESET["rotation"])
     result["align"] = bool(result["align"])
-    result["align_x"] = max(1, int(result["align_x"]))
-    result["align_y"] = max(1, int(result["align_y"]))
-    result["brightness"] = float(result["brightness"])
-    result["contrast"] = float(result["contrast"])
+    result["align_x"] = max(1, _as_int(result["align_x"], DEFAULT_PRESET["align_x"]))
+    result["align_y"] = max(1, _as_int(result["align_y"], DEFAULT_PRESET["align_y"]))
+    result["brightness"] = _as_float(result["brightness"], DEFAULT_PRESET["brightness"])
+    result["contrast"] = _as_float(result["contrast"], DEFAULT_PRESET["contrast"])
     result["invert"] = bool(result["invert"])
-    result["fg_opacity"] = int(result["fg_opacity"])
-    result["bg_opacity"] = int(result["bg_opacity"])
-    result["hardness"] = float(result["hardness"])
+    result["fg_opacity"] = _as_int(result["fg_opacity"], DEFAULT_PRESET["fg_opacity"])
+    result["bg_opacity"] = _as_int(result["bg_opacity"], DEFAULT_PRESET["bg_opacity"])
+    result["hardness"] = _as_float(result["hardness"], DEFAULT_PRESET["hardness"])
     result["constrain_frequency"] = bool(result["constrain_frequency"])
     return result
 
@@ -296,17 +321,35 @@ def load_presets(path):
     presets = []
     for item in data:
         if isinstance(item, dict):
-            presets.append(normalize_preset(item))
+            try:
+                presets.append(normalize_preset(item))
+            except (AttributeError, TypeError, ValueError):
+                # Um preset quebrado não pode derrubar o docker inteiro: segue
+                # sem ele e o resto da lista continua utilizável.
+                continue
     return presets
 
 
 def save_presets(path, presets):
+    """Grava a lista de presets do usuário de forma atômica.
+
+    A escrita direta truncava o arquivo no meio quando o disco encheu ou o
+    Krita foi fechado durante o ``json.dump``; como os presets do usuário são
+    trabalho manual, a perda era sem volta.
+    """
     directory = os.path.dirname(os.path.abspath(path))
     os.makedirs(directory, exist_ok=True)
-    with open(path, "w", encoding="utf-8") as handle:
-        json.dump(
-            {"presets": [normalize_preset(item) for item in presets]},
-            handle,
-            indent=2,
-            ensure_ascii=False,
-        )
+    payload = {"presets": [normalize_preset(item) for item in presets]}
+    handle = tempfile.NamedTemporaryFile(
+        "w", encoding="utf-8", dir=directory, delete=False
+    )
+    try:
+        with handle:
+            json.dump(payload, handle, indent=2, ensure_ascii=False)
+        os.replace(handle.name, path)
+    except BaseException:
+        try:
+            os.unlink(handle.name)
+        except OSError:
+            pass
+        raise

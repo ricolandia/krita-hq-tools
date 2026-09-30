@@ -29,7 +29,7 @@ from ...core.compat import (
     standard_icon,
 )
 from ...core.config import Config
-from ...core.cpmt import CPMTProject, create_project_with_page
+from ...core.cpmt import CPMTError, CPMTProject, create_project_with_page
 from ...core.paths import MODELOS_DIR
 from ...core.thumbs import thumbnail_pixmap
 from ..biblioteca import core as biblioteca_core
@@ -45,6 +45,21 @@ FORMATO_ITENS = (
     ("quadrado", "Quadrado"),
     ("livre", "Livre (largura x altura)"),
 )
+
+
+def _descartar_pagina_orphã(document, path):
+    """Fecha o documento e apaga o ``.kra`` que ficou sem registro.
+
+    Só mexe no arquivo que o próprio fluxo acabou de criar: se a remoção
+    falhar (permissão, arquivo aberto em outro app), o erro vai para o log em
+    vez de mascarar o aviso que o usuário já recebeu.
+    """
+    helpers.close_document(document)
+    try:
+        if os.path.isfile(path):
+            os.unlink(path)
+    except OSError as error:
+        helpers.log("não foi possível remover a página órfã {0}: {1}".format(path, error))
 
 
 class PageListWidget(QtWidgets.QListWidget):
@@ -335,7 +350,7 @@ class PagesDocker(DockWidget):
 
         spin_dpi = widgets.QSpinBox()
         spin_dpi.setRange(72, 1200)
-        spin_dpi.setValue(int(self.config.get("pages.dpi", 300) or 300))
+        spin_dpi.setValue(self.config.get_int("pages.dpi", 300))
         form.addRow("DPI:", spin_dpi)
 
         spin_w = widgets.QDoubleSpinBox()
@@ -355,7 +370,7 @@ class PagesDocker(DockWidget):
 
         spin_strip = widgets.QSpinBox()
         spin_strip.setRange(1, 8)
-        spin_strip.setValue(int(self.config.get("pages.strip_panels", 3) or 3))
+        spin_strip.setValue(self.config.get_int("pages.strip_panels", 3))
         form.addRow("Painéis da tirinha:", spin_strip)
 
         def _update_enabled():
@@ -442,6 +457,7 @@ class PagesDocker(DockWidget):
 
         modelo = opcoes.get("modelo_path") or ""
         if modelo and os.path.isfile(modelo):
+            document = None
             try:
                 shutil.copy2(modelo, path)
                 document = Krita.instance().openDocument(path)
@@ -454,12 +470,16 @@ class PagesDocker(DockWidget):
                 if not document.saveAs(path):
                     raise RuntimeError("não foi possível salvar a página adaptada")
                 document.setModified(False)
-                document.close()
             except (OSError, RuntimeError) as error:
                 helpers.show_info(
                     "Nova página", "Falha ao usar o modelo: {0}".format(error)
                 )
+                # A cópia do modelo foi colada em `path` antes da falha: sem
+                # remover, sobra um .kra na pasta de páginas que não está na
+                # lista do CPMT e o usuário só descobre ao recontar os arquivos.
+                _descartar_pagina_orphã(document, path)
                 return
+            helpers.close_document(document)
         else:
             page = {
                 "index": numero,
@@ -843,7 +863,35 @@ class PagesDocker(DockWidget):
             self.list_pages.item(index).data(USER_ROLE)
             for index in range(self.list_pages.count())
         ]
-        self.project.set_page_order(ordered)
+        # Um item sem caminho (item solto arrastado para a lista) viraria
+        # "None" no comicConfig.json e o CPMT exportaria a página duas vezes.
+        if any(not relative for relative in ordered):
+            ordered = [
+                relative
+                for relative in ordered
+                if relative
+            ]
+        # A gravação pode falhar (arquivo corrompido, sem permissão): sem o
+        # try, a exceção subia para o Qt e a tela continuava mostrando a nova
+        # ordem, que na verdade nunca foi salva.
+        try:
+            self.project.set_page_order(ordered)
+        except (OSError, CPMTError) as error:
+            helpers.show_info(
+                "Ordem das páginas",
+                "Não foi possível gravar a nova ordem: {0}".format(error),
+            )
+            self._loading = True
+            try:
+                self.refresh()
+            finally:
+                self._loading = False
+            return
+        self.lbl_project.setText(
+            "Projeto: {0} ({1} páginas)".format(
+                self.project.project_name, self.list_pages.count()
+            )
+        )
         helpers.show_message("Ordem das páginas atualizada no projeto.")
 
     def open_page(self, item):

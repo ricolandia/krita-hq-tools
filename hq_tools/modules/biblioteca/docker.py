@@ -217,6 +217,15 @@ class BibliotecaDocker(DockWidget):
                 document.rootNode().addChildNode(layer, None)
                 document.setActiveNode(layer)
         document.refreshProjection()
+        if not helpers.present_document(document):
+            # Sem view o usuário não enxergaria a camada criada nem conseguiria
+            # desenhá-la; o documento ficaria oculto até o próximo Ctrl+Tab.
+            helpers.show_info(
+                "Novo recurso",
+                "O documento foi criado, mas o Krita não abriu uma aba para "
+                "ele. Procure a aba do novo documento e volte aqui para salvar.",
+            )
+            return
         helpers.show_message(
             "Desenhe o {0} na camada 'recurso' e use 'Salvar recurso do "
             "documento'.".format(rotulo.lower())

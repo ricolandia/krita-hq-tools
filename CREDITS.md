@@ -94,6 +94,23 @@ Comics pack e InkP/Expressive Inks.
   3x3), criados para o projeto.
 - Paletas, presets de retícula, amostras de balões e onomatopeias: criadas
   para o projeto.
+- Balões vetorizados do kit handdrawn (`Referencias/baloes-vetorizados/`):
+  vetorizados pelo próprio autor a partir das pranchas de
+  `Referencias/baloes/`, com `scripts/vetorizar-baloes.py` (MIT).
+
+## Pastas que não vão no ZIP
+
+O pacote distribuído (`dist/hq_tools-<versão>.zip`) leva só `hq_tools/`,
+`hq_tools.desktop`, `hq_tools.action` e os documentos. Estas pastas ficam só
+no repositório, por serem material de trabalho:
+
+- `Referencias/baloes/` e `Referencias/vetores-teste/`: pranchas de referência
+  usadas para calibrar o vetorizador. **Origem a declarar pelo autor**
+  (desenho próprio, material de terceiros ou imagem gerada por IA): enquanto
+  não houver linha de origem e licença aqui e em
+  `Referencias/baloes-vetorizados/INDEX.md`, o repositório não deve ser
+  publicado com essas pranchas.
+- `Novas_ideias/`: implementações em estudo, fora do CI e do pacote.
 
 ## Projeto e contato
 

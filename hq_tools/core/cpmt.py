@@ -14,6 +14,10 @@ import uuid
 CONFIG_NAMES = ("comicConfig.json", "comicsConfig.json")
 
 
+class CPMTError(ValueError):
+    """Erro de leitura ou escrita do arquivo de projeto do CPMT."""
+
+
 def create_project_with_page(folder, page_relative, project_name=None):
     """Cria um projeto CPMT na pasta, registrando a página já salva.
 
@@ -38,9 +42,31 @@ def create_project_with_page(folder, page_relative, project_name=None):
     for sub in ("export", "templates", "translations"):
         os.makedirs(os.path.join(folder, sub), exist_ok=True)
     path = os.path.join(folder, "comicConfig.json")
-    with open(path, "w", encoding="utf-16", newline="") as handle:
-        json.dump(config, handle, indent=4, sort_keys=True, ensure_ascii=False)
+    _escrever_atomico(path, config, "utf-16")
     return path
+
+
+def _escrever_atomico(path, config, encoding):
+    """Grava JSON por arquivo temporário e troca pelo original.
+
+    O CPMT do Krita lê esse arquivo em memória e não tolera meio arquivo: uma
+    escrita interrompida deixava o projeto sem lista de páginas.
+    """
+    directory = os.path.dirname(path) or "."
+    prefix = ".{0}.".format(os.path.basename(path))
+    handle = tempfile.NamedTemporaryFile(
+        "w", encoding=encoding, newline="", dir=directory, prefix=prefix, delete=False
+    )
+    try:
+        with handle:
+            json.dump(config, handle, indent=4, sort_keys=True, ensure_ascii=False)
+        os.replace(handle.name, path)
+    except BaseException:
+        try:
+            os.unlink(handle.name)
+        except OSError:
+            pass
+        raise
 
 
 class CPMTProject:
@@ -66,7 +92,21 @@ class CPMTProject:
             head = handle.read(2)
         self._encoding = "utf-16" if head in (b"\xff\xfe", b"\xfe\xff") else "utf-8"
         with open(self.config_path, "r", encoding=self._encoding) as handle:
-            self.config = json.load(handle)
+            try:
+                self.config = json.load(handle)
+            except ValueError as error:
+                # Antes disso o erro subia como JSONDecodeError, que os
+                # chamadores não pegavam, então uma pasta com config quebrada
+                # aparecia como falha genérica do módulo em vez de "projeto
+                # inválido".
+                raise CPMTError(
+                    "{0} está corrompido ({1}). Restaure uma cópia ou apague o "
+                    "arquivo para recriar o projeto.".format(self.config_path, error)
+                )
+        if not isinstance(self.config, dict):
+            raise CPMTError(
+                "{0} não tem o formato esperado (objeto JSON).".format(self.config_path)
+            )
 
     @classmethod
     def is_project(cls, root):
@@ -85,7 +125,12 @@ class CPMTProject:
 
     @property
     def page_number(self):
-        return int(self.config.get("pageNumber") or 0)
+        try:
+            return int(self.config.get("pageNumber") or 0)
+        except (TypeError, ValueError):
+            # pageNumber corrompido não pode derrubar a criação de páginas:
+            # sem ele o nome seguinte repetiria uma página já existente.
+            return 0
 
     def page_relatives(self):
         pages = self.config.get("pages") or []
@@ -115,37 +160,49 @@ class CPMTProject:
         return os.path.join(self.root, self.pages_location)
 
     def register_pages(self, relatives):
-        """Acrescenta páginas ao projeto e avança o contador ``pageNumber``."""
+        """Acrescenta páginas ao projeto e avança o contador ``pageNumber``.
+
+        Ignora caminhos já registrados. Reexecutar o mesmo roteiro era o
+        caminho comum para a mesma página aparecer duas vezes na lista do CPMT,
+        e o plugin de exportação do Krita exporta o mesmo arquivo duas vezes.
+        """
         relatives = list(relatives)
         if not relatives:
-            return
+            return []
         pages = self.config.setdefault("pages", [])
-        pages.extend(relatives)
-        numbers = []
+        ja_cadastradas = {str(item) for item in pages}
+        novas = []
         for relative in relatives:
+            relative = str(relative)
+            if relative in ja_cadastradas:
+                continue
+            ja_cadastradas.add(relative)
+            novas.append(relative)
+        if not novas:
+            return []
+        pages.extend(novas)
+        numbers = []
+        for relative in novas:
             match = re.search(r"(\d+)(?=\.kra$)", relative)
             if match:
                 numbers.append(int(match.group(1)))
         if numbers:
             self.config["pageNumber"] = max(self.page_number, max(numbers))
         self.save()
+        return novas
 
     def set_page_order(self, relatives):
         """Reescreve a ordem das páginas (lista de caminhos relativos)."""
-        self.config["pages"] = [str(item) for item in relatives]
+        order = []
+        vistas = set()
+        for item in relatives:
+            item = str(item)
+            if item in vistas:
+                continue
+            vistas.add(item)
+            order.append(item)
+        self.config["pages"] = order
         self.save()
 
     def save(self):
-        directory = os.path.dirname(self.config_path)
-        handle = tempfile.NamedTemporaryFile(
-            "w", encoding=self._encoding, newline="", dir=directory, delete=False
-        )
-        try:
-            with handle:
-                json.dump(self.config, handle, indent=4, sort_keys=True, ensure_ascii=False)
-            os.replace(handle.name, self.config_path)
-        except OSError:
-            try:
-                os.unlink(handle.name)
-            except OSError:
-                pass
+        _escrever_atomico(self.config_path, self.config, self._encoding)

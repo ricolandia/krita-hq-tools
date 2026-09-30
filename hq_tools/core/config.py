@@ -7,7 +7,10 @@ módulos habilitados, presets do usuário, pastas e preferências de interface.
 import copy
 import json
 import os
+import shutil
+import sys
 import tempfile
+import time
 
 from .paths import CONFIG_PATH, ensure_user_dirs
 
@@ -82,8 +85,25 @@ class Config:
                 stored = json.load(handle)
             if isinstance(stored, dict):
                 self.data = _deep_merge(DEFAULT_CONFIG, stored)
-        except (OSError, ValueError):
+        except FileNotFoundError:
             self.data = copy.deepcopy(DEFAULT_CONFIG)
+        except (OSError, ValueError):
+            # Arquivo ilegível ou JSON inválido: guarda uma cópia antes de
+            # voltar ao padrão, porque o próximo `set()` sobrescreve o
+            # arquivo e o usuário perderia a configuração sem ter como recuperar.
+            self._preservar_ilegivel()
+            self.data = copy.deepcopy(DEFAULT_CONFIG)
+
+    def _preservar_ilegivel(self):
+        try:
+            stamp = time.strftime("%Y%m%d-%H%M%S")
+            backup = "{0}.ilegivel-{1}".format(self.path, stamp)
+            shutil.copy2(self.path, backup)
+            sys.stderr.write(
+                "[hq_tools] config.json ilegível; cópia em {0}\n".format(backup)
+            )
+        except OSError:
+            pass
 
     def save(self):
         ensure_user_dirs()
@@ -110,15 +130,63 @@ class Config:
             node = node[key]
         return node
 
-    def set(self, key_path, value, save=True):
-        """Grava um valor usando caminho com pontos."""
-        keys = key_path.split(".")
+    def get_int(self, key_path, default=0):
+        """Lê um inteiro, ignorando valor corrompido.
+
+        Usado nos widgets, que chamam ``int()`` direto: uma string ou um
+        ``null`` deixado no JSON derrubava a construção do docker inteiro.
+        """
+        try:
+            return int(self.get(key_path, default))
+        except (TypeError, ValueError):
+            return default
+
+    def get_float(self, key_path, default=0.0):
+        """Lê um float, ignorando valor corrompido."""
+        try:
+            return float(self.get(key_path, default))
+        except (TypeError, ValueError):
+            return default
+
+    def _resolve_container(self, keys, create=True):
+        """Desce pelo caminho devolvendo ``(pai, última_chave)``.
+
+        Nível intermediário que não é dicionário é considerado arquivo
+        corrompido: antes ele era sobrescrito por ``{}`` sem aviso, o que
+        apagava de uma vez uma lista inteira (os slots de pincel, por exemplo)
+        por causa de um erro de digitação no caminho.
+        """
         node = self.data
         for key in keys[:-1]:
-            if not isinstance(node.get(key), dict):
-                node[key] = {}
-            node = node[key]
-        node[keys[-1]] = value
+            child = node.get(key)
+            if child is None:
+                if not create:
+                    return None, keys[-1]
+                child = {}
+                node[key] = child
+            elif not isinstance(child, dict):
+                raise TypeError(
+                    "'{0}' não é um grupo de configuração (é {1}). Use um "
+                    "caminho existente em vez de sobrescrever.".format(
+                        key, type(child).__name__
+                    )
+                )
+            node = child
+        return node, keys[-1]
+
+    def set(self, key_path, value, save=True):
+        """Grava um valor usando caminho com pontos.
+
+        Rele o arquivo antes de escrever: cada docker tem a sua instância de
+        :class:`Config` e elas ficam abertas horas a fio. Sem a releitura, a
+        última escrita apagava o que os outros módulos gravaram no intervalo
+        (mudar o preset de retícula apagava os slots de pincel, por exemplo).
+        """
+        keys = key_path.split(".")
+        if save:
+            self.load()
+        node, last = self._resolve_container(keys)
+        node[last] = value
         if save:
             self.save()
         return value

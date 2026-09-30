@@ -163,10 +163,30 @@ def preset_aliases(pack_dir):
     return aliases
 
 
-def instalar_pack(pack_dir, destinos):
+def _backup_de_preservado(destino_arquivo):
+    """Guarda uma cópia do preset do usuário que seria sobrescrito.
+
+    Os packs trazem presets com o mesmo nome dos que o usuário pode ter
+    editado. A cópia vai para ``<nome>.hqtools-backup`` para não haver duas
+    cópias do mesmo preset na pasta de recursos (o Krita leria as duas).
+    Devolve o caminho da cópia, ou None se não deu para fazer.
+    """
+    backup = destino_arquivo + ".hqtools-backup"
+    try:
+        if os.path.isfile(backup):
+            os.unlink(backup)
+        shutil.copy2(destino_arquivo, backup)
+    except OSError:
+        return None
+    return backup
+
+
+def instalar_pack(pack_dir, destinos, relatorio=None):
     """Copia os arquivos do pack para as pastas de recursos do usuário.
 
     ``destinos`` é ``{tipo: pasta_destino}``; devolve o total copiado.
+    ``relatorio``, se fornecido, recebe uma linha por arquivo preservado ou que
+    falhou, para o docker poder avisar o autor em vez de engolir em silêncio.
     """
     total = 0
     for tipo, arquivos in arquivos_por_tipo(pack_dir).items():
@@ -175,12 +195,51 @@ def instalar_pack(pack_dir, destinos):
             continue
         os.makedirs(destino, exist_ok=True)
         for caminho in arquivos:
+            alvo = os.path.join(destino, os.path.basename(caminho))
             try:
-                shutil.copy2(caminho, os.path.join(destino, os.path.basename(caminho)))
+                if os.path.isfile(alvo) and not _mesmos_bytes(caminho, alvo):
+                    backup = _backup_de_preservado(alvo)
+                    if backup is None:
+                        # Sem cópia de segurança possível, o preset editado
+                        # pelo autor tem prioridade.
+                        if relatorio is not None:
+                            relatorio.append(
+                                "mantido o seu preset (não foi possível fazer "
+                                "cópia de segurança): {0}".format(
+                                    os.path.basename(alvo)
+                                )
+                            )
+                        continue
+                    if relatorio is not None:
+                        relatorio.append(
+                            "seu preset foi substituído; cópia em {0}".format(
+                                os.path.basename(backup)
+                            )
+                        )
+                elif os.path.isfile(alvo):
+                    # Idêntico: instalar de novo só gastaria I/O.
+                    continue
+                shutil.copy2(caminho, alvo)
                 total += 1
-            except OSError:
+            except OSError as error:
+                if relatorio is not None:
+                    relatorio.append(
+                        "falha ao instalar {0}: {1}".format(
+                            os.path.basename(alvo), error
+                        )
+                    )
                 continue
     return total
+
+
+def _mesmos_bytes(um, outro):
+    try:
+        if os.path.getsize(um) != os.path.getsize(outro):
+            return False
+        with open(um, "rb") as a, open(outro, "rb") as b:
+            return a.read() == b.read()
+    except OSError:
+        return False
 
 
 def pack_instalado(pack_dir, destinos):

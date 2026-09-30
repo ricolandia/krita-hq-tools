@@ -1,5 +1,7 @@
 """Funções utilitárias sobre a API do Krita usadas por todos os módulos."""
 
+import sys
+
 from krita import InfoObject, Krita, Selection
 
 from .compat import QIcon
@@ -18,13 +20,89 @@ def active_view():
     return window.activeView() if window is not None else None
 
 
+def log(text):
+    """Escreve no log do Krita (stderr capturado pelo plugin loader).
+
+    Usado em pontos onde antes o erro era engolido em silêncio, para o autor
+    conseguir diagnosticar sem o plugin travar.
+    """
+    try:
+        sys.stderr.write("[hq_tools] {0}\n".format(text))
+        sys.stderr.flush()
+    except (AttributeError, ValueError, OSError):
+        pass
+
+
 def show_message(text, timeout=4000):
-    """Mostra uma mensagem flutuante no canvas, se houver uma janela ativa."""
+    """Mostra uma mensagem flutuante no canvas, se houver uma janela ativa.
+
+    Sem view ativa o texto vai só para o log: abrir uma caixa de diálogo aqui
+    transformaria avisos rotineiros (slot vazio, recurso ausente) em modais
+    repetidos, que era o comportamento de ``show_info``.
+    """
     view = active_view()
     if view is not None:
         try:
             view.showFloatingMessage(text, QIcon(), timeout, 0)
         except (TypeError, RuntimeError):
+            log("showFloatingMessage falhou: {0}".format(text))
+            return
+    log(text)
+
+
+def present_document(document):
+    """Abre uma aba para o documento e o torna ativo.
+
+    Sem ``addView`` o documento fica sem janela: o usuário não vê o que foi
+    criado e os comandos que dependem de view (``activateResource``, seleção,
+    atalhos de pincel) passam a não ter efeito.
+    """
+    if document is None:
+        return False
+    try:
+        app().addView(document)
+        app().setActiveDocument(document)
+    except (AttributeError, RuntimeError):
+        return False
+    return True
+
+
+def close_document(document, modified=False):
+    """Fecha um documento descartando alterações pendentes.
+
+    Devolve ``True`` quando o documento foi realmente fechado. Sem isso, um
+    documento aberto só para adaptar um modelo fica como aba órfã e o Krita
+    pergunta ao usuário se quer salvar na saída.
+    """
+    if document is None:
+        return True
+    try:
+        if not modified:
+            document.setModified(False)
+        document.close()
+    except (AttributeError, RuntimeError):
+        return False
+    return True
+
+
+def run_in_macro(document, action):
+    """Executa ``action()`` dentro de uma macro do Krita (desfazer por Ctrl+Z).
+
+    O ``endMacro`` sempre roda, mesmo se a ação levantar, para não deixar a
+    macro aberta no histórico.
+    """
+    if document is None:
+        return action()
+    try:
+        document.beginMacro(action.__name__ if hasattr(action, "__name__") else "HQ Tools")
+    except (AttributeError, RuntimeError):
+        return action()
+    try:
+        return action()
+    finally:
+        try:
+            document.endMacro()
+        except (AttributeError, RuntimeError):
             pass
 
 
