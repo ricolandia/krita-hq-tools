@@ -14,19 +14,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
       - name: Conferir que a tag é a versão do plugin
         # Sem isto, dá para publicar v0.7.0 com o __version__ = 0.6.2 dentro do
-        # ZIP e o autor só descobre quando alguém instala.
+        # ZIP e o autor só descobre quando alguém instala. Aceita disparo por
+        # tag e por workflow_dispatch, mas neste último exige o commit marcado.
         run: |
           set -euo pipefail
           versao=$(sed -n 's/^__version__ = "\(.*\)"/\1/p' hq_tools/core/version.py)
-          if [ "$GITHUB_REF_NAME" = "" ]; then
-            tag=$(git describe --tags --exact-match 2>/dev/null || echo "v$versao")
-          else
-            tag="$GITHUB_REF_NAME"
+          case "$GITHUB_REF" in
+            refs/tags/*) tag="$GITHUB_REF_NAME" ;;
+            *) tag=$(git describe --tags --exact-match 2>/dev/null || true) ;;
+          esac
+          if [ -z "$tag" ]; then
+            echo "::error::disparo manual sem tag no commit. Marque a tag v$versao antes de publicar."
+            exit 1
           fi
           echo "tag: $tag | versão: $versao"
           if [ "$tag" != "v$versao" ]; then
