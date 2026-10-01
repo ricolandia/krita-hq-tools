@@ -36,8 +36,8 @@ Feito:
 
 - v0.1.0 a v0.4.0 completas (ver CHANGELOG).
 - **Kit de pincéis da comunidade (v0.5.0)**: curadoria com licença verificada
-  na fonte; inclusos Deevad v8.2 (David Revoy, CC-BY 4.0, 64 presets + brushes/
-  patterns/palettes) e Krita Watercolor Set (Vasco Basqué, CC-0, 13 presets +
+  na fonte; inclusos Deevad v8.2 (David Revoy, CC-BY 4.0, 62 presets + brushes/
+  patterns/palettes) e Krita Watercolor Set (Vasco Basqué, CC-0, 12 presets +
   11 brushes) em `hq_tools/resources/brushes/`, cada um com `LICENSE.txt` e
   `FONTE.md`; aba "Packs" no docker de pincéis (instalar com um clique,
   ver licença, marca "[instalado]"); `modules/brushes/packs.py` puro com 6
@@ -101,9 +101,9 @@ Pendente (validação dentro do Krita):
 Auditoria por quatro frentes (correção, desempenho, robustez, testes/docs),
 aplicada em quatro commits. Relatório completo em
 **`docs/AUDITORIA-2026-09-30.md`**; changelog na seção `[Não publicado]`.
-**161 testes verdes, com e sem PyQt instalado.** A versão continua 0.6.2: nada
-foi validado dentro do Krita ainda, e a checklist de validação está no fim do
-relatório.
+**161 testes verdes, com e sem PyQt instalado** (177 depois da camada de
+interface, ver adiante). A versão continua 0.6.2: nada foi validado dentro do
+Krita ainda, e a checklist de validação está no fim do relatório.
 
 | Lote | Commit | O que era |
 |---|---|---|
@@ -173,8 +173,9 @@ código de interface:
 - Ícone por chave semântica (`"pasta"`, `"atualizar"`, `"aplicar"`) e fallback
   `SP_FileIcon`: chave errada perde o ícone, não o botão. A API de ícones do
   tema do Krita (em vez do `QStyle`) continua **não verificada** e fora do lote.
-- Bug achado no caminho: `palettes/docker.py` usava `KRITA_PALETTES_DIR` sem
-  importar. A suíte pegou; o import voltou.
+- Nota de verificação (2026-10-01): o import de `KRITA_PALETTES_DIR` em
+  `palettes/docker.py` existe desde o commit original `d718877`, junto com
+  `QtCore`/`QtGui`; não houve correção de nome não definido nesse arquivo.
 
 Escopo que **não** foi mexido, de propósito: `QToolButton` dos slots e dos
 cartões (tem reordenação por arrastar e clique direito, que é comportamento, não

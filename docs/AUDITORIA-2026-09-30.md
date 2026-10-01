@@ -5,7 +5,7 @@ robustez, testes/documentação), com os achados aplicados em quatro lotes. Este
 documento é o índice do que foi encontrado, do que foi corrigido e do que
 continua aberto. O changelog tem o detalhe por lote; aqui fica o mapa.
 
-**Estado:** 161 testes verdes, com e sem PyQt instalado. **Nenhuma correção foi
+**Estado:** 177 testes verdes, com e sem PyQt instalado. **Nenhuma correção foi
 validada dentro do Krita ainda** (ver *Validação pendente* no fim), então a
 versão não sobe de 0.6.2.
 
@@ -169,8 +169,10 @@ miniaturas, tamanho dos ícones da lista, e a API de ícones do **tema** do Krit
 (não verificada; hoje o plugin usa `QStyle.StandardPixmap` via
 `standard_icon`, que respeita o tema do Qt).
 
-Suíte: 161 → **177**, com e sem PyQt. Bug achado no caminho:
-`palettes/docker.py` usava `KRITA_PALETTES_DIR` sem importar.
+Suíte: 161 → **177**, com e sem PyQt. Nota de verificação (2026-10-01): o
+import de `KRITA_PALETTES_DIR` em `palettes/docker.py` existe desde o commit
+original `d718877`, junto com `QtCore`/`QtGui`; não houve correção de nome não
+definido nesse arquivo.
 
 **A conferir no Acer** (sem PyQt aqui, não dá para provar layout): se o aviso de
 célula ainda empurra a largura do docker de Retículas, falta relaxar a política

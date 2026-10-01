@@ -34,8 +34,9 @@ alto dpi e a troca de tema.
   `ui.separador()` nos pontos onde os grupos separam de verdade.
 - Ícones por chave semântica (`"pasta"`, `"atualizar"`, `"aplicar"`), com
   fallback para `SP_FileIcon`: chave desconhecida perde o ícone, não o botão.
-- Correção de nome não definido: `palettes/docker.py` usava
-  `KRITA_PALETTES_DIR` sem importar (achado pela suíte durante o lote).
+- Nota de verificação (2026-10-01): o import de `KRITA_PALETTES_DIR` em
+  `palettes/docker.py` existe desde o commit original `d718877`, junto com
+  `QtCore`/`QtGui`; não houve correção de nome não definido nesse arquivo.
 
 ### Corrigido — dados do autor (Lote A)
 
