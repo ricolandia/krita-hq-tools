@@ -28,6 +28,7 @@ from ...core.compat import (
     QtWidgets,
 )
 from ...core.config import Config
+from ...core import ui
 from ...core.paths import BALLOONS_DIR, mesma_copia
 
 SAMPLES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "samples")
@@ -108,17 +109,19 @@ class BalloonsDocker(DockWidget):
 
     def _build_ui(self):
         widgets = QtWidgets
-        main = widgets.QWidget(self)
-        layout = widgets.QVBoxLayout(main)
+        main, layout = ui.painel(self)
 
         folder_row = widgets.QHBoxLayout()
-        self.lbl_folder = widgets.QLabel("")
-        self.lbl_folder.setWordWrap(True)
+        self.lbl_folder = ui.rotulo_info("")
         folder_row.addWidget(self.lbl_folder, 1)
-        button_pick = widgets.QPushButton("Pasta...")
+        button_pick = ui.botao(
+            "Pasta...",
+            "Escolhe a pasta de modelos de balão; use Atualizar depois de adicionar SVGs.",
+            icone_chave="pasta",
+        )
         button_pick.clicked.connect(self.pick_folder)
         folder_row.addWidget(button_pick)
-        button_open = widgets.QPushButton("Abrir")
+        button_open = ui.botao("Abrir", "Abre a pasta de modelos no explorador de arquivos.")
         button_open.clicked.connect(self.open_folder)
         folder_row.addWidget(button_open)
         layout.addLayout(folder_row)
@@ -141,35 +144,38 @@ class BalloonsDocker(DockWidget):
         layout.addWidget(self.chk_text_layer)
 
         buttons = widgets.QHBoxLayout()
-        button_insert = widgets.QPushButton("Inserir balão")
+        button_insert = ui.botao(
+            "Inserir balão", "Insere o modelo selecionado no grupo ou camada ativa."
+        )
         button_insert.clicked.connect(self.insert_balloon)
         buttons.addWidget(button_insert)
-        button_refresh = widgets.QPushButton("Atualizar")
+        button_refresh = ui.botao(
+            "Atualizar", "Relê os modelos da pasta atual.", icone_chave="atualizar"
+        )
         button_refresh.clicked.connect(self.refresh)
         buttons.addWidget(button_refresh)
         layout.addLayout(buttons)
 
         kit_row = widgets.QHBoxLayout()
-        button_symbols = widgets.QPushButton("Símbolos do Krita")
-        button_symbols.setToolTip(
-            "Abre o docker nativo 'Bibliotecas de símbolos' do Krita"
+        button_symbols = ui.botao(
+            "Símbolos do Krita",
+            "Abre o docker nativo 'Bibliotecas de símbolos' do Krita",
         )
         button_symbols.clicked.connect(self.open_native_symbols_docker)
         kit_row.addWidget(button_symbols)
-        button_fonts = widgets.QPushButton("Instalar fontes de HQ")
-        button_fonts.setToolTip(
-            "Copia as fontes inclusas (OFL) para o sistema e atualiza o cache"
+        button_fonts = ui.botao(
+            "Instalar fontes de HQ",
+            "Copia as fontes inclusas (OFL) para o sistema e atualiza o cache",
+            icone_chave="salvar",
         )
         button_fonts.clicked.connect(self.install_kit_fonts)
         kit_row.addWidget(button_fonts)
         layout.addLayout(kit_row)
 
-        hint = widgets.QLabel(
+        hint = ui.rotulo(
             "Os modelos são SVGs comuns: você pode desenhar os seus (Inkscape) e "
             "salvá-los na pasta acima. Clique duas vezes para inserir no grupo "
-            "ativo."
-        )
-        hint.setWordWrap(True)
+            "ativo.")
         layout.addWidget(hint)
 
         self.setWidget(main)

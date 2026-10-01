@@ -30,9 +30,9 @@ from ...core.compat import (
     QtCore,
     QtGui,
     QtWidgets,
-    standard_icon,
 )
 from ...core.config import Config
+from ...core import ui
 from ...core.paths import BIBLIOTECA_DIR
 from . import core as lib
 
@@ -83,52 +83,56 @@ class BibliotecaDocker(DockWidget):
 
     def _build_ui(self):
         widgets = QtWidgets
-        main = widgets.QWidget(self)
-        layout = widgets.QVBoxLayout(main)
+        main, layout = ui.painel(self)
 
         group_lib = widgets.QGroupBox("Biblioteca")
-        lib_layout = widgets.QVBoxLayout(group_lib)
+        lib_layout = ui.espacamento(widgets.QVBoxLayout(group_lib), margem=0, espaco=ui.GAP)
         folder_row = widgets.QHBoxLayout()
-        self.lbl_folder = widgets.QLabel("")
-        self.lbl_folder.setWordWrap(True)
+        self.lbl_folder = ui.rotulo_info("")
         folder_row.addWidget(self.lbl_folder, 1)
-        button_pick = widgets.QPushButton("Pasta...")
-        button_pick.setIcon(standard_icon("SP_DirOpenIcon"))
+        button_pick = ui.botao(
+            "Pasta...",
+            "Escolhe a pasta de recursos (biblioteca); use Atualizar depois de adicionar arquivos.",
+            icone_chave="pasta",
+        )
         button_pick.clicked.connect(self.pick_folder)
         folder_row.addWidget(button_pick)
-        button_open = widgets.QPushButton("Abrir")
+        button_open = ui.botao("Abrir", "Abre a pasta de recursos no explorador de arquivos.")
         button_open.clicked.connect(self.open_folder)
         folder_row.addWidget(button_open)
         lib_layout.addLayout(folder_row)
         layout.addWidget(group_lib)
+        layout.addWidget(ui.separador())
 
         group_new = widgets.QGroupBox("Recurso novo")
-        new_layout = widgets.QHBoxLayout(group_new)
-        new_layout.addWidget(widgets.QLabel("Tipo de camada:"))
+        new_layout = ui.espacamento(widgets.QHBoxLayout(group_new), margem=0, espaco=ui.GAP)
+        new_layout.addWidget(ui.rotulo("Tipo de camada:"))
         self.cmb_camada = widgets.QComboBox()
         for rotulo, valor in MODOS_CAMADA:
             self.cmb_camada.addItem(rotulo, valor)
         new_layout.addWidget(self.cmb_camada, 1)
-        button_new = widgets.QPushButton("Criar novo recurso")
-        button_new.setIcon(standard_icon("SP_FileDialogNewFolder"))
-        button_new.setToolTip(
-            "Abre um documento 15 x 15 cm a 300 dpi para desenhar o recurso"
+        button_new = ui.botao(
+            "Criar novo recurso",
+            "Abre um documento 15 x 15 cm a 300 dpi para desenhar o recurso",
+            icone_chave="novo",
         )
         button_new.clicked.connect(self.create_resource)
         new_layout.addWidget(button_new)
         layout.addWidget(group_new)
+        layout.addWidget(ui.separador())
 
         group_list = widgets.QGroupBox("Recursos")
-        list_layout = widgets.QVBoxLayout(group_list)
+        list_layout = ui.espacamento(widgets.QVBoxLayout(group_list), margem=0, espaco=ui.GAP)
         tipo_row = widgets.QHBoxLayout()
-        tipo_row.addWidget(widgets.QLabel("Tipo:"))
+        tipo_row.addWidget(ui.rotulo("Tipo:"))
         self.cmb_tipo = widgets.QComboBox()
         for chave, rotulo, _ in lib.TIPOS:
             self.cmb_tipo.addItem(rotulo, chave)
         self.cmb_tipo.currentIndexChanged.connect(self.refresh)
         tipo_row.addWidget(self.cmb_tipo, 1)
-        button_refresh = widgets.QPushButton("Atualizar")
-        button_refresh.setIcon(standard_icon("SP_BrowserReload"))
+        button_refresh = ui.botao(
+            "Atualizar", "Relê os recursos da pasta atual.", icone_chave="atualizar"
+        )
         button_refresh.clicked.connect(self.refresh)
         tipo_row.addWidget(button_refresh)
         list_layout.addLayout(tipo_row)
@@ -143,25 +147,25 @@ class BibliotecaDocker(DockWidget):
         list_layout.addWidget(self.list_items, 1)
 
         buttons = widgets.QHBoxLayout()
-        button_save = widgets.QPushButton("Salvar recurso do documento")
-        button_save.setIcon(standard_icon("SP_DialogSaveButton"))
-        button_save.setToolTip(
-            "Exporta a camada ativa (vetorial ou pintura) para a biblioteca"
+        button_save = ui.botao(
+            "Salvar recurso do documento",
+            "Exporta a camada ativa (vetorial ou pintura) para a biblioteca",
+            icone_chave="salvar",
         )
         button_save.clicked.connect(self.save_resource)
         buttons.addWidget(button_save)
-        button_insert = widgets.QPushButton("Inserir selecionado")
+        button_insert = ui.botao(
+            "Inserir selecionado", "Insere o recurso selecionado na camada ativa."
+        )
         button_insert.clicked.connect(self.insert_resource)
         buttons.addWidget(button_insert)
         list_layout.addLayout(buttons)
         layout.addWidget(group_list, 1)
 
-        hint = widgets.QLabel(
+        hint = ui.rotulo(
             "1) Escolha o tipo e 'Criar novo recurso'. 2) Desenhe na camada "
             "(formas/texto ou pincel). 3) 'Salvar recurso do documento' guarda "
-            "como SVG ou PNG transparente. 4) Duplo clique insere no grupo ativo."
-        )
-        hint.setWordWrap(True)
+            "como SVG ou PNG transparente. 4) Duplo clique insere no grupo ativo.")
         layout.addWidget(hint)
 
         self.setWidget(main)

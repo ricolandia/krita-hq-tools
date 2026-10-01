@@ -116,6 +116,7 @@ if QT_VERSION == 6:
     SIZE_FIXED = QtWidgets.QSizePolicy.Policy.Fixed
     NO_ITEM_FLAGS = QtCore.Qt.ItemFlag.NoItemFlags
     SINGLE_SELECTION = QtWidgets.QAbstractItemView.SelectionMode.SingleSelection
+    FRAME_HLINE = QtWidgets.QFrame.Shape.HLine
 else:
     IMAGE_FORMAT_ARGB32 = QtGui.QImage.Format_ARGB32
     TRANSPARENT = QtCore.Qt.transparent
@@ -130,6 +131,7 @@ else:
     SIZE_FIXED = QtWidgets.QSizePolicy.Fixed
     NO_ITEM_FLAGS = QtCore.Qt.NoItemFlags
     SINGLE_SELECTION = QtWidgets.QAbstractItemView.SingleSelection
+    FRAME_HLINE = QtWidgets.QFrame.HLine
 
 __all__ = [
     "QtCore",
@@ -158,6 +160,7 @@ __all__ = [
     "CONTEXT_MENU",
     "SIZE_EXPANDING",
     "SIZE_FIXED",
+    "FRAME_HLINE",
     "NO_ITEM_FLAGS",
     "SINGLE_SELECTION",
     "ICON_MODE",

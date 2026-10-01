@@ -14,6 +14,7 @@ from ...core import krita_helpers as helpers
 from ...core.compat import DIALOG_NO, DIALOG_YES, QtWidgets
 from ...core.config import Config
 from ...core.paths import USER_DIR
+from ...core import ui
 from . import core
 from . import effects
 
@@ -49,8 +50,7 @@ class ScreentoneDocker(DockWidget):
 
     def _build_ui(self):
         widgets = QtWidgets
-        main = widgets.QWidget(self)
-        layout = widgets.QVBoxLayout(main)
+        main, layout = ui.painel(self)
         self.tabs = widgets.QTabWidget()
         layout.addWidget(self.tabs, 1)
         self.tabs.addTab(self._build_tones_tab(), "Retículas")
@@ -67,14 +67,14 @@ class ScreentoneDocker(DockWidget):
         layout = widgets.QVBoxLayout(tab)
 
         preset_row = widgets.QHBoxLayout()
-        preset_row.addWidget(widgets.QLabel("Preset:"))
+        preset_row.addWidget(ui.rotulo("Preset:"))
         self.cmb_preset = widgets.QComboBox()
         self.cmb_preset.currentIndexChanged.connect(self._on_preset_changed)
         preset_row.addWidget(self.cmb_preset, 1)
-        button_save = widgets.QPushButton("Salvar como...")
+        button_save = ui.botao("Salvar como...", "Salva o preset atual na pasta de presets do usuário.", icone_chave="salvar")
         button_save.clicked.connect(self._save_preset)
         preset_row.addWidget(button_save)
-        button_delete = widgets.QPushButton("Excluir")
+        button_delete = ui.botao("Excluir", "Exclui o preset selecionado do usuário.", icone_chave=None)
         button_delete.clicked.connect(self._delete_preset)
         preset_row.addWidget(button_delete)
         layout.addLayout(preset_row)
@@ -178,16 +178,18 @@ class ScreentoneDocker(DockWidget):
             self.cmb_halftone.addItem(label, value)
         form.addRow("Meio-tom:", self.cmb_halftone)
 
+        # Botões só com a cor (o papel é pintado por _sync_colors), sem altura
+        # fixa: quem manda no tamanho é o tema do Krita.
         colors_row = widgets.QHBoxLayout()
-        self.btn_fg = widgets.QPushButton()
-        self.btn_fg.setFixedHeight(24)
+        colors_row.addWidget(ui.rotulo("Frente:"))
+        self.btn_fg = ui.botao(
+            "", "Escolhe a cor da frente (o que sai do pincel)."
+        )
         self.btn_fg.clicked.connect(lambda: self._pick_color("fg"))
-        colors_row.addWidget(widgets.QLabel("Frente:"))
         colors_row.addWidget(self.btn_fg, 1)
-        self.btn_bg = widgets.QPushButton()
-        self.btn_bg.setFixedHeight(24)
+        colors_row.addWidget(ui.rotulo("Fundo:"))
+        self.btn_bg = ui.botao("", "Escolhe a cor do fundo (o que fica embaixo).")
         self.btn_bg.clicked.connect(lambda: self._pick_color("bg"))
-        colors_row.addWidget(widgets.QLabel("Fundo:"))
         colors_row.addWidget(self.btn_bg, 1)
         form.addRow("Cores:", colors_row)
 
@@ -196,38 +198,52 @@ class ScreentoneDocker(DockWidget):
 
         layout.addLayout(form)
 
-        self.lbl_info = widgets.QLabel("")
+        self.lbl_info = ui.rotulo_info()
         layout.addWidget(self.lbl_info)
 
-        button_fill = widgets.QPushButton("Aplicar retícula (camada de preenchimento)")
+        button_fill = ui.botao(
+            "Aplicar retícula (camada de preenchimento)",
+            "Cria uma camada com o padrão repetido na tela, dentro do grupo ativo.",
+            icone_chave="aplicar",
+        )
         button_fill.clicked.connect(self.apply_fill)
         layout.addWidget(button_fill)
 
-        button_halftone = widgets.QPushButton("Aplicar meio-tom (máscara de filtro)")
+        button_halftone = ui.botao(
+            "Aplicar meio-tom (máscara de filtro)",
+            "Cria a retícula como máscara de filtro: pintar aplica a textura.",
+            icone_chave="aplicar",
+        )
         button_halftone.clicked.connect(self.apply_halftone)
         layout.addWidget(button_halftone)
+        layout.addWidget(ui.separador())
 
         edit_row = widgets.QHBoxLayout()
-        button_edit = widgets.QPushButton("Editar selecionada")
+        button_edit = ui.botao(
+            "Editar selecionada",
+            "Carrega as opções da camada ou máscara de retícula ativa.",
+        )
         button_edit.clicked.connect(self.edit_selected)
         edit_row.addWidget(button_edit)
-        button_area = widgets.QPushButton("Mostrar área")
+        button_area = ui.botao(
+            "Mostrar área",
+            "Transforma a máscara de retícula ativa em seleção, para pintar só nela.",
+        )
         button_area.clicked.connect(self.show_area)
         edit_row.addWidget(button_area)
         layout.addLayout(edit_row)
 
-        hint = widgets.QLabel(
+        hint = ui.rotulo(
             "A retícula entra dentro do grupo ativo. 'Editar selecionada' carrega "
             "as opções da camada/máscara ativa; 'Mostrar área' transforma a "
-            "máscara em seleção."
-        )
-        hint.setWordWrap(True)
+            "máscara em seleção.")
         layout.addWidget(hint)
 
-        button_patterns = widgets.QPushButton("Instalar padrões e texturas (kit)")
-        button_patterns.setToolTip(
+        button_patterns = ui.botao(
+            "Instalar padrões e texturas (kit)",
             "Copia os padrões próprios do kit (papéis, retículas, hachuras) "
-            "para os padrões do Krita"
+            "para os padrões do Krita",
+            icone_chave="salvar",
         )
         button_patterns.clicked.connect(self.install_kit_patterns)
         layout.addWidget(button_patterns)
@@ -311,15 +327,17 @@ class ScreentoneDocker(DockWidget):
 
         layout.addLayout(form)
 
-        button_effects = widgets.QPushButton("Inserir linhas de efeito")
+        button_effects = ui.botao(
+            "Inserir linhas de efeito",
+            "Cria a camada vetorial de linhas de velocidade ou de efeito.",
+            icone_chave="aplicar",
+        )
         button_effects.clicked.connect(self.insert_effect_lines)
         layout.addWidget(button_effects)
 
-        hint = widgets.QLabel(
+        hint = ui.rotulo(
             "Foco: linhas radiais saindo de um ponto (linhas de velocidade). "
-            "Paralelas: linhas preenchendo a região indicada. A camada é vetorial."
-        )
-        hint.setWordWrap(True)
+            "Paralelas: linhas preenchendo a região indicada. A camada é vetorial.")
         layout.addWidget(hint)
         layout.addStretch(1)
         return tab

@@ -26,11 +26,11 @@ from ...core.compat import (
     QtWidgets,
     pyqtSignal,
     qlibrary_prefix,
-    standard_icon,
 )
 from ...core.config import Config
 from ...core.cpmt import CPMTError, CPMTProject, create_project_with_page
 from ...core.paths import MODELOS_DIR
+from ...core import ui
 from ...core.thumbs import thumbnail_pixmap
 from ..biblioteca import core as biblioteca_core
 from . import generator, modelos as modelos_lib, roteiro
@@ -98,95 +98,89 @@ class PagesDocker(DockWidget):
 
     def _build_ui(self):
         widgets = QtWidgets
-        main = widgets.QWidget(self)
-        layout = widgets.QVBoxLayout(main)
+        main, layout = ui.painel(self)
 
         group_project = widgets.QGroupBox("Projeto")
-        project_layout = widgets.QVBoxLayout(group_project)
-        self.lbl_project = widgets.QLabel(
+        project_layout = ui.espacamento(widgets.QVBoxLayout(group_project), margem=0, espaco=ui.GAP)
+        self.lbl_project = ui.rotulo_info(
             "Nenhum projeto aberto. Crie um projeto a partir da página salva, "
-            "abra um comicConfig.json do CPMT ou abra uma pasta com .kra."
-        )
-        self.lbl_project.setWordWrap(True)
+            "abra um comicConfig.json do CPMT ou abra uma pasta com .kra.")
         project_layout.addWidget(self.lbl_project)
         row = widgets.QHBoxLayout()
-        button_new = widgets.QPushButton("Novo projeto...")
-        button_new.setIcon(standard_icon("SP_FileDialogNewFolder"))
-        button_new.setToolTip(
-            "Usa a pasta da página atual salva como pasta do projeto"
-        )
+        button_new = ui.botao("Novo projeto...", "Usa a pasta da página atual salva como pasta do projeto.", icone_chave="novo")
         button_new.clicked.connect(self.new_project)
         row.addWidget(button_new)
-        button_open = widgets.QPushButton("Abrir projeto...")
-        button_open.setIcon(standard_icon("SP_DialogOpenButton"))
-        button_open.setToolTip("Abre o comicConfig.json de um projeto CPMT")
+        button_open = ui.botao("Abrir projeto...", "Abre o comicConfig.json de um projeto CPMT", icone_chave="abrir")
         button_open.clicked.connect(self.pick_project)
         row.addWidget(button_open)
-        button_folder = widgets.QPushButton("Pasta...")
-        button_folder.setIcon(standard_icon("SP_DirOpenIcon"))
-        button_folder.setToolTip("Abre uma pasta com arquivos .kra")
+        button_folder = ui.botao("Pasta...", "Abre uma pasta com arquivos .kra", icone_chave="pasta")
         button_folder.clicked.connect(self.pick_folder)
         row.addWidget(button_folder)
         project_layout.addLayout(row)
         layout.addWidget(group_project)
 
         group_page = widgets.QGroupBox("Página")
-        page_layout = widgets.QVBoxLayout(group_page)
+        page_layout = ui.espacamento(widgets.QVBoxLayout(group_page), margem=0, espaco=ui.GAP)
         row_page = widgets.QHBoxLayout()
-        button_new_page = widgets.QPushButton("Criar próxima página")
-        button_new_page.setIcon(standard_icon("SP_FileDialogNewFolder"))
-        button_new_page.setToolTip(
-            "Cria uma página nova (formato, DPI, modelo) na pasta do projeto"
+        button_new_page = ui.botao(
+            "Criar próxima página",
+            "Cria uma página nova (formato, DPI, modelo) na pasta do projeto",
+            icone_chave="novo",
         )
         button_new_page.clicked.connect(self.create_next_page)
         row_page.addWidget(button_new_page)
-        button_guides = widgets.QPushButton("Guias de margem")
-        button_guides.setToolTip(
+        button_guides = ui.botao(
+            "Guias de margem",
             "Cria 12 guias no documento ativo (0,5 / 1 / 1,5 cm por lado); "
-            "substitui as guias existentes"
+            "substitui as guias existentes",
         )
         button_guides.clicked.connect(self.create_margin_guides)
         row_page.addWidget(button_guides)
         page_layout.addLayout(row_page)
         row_model = widgets.QHBoxLayout()
-        button_model = widgets.QPushButton("Definir modelo de página...")
-        button_model.setToolTip(
+        button_model = ui.botao(
+            "Definir modelo de página...",
             "Usa a página atual ou um template de HQ do Krita como modelo "
-            "para as próximas páginas"
+            "para as próximas páginas",
         )
         button_model.clicked.connect(self.define_model)
         row_model.addWidget(button_model)
-        self.lbl_model = widgets.QLabel("")
-        self.lbl_model.setWordWrap(True)
+        self.lbl_model = ui.rotulo_info("")
         row_model.addWidget(self.lbl_model, 1)
         page_layout.addLayout(row_model)
         layout.addWidget(group_page)
+        layout.addWidget(ui.separador())
 
         group_ref = widgets.QGroupBox("Referência")
-        ref_layout = widgets.QHBoxLayout(group_ref)
-        button_ref = widgets.QPushButton("Camada de referência")
-        button_ref.setToolTip(
+        ref_layout = ui.espacamento(widgets.QHBoxLayout(group_ref), margem=0, espaco=ui.GAP)
+        button_ref = ui.botao(
+            "Camada de referência",
             "Marca a camada selecionada como referência (rótulo, trava e "
-            "opacidade reduzida)"
+            "opacidade reduzida)",
         )
         button_ref.clicked.connect(self.mark_reference_layer)
         ref_layout.addWidget(button_ref)
-        button_import = widgets.QPushButton("Importar referência (PNG)...")
-        button_import.setToolTip(
-            "Insere um PNG como camada de referência travada no grupo ativo"
+        button_import = ui.botao(
+            "Importar referência (PNG)...",
+            "Insere um PNG como camada de referência travada no grupo ativo",
+            icone_chave="abrir",
         )
         button_import.clicked.connect(self.import_reference)
         ref_layout.addWidget(button_import)
         layout.addWidget(group_ref)
+        layout.addWidget(ui.separador())
 
         group_list = widgets.QGroupBox("Páginas")
-        list_layout = widgets.QVBoxLayout(group_list)
+        list_layout = ui.espacamento(widgets.QVBoxLayout(group_list), margem=0, espaco=ui.GAP)
         row2 = widgets.QHBoxLayout()
-        button_refresh = widgets.QPushButton("Atualizar miniaturas")
-        button_refresh.setIcon(standard_icon("SP_BrowserReload"))
+        button_refresh = ui.botao(
+            "Atualizar miniaturas", "Regera as miniaturas das páginas.", icone_chave="atualizar"
+        )
         button_refresh.clicked.connect(self.refresh)
         row2.addWidget(button_refresh)
-        button_open_folder = widgets.QPushButton("Abrir pasta")
+        button_open_folder = ui.botao(
+            "Abrir pasta", "Abre a pasta do projeto atual no explorador.", icone_chave="pasta"
+        )
         button_open_folder.clicked.connect(self.open_current_folder)
         row2.addWidget(button_open_folder)
         list_layout.addLayout(row2)
@@ -204,11 +198,9 @@ class PagesDocker(DockWidget):
         list_layout.addWidget(self.list_pages, 1)
         layout.addWidget(group_list, 1)
 
-        hint = widgets.QLabel(
+        hint = ui.rotulo(
             "Clique duas vezes para abrir a página. Arraste para reordenar "
-            "(a ordem é salva no projeto CPMT quando aberto por ele)."
-        )
-        hint.setWordWrap(True)
+            "(a ordem é salva no projeto CPMT quando aberto por ele).")
         layout.addWidget(hint)
 
         self.setWidget(main)
@@ -362,9 +354,9 @@ class PagesDocker(DockWidget):
         spin_h.setValue(210)
         spin_h.setSuffix(" mm")
         row_livre = widgets.QHBoxLayout()
-        row_livre.addWidget(widgets.QLabel("L:"))
+        row_livre.addWidget(ui.rotulo("L:"))
         row_livre.addWidget(spin_w)
-        row_livre.addWidget(widgets.QLabel("A:"))
+        row_livre.addWidget(ui.rotulo("A:"))
         row_livre.addWidget(spin_h)
         form.addRow("Livre:", row_livre)
 
@@ -388,9 +380,9 @@ class PagesDocker(DockWidget):
         form.addRow("", chk_modelo)
 
         buttons_row = widgets.QHBoxLayout()
-        button_ok = widgets.QPushButton("Criar")
+        button_ok = ui.botao("Criar", "Cria a pasta do projeto e a primeira página.")
         button_ok.setDefault(True)
-        button_cancel = widgets.QPushButton("Cancelar")
+        button_cancel = ui.botao("Cancelar", "Fecha a janela sem criar nada.")
         button_ok.clicked.connect(dialog.accept)
         button_cancel.clicked.connect(dialog.reject)
         buttons_row.addStretch(1)
@@ -673,9 +665,9 @@ class PagesDocker(DockWidget):
         widgets = QtWidgets
         dialog = widgets.QDialog(self.widget())
         dialog.setWindowTitle("Definir modelo de página")
-        layout = widgets.QVBoxLayout(dialog)
+        layout = ui.espacamento(widgets.QVBoxLayout(dialog), margem=0, espaco=ui.GAP)
         layout.addWidget(
-            widgets.QLabel(
+            ui.rotulo(
                 "O modelo é copiado para {0} e usado pelas próximas páginas.".format(
                     MODELOS_DIR
                 )
@@ -696,9 +688,10 @@ class PagesDocker(DockWidget):
                 if cmb.findData(caminho) < 0:
                     cmb.addItem("HQ Tools: {0}".format(rotulo), caminho)
         gerar_row = widgets.QHBoxLayout()
-        button_gerar = widgets.QPushButton("Gerar modelos padrão do HQ Tools")
-        button_gerar.setToolTip(
-            "Cria A4, A3, tirinhas (1-3) e grades (2x2, 3x3) na pasta de modelos"
+        button_gerar = ui.botao(
+            "Gerar modelos padrão do HQ Tools",
+            "Cria A4, A3, tirinhas (1-3) e grades (2x2, 3x3) na pasta de modelos",
+            icone_chave="novo",
         )
         gerar_row.addWidget(button_gerar)
 
@@ -716,9 +709,9 @@ class PagesDocker(DockWidget):
         layout.addLayout(gerar_row)
         layout.addWidget(cmb)
         buttons_row = widgets.QHBoxLayout()
-        button_ok = widgets.QPushButton("Usar como modelo")
+        button_ok = ui.botao("Usar como modelo", "Usa o modelo escolhido nas próximas páginas.")
         button_ok.setDefault(True)
-        button_cancel = widgets.QPushButton("Cancelar")
+        button_cancel = ui.botao("Cancelar", "Fecha a janela sem escolher modelo.")
         button_ok.clicked.connect(dialog.accept)
         button_cancel.clicked.connect(dialog.reject)
         buttons_row.addStretch(1)

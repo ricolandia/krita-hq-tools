@@ -18,6 +18,7 @@ from ...core.compat import (
 from ...core.config import Config
 from ...core.gpl import load_gpl
 from ...core.paths import KRITA_PALETTES_DIR
+from ...core import ui
 
 TEMPLATES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
 
@@ -49,8 +50,7 @@ class PalettesDocker(DockWidget):
 
     def _build_ui(self):
         widgets = QtWidgets
-        main = widgets.QWidget(self)
-        layout = widgets.QVBoxLayout(main)
+        main, layout = ui.painel(self)
         self.tabs = widgets.QTabWidget()
         layout.addWidget(self.tabs, 1)
         self.tabs.addTab(self._build_templates_tab(), "Templates de HQ")
@@ -63,7 +63,7 @@ class PalettesDocker(DockWidget):
         layout = widgets.QVBoxLayout(tab)
 
         row = widgets.QHBoxLayout()
-        row.addWidget(widgets.QLabel("Template:"))
+        row.addWidget(ui.rotulo("Template:"))
         self.cmb_template = widgets.QComboBox()
         self.cmb_template.currentIndexChanged.connect(self._load_swatches)
         row.addWidget(self.cmb_template, 1)
@@ -79,20 +79,21 @@ class PalettesDocker(DockWidget):
         self.list_swatches.setMovement(LIST_STATIC)
         layout.addWidget(self.list_swatches, 1)
 
+        layout.addWidget(ui.separador())
         buttons = widgets.QHBoxLayout()
-        button_fg = widgets.QPushButton("Aplicar na frente")
+        button_fg = ui.botao("Aplicar na frente", "Define a cor de frente com o swatch selecionado.", icone_chave="aplicar")
         button_fg.clicked.connect(lambda: self.apply_swatch(True))
         buttons.addWidget(button_fg)
-        button_bg = widgets.QPushButton("Aplicar no fundo")
+        button_bg = ui.botao("Aplicar no fundo", "Define a cor de fundo com o swatch selecionado.", icone_chave="aplicar")
         button_bg.clicked.connect(lambda: self.apply_swatch(False))
         buttons.addWidget(button_bg)
         layout.addLayout(buttons)
 
         buttons2 = widgets.QHBoxLayout()
-        button_install = widgets.QPushButton("Instalar no Krita")
+        button_install = ui.botao("Instalar no Krita", "Copia os templates de paleta para a pasta de paletas do Krita.", icone_chave="salvar")
         button_install.clicked.connect(self.install_templates)
         buttons2.addWidget(button_install)
-        button_folder = widgets.QPushButton("Abrir pasta do Krita")
+        button_folder = ui.botao("Abrir pasta do Krita", "Abre a pasta de paletas do Krita no explorador.", icone_chave="pasta")
         button_folder.clicked.connect(self.open_krita_folder)
         buttons2.addWidget(button_folder)
         layout.addLayout(buttons2)
@@ -105,11 +106,11 @@ class PalettesDocker(DockWidget):
         layout = widgets.QVBoxLayout(tab)
 
         row = widgets.QHBoxLayout()
-        row.addWidget(widgets.QLabel("Paleta:"))
+        row.addWidget(ui.rotulo("Paleta:"))
         self.cmb_krita = widgets.QComboBox()
         self.cmb_krita.currentIndexChanged.connect(self._on_krita_palette_changed)
         row.addWidget(self.cmb_krita, 1)
-        button_refresh = widgets.QPushButton("Atualizar")
+        button_refresh = ui.botao("Atualizar", "Recarrega a lista de paletas do Krita.", icone_chave="atualizar")
         button_refresh.clicked.connect(self._load_krita_palettes)
         row.addWidget(button_refresh)
         layout.addLayout(row)
@@ -118,9 +119,7 @@ class PalettesDocker(DockWidget):
             self.palette_view = PaletteView()
             layout.addWidget(self.palette_view, 1)
         else:  # pragma: no cover
-            layout.addWidget(
-                widgets.QLabel("PaletteView indisponível nesta versão do Krita.")
-            )
+            layout.addWidget(ui.rotulo("PaletteView indisponível nesta versão do Krita."))
             self.palette_view = None
 
         return tab

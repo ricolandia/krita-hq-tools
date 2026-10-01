@@ -29,8 +29,8 @@ from ...core.compat import (
     QtCore,
     QtGui,
     QtWidgets,
-    standard_icon,
 )
+from ...core import ui
 from ...core.config import Config
 from ...core.paths import BRUSHES_KIT_DIR
 from . import SLOT_COUNT, register_docker
@@ -78,8 +78,7 @@ class BrushesDocker(DockWidget):
 
     def _build_ui(self):
         widgets = QtWidgets
-        main = widgets.QWidget(self)
-        layout = widgets.QVBoxLayout(main)
+        main, layout = ui.painel(self)
 
         self.tabs = widgets.QTabWidget()
         self.tab_lists = {}
@@ -104,23 +103,31 @@ class BrushesDocker(DockWidget):
         layout.addWidget(self.slots_box)
 
         buttons = widgets.QHBoxLayout()
-        button_reload = widgets.QPushButton("Atualizar presets")
+        button_reload = ui.botao(
+            "Atualizar presets",
+            "Relê os arquivos .kpp dos packs instalados (não reinicia o Krita).",
+            icone_chave="atualizar",
+        )
         button_reload.clicked.connect(self.reload_presets)
         buttons.addWidget(button_reload)
-        button_suggest = widgets.QPushButton("Preencher slots com sugestões")
+        button_suggest = ui.botao(
+            "Preencher slots com sugestões",
+            "Sugere um pincel parecido com o que está selecionado para cada slot livre.",
+        )
         button_suggest.clicked.connect(self.apply_suggestions)
         buttons.addWidget(button_suggest)
-        button_bundle = widgets.QPushButton("Instalar bundle...")
-        button_bundle.setToolTip("Copia um .bundle (ex.: Cityscape, Pesi's Watercolors) para o Krita")
+        button_bundle = ui.botao(
+            "Instalar bundle...",
+            "Copia um .bundle (ex.: Cityscape, Pesi's Watercolors) para o Krita",
+            icone_chave="salvar",
+        )
         button_bundle.clicked.connect(self.install_bundle)
         buttons.addWidget(button_bundle)
         layout.addLayout(buttons)
 
-        hint = widgets.QLabel(
+        hint = ui.rotulo(
             "Clique no cartão para ativar o pincel; botão direito atribui ao slot. "
-            "Os conjuntos buscam os presets já instalados no seu Krita."
-        )
-        hint.setWordWrap(True)
+            "Os conjuntos buscam os presets já instalados no seu Krita.")
         layout.addWidget(hint)
 
         self.setWidget(main)
@@ -156,25 +163,29 @@ class BrushesDocker(DockWidget):
         layout.addWidget(self.list_packs, 1)
 
         buttons = widgets.QHBoxLayout()
-        button_install = widgets.QPushButton("Instalar pack selecionado")
-        button_install.setIcon(standard_icon("SP_DialogApplyButton"))
+        button_install = ui.botao(
+            "Instalar pack selecionado",
+            "Copia os .kpp do pack selecionado para a pasta de pincel do Krita.",
+            icone_chave="aplicar",
+        )
         button_install.clicked.connect(self.install_pack)
         buttons.addWidget(button_install)
-        button_license = widgets.QPushButton("Ver licença")
+        button_license = ui.botao(
+            "Ver licença", "Mostra a licença (e a autoria) do pack selecionado."
+        )
         button_license.clicked.connect(self.view_pack_license)
         buttons.addWidget(button_license)
-        button_refresh = widgets.QPushButton("Atualizar")
-        button_refresh.setIcon(standard_icon("SP_BrowserReload"))
+        button_refresh = ui.botao(
+            "Atualizar", "Relê os packs instalados e os do usuário.", icone_chave="atualizar"
+        )
         button_refresh.clicked.connect(self._refresh_packs)
         buttons.addWidget(button_refresh)
         layout.addLayout(buttons)
 
-        hint = widgets.QLabel(
+        hint = ui.rotulo(
             "Packs da comunidade incluídos com licença verificada (créditos em "
             "CREDITS.md). Instalar copia os arquivos para os recursos do Krita "
-            "e exige reiniciar o programa."
-        )
-        hint.setWordWrap(True)
+            "e exige reiniciar o programa.")
         layout.addWidget(hint)
         return tab
 
@@ -192,11 +203,9 @@ class BrushesDocker(DockWidget):
         self.list_community.itemClicked.connect(self.activate_item)
         self.list_community.itemDoubleClicked.connect(self.activate_item)
         layout.addWidget(self.list_community, 1)
-        hint = widgets.QLabel(
+        hint = ui.rotulo(
             "Presets dos packs da comunidade já instalados no Krita, agrupados "
-            "por pack. Clique para ativar; os créditos estão no CREDITS.md."
-        )
-        hint.setWordWrap(True)
+            "por pack. Clique para ativar; os créditos estão no CREDITS.md.")
         layout.addWidget(hint)
         return tab
 

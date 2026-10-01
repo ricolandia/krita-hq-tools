@@ -6,6 +6,37 @@ Correções e melhorias da auditoria de 2026-09-30, ainda sem validar dentro do
 Krita (ver `docs/AUDITORIA-2026-09-30.md`). A versão só sobe quando o roteiro de
 validação rodar dentro do Krita 5 e 6.
 
+### Interface — camada compartilhada (Lotes 1 e 2)
+
+Novo `hq_tools/core/ui.py`, com os widgets que os sete dockers construíam por
+conta própria: `botao`, `rotulo`, `rotulo_info`, `separador`, `icone`,
+`espacamento` e `painel`. Não há estilo próprio: fundo, borda, fonte e ícone
+continuam vindo do tema do Krita, que é o que respeita a escolha do autor, o
+alto dpi e a troca de tema.
+
+- **52 botões** nos 7 dockers passaram por `ui.botao`, que exige o tooltip como
+  segundo argumento. Antes: 11 botões com ícone, 22 com tooltip, e a diferença
+  entre eles era grande — o docker de páginas tinha 10 tooltips e 5 ícones, o de
+  retículas, que é o maior, tinha 1 e nenhum.
+- **Botão sem tooltip agora quebra a assinatura**, e `tests/test_ui.py` proíbe,
+  por análise estática, que `QPushButton` volte a ser criado direto num docker.
+  É o que mantém os 52 tooltips sem voltarem a sumir no próximo botão.
+- **Rótulo de estado não estufa mais o painel.** O `lbl_info` da aba Retículas
+  (célula em px, DPI, LPI) reservava a largura da linha inteira, então um aviso
+  longo alargava o docker em vez de quebrar; agora quebra linha e não reserva
+  largura mínima. Vale conferir no Krita se ainda empurra: se empurrar, falta
+  relaxar a política horizontal do rótulo.
+- **Sem altura fixa.** Os dois `setFixedHeight(24)` dos botões de cor saíram
+  (travavam a altura contra o tema); `tests/test_ui.py` também proíbe
+  `setFixedHeight`/`setFixedWidth` nos dockers.
+- Espaçamento unificado pela escala do `docs/DESIGN.md` (4 entre controles, 8
+  entre linhas, 12 na borda) via `ui.painel`/`ui.espacamento`, e divisórias com
+  `ui.separador()` nos pontos onde os grupos separam de verdade.
+- Ícones por chave semântica (`"pasta"`, `"atualizar"`, `"aplicar"`), com
+  fallback para `SP_FileIcon`: chave desconhecida perde o ícone, não o botão.
+- Correção de nome não definido: `palettes/docker.py` usava
+  `KRITA_PALETTES_DIR` sem importar (achado pela suíte durante o lote).
+
 ### Corrigido — dados do autor (Lote A)
 
 - **Crítico**: `create_project()` aceitava um projeto existente e escrevia por

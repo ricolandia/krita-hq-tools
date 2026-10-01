@@ -135,6 +135,48 @@ O falso de Qt foi para `tests/qt_falso.py`, registrado nos dois nomes, com
 registra o cursor. A suíte agora dá o mesmo resultado com e sem PyQt, e cada
 arquivo também verde sozinho.
 
+## Interface (2026-10-01) — camada compartilhada, lotes 1 e 2
+
+Achado por inspeção, no mesmo espírito da auditoria: **não havia camada de
+interface**, e sim 7 decisões independentes tomadas separadamente. 52 botões, 11
+com ícone, 22 com tooltip; o docker de páginas (o mais cuidado) com 10 tooltips
+e 5 ícones, o de retículas (o maior) com 1 e nenhum. Nenhum `addSpacing`,
+`setContentsMargins` ou `setIndent` nos dockers. Um `QGroupBox` com a cor de borda
+fixa (`#666`) enquanto o resto segue o tema. As ações destrutivas já pediam
+confirmação, e o de páginas já tinha reordenação por arrastar — ou seja, o que
+faltava era só a camada visual.
+
+Aplicado em `hq_tools/core/ui.py` (`botao`, `rotulo`, `rotulo_info`,
+`separador`, `icone`, `espacamento`, `painel`):
+
+- **52 botões** migrados para `ui.botao`, que exige o tooltip como 2º argumento
+  (sem padrão). `dica` obrigatória é a regra; a trava contra regressão é o
+  `tests/test_ui.py`, que por `ast` proíbe `QPushButton` direto e
+  `setFixedHeight`/`setFixedWidth` nos dockers. Isso segura a future.
+- **Rótulo de estado** (`lbl_info` da aba Retículas): o Qt reserva a largura da
+  linha inteira como largura mínima, então o aviso de célula/DPI/LPI estufava o
+  docker. Agora quebra linha e não reserva largura mínima.
+- **Alturas fixas** dos 2 botões de cor removidas; a borda `#666` do `QGroupBox`
+  não existia mais nesta versão e a identidade segue o tema.
+- Ícones por chave semântica com fallback `SP_FileIcon` (chave errada perde o
+  ícone, não o botão); espaçamento pela escala do `DESIGN.md` (4/8/12) via
+  `ui.painel`/`ui.espacamento`; divisórias com `ui.separador()` nos pontos onde
+  os grupos separam de verdade.
+
+Fora do escopo, de propósito: `QToolButton` dos slots e dos cartões (reordenação
+por arrastar + clique direito é comportamento), tipografia das listas de
+miniaturas, tamanho dos ícones da lista, e a API de ícones do **tema** do Krita
+(não verificada; hoje o plugin usa `QStyle.StandardPixmap` via
+`standard_icon`, que respeita o tema do Qt).
+
+Suíte: 161 → **177**, com e sem PyQt. Bug achado no caminho:
+`palettes/docker.py` usava `KRITA_PALETTES_DIR` sem importar.
+
+**A conferir no Acer** (sem PyQt aqui, não dá para provar layout): se o aviso de
+célula ainda empurra a largura do docker de Retículas, falta relaxar a política
+horizontal do rótulo; e a API de ícones do tema do Krita, se for usada depois,
+precisa ser verificada para Krita 5 e 6.
+
 ## Ferramentas de auditoria
 
 - `scripts/auditar-packs.py` — acha referência órfã nos packs, lendo o XML do

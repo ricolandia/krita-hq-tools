@@ -26,6 +26,7 @@ from ...core.compat import (
     QtWidgets,
 )
 from ...core.config import Config
+from ...core import ui
 from ...core.paths import ONOMATOPEIAS_DIR
 
 SAMPLES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "samples")
@@ -82,17 +83,19 @@ class OnomatopoeiasDocker(DockWidget):
 
     def _build_ui(self):
         widgets = QtWidgets
-        main = widgets.QWidget(self)
-        layout = widgets.QVBoxLayout(main)
+        main, layout = ui.painel(self)
 
         folder_row = widgets.QHBoxLayout()
-        self.lbl_folder = widgets.QLabel("")
-        self.lbl_folder.setWordWrap(True)
+        self.lbl_folder = ui.rotulo_info("")
         folder_row.addWidget(self.lbl_folder, 1)
-        button_pick = widgets.QPushButton("Pasta...")
+        button_pick = ui.botao(
+            "Pasta...",
+            "Escolhe a pasta de modelos de onomatopeia; use Atualizar depois de adicionar SVGs.",
+            icone_chave="pasta",
+        )
         button_pick.clicked.connect(self.pick_folder)
         folder_row.addWidget(button_pick)
-        button_open = widgets.QPushButton("Abrir")
+        button_open = ui.botao("Abrir", "Abre a pasta de modelos no explorador de arquivos.")
         button_open.clicked.connect(self.open_folder)
         folder_row.addWidget(button_open)
         layout.addLayout(folder_row)
@@ -107,19 +110,21 @@ class OnomatopoeiasDocker(DockWidget):
         layout.addWidget(self.list_items, 1)
 
         buttons = widgets.QHBoxLayout()
-        button_insert = widgets.QPushButton("Inserir onomatopeia")
+        button_insert = ui.botao(
+            "Inserir onomatopeia", "Insere o modelo selecionado na camada ativa."
+        )
         button_insert.clicked.connect(self.insert_effect)
         buttons.addWidget(button_insert)
-        button_refresh = widgets.QPushButton("Atualizar")
+        button_refresh = ui.botao(
+            "Atualizar", "Relê os modelos da pasta atual.", icone_chave="atualizar"
+        )
         button_refresh.clicked.connect(self.refresh)
         buttons.addWidget(button_refresh)
         layout.addLayout(buttons)
 
-        hint = widgets.QLabel(
+        hint = ui.rotulo(
             "Crie os seus modelos no Inkscape (texto + formas) e salve na pasta "
-            "acima como SVG. Clique duas vezes para inserir no grupo ativo."
-        )
-        hint.setWordWrap(True)
+            "acima como SVG. Clique duas vezes para inserir no grupo ativo.")
         layout.addWidget(hint)
 
         self.setWidget(main)

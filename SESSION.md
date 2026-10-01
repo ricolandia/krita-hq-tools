@@ -144,6 +144,42 @@ Duas descobertas que valem lembrar:
   embutido, sem arquivo externo; sem tratar isso, a auditoria acusa problema
   onde não há.
 
+## Interface: camada compartilhada (2026-10-01, lotes 1 e 2, sem release)
+
+Novo `hq_tools/core/ui.py` (`botao`, `rotulo`, `rotulo_info`, `separador`,
+`icone`, `espacamento`, `painel`), aplicado aos 7 dockers: **52 botões** agora
+passam por `ui.botao`, **177 testes verdes**. Sem estilo próprio, o visual
+continua sendo o do tema do Krita (decisão do Ricardo: seguir o tema, nada de
+QSS). Detalhes na seção `[Não publicado]` do CHANGELOG.
+
+O que a auditoria de interface mostrou, e que vale como regra para o resto do
+código de interface:
+
+- **Não havia regra, só 7 decisões independentes.** 52 botões escritos em
+  momentos diferentes: 11 com ícone, 22 com tooltip. O docker de páginas (o
+  mais cuidado) tinha 10 tooltips e 5 ícones; o de retículas, que é o maior, tinha
+  1 e nenhum. A correção não é o tooltip em si, é a trava que impede o próximo
+  botão de nascer sem ele: `dica` é o segundo argumento de `botao`, sem padrão, e
+  `tests/test_ui.py` proíbe `QPushButton` direto e `setFixedHeight/Width` nos
+  dockers por `ast`. Regressão de interface agora quebra a suíte.
+- **Rótulo de estado é o que alarga o docker.** O Qt reserva para um `QLabel` a
+  largura da linha inteira como largura mínima, então o `lbl_info` da aba
+  Retículas ("célula 4.32 px a 300 dpi = máx. 85.7 lpi, reduzida ao aplicar")
+  estufava o painel em vez de quebrar a linha. `rotulo_info` liga o wrap e zera a
+  largura mínima. **A conferir no Acer**: se ainda empurrar, falta relaxar a
+  política horizontal do rótulo (não dá para provar layout sem PyQt).
+- **`setFixedHeight(24)` nos botões de cor brigava com o tema.** Tirado; quem
+  manda no tamanho é o tema.
+- Ícone por chave semântica (`"pasta"`, `"atualizar"`, `"aplicar"`) e fallback
+  `SP_FileIcon`: chave errada perde o ícone, não o botão. A API de ícones do
+  tema do Krita (em vez do `QStyle`) continua **não verificada** e fora do lote.
+- Bug achado no caminho: `palettes/docker.py` usava `KRITA_PALETTES_DIR` sem
+  importar. A suíte pegou; o import voltou.
+
+Escopo que **não** foi mexido, de propósito: `QToolButton` dos slots e dos
+cartões (tem reordenação por arrastar e clique direito, que é comportamento, não
+aparência), tipografia das listas de miniaturas, tamanho dos ícones da lista.
+
 ## Comandos
 
 ```bash
