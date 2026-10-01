@@ -231,7 +231,10 @@ Espelho no Trilium: subnota "Lista do autor (a criar)" (`FoIRvo2ztN0D`).
   05b, 05d e 06b, mais a 06a, ficaram marcadas para o autor revisar; `03c`
   descartado (interior partido, precisa de corte manual fino). Ajuste fino
   de uma cauda: `--corte X1,Y1,X2,Y2`, `--alargar-base`, `--base-interna`.
-  Pendente: revisão do autor, subir no Penpot e integrar no plugin.
+- **Decisão (01/10): o Ricardo vai redesenhar todos os balões.** O lote atual
+  fica suspenso: não seguir para o Penpot nem integrar no plugin até o
+  redesenho chegar. A **publicação fica para depois do redesenho** (aguardar
+  o autor; junto com as bibliotecas que faltam para o repositório).
 
 **Onomatopeias (SVG)**
 - Conjunto próprio para substituir as 8 amostras: impacto, velocidade, som
@@ -273,6 +276,7 @@ Espelho no Trilium: subnota "Lista do autor (a criar)" (`FoIRvo2ztN0D`).
   Bangers/Londrina, regras de ícone e banner).
 
 **Publicação**
+- **Aguardar o redesenho dos balões (decisão de 01/10) antes de publicar.**
 - Criar o repositório no GitHub e subir o main (aguardando as bibliotecas).
 - Criar a tag v0.6.2 (a release sai com o ZIP automaticamente).
 - Trocar o endereço do repositório no CREDITS.md e no SESSION.md.
