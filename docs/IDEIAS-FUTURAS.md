@@ -89,6 +89,12 @@ Viável e a mais integrada, com condições:
   `scripts/exportar-poses3d.py` extrai as rotações de FBX animado (desvio
   máximo de 7 mm contra o Blender), `idle_maos_fechadas` é o padrão dos dois
   corpos e `mulher.json` entrou com seletor Corpo.
+- **Dividir a biblioteca em corpo e mãos (anotado em 03/10):** hoje cada pose
+  mistura corpo e dedos (Idle com mãos fechadas/abertas). O plano é separar em
+  `poses/corpo/` (sem ossos de dedo) e `poses/maos/` (só dedos), com o
+  extrator ganhando `--parte corpo|maos` e o docker com dois combos que se
+  combinam (pose do corpo + pose das mãos). Padrão: corpo idle + mãos fechadas.
+  Migrar as duas poses atuais para o novo formato.
 
 ### Rota B: Blender Layer (plugin existente)
 
