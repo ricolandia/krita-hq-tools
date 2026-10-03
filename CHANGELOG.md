@@ -1,27 +1,69 @@
 # Changelog
 
-## [Não publicado]
+## [0.7.0] — 2026-10-03
 
-- Docker de pincéis: "Instalar bundle..." saiu da fileira inferior e entrou
-  na aba "Packs", junto dos demais instaladores.
-- Biblioteca do projeto: "Renomear...", "Duplicar" e "Apagar" operam o recurso
-  selecionado direto no docker, com confirmação ao apagar.
-- Visualizador 3D (em teste): docker "HQ Tools: 3D" com o manequim low-poly
-  do autor (MakeHuman + Auto-Rig Pro, 68 ossos), escolha de corpo
-  (Homem/Mulher) e biblioteca de poses (padrão: Idle com mãos fechadas, mais
-  a Idle com mãos abertas; extraídas de FBX animado pelo
-  `scripts/exportar-poses3d.py`), clique na
-  região para abrir os sliders Dobrar/Abrir/Girar, inserção raster e como
-  referência. O núcleo em Python puro (cinemática, skinning, projeção
-  ortográfica e SVG) tem 30 testes e roda fora do Krita pelo script de
-  preview. Inclui os estilos Silhueta e Contorno (mais baratos que o
-  sombreado; o contorno remove as linhas escondidas, sem efeito de corpo
-  transparente), preview com fundo de papel, zoom por roda e +/−, deslocamento
-  do enquadramento (Shift, botão do meio ou botão Mover) com "Enquadrar",
-  correções de sliders/aviso/órbita e `--decimar` no exportador.
-- Ícone do plugin: `Icon=hq_tools` no `.desktop` e instalação no tema via
-  `scripts/install-icons.sh` (o Gerenciador de plugins Python passa a mostrar
-  o ícone).
+Segunda versão pública. Entra o **visualizador 3D** (a Rota A do
+`docs/IDEIAS-FUTURAS.md`): um manequim low-poly posável para usar como
+referência dentro do Krita, com escolha de corpo (Homem/Mulher) e biblioteca
+de poses. A biblioteca do projeto ganha gestão de arquivos, o ícone do plugin
+passa a aparecer no Gerenciador de plugins Python e o "Instalar bundle..."
+muda para a aba "Packs". Validado dentro do Krita pelo autor em 03/10/2026.
+
+### Visualizador 3D (novo módulo, em teste)
+
+- Docker "HQ Tools: 3D" com o manequim do autor: malha MakeHuman (CC0) com
+  rig Auto-Rig Pro, 68 ossos, cerca de 1.600 vértices. Sem Blender em tempo
+  de execução: o FBX (binário) vira JSON pelo `scripts/exportar-modelo3d.py`
+  e o núcleo lê em Python puro (sem Krita e sem numpy).
+- Corpo: Homem e Mulher, com os mesmos nomes de ossos, então as poses valem
+  para os dois.
+- Biblioteca de poses: **Idle (mãos fechadas)**, padrão, e **Idle (mãos
+  abertas)**; extração de FBX animado pelo `scripts/exportar-poses3d.py`,
+  validada contra o Blender com desvio máximo de 7 mm.
+- Interação: clique numa região do corpo (cabeça, tronco, braços, pernas)
+  abre os sliders **Dobrar/Abrir/Girar** daquela junta, mapeados para os eixos
+  reais do rig; um slider único dobra todos os dedos.
+- Estilos: Sombreado, Silhueta (chapada) e Contorno (linha de silhueta com
+  remoção de linhas escondidas, sem efeito de corpo transparente). Silhueta e
+  Contorno são mais baratos que o sombreado.
+- Câmera: arraste orbita; roda do mouse e botões −/+ dão zoom; Shift+arraste,
+  botão do meio ou botão Mover deslocam o enquadramento; "Enquadrar"
+  centraliza e "Frente" volta à vista frontal.
+- Inserção: raster na resolução do documento, como camada comum ou como
+  camada de referência travada (rótulo de cor, trava e opacidade 150).
+- Núcleo com 30 testes, mais o preview `scripts/preview-modelo3d.py` para QA
+  fora do Krita; `--decimar FRAÇÃO` no exportador gera modelos mais leves.
+
+### Biblioteca do projeto
+
+- "Renomear...", "Duplicar" e "Apagar" operam o recurso selecionado direto no
+  docker, com confirmação ao apagar. Núcleo sem Krita e 8 testes.
+
+### Docker de pincéis
+
+- "Instalar bundle..." saiu da fileira inferior e entrou na aba "Packs", junto
+  dos demais instaladores.
+
+### Ícone do plugin
+
+- `Icon=hq_tools` no `.desktop` e `scripts/install-icons.sh` instala os PNGs
+  no tema hicolor: o Gerenciador de plugins Python passa a mostrar o ícone
+  (antes ele não aparecia em lugar nenhum).
+
+### Repositório e CI
+
+- `Referencias/` e `Novas_ideias/` saíram do git (ficam no `.gitignore`); as
+  amostras do kit seguem publicadas dentro de `modules/`.
+- O CI não depende mais da pasta local: os testes do kit pulam de propósito e
+  a checagem que não pode pular passou a ser só o `TestVetorizador`.
+
+### Documentação
+
+- README PT/EN com o módulo 3D, os controles de câmera e a captura
+  `Screenshots/07-3d.png`; manual interno e INSTALL atualizados.
+- `docs/IDEIAS-FUTURAS.md` com a revisão das sugestões e as decisões de rota.
+
+Suíte: 222 testes.
 
 ## [0.6.2] — 2026-10-03
 

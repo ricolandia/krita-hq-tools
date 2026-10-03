@@ -74,7 +74,7 @@ Distribution (ZIP for Tools > Scripts > Import Python Plugin from File):
 
 ```bash
 bash scripts/build-zip.sh
-# result in dist/hq_tools-0.6.2.zip
+# result in dist/hq_tools-<version>.zip
 ```
 
 Then: enable **HQ Tools** in the Python Plugin Manager and restart Krita. If
