@@ -125,10 +125,12 @@ Duas descobertas que valem lembrar:
   E na máquina do autor, com PyQt6 instalado, o teste do cache de miniaturas
   pegava o Qt de verdade e comparava `None` com `None` — passava por acaso. O
   falso está em `tests/qt_falso.py`, registrado como PyQt5 e PyQt6.
-- **O lote de balões é reproduzível byte a byte** por
-  `scripts/vetorizar-lote.py`, e `tests/test_vetorizacao.py` trava isso. Uma
+- **O lote de balões gerado era reproduzível byte a byte** por
+  `scripts/vetorizar-lote.py`, e `tests/test_vetorizacao.py` travava isso. Uma
   refactor "óbvia" no `vetorizar-baloes.py` (cortar o pescoço antes de suavizar)
-  mudava a cauda de 9 para 37 segmentos em `balao-04b` sem erro nenhum.
+  mudava a cauda de 9 para 37 segmentos em `balao-04b` sem erro nenhum. O lote
+  gerado saiu de cena em 03/10 (substituído pelo desenho do autor); o teste
+  agora valida o kit entregue, e os scripts seguem cobertos por testes próprios.
 
 - **Packs de pincéis: os 3 presets com textura ausente foram removidos**
   (`deevad 2d expressive thin`, `deevad 6n stamp floor particles`,
@@ -224,22 +226,33 @@ Espelho no Trilium: subnota "Lista do autor (a criar)" (`FoIRvo2ztN0D`).
   (o arquivo original estava certo). O pipeline aceita arquivos do autor:
   basta normalizar o canvas (considerando transforms), deixar a cauda aberta
   e unificar o traço.
-- **Lote (29/09):** 15 SVGs em `Referencias/baloes-vetorizados/` (14 gerados
-  pelo `scripts/vetorizar-lote.py` + o `05a` do autor), com `previa.png`,
-  `INDEX.md` e `lote.json` (prancha, recorte, traço e pescoço de cada um).
-  QA de visão: corpos consistentes; caudas curtas de 02c, 03a, 03b, 04b,
-  05b, 05d e 06b, mais a 06a, ficaram marcadas para o autor revisar; `03c`
-  descartado (interior partido, precisa de corte manual fino). Ajuste fino
-  de uma cauda: `--corte X1,Y1,X2,Y2`, `--alargar-base`, `--base-interna`.
-- **Decisão (01/10): o Ricardo vai redesenhar todos os balões.** O lote atual
-  fica suspenso: não seguir para o Penpot nem integrar no plugin até o
-  redesenho chegar. A **publicação fica para depois do redesenho** (aguardar
-  o autor; junto com as bibliotecas que faltam para o repositório).
+- **Lote gerado (29/09, substituído):** 15 SVGs saídos das pranchas com o
+  `scripts/vetorizar-lote.py`; o autor decidiu redesenhar tudo em 01/10 e
+  removeu esse lote em 03/10. Os scripts ficam como ferramenta para pranchas
+  futuras.
+- **Lote do autor (02 e 03/10): 22 SVGs** em
+  `Referencias/baloes-vetorizados/` (8 caudas, 9 falas, 2 pensamentos e 3
+  onomatopeias), com `INDEX.md` e `lote.json` novos. QA de visão em 03/10:
+  nenhum traço cortado ou forma quebrada; para revisar com o autor apenas
+  `Calda_Tail_01_` (a cauda aberta mais ambígua), `Fala_Speak_03_` (sem
+  preenchimento) e `Ono_VSFX_01_` (letras quase encostadas), mais o traço
+  fino de `Fala_Speak_03/08/09` (0,68 a 0,70 mm contra 0,90 a 1,01 mm no
+  resto). `tests/test_vetorizacao.py` passou a travar o lote do autor (XML,
+  viewBox, paths com traço, sem texto, manifesto e índice em sincronia).
+- **Integração no plugin (pendente de decisão):** o kit deve substituir as 6
+  amostras genéricas de `hq_tools/modules/balloons/samples/` (recomendado)
+  ou entrar como pasta própria em `hq_tools/resources/`. Definir também o
+  nome (`Calda_` virar `Cauda_`) e a licença do kit (registrar no
+  CREDITS.md). A publicação fica para depois disso.
 
 **Onomatopeias (SVG)**
 - Conjunto próprio para substituir as 8 amostras: impacto, velocidade, som
   pequeno e sons de ação.
 - Versões com contorno e com preenchimento, para combinar com o nanquim.
+- **Parcial (03/10):** 3 entregues junto com os balões (`Ono_VSFX_01/02/03_`:
+  "WHOOSH!", "POW!" e "CRASH!", fonte Bangers convertida em contorno). Faltam
+  os sons menores; referências de estudo em `Referencias/Onomat/` (não
+  versionadas ainda).
 
 **Painéis e páginas (modelos)**
 - Já atendido pelo plugin: "Gerar modelos padrão do HQ Tools" cria A4, A3,

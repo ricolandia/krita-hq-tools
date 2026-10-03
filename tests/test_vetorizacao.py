@@ -1,13 +1,19 @@
-"""Testes do script de vetorização de balões (fora do Krita).
+"""Testes do vetorizador de balões e do lote desenhado pelo autor.
 
-O ponto principal é a reprodutibilidade: o lote em
-``Referencias/baloes-vetorizados`` foi gerado por este script, e uma refactor
-que muda o pescoço ou a cauda sem querer entrega um resultado diferente do
-que o autor vai revisar na tela. O teste roda o script de verdade e compara
-byte a byte com o que está no repositório.
+Duas partes:
+
+1. ``TestVetorizador`` roda ``scripts/vetorizar-baloes.py`` de verdade com uma
+   imagem de teste e confere o contrato do script (dois grupos, cauda aberta,
+   erros legíveis). É a ferramenta que sobra para vetorizar pranchas novas.
+2. ``TestLoteDoAutor`` trava o lote entregue em ``Referencias/
+   baloes-vetorizados``: 22 SVGs desenhados à mão (02 e 03/10/2026), que
+   substituíram o lote gerado de 29/09. O contrato aqui é o que o Krita exige
+   para importar (XML válido, viewBox, paths com traço, sem texto e sem
+   imagem externa) mais a sincronia entre a pasta, o ``lote.json`` e o
+   ``INDEX.md``.
 """
 
-import importlib.util
+import json
 import os
 import subprocess
 import sys
@@ -19,8 +25,14 @@ from xml.etree import ElementTree
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRIPTS = os.path.join(RAIZ, "scripts")
 VETORIZADOR = os.path.join(SCRIPTS, "vetorizar-baloes.py")
-VETORIZADOR_LOTE = os.path.join(SCRIPTS, "vetorizar-lote.py")
 LOTE = os.path.join(RAIZ, "Referencias", "baloes-vetorizados")
+ESPACO_SVG = "{http://www.w3.org/2000/svg}"
+TIPO_POR_PREFIXO = {
+    "Fala": "fala",
+    "Pensa": "pensamento",
+    "Ono": "onomatopeia",
+    "Calda": "cauda",
+}
 
 
 def tem_dependencias():
@@ -100,84 +112,90 @@ class TestVetorizador(unittest.TestCase):
         self.assertIn("I,J", resultado.stderr)
 
 
-@unittest.skipUnless(
-    os.path.isfile(VETORIZADOR_LOTE) and os.path.isdir(LOTE),
-    "lote de vetores fora do repositório",
-)
-class TestLoteEntregue(unittest.TestCase):
-    """O lote versionado tem que continuar sendo reproduzível pelo script."""
+@unittest.skipUnless(os.path.isdir(LOTE), "lote de vetores fora do repositório")
+class TestLoteDoAutor(unittest.TestCase):
+    """O lote entregue (desenho do autor) tem que continuar importável."""
 
-    def trabalhos(self):
-        # O nome do arquivo tem hífen, então não dá para importar direto.
-        especificacao = importlib.util.spec_from_file_location(
-            "vetorizar_lote", VETORIZADOR_LOTE
-        )
-        modulo = importlib.util.module_from_spec(especificacao)
-        especificacao.loader.exec_module(modulo)
-        return modulo.TRABALHOS
+    def svgs(self):
+        return sorted(n for n in os.listdir(LOTE) if n.endswith(".svg"))
 
-    def test_todo_svg_do_lote_e_reproduzivel(self):
-        if not tem_dependencias():
-            self.skipTest("o script precisa de numpy e Pillow")
-        trabalhos = self.trabalhos()
-        with tempfile.TemporaryDirectory(prefix="hq_tools_lote_") as saida:
-            subprocess.run(
-                [sys.executable, VETORIZADOR_LOTE, "--saida", saida],
-                capture_output=True,
-                text=True,
-                check=True,
-            )
-            self.assertTrue(trabalhos)
-            for nome in trabalhos:
-                with self.subTest(balao=nome):
-                    gerado = os.path.join(saida, nome + ".svg")
-                    self.assertTrue(os.path.isfile(gerado), gerado)
-                    with open(gerado, encoding="utf-8") as a:
-                        with open(os.path.join(LOTE, nome + ".svg"), encoding="utf-8") as b:
-                            self.assertEqual(
-                                a.read(),
-                                b.read(),
-                                "{0} mudou em relação ao lote versionado".format(nome),
-                            )
+    def manifesto(self):
+        with open(os.path.join(LOTE, "lote.json"), encoding="utf-8") as handle:
+            return json.load(handle)
 
-    def test_todos_os_svgs_do_lote_sao_svg_importavel(self):
-        nomes = [n for n in os.listdir(LOTE) if n.endswith(".svg")]
-        self.assertTrue(nomes, "nenhum SVG no lote")
-        espaco = "{http://www.w3.org/2000/svg}"
-        for nome in nomes:
+    def test_lote_nao_esta_vazio(self):
+        self.assertTrue(self.svgs(), "nenhum SVG no lote")
+
+    def test_nomes_seguem_a_convencao(self):
+        # Tipo_Nome_NN_.svg, com o tipo no começo (Fala/Pensa/Ono/Calda).
+        for nome in self.svgs():
+            with self.subTest(svg=nome):
+                prefixo = nome.split("_", 1)[0]
+                self.assertIn(
+                    prefixo, TIPO_POR_PREFIXO,
+                    "prefixo fora do padrão (Fala_/Pensa_/Ono_/Calda_)",
+                )
+                self.assertRegex(
+                    nome, r"^[A-Za-z]+_[A-Za-z]+_\d\d_\.svg$",
+                    "nome fora do padrão Tipo_Nome_NN_.svg",
+                )
+
+    def test_todos_sao_svg_importavel(self):
+        for nome in self.svgs():
             with self.subTest(svg=nome):
                 caminho = os.path.join(LOTE, nome)
+                with open(caminho, encoding="utf-8") as handle:
+                    bruto = handle.read()
                 # Parsear é o teste que importa: o Krita importa o SVG com
                 # addShapesFromSvg, e um XML quebrado vira "nada importado"
                 # sem dizer qual linha foi.
-                arvore = ElementTree.parse(caminho)
-                raiz = arvore.getroot()
-                self.assertEqual(espaco + "svg", raiz.tag)
+                raiz = ElementTree.parse(caminho).getroot()
+                self.assertEqual(ESPACO_SVG + "svg", raiz.tag)
                 self.assertTrue(raiz.get("viewBox"), "sem viewBox: o Krita não escala")
-                # O 05a é vetor do autor (tem camadas do Inkscape); os outros
-                # saem do script e têm os dois grupos com nome.
-                if nome not in self.trabalhos():
-                    self.assertTrue(len(raiz), nome)
-                    continue
-                grupos = {g.get("id"): g for g in raiz.findall(espaco + "g")}
-                self.assertEqual({"balao", "cauda"}, set(grupos), nome)
-                for identificador, grupo in grupos.items():
-                    caminhos = grupo.findall(espaco + "path")
-                    self.assertEqual(1, len(caminhos), "{0}/{1}".format(nome, identificador))
-                    d = caminhos[0].get("d") or ""
-                    self.assertTrue(d.startswith("M"), nome)
-                    self.assertTrue(len(d) > 20, "path vazio em " + nome)
-                    self.assertTrue(caminhos[0].get("stroke-width"), nome)
+                paths = raiz.findall(".//" + ESPACO_SVG + "path")
+                self.assertTrue(paths, "sem path")
+                for indice, path in enumerate(paths):
+                    with self.subTest(path=indice):
+                        d = (path.get("d") or "").strip()
+                        # O Inkscape escreve comandos relativos minúsculos (m).
+                        self.assertEqual("m", d[:1].lower(), "path sem comando inicial")
+                        self.assertGreater(len(d), 20, "path vazio")
+                        estilo = path.get("style") or ""
+                        self.assertIn(
+                            "stroke:#000000", estilo, "path sem traço preto"
+                        )
+                self.assertFalse(
+                    raiz.findall(".//" + ESPACO_SVG + "text"),
+                    "tem <text>: o kit é sem texto",
+                )
+                self.assertNotIn("<image", bruto, "SVG com imagem embutida")
+                self.assertNotIn("href", bruto, "SVG com referência externa")
+
+    def test_manifesto_cobre_o_lote(self):
+        itens = self.manifesto()["itens"]
+        self.assertEqual(
+            set(self.svgs()), set(itens),
+            "lote.json e a pasta divergem",
+        )
+        for nome, dados in itens.items():
+            with self.subTest(svg=nome):
+                self.assertIn(
+                    dados["tipo"], set(TIPO_POR_PREFIXO.values()),
+                    "tipo desconhecido",
+                )
+                self.assertTrue(dados["descricao"].strip(), "descrição vazia")
+
+    def test_prefixo_bate_com_o_tipo_do_manifesto(self):
+        for nome, dados in self.manifesto()["itens"].items():
+            with self.subTest(svg=nome):
+                prefixo = nome.split("_", 1)[0]
+                self.assertEqual(TIPO_POR_PREFIXO[prefixo], dados["tipo"])
 
     def test_indice_lista_todos_os_svgs(self):
-        indice = os.path.join(LOTE, "INDEX.md")
-        if not os.path.isfile(indice):
-            self.skipTest("sem INDEX.md no lote")
-        with open(indice, encoding="utf-8") as handle:
-            texto = handle.read()
-        for nome in os.listdir(LOTE):
-            if nome.endswith(".svg"):
-                self.assertIn(nome, texto, "{0} não está no INDEX.md".format(nome))
+        with open(os.path.join(LOTE, "INDEX.md"), encoding="utf-8") as handle:
+            indice = handle.read()
+        for nome in self.svgs():
+            self.assertIn(nome, indice, "{0} não está no INDEX.md".format(nome))
 
 
 if __name__ == "__main__":

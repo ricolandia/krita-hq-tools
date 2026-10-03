@@ -1,156 +1,30 @@
 {
-  "balao-02a": {
-    "prancha": "Refer_ball_02.png",
-    "recorte": [
-      225,
-      7,
-      185,
-      216
-    ],
-    "traco_px": 6.0,
-    "corte": "113,154,89,153"
-  },
-  "balao-02b": {
-    "prancha": "Refer_ball_02.png",
-    "recorte": [
-      652,
-      21,
-      193,
-      193
-    ],
-    "traco_px": 6.0,
-    "corte": "auto"
-  },
-  "balao-02c": {
-    "prancha": "Refer_ball_02.png",
-    "recorte": [
-      240,
-      291,
-      176,
-      133
-    ],
-    "traco_px": 6.0,
-    "corte": "auto"
-  },
-  "balao-02d": {
-    "prancha": "Refer_ball_02.png",
-    "recorte": [
-      439,
-      39,
-      185,
-      157
-    ],
-    "traco_px": 6.0,
-    "corte": "auto"
-  },
-  "balao-03a": {
-    "prancha": "Refer_ball_03.png",
-    "recorte": [
-      344,
-      181,
-      176,
-      120
-    ],
-    "traco_px": 5.0,
-    "corte": "auto"
-  },
-  "balao-03b": {
-    "prancha": "Refer_ball_03.png",
-    "recorte": [
-      691,
-      341,
-      129,
-      113
-    ],
-    "traco_px": 5.0,
-    "corte": "auto"
-  },
-  "balao-04a": {
-    "prancha": "Refer_ball_04.png",
-    "recorte": [
-      503,
-      99,
-      119,
-      99
-    ],
-    "traco_px": 4.0,
-    "corte": "auto"
-  },
-  "balao-04b": {
-    "prancha": "Refer_ball_04.png",
-    "recorte": [
-      123,
-      185,
-      95,
-      87
-    ],
-    "traco_px": 4.0,
-    "corte": "auto"
-  },
-  "balao-05b": {
-    "prancha": "Refer_ball_05.png",
-    "recorte": [
-      752,
-      345,
-      223,
-      129
-    ],
-    "traco_px": 5.0,
-    "corte": "auto"
-  },
-  "balao-05c": {
-    "prancha": "Refer_ball_05.png",
-    "recorte": [
-      38,
-      190,
-      133,
-      189
-    ],
-    "traco_px": 5.0,
-    "corte": "auto"
-  },
-  "balao-05d": {
-    "prancha": "Refer_ball_05.png",
-    "recorte": [
-      191,
-      210,
-      163,
-      121
-    ],
-    "traco_px": 5.0,
-    "corte": "auto"
-  },
-  "balao-06a": {
-    "prancha": "Refer_ball_06.png",
-    "recorte": [
-      415,
-      281,
-      110,
-      178
-    ],
-    "traco_px": 5.0,
-    "corte": "auto"
-  },
-  "balao-06b": {
-    "prancha": "Refer_ball_06.png",
-    "recorte": [
-      557,
-      246,
-      154,
-      90
-    ],
-    "traco_px": 5.0,
-    "corte": "auto"
-  },
-  "balao-06c": {
-    "prancha": "Refer_ball_06.png",
-    "recorte": [
-      714,
-      457,
-      144,
-      94
-    ],
-    "traco_px": 5.0,
-    "corte": "auto"
+  "lote": "balões e onomatopeias do autor",
+  "data": "2026-10-03",
+  "origem": "desenho do autor no Inkscape 1.4.4, substituindo o lote gerado de 29/09",
+  "unidade_viewbox": "mm",
+  "itens": {
+    "Calda_Tail_01_.svg": {"tipo": "cauda", "descricao": "cunha fina diagonal, base aberta"},
+    "Calda_Tail_02_.svg": {"tipo": "cauda", "descricao": "V simétrico, base aberta"},
+    "Calda_Tail_03_.svg": {"tipo": "cauda", "descricao": "V curvo assimétrico, base aberta"},
+    "Calda_Tail_04_.svg": {"tipo": "cauda", "descricao": "lâmina curva longa, base aberta"},
+    "Calda_Tail_05_.svg": {"tipo": "cauda", "descricao": "raio curto angular"},
+    "Calda_Tail_06_.svg": {"tipo": "cauda", "descricao": "raio em zigue-zague"},
+    "Calda_Tail_07_.svg": {"tipo": "cauda", "descricao": "três bolhas decrescentes"},
+    "Calda_Tail_08_.svg": {"tipo": "cauda", "descricao": "quatro bolhas crescentes"},
+    "Fala_Speak_01_.svg": {"tipo": "fala", "descricao": "retangular arredondado"},
+    "Fala_Speak_02_.svg": {"tipo": "fala", "descricao": "trapezoidal com perspectiva"},
+    "Fala_Speak_03_.svg": {"tipo": "fala", "descricao": "quadrado vazado, sem preenchimento"},
+    "Fala_Speak_04_.svg": {"tipo": "fala", "descricao": "circular"},
+    "Fala_Speak_05_.svg": {"tipo": "fala", "descricao": "oval levemente irregular"},
+    "Fala_Speak_06_.svg": {"tipo": "fala", "descricao": "circular com contorno irregular"},
+    "Fala_Speak_07_.svg": {"tipo": "fala", "descricao": "retangular alongado (legenda ou narração)"},
+    "Fala_Speak_08_.svg": {"tipo": "fala", "descricao": "explosão de espinhos esparsos"},
+    "Fala_Speak_09_.svg": {"tipo": "fala", "descricao": "explosão de espinhos densos"},
+    "Ono_VSFX_01_.svg": {"tipo": "onomatopeia", "descricao": "WHOOSH! em contorno"},
+    "Ono_VSFX_02_.svg": {"tipo": "onomatopeia", "descricao": "POW! em contorno"},
+    "Ono_VSFX_03_.svg": {"tipo": "onomatopeia", "descricao": "CRASH! em contorno"},
+    "Pensa_Think_01_.svg": {"tipo": "pensamento", "descricao": "nuvem achatada"},
+    "Pensa_Think_02_.svg": {"tipo": "pensamento", "descricao": "nuvem alta"}
   }
 }
