@@ -14,7 +14,8 @@
   referência. O núcleo em Python puro (cinemática, skinning, projeção
   ortográfica e SVG) tem 30 testes e roda fora do Krita pelo script de
   preview. Inclui os estilos Silhueta e Contorno (mais baratos que o
-  sombreado), preview com fundo de papel, correções de sliders/aviso/órbita
+  sombreado; o contorno remove as linhas escondidas, sem efeito de corpo
+  transparente), preview com fundo de papel, correções de sliders/aviso/órbita
   e `--decimar` no exportador.
 - Ícone do plugin: `Icon=hq_tools` no `.desktop` e instalação no tema via
   `scripts/install-icons.sh` (o Gerenciador de plugins Python passa a mostrar

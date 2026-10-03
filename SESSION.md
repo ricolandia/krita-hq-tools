@@ -226,7 +226,9 @@ aparência), tipografia das listas de miniaturas, tamanho dos ícones da lista.
   com os mesmos 68 ossos e nomes, então as poses valem para os dois; seletor
   Corpo no docker.
 - Correções de uso (03/10): modos Silhueta (path único, sem ordenação nem
-  sombreamento) e Contorno (arestas entre face da frente e de trás), preview
+  sombreamento) e Contorno (arestas entre face da frente e de trás, com
+  remoção de linhas escondidas por máscara projetada e fechamento de vãos
+  estreitos; 606 -> 278 segmentos), preview
   com fundo de papel nos estilos chapados (não some no tema escuro), sliders
   sem sobreposição (limpeza recursiva do layout), aviso fixo de clique e
   órbita invertida para o gesto natural. Benchmarks em 400x400: sombreado

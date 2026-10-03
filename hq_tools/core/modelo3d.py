@@ -310,6 +310,76 @@ class Modelo:
             resultado.append((x, y, z))
         return resultado
 
+    def _mascara_projetada(self, tela, largura, altura, celulas=140):
+        """Grade booleana da área coberta pela projeção de todas as faces.
+
+        Serve para esconder as linhas de contorno que estão no interior da
+        silhueta (membro atrás do tronco, olhos, boca): elas parecem
+        transparência num desenho de contorno.
+        """
+        tamanho = max(largura, altura) / float(celulas)
+        mascara = set()
+        for face in self.faces:
+            for triangulo in self._triangular(face):
+                pontos = [tela[indice] for indice in triangulo]
+                ys = [ponto[1] for ponto in pontos]
+                iy0 = int(min(ys) / tamanho)
+                iy1 = int(max(ys) / tamanho)
+                for iy in range(iy0, iy1 + 1):
+                    y = (iy + 0.5) * tamanho
+                    xs = []
+                    for posicao in range(3):
+                        a = pontos[posicao]
+                        b = pontos[(posicao + 1) % 3]
+                        if (a[1] <= y < b[1]) or (b[1] <= y < a[1]):
+                            fator = (y - a[1]) / (b[1] - a[1])
+                            xs.append(a[0] + fator * (b[0] - a[0]))
+                    if len(xs) < 2:
+                        continue
+                    ix0 = int(min(xs) / tamanho)
+                    ix1 = int(max(xs) / tamanho)
+                    for ix in range(ix0, ix1 + 1):
+                        mascara.add((ix, iy))
+        return mascara, tamanho
+
+    @staticmethod
+    def _fechar_mascara(mascara, iteracoes=2):
+        """Fechamento morfológico: preenche vãos estreitos (axila, virilha).
+
+        Dilata e erode de volta; canais vazios mais finos que o raio somem, e
+        as linhas de contorno que passavam por eles deixam de ser desenhadas.
+        Vãos largos (pernas afastadas) continuam abertos.
+        """
+        vizinhos = ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1))
+        for _ in range(iteracoes):
+            dilatada = set()
+            for ix, iy in mascara:
+                for dx, dy in vizinhos:
+                    dilatada.add((ix + dx, iy + dy))
+            erodida = set()
+            for ix, iy in dilatada:
+                if all((ix + dx, iy + dy) in dilatada for dx, dy in vizinhos):
+                    erodida.add((ix, iy))
+            mascara = erodida
+        return mascara
+
+    @staticmethod
+    def _na_borda_da_mascara(x, y, mascara, tamanho):
+        """Diz se o ponto está na borda da máscara (célula vazia ou vizinha).
+
+        Sem a dilatação diagonal: uma linha no interior sólido tem os quatro
+        vizinhos diretos preenchidos e é descartada; linhas a uma célula de um
+        buraco real continuam.
+        """
+        ix = int(x / tamanho)
+        iy = int(y / tamanho)
+        if (ix, iy) not in mascara:
+            return True
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            if (ix + dx, iy + dy) not in mascara:
+                return True
+        return False
+
     def _contorno(self, na_camera):
         """Arestas de silhueta: as que separam face da frente de face de trás.
 
@@ -422,12 +492,23 @@ class Modelo:
                     '<path d="{0}" fill="{1}"/>'.format("".join(caminho), cor_solida)
                 )
             else:
+                mascara, tamanho = self._mascara_projetada(tela, largura, altura)
+                mascara = self._fechar_mascara(mascara)
                 caminho = []
                 for inicio, fim in self._contorno(na_camera):
+                    a, b = tela[inicio], tela[fim]
+                    visivel = False
+                    for fator in (0.15, 0.35, 0.5, 0.65, 0.85):
+                        x = a[0] + (b[0] - a[0]) * fator
+                        y = a[1] + (b[1] - a[1]) * fator
+                        if self._na_borda_da_mascara(x, y, mascara, tamanho):
+                            visivel = True
+                            break
+                    if not visivel:
+                        continue
                     caminho.append(
                         "M{0:.1f} {1:.1f}L{2:.1f} {3:.1f}".format(
-                            tela[inicio][0], tela[inicio][1],
-                            tela[fim][0], tela[fim][1],
+                            a[0], a[1], b[0], b[1],
                         )
                     )
                 partes.append(
