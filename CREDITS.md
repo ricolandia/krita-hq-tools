@@ -114,11 +114,15 @@ Comics pack e InkP/Expressive Inks.
 
 ## Modelo 3D do visualizador (em teste)
 
-- `hq_tools/modules/viewer3d/modelos/low_poly_krita.json`: dado derivado do
-  FBX do autor (68 ossos, 1591 vértices, 1570 faces). Malha do MakeHuman
-  (CC0); rig gerado com Auto-Rig Pro (addon de terceiros) e exportado pelo
-  autor. O JSON é redistribuído para o visualizador 3D do plugin; o FBX
-  original fica fora do repositório.
+- `hq_tools/modules/viewer3d/modelos/homem.json` (68 ossos, 1591 vértices,
+  1570 faces) e `mulher.json` (68 ossos, 1605 vértices, 1584 faces): dados
+  derivados dos FBX do autor. Malha do MakeHuman (CC0); rig gerado com
+  Auto-Rig Pro (addon de terceiros) e exportado pelo autor. Os JSON são
+  redistribuídos para o visualizador 3D do plugin; os FBX originais ficam
+  fora do repositório.
+- `hq_tools/modules/viewer3d/poses/idle_maos_fechadas.json`: pose extraída do
+  FBX animado do autor (rotações locais por osso) e usada como padrão dos dois
+  corpos.
 
 ## Pastas fora do repositório
 

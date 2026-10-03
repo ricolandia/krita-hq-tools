@@ -7,12 +7,15 @@
 - Biblioteca do projeto: "Renomear...", "Duplicar" e "Apagar" operam o recurso
   selecionado direto no docker, com confirmação ao apagar.
 - Visualizador 3D (em teste): docker "HQ Tools: 3D" com o manequim low-poly
-  do autor (MakeHuman + Auto-Rig Pro, 68 ossos), clique na região para abrir
-  os sliders Dobrar/Abrir/Girar, inserção raster e como referência. O núcleo
-  em Python puro (cinemática, skinning, projeção ortográfica e SVG) tem 22
-  testes e roda fora do Krita pelo script de preview. Inclui os estilos
-  Silhueta e Contorno (mais baratos que o sombreado), preview com fundo de
-  papel, correções de sliders/aviso/órbita e `--decimar` no exportador.
+  do autor (MakeHuman + Auto-Rig Pro, 68 ossos), escolha de corpo
+  (Homem/Mulher) e biblioteca de poses (padrão: Idle com mãos fechadas,
+  extraída de FBX animado pelo `scripts/exportar-poses3d.py`), clique na
+  região para abrir os sliders Dobrar/Abrir/Girar, inserção raster e como
+  referência. O núcleo em Python puro (cinemática, skinning, projeção
+  ortográfica e SVG) tem 30 testes e roda fora do Krita pelo script de
+  preview. Inclui os estilos Silhueta e Contorno (mais baratos que o
+  sombreado), preview com fundo de papel, correções de sliders/aviso/órbita
+  e `--decimar` no exportador.
 - Ícone do plugin: `Icon=hq_tools` no `.desktop` e instalação no tema via
   `scripts/install-icons.sh` (o Gerenciador de plugins Python passa a mostrar
   o ícone).

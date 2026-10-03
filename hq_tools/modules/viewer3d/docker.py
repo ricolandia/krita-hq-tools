@@ -9,6 +9,8 @@ Z, X e Y). A inserção no documento é raster: o preview vira uma camada de
 pintura, opcionalmente marcada como referência (travada, opacidade 150).
 """
 
+import os
+
 from krita import DockWidget
 
 from ...core import krita_helpers as helpers
@@ -24,7 +26,11 @@ from ...core.compat import (
     QtGui,
     QtWidgets,
 )
-from ...core.paths import VIEWER3D_MODELO
+from ...core.paths import (
+    VIEWER3D_MODELOS,
+    VIEWER3D_POSE_PADRAO,
+    VIEWER3D_POSES_DIR,
+)
 
 LIMITE_SLIDER = 120
 
@@ -158,8 +164,10 @@ class Viewer3DDocker(DockWidget):
         super().__init__()
         self.setWindowTitle("HQ Tools: 3D")
         self.modelo = None
+        self.corpo = "homem"
         self.regiao = None
         self.semantica = {}
+        self.pose_atual = None
         self.camera = {"yaw": 0.0, "pitch": -10.0, "zoom": 1.0}
         self._tela = []
         self._timer = QtCore.QTimer(self)
@@ -167,7 +175,7 @@ class Viewer3DDocker(DockWidget):
         self._timer.setInterval(30)
         self._timer.timeout.connect(self.atualizar_preview)
         self._build_ui()
-        self._carregar_modelo()
+        self._carregar_modelo(aplicar_padrao=True)
 
     def canvasChanged(self, canvas):
         pass
@@ -185,6 +193,22 @@ class Viewer3DDocker(DockWidget):
 
         self.lbl_regiao = ui.rotulo_info("Nenhuma região selecionada.")
         layout.addWidget(self.lbl_regiao)
+
+        corpo_row = widgets.QHBoxLayout()
+        corpo_row.addWidget(ui.rotulo("Corpo:"))
+        self.cmb_corpo = widgets.QComboBox()
+        for chave, rotulo, _ in VIEWER3D_MODELOS:
+            self.cmb_corpo.addItem(rotulo, chave)
+        self.cmb_corpo.currentIndexChanged.connect(self._mudar_corpo)
+        corpo_row.addWidget(self.cmb_corpo, 1)
+        layout.addLayout(corpo_row)
+
+        pose_row = widgets.QHBoxLayout()
+        pose_row.addWidget(ui.rotulo("Pose:"))
+        self.cmb_pose = widgets.QComboBox()
+        self.cmb_pose.currentIndexChanged.connect(self._mudar_pose)
+        pose_row.addWidget(self.cmb_pose, 1)
+        layout.addLayout(pose_row)
 
         estilo_row = widgets.QHBoxLayout()
         estilo_row.addWidget(ui.rotulo("Estilo:"))
@@ -234,14 +258,80 @@ class Viewer3DDocker(DockWidget):
 
         self.setWidget(main)
 
-    def _carregar_modelo(self):
+    def _caminho_do_corpo(self, chave):
+        for chave_modelo, _, caminho in VIEWER3D_MODELOS:
+            if chave_modelo == chave:
+                return caminho
+        return None
+
+    def _carregar_modelo(self, aplicar_padrao=False):
         try:
-            self.modelo = modelo3d.Modelo.carregar(VIEWER3D_MODELO)
+            self.modelo = modelo3d.Modelo.carregar(self._caminho_do_corpo(self.corpo))
         except (OSError, ValueError) as error:
             self.lbl_regiao.setText("Modelo 3D indisponível: {0}".format(error))
             return
-        self._selecionar_regiao("tronco")
+        self._popular_poses()
+        if aplicar_padrao:
+            self._aplicar_pose(VIEWER3D_POSE_PADRAO)
+        if self.regiao is None:
+            self._selecionar_regiao("tronco")
+        else:
+            self._montar_sliders()
         self.atualizar_preview()
+
+    def _popular_poses(self):
+        self.cmb_pose.blockSignals(True)
+        self.cmb_pose.clear()
+        self.cmb_pose.addItem("—", None)
+        try:
+            arquivos = sorted(os.listdir(VIEWER3D_POSES_DIR))
+        except OSError:
+            arquivos = []
+        for arquivo in arquivos:
+            if not arquivo.endswith(".json"):
+                continue
+            try:
+                dados = modelo3d.carregar_pose(os.path.join(VIEWER3D_POSES_DIR, arquivo))
+                rotulo = dados.get("nome") or arquivo[:-5]
+            except (OSError, ValueError):
+                rotulo = arquivo[:-5]
+            self.cmb_pose.addItem(rotulo, arquivo)
+        indice = self.cmb_pose.findData(self.pose_atual)
+        self.cmb_pose.setCurrentIndex(indice if indice >= 0 else 0)
+        self.cmb_pose.blockSignals(False)
+
+    def _sincronizar_combo_pose(self):
+        indice = self.cmb_pose.findData(self.pose_atual)
+        self.cmb_pose.blockSignals(True)
+        self.cmb_pose.setCurrentIndex(indice if indice >= 0 else 0)
+        self.cmb_pose.blockSignals(False)
+
+    def _mudar_corpo(self, indice):
+        chave = self.cmb_corpo.itemData(indice)
+        if chave:
+            self.corpo = chave
+            self._carregar_modelo()
+
+    def _mudar_pose(self, indice):
+        arquivo = self.cmb_pose.itemData(indice)
+        if arquivo is None:
+            self.limpar_pose()
+            return
+        self._aplicar_pose(arquivo)
+
+    def _aplicar_pose(self, arquivo):
+        try:
+            dados = modelo3d.carregar_pose(os.path.join(VIEWER3D_POSES_DIR, arquivo))
+        except (OSError, ValueError) as error:
+            helpers.show_info("3D", "Não foi possível ler a pose: {0}".format(error))
+            return
+        self.semantica = {
+            osso: dict(valores) for osso, valores in dados.get("ossos", {}).items()
+        }
+        self.pose_atual = arquivo
+        self._sincronizar_combo_pose()
+        self._montar_sliders()
+        self.agendar_render()
 
     def _rotacoes(self):
         if self.modelo is None:
@@ -311,6 +401,8 @@ class Viewer3DDocker(DockWidget):
 
     def limpar_pose(self):
         self.semantica = {}
+        self.pose_atual = None
+        self._sincronizar_combo_pose()
         self._montar_sliders()
         self.agendar_render()
 

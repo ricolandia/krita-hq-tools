@@ -85,7 +85,10 @@ Viável e a mais integrada, com condições:
   Eixos medidos no rig: Y = eixo do osso (torção), Z = frente/trás (a junta),
   X = abrir para o lado. F3 feito (03/10): docker "HQ Tools: 3D" com clique
   na região, sliders semânticos (Dobrar/Abrir/Girar), dedos em um slider e
-  inserção raster/referência.
+  inserção raster/referência. Biblioteca de poses e corpo (03/10):
+  `scripts/exportar-poses3d.py` extrai as rotações de FBX animado (desvio
+  máximo de 7 mm contra o Blender), `idle_maos_fechadas` é o padrão dos dois
+  corpos e `mulher.json` entrou com seletor Corpo.
 
 ### Rota B: Blender Layer (plugin existente)
 

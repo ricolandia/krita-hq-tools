@@ -17,6 +17,8 @@ import math
 
 FORMATO = "hq_tools.modelo3d"
 VERSAO = 1
+POSE_FORMATO = "hq_tools.pose3d"
+POSE_VERSAO = 1
 
 LUZ_PADRAO = (0.4, -0.8, 0.45)
 
@@ -116,6 +118,23 @@ def _normalizar(vetor):
     if tamanho < 1e-12:
         return (0.0, 0.0, 0.0)
     return (vetor[0] / tamanho, vetor[1] / tamanho, vetor[2] / tamanho)
+
+
+def carregar_pose(caminho):
+    """Lê um JSON de pose do visualizador (``hq_tools.pose3d``)."""
+    with open(caminho, "r", encoding="utf-8") as arquivo:
+        dados = json.load(arquivo)
+    if dados.get("formato") != POSE_FORMATO:
+        raise ValueError(
+            "formato de pose desconhecido: {0}".format(dados.get("formato"))
+        )
+    if int(dados.get("versao", 0)) > POSE_VERSAO:
+        raise ValueError(
+            "pose versão {0}; o plugin entende até {1}".format(
+                dados["versao"], POSE_VERSAO
+            )
+        )
+    return dados
 
 
 EIXOS = {"x": 0, "y": 1, "z": 2}
@@ -390,11 +409,13 @@ class Modelo:
                 caminho = []
                 for face in self.faces:
                     for triangulo in self._triangular(face):
+                        a, b, c = (tela[indice] for indice in triangulo)
+                        area = (b[0] - a[0]) * (c[1] - a[1]) - (c[0] - a[0]) * (b[1] - a[1])
+                        if area < 0:
+                            b, c = c, b
                         caminho.append(
                             "M{0:.1f} {1:.1f}L{2:.1f} {3:.1f}L{4:.1f} {5:.1f}Z".format(
-                                tela[triangulo[0]][0], tela[triangulo[0]][1],
-                                tela[triangulo[1]][0], tela[triangulo[1]][1],
-                                tela[triangulo[2]][0], tela[triangulo[2]][1],
+                                a[0], a[1], b[0], b[1], c[0], c[1],
                             )
                         )
                 partes.append(

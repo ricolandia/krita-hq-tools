@@ -217,7 +217,14 @@ aparência), tipografia das listas de miniaturas, tamanho dos ícones da lista.
 - Ícone: o `.desktop` ganhou `Icon=hq_tools` e o `scripts/install-icons.sh`
   instala os PNGs no tema hicolor; os dockers também recebem o ícone pelo
   `ui.painel`. Sem a linha `Icon=`, o gerenciador de plugins não mostrava nada.
-- Suíte: 212 testes (22 do visualizador 3D).
+- Suíte: 220 testes (30 do visualizador 3D).
+- Biblioteca de poses (03/10): `scripts/exportar-poses3d.py` extrai as rotações
+  locais de um FBX animado (frame 1) e converte para Dobrar/Abrir/Girar;
+  validado contra o Blender com desvio máximo de 7 mm (mediana 0). A pose
+  `idle_maos_fechadas` é o padrão dos dois corpos.
+- Corpo (03/10): `homem.json` (1591 vértices) e `mulher.json` (1605 vértices)
+  com os mesmos 68 ossos e nomes, então as poses valem para os dois; seletor
+  Corpo no docker.
 - Correções de uso (03/10): modos Silhueta (path único, sem ordenação nem
   sombreamento) e Contorno (arestas entre face da frente e de trás), preview
   com fundo de papel nos estilos chapados (não some no tema escuro), sliders

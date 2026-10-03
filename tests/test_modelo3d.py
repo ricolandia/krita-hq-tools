@@ -2,12 +2,13 @@
 
 O manequim sintético de 2 ossos é o contrato do skinning: um osso raiz na
 origem e um filho a 1 m de altura, com vértices presos a cada um. O modelo real
-(``low_poly_krita.json``) entra como teste de integração: se o exportador mudar
-o formato, o teste acusa.
+(``homem.json`` e ``mulher.json``) entra como teste de integração: se o
+exportador mudar o formato, o teste acusa.
 """
 
 import json
 import os
+import re
 import tempfile
 import unittest
 import xml.etree.ElementTree as ET
@@ -16,7 +17,13 @@ from hq_tools.core import modelo3d
 
 RAIZ = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODELO_REAL = os.path.join(
-    RAIZ, "hq_tools", "modules", "viewer3d", "modelos", "low_poly_krita.json"
+    RAIZ, "hq_tools", "modules", "viewer3d", "modelos", "homem.json"
+)
+MODELO_MULHER = os.path.join(
+    RAIZ, "hq_tools", "modules", "viewer3d", "modelos", "mulher.json"
+)
+POSE_IDLE = os.path.join(
+    RAIZ, "hq_tools", "modules", "viewer3d", "poses", "idle_maos_fechadas.json"
 )
 
 
@@ -143,6 +150,26 @@ class TestManequim(unittest.TestCase):
         self.assertEqual(raiz.findall("{http://www.w3.org/2000/svg}polygon"), [])
         self.assertIn("M", caminhos[0].get("d"))
 
+    def test_chapado_normaliza_o_winding(self):
+        dados = triangulo_visivel()
+        dados["vertices"] = [
+            (0.0, 0.0, 0.0), (1.0, 0.0, 0.0), (0.0, 0.0, 1.0),
+            (0.0, 0.0, 0.0), (1.0, 0.0, 0.0), (0.0, 0.0, 1.0),
+        ]
+        dados["pesos"] = [[[0, 1.0]]] * 6
+        dados["faces"] = [[0, 1, 2], [5, 4, 3]]
+        modelo = modelo3d.Modelo(dados)
+        svg = modelo.renderizar(largura=400, altura=400, estilo="chapado")
+        raiz = ET.fromstring(svg)
+        caminho = raiz.find("{http://www.w3.org/2000/svg}path").get("d")
+        numeros = [float(valor) for valor in re.findall(r"-?\d+(?:\.\d+)?", caminho)]
+        areas = []
+        for inicio in range(0, len(numeros), 6):
+            x0, y0, x1, y1, x2, y2 = numeros[inicio:inicio + 6]
+            areas.append((x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0))
+        self.assertTrue(areas)
+        self.assertTrue(all(area >= 0 for area in areas))
+
     def test_svg_contorno_sem_preenchimento(self):
         modelo = modelo3d.Modelo(triangulo_visivel())
         svg = modelo.renderizar(largura=400, altura=400, estilo="contorno")
@@ -173,12 +200,33 @@ class TestManequim(unittest.TestCase):
             modelo = modelo3d.Modelo.carregar(caminho)
             self.assertEqual(modelo.nome, "manequim")
 
+    def test_carregar_pose(self):
+        with tempfile.TemporaryDirectory() as pasta:
+            caminho = os.path.join(pasta, "pose.json")
+            with open(caminho, "w", encoding="utf-8") as arquivo:
+                json.dump({
+                    "formato": "hq_tools.pose3d",
+                    "versao": 1,
+                    "nome": "teste",
+                    "ossos": {"filho": {"dobrar": 10.0}},
+                }, arquivo)
+            pose = modelo3d.carregar_pose(caminho)
+            self.assertEqual(pose["nome"], "teste")
+
+    def test_carregar_pose_formato_errado(self):
+        with tempfile.TemporaryDirectory() as pasta:
+            caminho = os.path.join(pasta, "pose.json")
+            with open(caminho, "w", encoding="utf-8") as arquivo:
+                json.dump({"formato": "outro", "versao": 1, "ossos": {}}, arquivo)
+            with self.assertRaises(ValueError):
+                modelo3d.carregar_pose(caminho)
+
 
 class TestEixosSemanticos(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         if not os.path.isfile(MODELO_REAL):
-            raise unittest.SkipTest("low_poly_krita.json não está no repositório")
+            raise unittest.SkipTest("homem.json não está no repositório")
         cls.modelo = modelo3d.Modelo.carregar(MODELO_REAL)
 
     def _vertice_da_coxa(self):
@@ -227,11 +275,46 @@ class TestEixosSemanticos(unittest.TestCase):
         )
 
 
+class TestModeloMulher(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        if not os.path.isfile(MODELO_MULHER):
+            raise unittest.SkipTest("mulher.json não está no repositório")
+        cls.modelo = modelo3d.Modelo.carregar(MODELO_MULHER)
+
+    def test_estrutura(self):
+        self.assertEqual(len(self.modelo.ossos), 68)
+        self.assertEqual(len(self.modelo.vertices), 1605)
+        self.assertEqual(len(self.modelo.faces), 1584)
+
+    def test_mesmos_ossos_do_homem(self):
+        if not os.path.isfile(MODELO_REAL):
+            self.skipTest("homem.json não está no repositório")
+        homem = modelo3d.Modelo.carregar(MODELO_REAL)
+        self.assertEqual(
+            set(self.modelo.nomes_dos_ossos()), set(homem.nomes_dos_ossos())
+        )
+
+    def test_pose_idle_move_o_corpo(self):
+        if not os.path.isfile(POSE_IDLE):
+            self.skipTest("pose idle não está no repositório")
+        pose = modelo3d.carregar_pose(POSE_IDLE)
+        repouso = self.modelo.vertices_em_pose()
+        posado = self.modelo.vertices_em_pose(
+            self.modelo.aplicar_semantica(pose["ossos"])
+        )
+        diferente = sum(
+            1 for a, b in zip(repouso, posado)
+            if abs(a[0] - b[0]) + abs(a[1] - b[1]) + abs(a[2] - b[2]) > 1e-6
+        )
+        self.assertGreater(diferente, 100)
+
+
 class TestModeloReal(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         if not os.path.isfile(MODELO_REAL):
-            raise unittest.SkipTest("low_poly_krita.json não está no repositório")
+            raise unittest.SkipTest("homem.json não está no repositório")
         cls.modelo = modelo3d.Modelo.carregar(MODELO_REAL)
 
     def test_estrutura(self):

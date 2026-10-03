@@ -19,7 +19,7 @@ sys.path.insert(0, RAIZ)
 from hq_tools.core import modelo3d
 
 MODELO_PADRAO = os.path.join(
-    RAIZ, "hq_tools", "modules", "viewer3d", "modelos", "low_poly_krita.json"
+    RAIZ, "hq_tools", "modules", "viewer3d", "modelos", "homem.json"
 )
 
 POSES = {
@@ -68,6 +68,7 @@ def main():
     parser.add_argument("--modelo", default=MODELO_PADRAO)
     parser.add_argument("--saida", default="preview-modelo3d.svg")
     parser.add_argument("--pose", choices=sorted(POSES), default="repouso")
+    parser.add_argument("--pose-json", default=None, help="arquivo de pose (hq_tools.pose3d)")
     parser.add_argument("--rot", action="append", help="rotação avulsa: osso=rx,ry,rz")
     parser.add_argument("--yaw", type=float, default=0.0)
     parser.add_argument("--pitch", type=float, default=-10.0)
@@ -83,6 +84,9 @@ def main():
 
     modelo = modelo3d.Modelo.carregar(argumentos.modelo)
     rotacoes = dict(POSES[argumentos.pose])
+    if argumentos.pose_json:
+        pose = modelo3d.carregar_pose(argumentos.pose_json)
+        rotacoes.update(modelo.aplicar_semantica(pose["ossos"]))
     rotacoes.update(_rotacoes(argumentos.rot))
 
     svg = modelo.renderizar(

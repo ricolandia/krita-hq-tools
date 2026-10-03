@@ -17,9 +17,13 @@ BALLOONS_DIR = os.path.join(USER_DIR, "balloons")
 ONOMATOPEIAS_DIR = os.path.join(USER_DIR, "onomatopeias")
 BIBLIOTECA_DIR = os.path.join(USER_DIR, "biblioteca")
 MODELOS_DIR = os.path.join(USER_DIR, "modelos")
-VIEWER3D_MODELO = os.path.join(
-    MODULES_DIR, "viewer3d", "modelos", "low_poly_krita.json"
+VIEWER3D_DIR = os.path.join(MODULES_DIR, "viewer3d")
+VIEWER3D_MODELOS = (
+    ("homem", "Homem", os.path.join(VIEWER3D_DIR, "modelos", "homem.json")),
+    ("mulher", "Mulher", os.path.join(VIEWER3D_DIR, "modelos", "mulher.json")),
 )
+VIEWER3D_POSES_DIR = os.path.join(VIEWER3D_DIR, "poses")
+VIEWER3D_POSE_PADRAO = "idle_maos_fechadas.json"
 ICONE_PATH = os.path.join(RESOURCES_DIR, "icon.png")
 KRITA_PALETTES_DIR = os.path.join(HOME, ".local", "share", "krita", "palettes")
 CONFIG_PATH = os.path.join(USER_DIR, "config.json")
