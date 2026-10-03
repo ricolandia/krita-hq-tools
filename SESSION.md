@@ -302,6 +302,10 @@ Espelho no Trilium: subnota "Lista do autor (a criar)" (`FoIRvo2ztN0D`).
 - Subir o `main`: os commits locais (auditoria, kit de balões, capturas)
   entram no primeiro push.
 - A tag `v0.6.2` fecha a publicação: a release sai com o ZIP pelo CI.
+- Pasta local fora do repositório (03/10): `Referencias/` e `Novas_ideias/`
+  entraram no `.gitignore` e saíram do índice (`git rm --cached`); os arquivos
+  continuam no disco. As amostras do kit seguem publicadas dentro de
+  `modules/`, e os testes do kit pulam no CI quando a pasta falta.
 
 Pronto: `INSTALL.md` (guia do usuário), CI em `.github/workflows/` (tests em
 push/PR com Python 3.11/3.13 + checagem do ZIP; release automática em tag

@@ -11,6 +11,10 @@ Duas partes:
    para importar (XML válido, viewBox, paths com traço, sem texto e sem
    imagem externa) mais a sincronia entre a pasta, o ``lote.json`` e o
    ``INDEX.md``.
+
+``Referencias/`` é material de trabalho local do autor e ficou fora do
+repositório (`.gitignore`): essas duas classes pulam quando a pasta não existe
+(é o caso do CI), e rodam inteiras na máquina do autor, onde o kit fica.
 """
 
 import json

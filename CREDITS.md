@@ -104,24 +104,24 @@ Comics pack e InkP/Expressive Inks.
 - Modelos de página gerados pelo plugin (A4, A3, tirinhas 1-3, grades 2x2 e
   3x3), criados para o projeto.
 - Paletas, presets de retícula e ícones: criados para o projeto.
-- Kit handdrawn de balões e onomatopeias (`Referencias/baloes-vetorizados/`,
-  22 SVGs; 19 amostras em `modules/balloons/samples/` e 3 em
-  `modules/onomatopeias/samples/`): desenhado à mão por Ricardo Graça no
+- Kit handdrawn de balões e onomatopeias (19 amostras em
+  `modules/balloons/samples/` e 3 em `modules/onomatopeias/samples/`; fonte
+  local do autor fora do repositório): desenhado à mão por Ricardo Graça no
   Inkscape em 02 e 03/10/2026 (MIT).
 
-## Pastas que não vão no ZIP
+## Pastas fora do repositório
+
+Estas pastas são material de trabalho local do autor e ficam no `.gitignore`
+(não entram no repositório nem no pacote):
+
+- `Referencias/`: pranchas de referência, o lote fonte dos vetores e imagens
+  de estudo. **Origem a declarar pelo autor** (desenho próprio, material de
+  terceiros ou imagem gerada por IA); o que é redistribuído são as amostras
+  já embarcadas em `hq_tools/`.
+- `Novas_ideias/`: implementações em estudo, fora do CI e do pacote.
 
 O pacote distribuído (`dist/hq_tools-<versão>.zip`) leva só `hq_tools/`,
-`hq_tools.desktop`, `hq_tools.action` e os documentos. Estas pastas ficam só
-no repositório, por serem material de trabalho:
-
-- `Referencias/baloes/` e `Referencias/vetores-teste/`: pranchas de referência
-  usadas para calibrar o vetorizador. **Origem a declarar pelo autor**
-  (desenho próprio, material de terceiros ou imagem gerada por IA): enquanto
-  não houver linha de origem e licença aqui e em
-  `Referencias/baloes-vetorizados/INDEX.md`, o repositório não deve ser
-  publicado com essas pranchas.
-- `Novas_ideias/`: implementações em estudo, fora do CI e do pacote.
+`hq_tools.desktop`, `hq_tools.action` e os documentos.
 
 ## Projeto e contato
 

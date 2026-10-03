@@ -42,8 +42,8 @@ alto dpi e a troca de tema.
 ### Balões e onomatopeias: kit do autor substitui as amostras
 
 22 SVGs desenhados à mão no Inkscape pelo autor (8 caudas, 9 falas, 2
-pensamentos e 3 onomatopeias) em `Referencias/baloes-vetorizados/`, sob a
-licença MIT do plugin.
+pensamentos e 3 onomatopeias), a partir do material de origem que fica fora do
+repositório, sob a licença MIT do plugin.
 
 - As 19 peças de balão (caudas, falas e pensamentos) substituem as 6 amostras
   genéricas de `modules/balloons/samples/`; as 3 onomatopeias (WHOOSH!, POW!
@@ -115,10 +115,10 @@ licença MIT do plugin.
   sem PyQt instalado ela quebrava com `ImportError`, e com PyQt6 instalado o
   teste do cache de miniaturas passava por acaso (o `qt_probe` prefere o
   binding já carregado). O falso de Qt ficou em `tests/qt_falso.py`.
-- Novo `tests/test_vetorizacao.py`: o lote de balões em
-  `Referencias/baloes-vetorizados` tem que continuar sendo reproduzível pelo
-  script, byte a byte, e cada SVG é parseado como XML (é o que o
-  `addShapesFromSvg` do Krita faz).
+- Novo `tests/test_vetorizacao.py`: cada SVG do kit é parseado como XML (é o
+  que o `addShapesFromSvg` do Krita faz), com manifesto e índice em sincronia,
+  e as amostras embarcadas têm que ser idênticas ao kit desenhado pelo autor
+  (a pasta fonte é local, fora do repositório; no CI esses testes pulam).
 - Novo `tests/test_tiles.py` (classe `TestTilesDoKit`): os 11 PNGs de
   `hq_tools/resources/patterns` têm que bater byte a byte com o que
   `tiles.gerar_todos` produz; mexer numa função de tile sem regerar o arquivo
