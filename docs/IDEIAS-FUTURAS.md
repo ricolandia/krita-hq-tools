@@ -83,8 +83,9 @@ Viável e a mais integrada, com condições:
   visão em 6 poses. O modelo do autor (MakeHuman CC0 + rig Auto-Rig Pro, 68
   ossos, 1591 vértices) já roda e bate com o Blender na validação numérica.
   Eixos medidos no rig: Y = eixo do osso (torção), Z = frente/trás (a junta),
-  X = abrir para o lado. Falta o docker (F3) com clique na região e sliders
-  semânticos.
+  X = abrir para o lado. F3 feito (03/10): docker "HQ Tools: 3D" com clique
+  na região, sliders semânticos (Dobrar/Abrir/Girar), dedos em um slider e
+  inserção raster/referência.
 
 ### Rota B: Blender Layer (plugin existente)
 

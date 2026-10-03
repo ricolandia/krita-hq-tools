@@ -18,14 +18,17 @@ já tem o repositório e quer desenvolver, veja `scripts/install-dev.sh` e o
    e escolha o ZIP.
 3. Em Configurar Krita > **Gerenciador de plugins Python**, marque **HQ Tools**.
 4. Feche e reabra o Krita.
-5. Os 7 dockers aparecem em Configurações > Dockers com o prefixo "HQ Tools":
-   retículas, balões, onomatopeias, paletas, páginas, pincéis e biblioteca.
+5. Os 8 dockers aparecem em Configurações > Dockers com o prefixo "HQ Tools":
+   retículas, balões, onomatopeias, paletas, páginas, pincéis, biblioteca e 3D.
    Para agrupá-los como abas de um mesmo painel, arraste um docker sobre o
    outro (o Krita junta automaticamente; desagrupar é só arrastar de volta).
 6. Atalhos de pincel (opcional): descompacte o ZIP, copie o arquivo
    `hq_tools.action` para a pasta `actions` do Krita (veja a tabela de pastas
    abaixo) e reinicie. Os atalhos aparecem em Configurar Krita > Atalhos >
    Scripts > HQ Tools (pincel 1 a 16).
+7. Ícone do plugin (opcional): para o ícone aparecer no Gerenciador de plugins
+   Python, copie o PNG de `<pykrita>/hq_tools/resources/icon-256.png` para
+   `~/.local/share/icons/hicolor/256x256/apps/hq_tools.png` e reinicie o Krita.
 
 ## Instalação manual (sem o diálogo de importação)
 

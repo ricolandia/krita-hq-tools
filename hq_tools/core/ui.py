@@ -13,7 +13,10 @@ pinta fundo, borda ou fonte, porque estilo próprio briga com o tema que o autor
 escolheu, com o alto dpi e com os ícones do programa.
 """
 
-from .compat import FRAME_HLINE, QtWidgets, standard_icon
+import os
+
+from .compat import FRAME_HLINE, QtGui, QtWidgets, standard_icon
+from .paths import ICONE_PATH
 
 # Escala de espaçamento do DESIGN.md (seção 4), recortada para o que cabe num
 # docker estreito: 4 entre controles, 8 entre linhas, 12 na borda do painel.
@@ -108,5 +111,7 @@ def painel(pai=None, margem=MARGEM, espaco=GAP):
     Os 7 dockers abriam com as mesmas duas linhas; agora abrem com uma.
     """
     widget = QtWidgets.QWidget(pai)
+    if os.path.isfile(ICONE_PATH):
+        widget.setWindowIcon(QtGui.QIcon(ICONE_PATH))
     layout = QtWidgets.QVBoxLayout(widget)
     return widget, espacamento(layout, margem, espaco)

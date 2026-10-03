@@ -108,6 +108,9 @@ Comics pack e InkP/Expressive Inks.
   `modules/balloons/samples/` e 3 em `modules/onomatopeias/samples/`; fonte
   local do autor fora do repositório): desenhado à mão por Ricardo Graça no
   Inkscape em 02 e 03/10/2026 (MIT).
+- Ícone do plugin (`assets/`; cópia em `hq_tools/resources/`): grade de
+  retícula em papel `#F4EFE6` e tinta `#141414`, desenhado no Penpot para o
+  projeto (MIT).
 
 ## Modelo 3D do visualizador (em teste)
 

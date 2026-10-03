@@ -12,6 +12,8 @@ ln -sfn "$REPO/hq_tools" "$PYKRITA/hq_tools"
 ln -sfn "$REPO/hq_tools.desktop" "$PYKRITA/hq_tools.desktop"
 cp -f "$REPO/hq_tools.action" "$ACTIONS/hq_tools.action"
 
+bash "$REPO/scripts/install-icons.sh"
+
 echo "Plugin instalado em modo de desenvolvimento:"
 echo "  $PYKRITA/hq_tools"
 echo "  $PYKRITA/hq_tools.desktop"

@@ -11,7 +11,7 @@ from .core.krita_helpers import log
 
 # (chave do módulo, id do docker, classe, caminho de import relativo a hq_tools)
 # A lista fica num lugar só para que o registro e a ação de pincel não
-# dependam de sete blocos de código repetidos.
+# dependam de oito blocos de código repetidos.
 MODULOS = (
     (
         "screentone",
@@ -40,6 +40,12 @@ MODULOS = (
         "modules.biblioteca.docker",
     ),
     ("brushes", "hq_tools_brushes", "BrushesDocker", "modules.brushes.docker"),
+    (
+        "viewer3d",
+        "hq_tools_viewer3d",
+        "Viewer3DDocker",
+        "modules.viewer3d.docker",
+    ),
 )
 
 

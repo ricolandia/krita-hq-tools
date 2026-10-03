@@ -33,6 +33,7 @@ Os quatro documentos originais de contexto do projeto estão em
 | Paletas | Templates de HQ e artísticas (tons, nanquim, pele, céu, vegetação, chapadas, Zorn, retrato, paisagem, amanhecer, noite, terra, pastel, aquarela, guache, acrílico, retrô, BD, super-herói, mangá, sépia), aplicação na cor de frente/fundo, instalação no Krita e visualização das paletas instaladas. |
 | Páginas | Gerenciador com miniaturas internas dos `.kra`: "Novo projeto..." usa a pasta da página salva (grava comicConfig.json e cria a biblioteca do projeto), "Abrir projeto..." lê um `comicConfig.json` do CPMT e "Pasta..." abre qualquer pasta; "Criar próxima página" abre um diálogo (formato A4/A5/A3/tirinha/americano/tankobon/quadrado/livre, DPI e painéis da tirinha), gera a página com guias de margem automáticas e atualiza a grade; "Definir modelo de página" usa a página atual ou um template de HQ do Krita (BD, EUA, mangá...) como modelo; "Camada de referência" marca a camada selecionada e "Importar referência (PNG)" insere uma referência travada no grupo ativo. |
 | Pincéis | Conjuntos sugeridos (Rascunho, Contornos, Aquarela/Guache, Acrílico/Óleo, Retículas) com cartões de miniatura + nome, montados com os presets instalados no Krita; 16 slots com atalhos configuráveis; aba "Packs" com pincéis da comunidade de licença verificada (instala com um clique e mostra a licença) e o instalador de bundle. |
+| Visualizador 3D | Manequim low-poly posável (MakeHuman + Auto-Rig Pro) como referência: arraste para orbitar, roda do mouse dá zoom e um clique numa região (cabeça, tronco, braço, perna) abre os sliders Dobrar/Abrir/Girar daquela junta; insere no documento como camada raster ou como referência travada. Em teste. |
 
 ## Kit de HQ (fontes e balões livres)
 
@@ -107,6 +108,9 @@ automaticamente; você pode desagrupar quando quiser).
    recurso" abre o documento 15 x 15 cm a 300 dpi; desenhe, "Salvar recurso do
    documento" e insira com duplo clique. A pintura sai como PNG transparente
    recortado pela camada ativa. Renomear, Duplicar e Apagar organizam a lista.
+8. **Visualizador 3D**: no docker "HQ Tools: 3D", arraste para orbitar e clique
+   numa região do corpo para posar; "Inserir como referência" cria a camada
+   travada com opacidade reduzida.
 
 ## Sintaxe do roteiro
 

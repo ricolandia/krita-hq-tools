@@ -210,9 +210,14 @@ aparência), tipografia das listas de miniaturas, tamanho dos ícones da lista.
   e braço; a hipótese "X é o eixo da junta" não se confirmou neste rig ARP.
 - Os FBX `Low_poly_Krita_.fbx` e `Low_poly_Krita_pose_A_.fbx` exportam JSON
   idêntico (0 diferenças): o `pose_A` não mudou o conteúdo.
-- F3 pendente: docker "HQ Tools: 3D" com clique na região (grupo de ossos) e
-  sliders semânticos (Dobrar/Abrir/Girar) mapeados para Z/X/Y, inserção raster
-  e "inserir como referência".
+- F3 feito (03/10): docker "HQ Tools: 3D" com clique na região (grupo de
+  ossos) e sliders semânticos (Dobrar/Abrir/Girar) mapeados para Z/X/Y (o
+  mapa vem de `eixos_semanticos`, calculado das matrizes), slider único para
+  dobrar os dedos, inserção raster e "inserir como referência".
+- Ícone: o `.desktop` ganhou `Icon=hq_tools` e o `scripts/install-icons.sh`
+  instala os PNGs no tema hicolor; os dockers também recebem o ícone pelo
+  `ui.painel`. Sem a linha `Icon=`, o gerenciador de plugins não mostrava nada.
+- Suíte: 211 testes (21 do visualizador 3D).
 
 ## Comandos
 

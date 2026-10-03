@@ -155,6 +155,59 @@ class TestManequim(unittest.TestCase):
             self.assertEqual(modelo.nome, "manequim")
 
 
+class TestEixosSemanticos(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        if not os.path.isfile(MODELO_REAL):
+            raise unittest.SkipTest("low_poly_krita.json não está no repositório")
+        cls.modelo = modelo3d.Modelo.carregar(MODELO_REAL)
+
+    def _vertice_da_coxa(self):
+        alvo = next(
+            indice
+            for indice, osso in enumerate(self.modelo.ossos)
+            if osso["nome"] == "thigh_stretch.l"
+        )
+        return max(
+            ((indice, dict(pares).get(alvo, 0.0)) for indice, pares in enumerate(self.modelo.pesos)),
+            key=lambda item: item[1],
+        )[0]
+
+    def test_mapa_da_coxa(self):
+        mapa = modelo3d.eixos_semanticos(self.modelo.osso_por_nome["thigh_stretch.l"])
+        self.assertEqual(mapa["dobrar"][0], "z")
+        self.assertEqual(mapa["abrir"][0], "x")
+        self.assertEqual(mapa["girar"], ("y", 1))
+
+    def test_mapa_da_cabeca(self):
+        mapa = modelo3d.eixos_semanticos(self.modelo.osso_por_nome["head.x"])
+        self.assertEqual(mapa["dobrar"][0], "x")
+        self.assertEqual(mapa["abrir"][0], "z")
+
+    def test_dobrar_positivo_vai_para_frente(self):
+        indice = self._vertice_da_coxa()
+        repouso = self.modelo.vertices_em_pose()[indice]
+        rotacoes = self.modelo.aplicar_semantica(
+            {"thigh_stretch.l": {"dobrar": 40.0}}
+        )
+        posado = self.modelo.vertices_em_pose(rotacoes)[indice]
+        self.assertLess(posado[1], repouso[1] - 0.02)
+
+    def test_abrir_positivo_vai_para_fora(self):
+        indice = self._vertice_da_coxa()
+        repouso = self.modelo.vertices_em_pose()[indice]
+        rotacoes = self.modelo.aplicar_semantica(
+            {"thigh_stretch.l": {"abrir": 40.0}}
+        )
+        posado = self.modelo.vertices_em_pose(rotacoes)[indice]
+        self.assertGreater(posado[0], repouso[0] + 0.02)
+
+    def test_osso_desconhecido_e_ignorado(self):
+        self.assertEqual(
+            self.modelo.aplicar_semantica({"nao_existe": {"dobrar": 30.0}}), {}
+        )
+
+
 class TestModeloReal(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

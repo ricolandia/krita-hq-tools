@@ -118,6 +118,58 @@ def _normalizar(vetor):
     return (vetor[0] / tamanho, vetor[1] / tamanho, vetor[2] / tamanho)
 
 
+EIXOS = {"x": 0, "y": 1, "z": 2}
+
+
+def eixos_semanticos(osso):
+    """Mapeia os eixos locais do osso para nomes de junta.
+
+    Devolve ``{"dobrar": (eixo, sinal), "abrir": (eixo, sinal), "girar": ...}``
+    onde ``eixo`` é "x", "y" ou "z" e ``sinal`` é +1 ou -1. O eixo alinhado com
+    o lado do corpo (mundo X) é o de dobrar (frente/trás); o outro é o de abrir
+    para o lado; o eixo do osso (Y) é o de girar. Os sinais são escolhidos para
+    que "dobrar" positivo vá para frente e "abrir" positivo vá para fora do
+    corpo. Medido no rig do autor (Auto-Rig Pro): coxa e braço têm dobrar no Z
+    e abrir no X; cabeça e tronco, o contrário.
+    """
+    matriz = osso["matriz"]
+
+    def coluna(indice):
+        return _normalizar((
+            matriz[indice], matriz[4 + indice], matriz[8 + indice]
+        ))
+
+    eixo_x, eixo_y, eixo_z = coluna(0), coluna(1), coluna(2)
+    if abs(eixo_z[0]) >= abs(eixo_x[0]):
+        dobrar = ("z", eixo_z)
+        abrir = ("x", eixo_x)
+    else:
+        dobrar = ("x", eixo_x)
+        abrir = ("z", eixo_z)
+
+    def sinal(escolhido, alvo):
+        a = escolhido[1]
+        cruzamento = (
+            a[1] * eixo_y[2] - a[2] * eixo_y[1],
+            a[2] * eixo_y[0] - a[0] * eixo_y[2],
+            a[0] * eixo_y[1] - a[1] * eixo_y[0],
+        )
+        produto = (
+            cruzamento[0] * alvo[0]
+            + cruzamento[1] * alvo[1]
+            + cruzamento[2] * alvo[2]
+        )
+        return 1 if produto > 0 else -1
+
+    frente = (0.0, -1.0, 0.0)
+    lado = (1.0, 0.0, 0.0) if osso["nome"].endswith(".l") else (-1.0, 0.0, 0.0)
+    return {
+        "dobrar": (dobrar[0], sinal(dobrar, frente)),
+        "abrir": (abrir[0], sinal(abrir, lado)),
+        "girar": ("y", 1),
+    }
+
+
 def _hex_para_rgb(cor):
     cor = cor.lstrip("#")
     return (int(cor[0:2], 16), int(cor[2:4], 16), int(cor[4:6], 16))
@@ -151,6 +203,7 @@ class Modelo:
         self.vertices = [tuple(vertice) for vertice in dados["vertices"]]
         self.pesos = [list(pares) for pares in dados["pesos"]]
         self.faces = [tuple(face) for face in dados["faces"]]
+        self.osso_por_nome = {osso["nome"]: osso for osso in self.ossos}
         self.caixa = self._calcular_caixa()
 
     @classmethod
@@ -194,6 +247,27 @@ class Modelo:
             for indice, osso in enumerate(self.ossos)
         ]
 
+    def aplicar_semantica(self, valores):
+        """Converte valores de junta (dobrar/abrir/girar) em rotações locais.
+
+        ``valores`` é ``{nome_do_osso: {"dobrar": graus, ...}}``; o mapeamento
+        de cada osso vem de :func:`eixos_semanticos`.
+        """
+        rotacoes = {}
+        for nome, pedidos in valores.items():
+            osso = self.osso_por_nome.get(nome)
+            if osso is None:
+                continue
+            mapa = eixos_semanticos(osso)
+            vetor = [0.0, 0.0, 0.0]
+            for chave, graus in pedidos.items():
+                if chave not in mapa:
+                    continue
+                eixo, sinal = mapa[chave]
+                vetor[EIXOS[eixo]] += sinal * float(graus)
+            rotacoes[nome] = tuple(vetor)
+        return rotacoes
+
     def vertices_em_pose(self, rotacoes=None):
         """Vértices no espaço do modelo com o skinning aplicado."""
         matrizes = self.matrizes_de_pele(rotacoes)
@@ -232,11 +306,14 @@ class Modelo:
         return visao, centro, escala
 
     def vertices_em_tela(self, rotacoes=None, yaw=0.0, pitch=-10.0, zoom=1.0,
-                         largura=700, altura=700, pan_x=0.0, pan_y=0.0):
+                         largura=700, altura=700, pan_x=0.0, pan_y=0.0,
+                         posados=None):
         """Projeta os vértices posados: (x, y na tela, profundidade)."""
         visao, centro, escala = self._camera(yaw, pitch, zoom, largura, altura, pan_x, pan_y)
+        if posados is None:
+            posados = self.vertices_em_pose(rotacoes)
         resultado = []
-        for vertice in self.vertices_em_pose(rotacoes):
+        for vertice in posados:
             x, y, z = aplicar_ponto(visao, vertice)
             tela_x = largura / 2.0 + (x - centro[0]) * escala + pan_x
             tela_y = altura / 2.0 - (z - centro[2]) * escala + pan_y
@@ -245,10 +322,11 @@ class Modelo:
 
     def renderizar(self, rotacoes=None, yaw=0.0, pitch=-10.0, zoom=1.0,
                    largura=700, altura=700, pan_x=0.0, pan_y=0.0,
-                   cor=None, fundo=None, luz=LUZ_PADRAO, cull=False):
+                   cor=None, fundo=None, luz=LUZ_PADRAO, cull=False, posados=None):
         """Devolve o SVG do modelo posado, com painter's algorithm."""
         visao, centro, escala = self._camera(yaw, pitch, zoom, largura, altura, pan_x, pan_y)
-        posados = self.vertices_em_pose(rotacoes)
+        if posados is None:
+            posados = self.vertices_em_pose(rotacoes)
         na_camera = [aplicar_ponto(visao, vertice) for vertice in posados]
         tela = [
             (

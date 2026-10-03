@@ -6,10 +6,14 @@
   na aba "Packs", junto dos demais instaladores.
 - Biblioteca do projeto: "Renomear...", "Duplicar" e "Apagar" operam o recurso
   selecionado direto no docker, com confirmação ao apagar.
-- Visualizador 3D (em teste, ainda sem docker): exportador FBX -> JSON para
-  rodar no Blender, núcleo em Python puro (cinemática, skinning, projeção
-  ortográfica e SVG) com 16 testes e script de preview fora do Krita. O modelo
-  do autor (MakeHuman + Auto-Rig Pro, 68 ossos) veio do FBX.
+- Visualizador 3D (em teste): docker "HQ Tools: 3D" com o manequim low-poly
+  do autor (MakeHuman + Auto-Rig Pro, 68 ossos), clique na região para abrir
+  os sliders Dobrar/Abrir/Girar, inserção raster e como referência. O núcleo
+  em Python puro (cinemática, skinning, projeção ortográfica e SVG) tem 21
+  testes e roda fora do Krita pelo script de preview.
+- Ícone do plugin: `Icon=hq_tools` no `.desktop` e instalação no tema via
+  `scripts/install-icons.sh` (o Gerenciador de plugins Python passa a mostrar
+  o ícone).
 
 ## [0.6.2] — 2026-10-03
 
