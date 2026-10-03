@@ -46,8 +46,9 @@ licença MIT do plugin.
 
 - As 19 peças de balão (caudas, falas e pensamentos) substituem as 6 amostras
   genéricas de `modules/balloons/samples/`; as 3 onomatopeias (WHOOSH!, POW!
-  e CRASH!) entram junto das 8 que já existiam. Quem já tem a pasta de
-  amostras não recebe cópia nova: o plugin só copia na primeira execução.
+  e CRASH!) substituem as 8 genéricas de `modules/onomatopeias/samples/`.
+  Quem já tem a pasta de amostras não recebe cópia nova: o plugin só copia na
+  primeira execução.
 - Caudas 01 a 04 têm a base aberta, para emendar no corpo dentro do Krita.
 - O lote gerado de 29/09 e os materiais de `Referencias/vetores-teste/` foram
   removidos; os scripts de vetorização ficam como ferramenta para pranchas

@@ -232,13 +232,16 @@ class TestAmostrasEmbarcadas(unittest.TestCase):
             with self.subTest(svg=nome):
                 self.iguais(nome, self.AMOSTRAS_BALOES)
 
-    def test_amostras_de_onomatopeias_incluem_o_kit_do_autor(self):
+    def test_amostras_de_onomatopeias_sao_o_kit_do_autor(self):
         kit = self.kit({"Ono"})
         self.assertTrue(kit)
         amostras = {
             nome for nome in os.listdir(self.AMOSTRAS_ONO) if nome.endswith(".svg")
         }
-        self.assertLessEqual(kit, amostras, "falta onomatopeia do autor nas amostras")
+        self.assertEqual(
+            kit, amostras,
+            "as amostras de onomatopeia têm que ser exatamente o kit do autor",
+        )
         for nome in sorted(kit):
             with self.subTest(svg=nome):
                 self.iguais(nome, self.AMOSTRAS_ONO)

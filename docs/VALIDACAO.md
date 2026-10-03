@@ -105,7 +105,7 @@ Diferenças entre o dump do bloco 2/3 e o que o plugin gera (ver
 
 ### 3d. Onomatopeias
 
-- Docker "HQ Tools: onomatopeias": 11 amostras na primeira execução; duplo
+- Docker "HQ Tools: onomatopeias": 3 amostras na primeira execução; duplo
   clique insere no grupo ativo como camada vetorial.
 - Adicionar um SVG próprio (Inkscape) na pasta e Atualizar.
 

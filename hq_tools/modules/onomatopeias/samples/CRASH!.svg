@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" width="240pt" height="120pt" viewBox="0 0 240 120">
-  <path d="M 10 40 L 35 10 L 80 5 L 150 6 L 205 12 L 230 40 L 232 80 L 205 108 L 150 115 L 80 113 L 35 110 L 10 82 Z"
-        fill="#ffffff" stroke="#000000" stroke-width="3"/>
-  <text x="120" y="78" font-family="Bangers, 'Comic Relief', sans-serif" font-size="50"
-        font-weight="bold" text-anchor="middle" fill="#2f6bd8" stroke="#000000"
-        stroke-width="3" transform="rotate(4 120 70)">CRASH!</text>
-</svg>

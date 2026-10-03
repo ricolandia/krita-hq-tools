@@ -243,7 +243,8 @@ Espelho no Trilium: subnota "Lista do autor (a criar)" (`FoIRvo2ztN0D`).
   viewBox, paths com traço, sem texto, manifesto e índice em sincronia).
 - **Integrado (03/10):** as 19 peças de balão viraram as amostras de
   `hq_tools/modules/balloons/samples/` (as 6 genéricas saíram) e as 3
-  onomatopeias entraram junto das 8 existentes. `Cauda_` no lugar de
+  onomatopeias substituíram as 8 genéricas de `onomatopeias/samples/`.
+  `Cauda_` no lugar de
   `Calda_`; licença MIT registrada no CREDITS.md; `tests/test_vetorizacao.py`
   passou a exigir kit e amostras idênticos byte a byte. A pasta do usuário
   do Acer foi atualizada à mão (o plugin só copia amostras com a pasta
@@ -253,7 +254,7 @@ Espelho no Trilium: subnota "Lista do autor (a criar)" (`FoIRvo2ztN0D`).
 - Conjunto próprio para substituir as 8 amostras: impacto, velocidade, som
   pequeno e sons de ação.
 - Versões com contorno e com preenchimento, para combinar com o nanquim.
-- **Parcial (03/10):** 3 entregues junto com os balões (`Ono_VSFX_01/02/03_`:
+- **Parcial (03/10):** 3 já no lugar das 8 amostras (`Ono_VSFX_01/02/03_`:
   "WHOOSH!", "POW!" e "CRASH!", fonte Bangers convertida em contorno). Faltam
   os sons menores; referências de estudo em `Referencias/Onomat/` (não
   versionadas ainda).
