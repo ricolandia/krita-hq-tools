@@ -31,7 +31,7 @@ TIPO_POR_PREFIXO = {
     "Fala": "fala",
     "Pensa": "pensamento",
     "Ono": "onomatopeia",
-    "Calda": "cauda",
+    "Cauda": "cauda",
 }
 
 
@@ -127,13 +127,13 @@ class TestLoteDoAutor(unittest.TestCase):
         self.assertTrue(self.svgs(), "nenhum SVG no lote")
 
     def test_nomes_seguem_a_convencao(self):
-        # Tipo_Nome_NN_.svg, com o tipo no começo (Fala/Pensa/Ono/Calda).
+        # Tipo_Nome_NN_.svg, com o tipo no começo (Fala/Pensa/Ono/Cauda).
         for nome in self.svgs():
             with self.subTest(svg=nome):
                 prefixo = nome.split("_", 1)[0]
                 self.assertIn(
                     prefixo, TIPO_POR_PREFIXO,
-                    "prefixo fora do padrão (Fala_/Pensa_/Ono_/Calda_)",
+                    "prefixo fora do padrão (Fala_/Pensa_/Ono_/Cauda_)",
                 )
                 self.assertRegex(
                     nome, r"^[A-Za-z]+_[A-Za-z]+_\d\d_\.svg$",

@@ -22,14 +22,14 @@ desenhado à mão.
 
 | Arquivo | Tipo | Descrição |
 |---|---|---|
-| Calda_Tail_01_.svg | cauda | cunha fina diagonal (base aberta) |
-| Calda_Tail_02_.svg | cauda | "V" simétrico (base aberta) |
-| Calda_Tail_03_.svg | cauda | "V" curvo assimétrico (base aberta) |
-| Calda_Tail_04_.svg | cauda | lâmina curva longa (base aberta) |
-| Calda_Tail_05_.svg | cauda | raio curto angular |
-| Calda_Tail_06_.svg | cauda | raio em zigue-zague |
-| Calda_Tail_07_.svg | cauda | três bolhas decrescentes (pensamento) |
-| Calda_Tail_08_.svg | cauda | quatro bolhas crescentes (pensamento) |
+| Cauda_Tail_01_.svg | cauda | cunha fina diagonal (base aberta) |
+| Cauda_Tail_02_.svg | cauda | "V" simétrico (base aberta) |
+| Cauda_Tail_03_.svg | cauda | "V" curvo assimétrico (base aberta) |
+| Cauda_Tail_04_.svg | cauda | lâmina curva longa (base aberta) |
+| Cauda_Tail_05_.svg | cauda | raio curto angular |
+| Cauda_Tail_06_.svg | cauda | raio em zigue-zague |
+| Cauda_Tail_07_.svg | cauda | três bolhas decrescentes (pensamento) |
+| Cauda_Tail_08_.svg | cauda | quatro bolhas crescentes (pensamento) |
 | Fala_Speak_01_.svg | fala | retangular arredondado |
 | Fala_Speak_02_.svg | fala | trapezoidal com perspectiva |
 | Fala_Speak_03_.svg | fala | quadrado vazado, sem preenchimento |
@@ -50,7 +50,7 @@ O `lote.json` guarda tipo e descrição de cada arquivo (o teste usa os dois).
 ## Status (QA de visão, 03/10/2026)
 
 - Nenhum traço cortado na borda e nenhuma forma quebrada nos 22.
-- Pontos para o autor conferir: `Calda_Tail_01_` (a mais ambígua das caudas
+- Pontos para o autor conferir: `Cauda_Tail_01_` (a mais ambígua das caudas
   abertas), `Fala_Speak_03_` (sem preenchimento, confirmar se é intencional)
   e `Ono_VSFX_01_` ("WHOOSH!" com W/H e O/O quase encostados).
 - Traço mais fino em `Fala_Speak_03_`, `08_` e `09_` (0,68 a 0,70 mm) do que

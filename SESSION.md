@@ -234,7 +234,7 @@ Espelho no Trilium: subnota "Lista do autor (a criar)" (`FoIRvo2ztN0D`).
   `Referencias/baloes-vetorizados/` (8 caudas, 9 falas, 2 pensamentos e 3
   onomatopeias), com `INDEX.md` e `lote.json` novos. QA de visão em 03/10:
   nenhum traço cortado ou forma quebrada; para revisar com o autor apenas
-  `Calda_Tail_01_` (a cauda aberta mais ambígua), `Fala_Speak_03_` (sem
+  `Cauda_Tail_01_` (a cauda aberta mais ambígua), `Fala_Speak_03_` (sem
   preenchimento) e `Ono_VSFX_01_` (letras quase encostadas), mais o traço
   fino de `Fala_Speak_03/08/09` (0,68 a 0,70 mm contra 0,90 a 1,01 mm no
   resto). `tests/test_vetorizacao.py` passou a travar o lote do autor (XML,
