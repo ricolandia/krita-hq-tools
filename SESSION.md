@@ -294,17 +294,20 @@ Espelho no Trilium: subnota "Lista do autor (a criar)" (`FoIRvo2ztN0D`).
   Bangers/Londrina, regras de ícone e banner).
 
 **Publicação**
-- **Aguardar o redesenho dos balões (decisão de 01/10) antes de publicar.**
-- Criar o repositório no GitHub e subir o main (aguardando as bibliotecas).
-- Criar a tag v0.6.2 (a release sai com o ZIP automaticamente).
-- Trocar o endereço do repositório no CREDITS.md e no SESSION.md.
-- Revisar README e INSTALL antes de abrir o repositório.
+- Repositório no GitHub: **https://github.com/ricolandia/krita-hq-tools**
+  (criado em 03/10; remote `origin` por SSH). O projeto deixou de ser pasta
+  local.
+- Subir o `main`: os commits locais (auditoria, kit de balões, capturas)
+  entram no primeiro push.
+- Criar a tag v0.6.2 quando a validação dentro do Krita passar (a release sai
+  com o ZIP automaticamente). Até lá o repositório fica público só com o
+  código.
 
-Pronto para a publicação: `INSTALL.md` (guia do usuário), CI em
-`.github/workflows/` (tests em push/PR com Python 3.11/3.13 + checagem do ZIP;
-release automática em tag `v*`), manual interno alinhado à v0.6.2 e CREDITS
-com placeholder do repositório. O ZIP atual está em `dist/hq_tools-0.6.2.zip`
-(não versionado; inclui `hq_tools.action` e `hq_tools.desktop`).
+Pronto: `INSTALL.md` (guia do usuário), CI em `.github/workflows/` (tests em
+push/PR com Python 3.11/3.13 + checagem do ZIP; release automática em tag
+`v*`), manual interno alinhado à v0.6.2, CREDITS e SESSION com o endereço do
+repositório. O ZIP atual está em `dist/hq_tools-0.6.2.zip` (não versionado;
+inclui `hq_tools.action` e `hq_tools.desktop`).
 
 ## Pendências futuras (fora de escopo por ora)
 

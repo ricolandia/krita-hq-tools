@@ -125,6 +125,5 @@ no repositório, por serem material de trabalho:
 
 ## Projeto e contato
 
-HQ Tools, por Ricardo Graça. Repositório público a publicar (por ora na
-pasta local `31_APPS_GITHUB/Krita-Comics-Plugin`; o endereço entra aqui na
-publicação).
+HQ Tools, por Ricardo Graça. Repositório público:
+https://github.com/ricolandia/krita-hq-tools
