@@ -118,6 +118,18 @@ def _posicao(evento):
     return evento.pos()
 
 
+def _botao_do_meio(evento):
+    meio = getattr(getattr(QtCore.Qt, "MouseButton", QtCore.Qt), "MiddleButton")
+    return evento.button() == meio
+
+
+def _shift_pressionado(evento):
+    shift = getattr(
+        getattr(QtCore.Qt, "KeyboardModifier", QtCore.Qt), "ShiftModifier"
+    )
+    return bool(evento.modifiers() & shift)
+
+
 class _Preview(QtWidgets.QLabel):
     """Área do preview: arrastar orbita, roda dá zoom, clique seleciona."""
 
@@ -128,6 +140,7 @@ class _Preview(QtWidgets.QLabel):
         self.setAlignment(ALIGN_CENTER)
         self._ultimo = None
         self._arrastou = False
+        self._deslocando = False
 
     def resizeEvent(self, evento):
         super().resizeEvent(evento)
@@ -136,6 +149,11 @@ class _Preview(QtWidgets.QLabel):
     def mousePressEvent(self, evento):
         self._ultimo = _posicao(evento)
         self._arrastou = False
+        self._deslocando = (
+            self.docker.modo_mover
+            or _shift_pressionado(evento)
+            or _botao_do_meio(evento)
+        )
 
     def mouseMoveEvent(self, evento):
         if self._ultimo is None:
@@ -144,7 +162,10 @@ class _Preview(QtWidgets.QLabel):
         delta = posicao - self._ultimo
         if abs(delta.x()) + abs(delta.y()) > 3:
             self._arrastou = True
-            self.docker.orbitar(delta.x(), delta.y())
+            if self._deslocando:
+                self.docker.deslocar(delta.x(), delta.y())
+            else:
+                self.docker.orbitar(delta.x(), delta.y())
             self._ultimo = posicao
 
     def mouseReleaseEvent(self, evento):
@@ -168,7 +189,14 @@ class Viewer3DDocker(DockWidget):
         self.regiao = None
         self.semantica = {}
         self.pose_atual = None
-        self.camera = {"yaw": 0.0, "pitch": -10.0, "zoom": 1.0}
+        self.modo_mover = False
+        self.camera = {
+            "yaw": 0.0,
+            "pitch": -10.0,
+            "zoom": 1.0,
+            "pan_x": 0.0,
+            "pan_y": 0.0,
+        }
         self._tela = []
         self._timer = QtCore.QTimer(self)
         self._timer.setSingleShot(True)
@@ -227,13 +255,37 @@ class Viewer3DDocker(DockWidget):
         layout.addWidget(self.grupo_juntas)
 
         cameras = widgets.QHBoxLayout()
-        button_front = ui.botao("Frente", "Volta a câmera para a vista frontal.")
+        button_front = ui.botao(
+            "Frente", "Volta à vista frontal (ângulo, zoom e enquadramento)."
+        )
         button_front.clicked.connect(self.reset_camera)
         cameras.addWidget(button_front)
+        button_fit = ui.botao(
+            "Enquadrar", "Centraliza o modelo e volta ao zoom 1, sem mudar o ângulo."
+        )
+        button_fit.clicked.connect(self.enquadrar)
+        cameras.addWidget(button_fit)
+        button_zoom_out = ui.botao("−", "Diminui o zoom.")
+        button_zoom_out.clicked.connect(lambda: self.aplicar_zoom(0.8))
+        cameras.addWidget(button_zoom_out)
+        button_zoom_in = ui.botao("+", "Aumenta o zoom.")
+        button_zoom_in.clicked.connect(lambda: self.aplicar_zoom(1.25))
+        cameras.addWidget(button_zoom_in)
+        layout.addLayout(cameras)
+
+        posse = widgets.QHBoxLayout()
         button_reset = ui.botao("Limpar pose", "Zera todas as juntas.")
         button_reset.clicked.connect(self.limpar_pose)
-        cameras.addWidget(button_reset)
-        layout.addLayout(cameras)
+        posse.addWidget(button_reset)
+        self.button_move = ui.botao(
+            "Mover",
+            "Ligado, arrastar desloca o enquadramento em vez de girar "
+            "(ou use Shift/botão do meio).",
+        )
+        self.button_move.setCheckable(True)
+        self.button_move.toggled.connect(self._alternar_mover)
+        posse.addWidget(self.button_move)
+        layout.addLayout(posse)
 
         acoes = widgets.QHBoxLayout()
         button_layer = ui.botao(
@@ -252,8 +304,9 @@ class Viewer3DDocker(DockWidget):
         layout.addLayout(acoes)
 
         layout.addWidget(ui.rotulo(
-            "Arraste para orbitar, roda do mouse dá zoom; clique numa região "
-            "para abrir os sliders. Dobrar/Abrir/Girar seguem os eixos do rig."
+            "Arraste para orbitar; Shift+arraste (ou botão do meio) desloca; "
+            "roda do mouse ou +/− dão zoom; clique numa região para abrir os "
+            "sliders. Dobrar/Abrir/Girar seguem os eixos do rig."
         ))
 
         self.setWidget(main)
@@ -361,6 +414,8 @@ class Viewer3DDocker(DockWidget):
             yaw=self.camera["yaw"],
             pitch=self.camera["pitch"],
             zoom=self.camera["zoom"],
+            pan_x=self.camera["pan_x"],
+            pan_y=self.camera["pan_y"],
             largura=largura,
             altura=altura,
             posados=posados,
@@ -372,6 +427,8 @@ class Viewer3DDocker(DockWidget):
             yaw=self.camera["yaw"],
             pitch=self.camera["pitch"],
             zoom=self.camera["zoom"],
+            pan_x=self.camera["pan_x"],
+            pan_y=self.camera["pan_y"],
             largura=largura,
             altura=altura,
             posados=posados,
@@ -395,8 +452,28 @@ class Viewer3DDocker(DockWidget):
         self.camera["zoom"] = max(0.3, min(4.0, self.camera["zoom"] * fator))
         self.agendar_render()
 
+    def deslocar(self, dx, dy):
+        self.camera["pan_x"] += dx
+        self.camera["pan_y"] += dy
+        self.agendar_render()
+
+    def enquadrar(self):
+        self.camera["zoom"] = 1.0
+        self.camera["pan_x"] = 0.0
+        self.camera["pan_y"] = 0.0
+        self.agendar_render()
+
+    def _alternar_mover(self, ligado):
+        self.modo_mover = bool(ligado)
+
     def reset_camera(self):
-        self.camera = {"yaw": 0.0, "pitch": -10.0, "zoom": 1.0}
+        self.camera = {
+            "yaw": 0.0,
+            "pitch": -10.0,
+            "zoom": 1.0,
+            "pan_x": 0.0,
+            "pan_y": 0.0,
+        }
         self.agendar_render()
 
     def limpar_pose(self):
@@ -544,6 +621,8 @@ class Viewer3DDocker(DockWidget):
             yaw=self.camera["yaw"],
             pitch=self.camera["pitch"],
             zoom=self.camera["zoom"],
+            pan_x=self.camera["pan_x"],
+            pan_y=self.camera["pan_y"],
             largura=largura,
             altura=altura,
             estilo=estilo,

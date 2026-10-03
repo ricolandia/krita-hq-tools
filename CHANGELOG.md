@@ -16,8 +16,9 @@
   ortográfica e SVG) tem 30 testes e roda fora do Krita pelo script de
   preview. Inclui os estilos Silhueta e Contorno (mais baratos que o
   sombreado; o contorno remove as linhas escondidas, sem efeito de corpo
-  transparente), preview com fundo de papel, correções de sliders/aviso/órbita
-  e `--decimar` no exportador.
+  transparente), preview com fundo de papel, zoom por roda e +/−, deslocamento
+  do enquadramento (Shift, botão do meio ou botão Mover) com "Enquadrar",
+  correções de sliders/aviso/órbita e `--decimar` no exportador.
 - Ícone do plugin: `Icon=hq_tools` no `.desktop` e instalação no tema via
   `scripts/install-icons.sh` (o Gerenciador de plugins Python passa a mostrar
   o ícone).

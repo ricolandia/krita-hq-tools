@@ -232,7 +232,9 @@ aparência), tipografia das listas de miniaturas, tamanho dos ícones da lista.
   estreitos; 606 -> 278 segmentos), preview
   com fundo de papel nos estilos chapados (não some no tema escuro), sliders
   sem sobreposição (limpeza recursiva do layout), aviso fixo de clique e
-  órbita invertida para o gesto natural. Benchmarks em 400x400: sombreado
+  órbita invertida para o gesto natural. Câmera: zoom por roda e +/−,
+  deslocamento do enquadramento (Shift+arraste, botão do meio ou botão Mover)
+  e "Enquadrar" para centralizar. Benchmarks em 400x400: sombreado
   ~47 ms, silhueta ~15 ms, contorno ~21 ms; 848 faces = 10 ms e 526 = 6,6 ms
   (sombreado). O exportador ganhou `--decimar` (fração 0-1).
 

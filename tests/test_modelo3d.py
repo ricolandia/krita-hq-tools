@@ -7,6 +7,7 @@ exportador mudar o formato, o teste acusa.
 """
 
 import json
+import math
 import os
 import re
 import tempfile
@@ -101,6 +102,26 @@ class TestManequim(unittest.TestCase):
     def test_projecao_z_para_cima(self):
         tela = self.modelo.vertices_em_tela(largura=700, altura=700)
         self.assertLess(tela[1][1], tela[0][1])
+
+    def test_pan_desloca_a_tela(self):
+        base = self.modelo.vertices_em_tela(largura=700, altura=700)
+        movido = self.modelo.vertices_em_tela(
+            largura=700, altura=700, pan_x=50.0, pan_y=-30.0
+        )
+        self.assertAlmostEqual(movido[0][0] - base[0][0], 50.0, places=6)
+        self.assertAlmostEqual(movido[0][1] - base[0][1], -30.0, places=6)
+
+    def test_zoom_escala_a_partir_do_centro(self):
+        base = self.modelo.vertices_em_tela(largura=700, altura=700)
+        ampliado = self.modelo.vertices_em_tela(largura=700, altura=700, zoom=2.0)
+
+        def distancia(ponto):
+            return math.hypot(ponto[0] - 350.0, ponto[1] - 350.0)
+
+        indice = max(range(len(base)), key=lambda i: distancia(base[i]))
+        self.assertAlmostEqual(
+            distancia(ampliado[indice]), 2.0 * distancia(base[indice]), places=4
+        )
 
     def test_svg_face_visivel(self):
         modelo = modelo3d.Modelo(triangulo_visivel())
