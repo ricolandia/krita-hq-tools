@@ -11,6 +11,10 @@ is the English overview.
 The four original context documents of the project are in `docs/contexto/`
 (Portuguese).
 
+## Demo
+
+[<img src="Screenshots/08-demo.png" width="720" alt="Watch the HQ Tools demo (1-minute video)">](https://youtu.be/B9KYYyLdHF0)
+
 ## Screenshots
 
 <img src="Screenshots/01-baloes.png" width="380" alt="Balloons docker with the author's hand-drawn kit">

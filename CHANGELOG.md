@@ -63,6 +63,10 @@ muda para a aba "Packs". Validado dentro do Krita pelo autor em 03/10/2026.
   `Screenshots/07-3d.png`; manual interno e INSTALL atualizados.
 - `docs/IDEIAS-FUTURAS.md` com a revisão das sugestões e as decisões de rota.
 
+### Divulgação
+
+- Demo em vídeo (1 minuto): https://youtu.be/B9KYYyLdHF0
+
 Suíte: 222 testes.
 
 ## [0.6.2] — 2026-10-03

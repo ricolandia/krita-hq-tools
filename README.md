@@ -10,6 +10,10 @@ para o Krita 6 (PyQt6).
 Os quatro documentos originais de contexto do projeto estão em
 `docs/contexto/`.
 
+## Demo
+
+[<img src="Screenshots/08-demo.png" width="720" alt="Assista ao demo do HQ Tools (vídeo de 1 minuto)">](https://youtu.be/B9KYYyLdHF0)
+
 ## Capturas
 
 <img src="Screenshots/01-baloes.png" width="380" alt="Docker de balões com o kit handdrawn do autor">

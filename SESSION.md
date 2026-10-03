@@ -336,6 +336,9 @@ Espelho no Trilium: subnota "Lista do autor (a criar)" (`FoIRvo2ztN0D`).
 - Ícone: **pronto** em `assets/` (mestre 512 claro/escuro mais a grade pequena
   dedicada para 128/64/32/16, sem a gota por decisão do autor), aprovado no QA
   de visão; editável nos 4 boards do Penpot e regras em `docs/DESIGN.md`.
+- Vídeo demo: **publicado** no YouTube em 03/10 (https://youtu.be/B9KYYyLdHF0);
+  capa em `Screenshots/08-demo.png`, seção "Demo" nos READMEs PT/EN e roteiro
+  em `docs/ROTEIRO-VIDEO.md`.
 - Banner ou capa para o repositório e redes (próximo passo, mesmo fluxo).
 - Capturas e GIFs: roteiro pronto em `docs/ROTEIRO-CAPTURAS.md` (10 cenas com
   formato e nomes de arquivo).
