@@ -291,6 +291,34 @@ class Modelo:
             resultado.append((x, y, z))
         return resultado
 
+    def _contorno(self, na_camera):
+        """Arestas de silhueta: as que separam face da frente de face de trás.
+
+        Percorre os triângulos, marca a orientação de cada um e devolve os
+        pares de vértices cujas faces vizinhas discordam (ou que só têm uma
+        face). É o que desenha a linha do contorno do modelo projetado.
+        """
+        vizinhanca = {}
+        for face in self.faces:
+            for triangulo in self._triangular(face):
+                p0, p1, p2 = (na_camera[indice] for indice in triangulo)
+                aresta1 = (p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2])
+                aresta2 = (p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2])
+                normal_y = aresta1[2] * aresta2[0] - aresta1[0] * aresta2[2]
+                frente = normal_y < -1e-9
+                for a, b in ((0, 1), (1, 2), (2, 0)):
+                    chave = (
+                        min(triangulo[a], triangulo[b]),
+                        max(triangulo[a], triangulo[b]),
+                    )
+                    registro = vizinhanca.setdefault(chave, [0, 0])
+                    registro[0 if frente else 1] += 1
+        return [
+            chave
+            for chave, (frente, tras) in vizinhanca.items()
+            if (frente > 0 and tras > 0) or (frente + tras) == 1
+        ]
+
     @staticmethod
     def _triangular(face):
         """Leque de triângulos: o culling e o painter ficam estáveis com quads
@@ -329,7 +357,8 @@ class Modelo:
         ``estilo="sombreado"`` (padrão) usa painter's algorithm e sombreamento
         por face. ``estilo="chapado"`` desenha a silhueta: todas as faces numa
         cor só, num único ``path``, sem ordenar nem sombrear; é mais barato de
-        gerar e de rasterizar.
+        gerar e de rasterizar. ``estilo="contorno"`` desenha só a linha de
+        silhueta (as arestas entre faces da frente e de trás).
         """
         visao, centro, escala = self._camera(yaw, pitch, zoom, largura, altura, pan_x, pan_y)
         if posados is None:
@@ -355,21 +384,35 @@ class Modelo:
                 '<rect width="{0}" height="{1}" fill="{2}"/>'.format(largura, altura, fundo)
             )
 
-        if estilo == "chapado":
-            cor_chapada = _rgb_para_hex(_hex_para_rgb(cor or self.cor_padrao))
-            caminho = []
-            for face in self.faces:
-                for triangulo in self._triangular(face):
+        if estilo in ("chapado", "contorno"):
+            cor_solida = _rgb_para_hex(_hex_para_rgb(cor or self.cor_padrao))
+            if estilo == "chapado":
+                caminho = []
+                for face in self.faces:
+                    for triangulo in self._triangular(face):
+                        caminho.append(
+                            "M{0:.1f} {1:.1f}L{2:.1f} {3:.1f}L{4:.1f} {5:.1f}Z".format(
+                                tela[triangulo[0]][0], tela[triangulo[0]][1],
+                                tela[triangulo[1]][0], tela[triangulo[1]][1],
+                                tela[triangulo[2]][0], tela[triangulo[2]][1],
+                            )
+                        )
+                partes.append(
+                    '<path d="{0}" fill="{1}"/>'.format("".join(caminho), cor_solida)
+                )
+            else:
+                caminho = []
+                for inicio, fim in self._contorno(na_camera):
                     caminho.append(
-                        "M{0:.1f} {1:.1f}L{2:.1f} {3:.1f}L{4:.1f} {5:.1f}Z".format(
-                            tela[triangulo[0]][0], tela[triangulo[0]][1],
-                            tela[triangulo[1]][0], tela[triangulo[1]][1],
-                            tela[triangulo[2]][0], tela[triangulo[2]][1],
+                        "M{0:.1f} {1:.1f}L{2:.1f} {3:.1f}".format(
+                            tela[inicio][0], tela[inicio][1],
+                            tela[fim][0], tela[fim][1],
                         )
                     )
-            partes.append(
-                '<path d="{0}" fill="{1}"/>'.format("".join(caminho), cor_chapada)
-            )
+                partes.append(
+                    '<path d="{0}" fill="none" stroke="{1}" stroke-width="1.5" '
+                    'stroke-linejoin="round"/>'.format("".join(caminho), cor_solida)
+                )
             partes.append("</svg>")
             return "".join(partes)
 

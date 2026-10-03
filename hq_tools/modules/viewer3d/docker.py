@@ -191,6 +191,7 @@ class Viewer3DDocker(DockWidget):
         self.cmb_estilo = widgets.QComboBox()
         self.cmb_estilo.addItem("Sombreado", "sombreado")
         self.cmb_estilo.addItem("Silhueta", "silhueta")
+        self.cmb_estilo.addItem("Contorno", "contorno")
         self.cmb_estilo.currentIndexChanged.connect(self.agendar_render)
         estilo_row.addWidget(self.cmb_estilo, 1)
         layout.addLayout(estilo_row)
@@ -251,9 +252,12 @@ class Viewer3DDocker(DockWidget):
         self._timer.start()
 
     def _estilo(self):
-        if self.cmb_estilo.currentData() == "silhueta":
-            return "chapado", "#141414"
-        return "sombreado", None
+        dados = self.cmb_estilo.currentData()
+        if dados == "silhueta":
+            return "chapado", "#141414", "#ffffff"
+        if dados == "contorno":
+            return "contorno", "#141414", "#ffffff"
+        return "sombreado", None, None
 
     def atualizar_preview(self):
         if self.modelo is None:
@@ -262,7 +266,7 @@ class Viewer3DDocker(DockWidget):
         altura = max(self.preview.height(), 200)
         rotacoes = self._rotacoes()
         posados = self.modelo.vertices_em_pose(rotacoes)
-        estilo, cor = self._estilo()
+        estilo, cor, fundo = self._estilo()
         svg = self.modelo.renderizar(
             yaw=self.camera["yaw"],
             pitch=self.camera["pitch"],
@@ -272,6 +276,7 @@ class Viewer3DDocker(DockWidget):
             posados=posados,
             estilo=estilo,
             cor=cor,
+            fundo=fundo,
         )
         self._tela = self.modelo.vertices_em_tela(
             yaw=self.camera["yaw"],
@@ -441,7 +446,7 @@ class Viewer3DDocker(DockWidget):
             return
         largura = documento.width()
         altura = documento.height()
-        estilo, cor = self._estilo()
+        estilo, cor, _ = self._estilo()
         svg = self.modelo.renderizar(
             self._rotacoes(),
             yaw=self.camera["yaw"],

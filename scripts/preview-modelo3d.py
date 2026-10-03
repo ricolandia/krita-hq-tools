@@ -77,7 +77,7 @@ def main():
     parser.add_argument("--cor", default=None)
     parser.add_argument("--fundo", default=None)
     parser.add_argument(
-        "--estilo", choices=("sombreado", "chapado"), default="sombreado"
+        "--estilo", choices=("sombreado", "chapado", "contorno"), default="sombreado"
     )
     argumentos = parser.parse_args()
 

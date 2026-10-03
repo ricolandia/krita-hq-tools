@@ -143,6 +143,16 @@ class TestManequim(unittest.TestCase):
         self.assertEqual(raiz.findall("{http://www.w3.org/2000/svg}polygon"), [])
         self.assertIn("M", caminhos[0].get("d"))
 
+    def test_svg_contorno_sem_preenchimento(self):
+        modelo = modelo3d.Modelo(triangulo_visivel())
+        svg = modelo.renderizar(largura=400, altura=400, estilo="contorno")
+        raiz = ET.fromstring(svg)
+        caminhos = raiz.findall("{http://www.w3.org/2000/svg}path")
+        self.assertEqual(len(caminhos), 1)
+        self.assertEqual(caminhos[0].get("fill"), "none")
+        self.assertIn("stroke", caminhos[0].attrib)
+        self.assertEqual(caminhos[0].get("d").count("M"), 3)
+
     def test_formato_desconhecido(self):
         dados = manequim()
         dados["formato"] = "outro"
@@ -239,6 +249,13 @@ class TestModeloReal(unittest.TestCase):
         poligonos = raiz.findall("{http://www.w3.org/2000/svg}polygon")
         self.assertGreater(len(poligonos), 500)
         self.assertLessEqual(len(poligonos), 2 * len(self.modelo.faces))
+
+    def test_contorno_tem_muitos_segmentos(self):
+        svg = self.modelo.renderizar(largura=500, altura=500, estilo="contorno")
+        raiz = ET.fromstring(svg)
+        caminho = raiz.find("{http://www.w3.org/2000/svg}path")
+        self.assertIsNotNone(caminho)
+        self.assertGreater(caminho.get("d").count("M"), 50)
 
     def test_pose_move_vertices(self):
         repouso = self.modelo.vertices_em_pose()

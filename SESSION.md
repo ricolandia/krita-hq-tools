@@ -218,11 +218,13 @@ aparência), tipografia das listas de miniaturas, tamanho dos ícones da lista.
   instala os PNGs no tema hicolor; os dockers também recebem o ícone pelo
   `ui.painel`. Sem a linha `Icon=`, o gerenciador de plugins não mostrava nada.
 - Suíte: 212 testes (22 do visualizador 3D).
-- Correções de uso (03/10): modo Silhueta (path único, sem ordenação nem
-  sombreamento), sliders sem sobreposição (limpeza recursiva do layout),
-  aviso fixo de clique e órbita invertida para o gesto natural. Benchmarks
-  em 400x400: 1570 faces = 27 ms, 848 = 10 ms, 526 = 6,6 ms; o exportador
-  ganhou `--decimar` (fração 0-1) para gerar modelos mais leves.
+- Correções de uso (03/10): modos Silhueta (path único, sem ordenação nem
+  sombreamento) e Contorno (arestas entre face da frente e de trás), preview
+  com fundo de papel nos estilos chapados (não some no tema escuro), sliders
+  sem sobreposição (limpeza recursiva do layout), aviso fixo de clique e
+  órbita invertida para o gesto natural. Benchmarks em 400x400: sombreado
+  ~47 ms, silhueta ~15 ms, contorno ~21 ms; 848 faces = 10 ms e 526 = 6,6 ms
+  (sombreado). O exportador ganhou `--decimar` (fração 0-1).
 
 ## Comandos
 
