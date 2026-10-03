@@ -8,8 +8,9 @@
   selecionado direto no docker, com confirmação ao apagar.
 - Visualizador 3D (em teste): docker "HQ Tools: 3D" com o manequim low-poly
   do autor (MakeHuman + Auto-Rig Pro, 68 ossos), escolha de corpo
-  (Homem/Mulher) e biblioteca de poses (padrão: Idle com mãos fechadas,
-  extraída de FBX animado pelo `scripts/exportar-poses3d.py`), clique na
+  (Homem/Mulher) e biblioteca de poses (padrão: Idle com mãos fechadas, mais
+  a Idle com mãos abertas; extraídas de FBX animado pelo
+  `scripts/exportar-poses3d.py`), clique na
   região para abrir os sliders Dobrar/Abrir/Girar, inserção raster e como
   referência. O núcleo em Python puro (cinemática, skinning, projeção
   ortográfica e SVG) tem 30 testes e roda fora do Krita pelo script de

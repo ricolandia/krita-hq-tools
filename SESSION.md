@@ -220,8 +220,9 @@ aparência), tipografia das listas de miniaturas, tamanho dos ícones da lista.
 - Suíte: 220 testes (30 do visualizador 3D).
 - Biblioteca de poses (03/10): `scripts/exportar-poses3d.py` extrai as rotações
   locais de um FBX animado (frame 1) e converte para Dobrar/Abrir/Girar;
-  validado contra o Blender com desvio máximo de 7 mm (mediana 0). A pose
-  `idle_maos_fechadas` é o padrão dos dois corpos.
+  validado contra o Blender com desvio máximo de 7 mm (mediana 0). A
+  biblioteca tem `idle_maos_fechadas` (padrão dos dois corpos) e
+  `idle_maos_abertas` (dedos no repouso, extraída do `Pose_Idle_.fbx`).
 - Corpo (03/10): `homem.json` (1591 vértices) e `mulher.json` (1605 vértices)
   com os mesmos 68 ossos e nomes, então as poses valem para os dois; seletor
   Corpo no docker.

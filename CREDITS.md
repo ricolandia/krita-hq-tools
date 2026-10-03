@@ -120,9 +120,9 @@ Comics pack e InkP/Expressive Inks.
   Auto-Rig Pro (addon de terceiros) e exportado pelo autor. Os JSON são
   redistribuídos para o visualizador 3D do plugin; os FBX originais ficam
   fora do repositório.
-- `hq_tools/modules/viewer3d/poses/idle_maos_fechadas.json`: pose extraída do
-  FBX animado do autor (rotações locais por osso) e usada como padrão dos dois
-  corpos.
+- `hq_tools/modules/viewer3d/poses/`: poses extraídas dos FBX animados do
+  autor (rotações locais por osso). Hoje: `idle_maos_fechadas.json` (padrão dos
+  dois corpos) e `idle_maos_abertas.json` (dedos no repouso, mãos abertas).
 
 ## Pastas fora do repositório
 
