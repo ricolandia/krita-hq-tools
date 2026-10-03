@@ -109,6 +109,14 @@ Comics pack e InkP/Expressive Inks.
   local do autor fora do repositório): desenhado à mão por Ricardo Graça no
   Inkscape em 02 e 03/10/2026 (MIT).
 
+## Modelo 3D do visualizador (em teste)
+
+- `hq_tools/modules/viewer3d/modelos/low_poly_krita.json`: dado derivado do
+  FBX do autor (68 ossos, 1591 vértices, 1570 faces). Malha do MakeHuman
+  (CC0); rig gerado com Auto-Rig Pro (addon de terceiros) e exportado pelo
+  autor. O JSON é redistribuído para o visualizador 3D do plugin; o FBX
+  original fica fora do repositório.
+
 ## Pastas fora do repositório
 
 Estas pastas são material de trabalho local do autor e ficam no `.gitignore`

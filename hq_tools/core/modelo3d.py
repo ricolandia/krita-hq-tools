@@ -1,0 +1,315 @@
+"""Visualizador 3D do HQ Tools: núcleo puro, sem Krita e sem numpy.
+
+O modelo vem do exportador ``scripts/exportar-modelo3d.py`` (FBX -> JSON). Aqui
+ficam a cinemática direta dos ossos, o skinning linear, a projeção ortográfica
+com câmera orbit e a saída SVG. O Blender não é dependência em tempo de
+execução; o FBX também não, porque é binário e o Python do Krita não o lê.
+
+Convenções: o modelo é Z-up (padrão do Blender). A câmera orbita em torno do
+eixo Z (``yaw``) e inclina em torno do eixo horizontal (``pitch``); o ``y`` do
+espaço do modelo é a profundidade (a câmera olha do ``-y`` para o ``+y``). As
+rotações das juntas são locais, em graus, aplicadas na ordem X, depois Y,
+depois Z.
+"""
+
+import json
+import math
+
+FORMATO = "hq_tools.modelo3d"
+VERSAO = 1
+
+LUZ_PADRAO = (0.4, -0.8, 0.45)
+
+
+def identidade():
+    return [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0]
+
+
+def multiplicar(a, b):
+    resultado = [0.0] * 16
+    for linha in range(4):
+        base = linha * 4
+        for coluna in range(4):
+            resultado[base + coluna] = (
+                a[base] * b[coluna]
+                + a[base + 1] * b[4 + coluna]
+                + a[base + 2] * b[8 + coluna]
+                + a[base + 3] * b[12 + coluna]
+            )
+    return resultado
+
+
+def aplicar_ponto(matriz, ponto):
+    x, y, z = ponto
+    return (
+        matriz[0] * x + matriz[1] * y + matriz[2] * z + matriz[3],
+        matriz[4] * x + matriz[5] * y + matriz[6] * z + matriz[7],
+        matriz[8] * x + matriz[9] * y + matriz[10] * z + matriz[11],
+    )
+
+
+def inversa_afim(matriz):
+    a, b, c, tx = matriz[0], matriz[1], matriz[2], matriz[3]
+    d, e, f, ty = matriz[4], matriz[5], matriz[6], matriz[7]
+    g, h, i, tz = matriz[8], matriz[9], matriz[10], matriz[11]
+    determinante = a * (e * i - f * h) - b * (d * i - f * g) + c * (d * h - e * g)
+    if abs(determinante) < 1e-12:
+        raise ValueError("matriz de repouso sem inversa")
+    fator = 1.0 / determinante
+    r00 = (e * i - f * h) * fator
+    r01 = (c * h - b * i) * fator
+    r02 = (b * f - c * e) * fator
+    r10 = (f * g - d * i) * fator
+    r11 = (a * i - c * g) * fator
+    r12 = (c * d - a * f) * fator
+    r20 = (d * h - e * g) * fator
+    r21 = (b * g - a * h) * fator
+    r22 = (a * e - b * d) * fator
+    return [
+        r00, r01, r02, -(r00 * tx + r01 * ty + r02 * tz),
+        r10, r11, r12, -(r10 * tx + r11 * ty + r12 * tz),
+        r20, r21, r22, -(r20 * tx + r21 * ty + r22 * tz),
+        0.0, 0.0, 0.0, 1.0,
+    ]
+
+
+def rotacao_x(graus):
+    radianos = math.radians(graus)
+    cosseno, seno = math.cos(radianos), math.sin(radianos)
+    return [
+        1.0, 0.0, 0.0, 0.0,
+        0.0, cosseno, -seno, 0.0,
+        0.0, seno, cosseno, 0.0,
+        0.0, 0.0, 0.0, 1.0,
+    ]
+
+
+def rotacao_y(graus):
+    radianos = math.radians(graus)
+    cosseno, seno = math.cos(radianos), math.sin(radianos)
+    return [
+        cosseno, 0.0, seno, 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        -seno, 0.0, cosseno, 0.0,
+        0.0, 0.0, 0.0, 1.0,
+    ]
+
+
+def rotacao_z(graus):
+    radianos = math.radians(graus)
+    cosseno, seno = math.cos(radianos), math.sin(radianos)
+    return [
+        cosseno, -seno, 0.0, 0.0,
+        seno, cosseno, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0,
+    ]
+
+
+def rotacao_euler(rotacao):
+    rx, ry, rz = rotacao
+    return multiplicar(rotacao_z(rz), multiplicar(rotacao_y(ry), rotacao_x(rx)))
+
+
+def _normalizar(vetor):
+    tamanho = math.sqrt(vetor[0] ** 2 + vetor[1] ** 2 + vetor[2] ** 2)
+    if tamanho < 1e-12:
+        return (0.0, 0.0, 0.0)
+    return (vetor[0] / tamanho, vetor[1] / tamanho, vetor[2] / tamanho)
+
+
+def _hex_para_rgb(cor):
+    cor = cor.lstrip("#")
+    return (int(cor[0:2], 16), int(cor[2:4], 16), int(cor[4:6], 16))
+
+
+def _rgb_para_hex(rgb):
+    return "#{0:02x}{1:02x}{2:02x}".format(
+        max(0, min(255, int(round(rgb[0])))),
+        max(0, min(255, int(round(rgb[1])))),
+        max(0, min(255, int(round(rgb[2])))),
+    )
+
+
+class Modelo:
+    """Modelo 3D com ossos, malha e pesos, pronto para posar e desenhar."""
+
+    def __init__(self, dados):
+        if dados.get("formato") != FORMATO:
+            raise ValueError(
+                "formato de modelo desconhecido: {0}".format(dados.get("formato"))
+            )
+        if int(dados.get("versao", 0)) > VERSAO:
+            raise ValueError(
+                "modelo versão {0}; o plugin entende até {1}".format(
+                    dados["versao"], VERSAO
+                )
+            )
+        self.nome = dados.get("nome", "modelo")
+        self.cor_padrao = dados.get("cor_padrao", "#d8c3b0")
+        self.ossos = list(dados["ossos"])
+        self.vertices = [tuple(vertice) for vertice in dados["vertices"]]
+        self.pesos = [list(pares) for pares in dados["pesos"]]
+        self.faces = [tuple(face) for face in dados["faces"]]
+        self.caixa = self._calcular_caixa()
+
+    @classmethod
+    def carregar(cls, caminho):
+        with open(caminho, "r", encoding="utf-8") as arquivo:
+            return cls(json.load(arquivo))
+
+    def _calcular_caixa(self):
+        xs = [vertice[0] for vertice in self.vertices]
+        ys = [vertice[1] for vertice in self.vertices]
+        zs = [vertice[2] for vertice in self.vertices]
+        return (min(xs), min(ys), min(zs), max(xs), max(ys), max(zs))
+
+    def centro(self):
+        x0, y0, z0, x1, y1, z1 = self.caixa
+        return ((x0 + x1) / 2.0, (y0 + y1) / 2.0, (z0 + z1) / 2.0)
+
+    def diagonal(self):
+        x0, y0, z0, x1, y1, z1 = self.caixa
+        return math.sqrt((x1 - x0) ** 2 + (y1 - y0) ** 2 + (z1 - z0) ** 2)
+
+    def nomes_dos_ossos(self):
+        return [osso["nome"] for osso in self.ossos]
+
+    def matrizes_de_pele(self, rotacoes=None):
+        """Matrizes que levam cada vértice de repouso à pose pedida."""
+        rotacoes = rotacoes or {}
+        poses = []
+        for osso in self.ossos:
+            repouso = osso["matriz"]
+            rotacao = rotacao_euler(rotacoes.get(osso["nome"], (0.0, 0.0, 0.0)))
+            pai = osso["pai"]
+            if pai is None:
+                pose = multiplicar(repouso, rotacao)
+            else:
+                relativo = multiplicar(inversa_afim(self.ossos[pai]["matriz"]), repouso)
+                pose = multiplicar(poses[pai], multiplicar(relativo, rotacao))
+            poses.append(pose)
+        return [
+            multiplicar(poses[indice], inversa_afim(osso["matriz"]))
+            for indice, osso in enumerate(self.ossos)
+        ]
+
+    def vertices_em_pose(self, rotacoes=None):
+        """Vértices no espaço do modelo com o skinning aplicado."""
+        matrizes = self.matrizes_de_pele(rotacoes)
+        resultado = []
+        for indice, vertice in enumerate(self.vertices):
+            x = y = z = 0.0
+            for osso, peso in self.pesos[indice]:
+                matriz = matrizes[osso]
+                x += peso * (
+                    matriz[0] * vertice[0] + matriz[1] * vertice[1]
+                    + matriz[2] * vertice[2] + matriz[3]
+                )
+                y += peso * (
+                    matriz[4] * vertice[0] + matriz[5] * vertice[1]
+                    + matriz[6] * vertice[2] + matriz[7]
+                )
+                z += peso * (
+                    matriz[8] * vertice[0] + matriz[9] * vertice[1]
+                    + matriz[10] * vertice[2] + matriz[11]
+                )
+            resultado.append((x, y, z))
+        return resultado
+
+    @staticmethod
+    def _triangular(face):
+        """Leque de triângulos: o culling e o painter ficam estáveis com quads
+        não planares, que é o caso de todas as faces do modelo exportado."""
+        if len(face) <= 3:
+            return [face]
+        return [(face[0], face[indice], face[indice + 1]) for indice in range(1, len(face) - 1)]
+
+    def _camera(self, yaw, pitch, zoom, largura, altura, pan_x, pan_y):
+        visao = multiplicar(rotacao_x(pitch), rotacao_z(yaw))
+        centro = aplicar_ponto(visao, self.centro())
+        escala = min(largura, altura) / max(self.diagonal(), 1e-6) * 0.85 * zoom
+        return visao, centro, escala
+
+    def vertices_em_tela(self, rotacoes=None, yaw=0.0, pitch=-10.0, zoom=1.0,
+                         largura=700, altura=700, pan_x=0.0, pan_y=0.0):
+        """Projeta os vértices posados: (x, y na tela, profundidade)."""
+        visao, centro, escala = self._camera(yaw, pitch, zoom, largura, altura, pan_x, pan_y)
+        resultado = []
+        for vertice in self.vertices_em_pose(rotacoes):
+            x, y, z = aplicar_ponto(visao, vertice)
+            tela_x = largura / 2.0 + (x - centro[0]) * escala + pan_x
+            tela_y = altura / 2.0 - (z - centro[2]) * escala + pan_y
+            resultado.append((tela_x, tela_y, y))
+        return resultado
+
+    def renderizar(self, rotacoes=None, yaw=0.0, pitch=-10.0, zoom=1.0,
+                   largura=700, altura=700, pan_x=0.0, pan_y=0.0,
+                   cor=None, fundo=None, luz=LUZ_PADRAO, cull=False):
+        """Devolve o SVG do modelo posado, com painter's algorithm."""
+        visao, centro, escala = self._camera(yaw, pitch, zoom, largura, altura, pan_x, pan_y)
+        posados = self.vertices_em_pose(rotacoes)
+        na_camera = [aplicar_ponto(visao, vertice) for vertice in posados]
+        tela = [
+            (
+                largura / 2.0 + (x - centro[0]) * escala + pan_x,
+                altura / 2.0 - (z - centro[2]) * escala + pan_y,
+                y,
+            )
+            for x, y, z in na_camera
+        ]
+        luz_normalizada = _normalizar(luz)
+        base = _hex_para_rgb(cor or self.cor_padrao)
+
+        partes = [
+            '<svg xmlns="http://www.w3.org/2000/svg" width="{0}" height="{1}" '
+            'viewBox="0 0 {0} {1}">'.format(largura, altura)
+        ]
+        if fundo:
+            partes.append(
+                '<rect width="{0}" height="{1}" fill="{2}"/>'.format(largura, altura, fundo)
+            )
+
+        desenhaveis = []
+        for face in self.faces:
+            for triangulo in self._triangular(face):
+                p0, p1, p2 = (
+                    na_camera[triangulo[0]],
+                    na_camera[triangulo[1]],
+                    na_camera[triangulo[2]],
+                )
+                aresta1 = (p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2])
+                aresta2 = (p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2])
+                normal = _normalizar((
+                    aresta1[1] * aresta2[2] - aresta1[2] * aresta2[1],
+                    aresta1[2] * aresta2[0] - aresta1[0] * aresta2[2],
+                    aresta1[0] * aresta2[1] - aresta1[1] * aresta2[0],
+                ))
+                if cull and normal[1] >= -1e-9:
+                    continue
+                difusa = abs(
+                    normal[0] * luz_normalizada[0]
+                    + normal[1] * luz_normalizada[1]
+                    + normal[2] * luz_normalizada[2]
+                )
+                brilho = 0.35 + 0.65 * difusa
+                profundidade = (
+                    p0[1] + p1[1] + p2[1]
+                ) / 3.0
+                desenhaveis.append((profundidade, triangulo, brilho))
+
+        desenhaveis.sort(key=lambda item: item[0], reverse=True)
+        for _, face, brilho in desenhaveis:
+            rgb = tuple(canal * brilho for canal in base)
+            pontos_svg = " ".join(
+                "{0:.1f},{1:.1f}".format(tela[indice][0], tela[indice][1])
+                for indice in face
+            )
+            cor_face = _rgb_para_hex(rgb)
+            partes.append(
+                '<polygon points="{0}" fill="{1}" stroke="{1}" stroke-width="0.4"/>'.format(
+                    pontos_svg, cor_face
+                )
+            )
+        partes.append("</svg>")
+        return "".join(partes)

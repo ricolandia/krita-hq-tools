@@ -77,8 +77,14 @@ Viável e a mais integrada, com condições:
 - Condições: malha low-poly (500-1500 faces) para fluidez; sem numpy;
   sliders na v1 (arrastar no canvas fica para depois); Blender só na criação
   do modelo (Krita manipula offline).
-- Próximo marco quando for retomado: PoC com manequim procedimental mínimo
-  (2 ossos, poucos vértices) antes do modelo final do autor.
+- **Em teste (03/10/2026):** F1 e F2 concluídos: exportador FBX->JSON
+  (`scripts/exportar-modelo3d.py`), núcleo `hq_tools/core/modelo3d.py` (FK,
+  skinning, projeção ortográfica, SVG) com 16 testes, preview em SVG e QA de
+  visão em 6 poses. O modelo do autor (MakeHuman CC0 + rig Auto-Rig Pro, 68
+  ossos, 1591 vértices) já roda e bate com o Blender na validação numérica.
+  Eixos medidos no rig: Y = eixo do osso (torção), Z = frente/trás (a junta),
+  X = abrir para o lado. Falta o docker (F3) com clique na região e sliders
+  semânticos.
 
 ### Rota B: Blender Layer (plugin existente)
 

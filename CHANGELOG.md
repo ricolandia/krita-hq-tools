@@ -6,6 +6,10 @@
   na aba "Packs", junto dos demais instaladores.
 - Biblioteca do projeto: "Renomear...", "Duplicar" e "Apagar" operam o recurso
   selecionado direto no docker, com confirmação ao apagar.
+- Visualizador 3D (em teste, ainda sem docker): exportador FBX -> JSON para
+  rodar no Blender, núcleo em Python puro (cinemática, skinning, projeção
+  ortográfica e SVG) com 16 testes e script de preview fora do Krita. O modelo
+  do autor (MakeHuman + Auto-Rig Pro, 68 ossos) veio do FBX.
 
 ## [0.6.2] — 2026-10-03
 

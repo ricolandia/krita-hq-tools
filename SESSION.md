@@ -193,6 +193,27 @@ aparência), tipografia das listas de miniaturas, tamanho dos ícones da lista.
 - `docs/IDEIAS-FUTURAS.md` revisado: nova seção "Revisão da lista de
   sugestões" com o que entrou, o que fica anotado e as correções de rota.
 
+## Visualizador 3D: Rota A em teste (03/10/2026, sem release)
+
+- Fluxo: FBX (fonte única) -> `scripts/exportar-modelo3d.py` roda no Blender
+  5.2.2 -> `hq_tools/modules/viewer3d/modelos/low_poly_krita.json` -> núcleo
+  `hq_tools/core/modelo3d.py` (Python puro, sem Krita e sem numpy).
+- Modelo: 68 ossos, 1591 vértices, 1570 quads (triangulados na renderização),
+  sem materiais; MakeHuman (CC0) + rig Auto-Rig Pro do autor.
+- `scripts/preview-modelo3d.py` gera SVG fora do Krita; QA de visão em 6
+  poses (repouso, aceno, braços para cima, passo, sentado) sem membro
+  invertido nem polígono quebrado.
+- Validação numérica contra o Blender: vértice 1098 idêntico (repouso, coxa
+  X=60 e Z=60, 4 casas decimais). A matemática do viewer bate com o Blender.
+- **Eixos do rig (medidos no .blend e no FBX)**: Y = eixo do osso (torção);
+  **Z = frente/trás (a junta)**; X = abrir para o lado. Vale para coxa, joelho
+  e braço; a hipótese "X é o eixo da junta" não se confirmou neste rig ARP.
+- Os FBX `Low_poly_Krita_.fbx` e `Low_poly_Krita_pose_A_.fbx` exportam JSON
+  idêntico (0 diferenças): o `pose_A` não mudou o conteúdo.
+- F3 pendente: docker "HQ Tools: 3D" com clique na região (grupo de ossos) e
+  sliders semânticos (Dobrar/Abrir/Girar) mapeados para Z/X/Y, inserção raster
+  e "inserir como referência".
+
 ## Comandos
 
 ```bash
