@@ -38,6 +38,25 @@ alto dpi e a troca de tema.
   `palettes/docker.py` existe desde o commit original `d718877`, junto com
   `QtCore`/`QtGui`; não houve correção de nome não definido nesse arquivo.
 
+### Balões e onomatopeias: kit do autor substitui as amostras
+
+22 SVGs desenhados à mão no Inkscape pelo autor (8 caudas, 9 falas, 2
+pensamentos e 3 onomatopeias) em `Referencias/baloes-vetorizados/`, sob a
+licença MIT do plugin.
+
+- As 19 peças de balão (caudas, falas e pensamentos) substituem as 6 amostras
+  genéricas de `modules/balloons/samples/`; as 3 onomatopeias (WHOOSH!, POW!
+  e CRASH!) entram junto das 8 que já existiam. Quem já tem a pasta de
+  amostras não recebe cópia nova: o plugin só copia na primeira execução.
+- Caudas 01 a 04 têm a base aberta, para emendar no corpo dentro do Krita.
+- O lote gerado de 29/09 e os materiais de `Referencias/vetores-teste/` foram
+  removidos; os scripts de vetorização ficam como ferramenta para pranchas
+  futuras.
+- `tests/test_vetorizacao.py` passou a travar o kit (XML, viewBox, traço, sem
+  texto, manifesto e índice em sincronia) e a igualdade byte a byte entre o
+  kit e as amostras embarcadas.
+- CREDITS.md registra a autoria (Ricardo Graça) e a licença MIT do kit.
+
 ### Corrigido — dados do autor (Lote A)
 
 - **Crítico**: `create_project()` aceitava um projeto existente e escrevia por

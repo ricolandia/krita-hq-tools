@@ -198,5 +198,51 @@ class TestLoteDoAutor(unittest.TestCase):
             self.assertIn(nome, indice, "{0} não está no INDEX.md".format(nome))
 
 
+@unittest.skipUnless(os.path.isdir(LOTE), "lote de vetores fora do repositório")
+class TestAmostrasEmbarcadas(unittest.TestCase):
+    """O kit do autor e o que o plugin copia na primeira execução não divergem."""
+
+    AMOSTRAS_BALOES = os.path.join(RAIZ, "hq_tools", "modules", "balloons", "samples")
+    AMOSTRAS_ONO = os.path.join(
+        RAIZ, "hq_tools", "modules", "onomatopeias", "samples"
+    )
+
+    def kit(self, prefixos):
+        return {
+            nome for nome in os.listdir(LOTE)
+            if nome.endswith(".svg") and nome.split("_", 1)[0] in prefixos
+        }
+
+    def iguais(self, nome, pasta):
+        with open(os.path.join(LOTE, nome), "rb") as a:
+            with open(os.path.join(pasta, nome), "rb") as b:
+                self.assertEqual(a.read(), b.read(), nome + " divergiu do kit")
+
+    def test_amostras_de_baloes_sao_o_kit_do_autor(self):
+        kit = self.kit({"Cauda", "Fala", "Pensa"})
+        self.assertTrue(kit)
+        amostras = {
+            nome for nome in os.listdir(self.AMOSTRAS_BALOES) if nome.endswith(".svg")
+        }
+        self.assertEqual(
+            kit, amostras,
+            "as amostras de balão têm que ser exatamente o kit do autor",
+        )
+        for nome in sorted(kit):
+            with self.subTest(svg=nome):
+                self.iguais(nome, self.AMOSTRAS_BALOES)
+
+    def test_amostras_de_onomatopeias_incluem_o_kit_do_autor(self):
+        kit = self.kit({"Ono"})
+        self.assertTrue(kit)
+        amostras = {
+            nome for nome in os.listdir(self.AMOSTRAS_ONO) if nome.endswith(".svg")
+        }
+        self.assertLessEqual(kit, amostras, "falta onomatopeia do autor nas amostras")
+        for nome in sorted(kit):
+            with self.subTest(svg=nome):
+                self.iguais(nome, self.AMOSTRAS_ONO)
+
+
 if __name__ == "__main__":
     unittest.main()

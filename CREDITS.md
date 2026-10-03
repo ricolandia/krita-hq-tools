@@ -44,10 +44,12 @@ Mais balões livres podem ser baixados em:
 
 ## Amostras do plugin
 
-Os SVGs de exemplo (6 balões em `modules/balloons/samples/`, 8 onomatopeias
-em `modules/onomatopeias/samples/`), as paletas `.gpl`, os presets de retícula
-e os ícones gerados foram criados para o projeto e seguem a licença MIT do
-plugin.
+As 19 amostras de balão em `modules/balloons/samples/` são o kit handdrawn do
+autor (Ricardo Graça), desenhado no Inkscape em outubro de 2026 sob a licença
+MIT do plugin. Em `modules/onomatopeias/samples/` convivem as 8 onomatopeias
+criadas para o projeto e as 3 novas do autor (WHOOSH!, POW! e CRASH!), também
+em MIT. As paletas `.gpl`, os presets de retícula e os ícones gerados foram
+criados para o projeto e seguem a mesma licença.
 
 ## Bibliotecas de símbolos do Krita (referência, não redistribuídas)
 
@@ -102,11 +104,11 @@ Comics pack e InkP/Expressive Inks.
   hachuras 45°/135° e granulado de nanquim), criados para o projeto.
 - Modelos de página gerados pelo plugin (A4, A3, tirinhas 1-3, grades 2x2 e
   3x3), criados para o projeto.
-- Paletas, presets de retícula, amostras de balões e onomatopeias: criadas
-  para o projeto.
-- Balões vetorizados do kit handdrawn (`Referencias/baloes-vetorizados/`):
-  vetorizados pelo próprio autor a partir das pranchas de
-  `Referencias/baloes/`, com `scripts/vetorizar-baloes.py` (MIT).
+- Paletas, presets de retícula e as 8 onomatopeias de amostra: criados para o
+  projeto.
+- Kit handdrawn de balões e onomatopeias (`Referencias/baloes-vetorizados/`,
+  22 SVGs, e as 19 amostras em `modules/balloons/samples/`): desenhado à mão
+  por Ricardo Graça no Inkscape em 02 e 03/10/2026 (MIT).
 
 ## Pastas que não vão no ZIP
 

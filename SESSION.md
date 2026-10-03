@@ -95,6 +95,8 @@ Pendente (validação dentro do Krita):
 - Itens novos da v0.6.2: excluir um preset do usuário (sem derrubar o Krita),
   "Editar selecionada" + Aplicar atualizando a mesma retícula/máscara, e
   "Novo projeto..." em pasta com `comicConfig.json` existente (não sobrescreve).
+- Kit do autor: lista de modelos na pasta de balões e a inserção no grupo
+  ativo (conferir também uma cauda com base aberta, para emendar no corpo).
 
 ## Auditoria de 2026-09-30 (4 lotes, sem release ainda)
 
@@ -239,11 +241,13 @@ Espelho no Trilium: subnota "Lista do autor (a criar)" (`FoIRvo2ztN0D`).
   fino de `Fala_Speak_03/08/09` (0,68 a 0,70 mm contra 0,90 a 1,01 mm no
   resto). `tests/test_vetorizacao.py` passou a travar o lote do autor (XML,
   viewBox, paths com traço, sem texto, manifesto e índice em sincronia).
-- **Integração no plugin (pendente de decisão):** o kit deve substituir as 6
-  amostras genéricas de `hq_tools/modules/balloons/samples/` (recomendado)
-  ou entrar como pasta própria em `hq_tools/resources/`. Definir também o
-  nome (`Calda_` virar `Cauda_`) e a licença do kit (registrar no
-  CREDITS.md). A publicação fica para depois disso.
+- **Integrado (03/10):** as 19 peças de balão viraram as amostras de
+  `hq_tools/modules/balloons/samples/` (as 6 genéricas saíram) e as 3
+  onomatopeias entraram junto das 8 existentes. `Cauda_` no lugar de
+  `Calda_`; licença MIT registrada no CREDITS.md; `tests/test_vetorizacao.py`
+  passou a exigir kit e amostras idênticos byte a byte. A pasta do usuário
+  do Acer foi atualizada à mão (o plugin só copia amostras com a pasta
+  vazia). A publicação fica para depois da validação no Krita.
 
 **Onomatopeias (SVG)**
 - Conjunto próprio para substituir as 8 amostras: impacto, velocidade, som
