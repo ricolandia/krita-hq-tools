@@ -1,10 +1,11 @@
 # Changelog
 
-## [Não publicado]
+## [0.6.2] — 2026-10-03
 
-Correções e melhorias da auditoria de 2026-09-30, ainda sem validar dentro do
-Krita (ver `docs/AUDITORIA-2026-09-30.md`). A versão só sobe quando o roteiro de
-validação rodar dentro do Krita 5 e 6.
+Primeira versão pública. Reúne a auditoria de 2026-09-30 (quatro lotes, ver
+`docs/AUDITORIA-2026-09-30.md`), a camada de interface compartilhada, o kit de
+balões e onomatopeias do autor e o polimento de empacotamento e release.
+Validado dentro do Krita pelo autor em 03/10/2026.
 
 ### Interface — camada compartilhada (Lotes 1 e 2)
 
@@ -171,13 +172,13 @@ licença MIT do plugin.
 - `descoberta_scripter.py`: o bloco 7 descobre o binding do Qt em vez de
   importar PyQt5 fixo, que não existe no Krita 6.
 
-## [0.6.2] — 2026-09-27
+### Base anterior (27/09)
 
 Auditoria completa do estado v0.6.1 (delta pós-v0.5.4 + varredura geral).
 76 testes passando (5 de símbolos removidos junto do código morto, 1 de
 checagem estática e 3 asserções novas no fingerprint).
 
-### Corrigido
+#### Corrigido
 
 - **Crítico**: `screentone/docker.py` usava `DIALOG_YES`/`DIALOG_NO` sem
   importar; excluir um preset do usuário levantava NameError e, em PyQt5,
@@ -208,14 +209,14 @@ checagem estática e 3 asserções novas no fingerprint).
 - "Criar próxima página" em modo projeto evita sobrescrever arquivo existente
   quando o `pageNumber` está defasado (avança o número até achar nome livre).
 
-### Limpeza
+#### Limpeza
 
 - `modules/balloons/symbols.py` removido (sem uso desde a v0.2, quando a aba
   de símbolos passou a abrir o docker nativo do Krita) junto de
   `tests/test_symbols.py`; histórico preservado no git. `paths.module_dir`
   removido (sem uso).
 
-### Documentado
+#### Documentado
 
 - Entrada 0.6.1 (fix do `paths.py`) que faltava no changelog; README com a
   versão atual do ZIP; ARQUITETURA com os 7 módulos e a árvore de recursos

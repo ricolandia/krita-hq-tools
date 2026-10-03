@@ -1,5 +1,7 @@
 # HQ Tools: ferramentas de quadrinhos para o Krita
 
+**Português** · [English](README.en.md)
+
 Plugin do Krita com retículas e hachuras, balões vetoriais, paletas,
 gerenciador de páginas com miniaturas, gerador de páginas a partir de roteiro e
 atalhos de pincel. Feito para o Krita 5.3.4 (AppImage, PyQt5) com preparação

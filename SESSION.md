@@ -297,11 +297,11 @@ Espelho no Trilium: subnota "Lista do autor (a criar)" (`FoIRvo2ztN0D`).
 - Repositório no GitHub: **https://github.com/ricolandia/krita-hq-tools**
   (criado em 03/10; remote `origin` por SSH). O projeto deixou de ser pasta
   local.
+- **Validado dentro do Krita pelo autor em 03/10/2026.** A release v0.6.2 sai
+  pela tag `v0.6.2` (o CI roda os testes, monta o ZIP e publica).
 - Subir o `main`: os commits locais (auditoria, kit de balões, capturas)
   entram no primeiro push.
-- Criar a tag v0.6.2 quando a validação dentro do Krita passar (a release sai
-  com o ZIP automaticamente). Até lá o repositório fica público só com o
-  código.
+- A tag `v0.6.2` fecha a publicação: a release sai com o ZIP pelo CI.
 
 Pronto: `INSTALL.md` (guia do usuário), CI em `.github/workflows/` (tests em
 push/PR com Python 3.11/3.13 + checagem do ZIP; release automática em tag

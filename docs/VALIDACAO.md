@@ -4,6 +4,9 @@ Checklist para validar o HQ Tools no Krita 5.3.4 (AppImage). O núcleo puro já 
 coberto por testes (`python3 -m unittest discover -s tests`); aqui o foco é o
 comportamento dentro do programa.
 
+**Status (03/10/2026):** roteiro validado pelo autor; release v0.6.2 publicada
+pela tag `v0.6.2`. Este documento fica como referência para as próximas.
+
 ## Instalação em desenvolvimento
 
 ```bash
