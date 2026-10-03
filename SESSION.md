@@ -217,7 +217,12 @@ aparência), tipografia das listas de miniaturas, tamanho dos ícones da lista.
 - Ícone: o `.desktop` ganhou `Icon=hq_tools` e o `scripts/install-icons.sh`
   instala os PNGs no tema hicolor; os dockers também recebem o ícone pelo
   `ui.painel`. Sem a linha `Icon=`, o gerenciador de plugins não mostrava nada.
-- Suíte: 211 testes (21 do visualizador 3D).
+- Suíte: 212 testes (22 do visualizador 3D).
+- Correções de uso (03/10): modo Silhueta (path único, sem ordenação nem
+  sombreamento), sliders sem sobreposição (limpeza recursiva do layout),
+  aviso fixo de clique e órbita invertida para o gesto natural. Benchmarks
+  em 400x400: 1570 faces = 27 ms, 848 = 10 ms, 526 = 6,6 ms; o exportador
+  ganhou `--decimar` (fração 0-1) para gerar modelos mais leves.
 
 ## Comandos
 

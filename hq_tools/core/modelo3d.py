@@ -322,8 +322,15 @@ class Modelo:
 
     def renderizar(self, rotacoes=None, yaw=0.0, pitch=-10.0, zoom=1.0,
                    largura=700, altura=700, pan_x=0.0, pan_y=0.0,
-                   cor=None, fundo=None, luz=LUZ_PADRAO, cull=False, posados=None):
-        """Devolve o SVG do modelo posado, com painter's algorithm."""
+                   cor=None, fundo=None, luz=LUZ_PADRAO, cull=False, posados=None,
+                   estilo="sombreado"):
+        """Devolve o SVG do modelo posado.
+
+        ``estilo="sombreado"`` (padrão) usa painter's algorithm e sombreamento
+        por face. ``estilo="chapado"`` desenha a silhueta: todas as faces numa
+        cor só, num único ``path``, sem ordenar nem sombrear; é mais barato de
+        gerar e de rasterizar.
+        """
         visao, centro, escala = self._camera(yaw, pitch, zoom, largura, altura, pan_x, pan_y)
         if posados is None:
             posados = self.vertices_em_pose(rotacoes)
@@ -347,6 +354,24 @@ class Modelo:
             partes.append(
                 '<rect width="{0}" height="{1}" fill="{2}"/>'.format(largura, altura, fundo)
             )
+
+        if estilo == "chapado":
+            cor_chapada = _rgb_para_hex(_hex_para_rgb(cor or self.cor_padrao))
+            caminho = []
+            for face in self.faces:
+                for triangulo in self._triangular(face):
+                    caminho.append(
+                        "M{0:.1f} {1:.1f}L{2:.1f} {3:.1f}L{4:.1f} {5:.1f}Z".format(
+                            tela[triangulo[0]][0], tela[triangulo[0]][1],
+                            tela[triangulo[1]][0], tela[triangulo[1]][1],
+                            tela[triangulo[2]][0], tela[triangulo[2]][1],
+                        )
+                    )
+            partes.append(
+                '<path d="{0}" fill="{1}"/>'.format("".join(caminho), cor_chapada)
+            )
+            partes.append("</svg>")
+            return "".join(partes)
 
         desenhaveis = []
         for face in self.faces:

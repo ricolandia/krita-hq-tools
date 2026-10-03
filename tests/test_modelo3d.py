@@ -134,6 +134,15 @@ class TestManequim(unittest.TestCase):
         primeiro_x = float(poligonos[0].get("points").split()[0].split(",")[0])
         self.assertGreater(primeiro_x, 5.0)
 
+    def test_svg_chapado_e_um_path(self):
+        modelo = modelo3d.Modelo(triangulo_visivel())
+        svg = modelo.renderizar(largura=400, altura=400, estilo="chapado")
+        raiz = ET.fromstring(svg)
+        caminhos = raiz.findall("{http://www.w3.org/2000/svg}path")
+        self.assertEqual(len(caminhos), 1)
+        self.assertEqual(raiz.findall("{http://www.w3.org/2000/svg}polygon"), [])
+        self.assertIn("M", caminhos[0].get("d"))
+
     def test_formato_desconhecido(self):
         dados = manequim()
         dados["formato"] = "outro"

@@ -179,10 +179,21 @@ class Viewer3DDocker(DockWidget):
         self.preview = _Preview(self)
         layout.addWidget(self.preview, 1)
 
-        self.lbl_regiao = ui.rotulo_info(
-            "Clique numa parte do corpo para ajustar as juntas."
-        )
+        layout.addWidget(ui.rotulo(
+            "Clique sobre a parte do corpo que deseja rotacionar."
+        ))
+
+        self.lbl_regiao = ui.rotulo_info("Nenhuma região selecionada.")
         layout.addWidget(self.lbl_regiao)
+
+        estilo_row = widgets.QHBoxLayout()
+        estilo_row.addWidget(ui.rotulo("Estilo:"))
+        self.cmb_estilo = widgets.QComboBox()
+        self.cmb_estilo.addItem("Sombreado", "sombreado")
+        self.cmb_estilo.addItem("Silhueta", "silhueta")
+        self.cmb_estilo.currentIndexChanged.connect(self.agendar_render)
+        estilo_row.addWidget(self.cmb_estilo, 1)
+        layout.addLayout(estilo_row)
 
         self.grupo_juntas = widgets.QGroupBox("Juntas")
         self.juntas_layout = ui.espacamento(
@@ -239,6 +250,11 @@ class Viewer3DDocker(DockWidget):
     def agendar_render(self):
         self._timer.start()
 
+    def _estilo(self):
+        if self.cmb_estilo.currentData() == "silhueta":
+            return "chapado", "#141414"
+        return "sombreado", None
+
     def atualizar_preview(self):
         if self.modelo is None:
             return
@@ -246,6 +262,7 @@ class Viewer3DDocker(DockWidget):
         altura = max(self.preview.height(), 200)
         rotacoes = self._rotacoes()
         posados = self.modelo.vertices_em_pose(rotacoes)
+        estilo, cor = self._estilo()
         svg = self.modelo.renderizar(
             yaw=self.camera["yaw"],
             pitch=self.camera["pitch"],
@@ -253,6 +270,8 @@ class Viewer3DDocker(DockWidget):
             largura=largura,
             altura=altura,
             posados=posados,
+            estilo=estilo,
+            cor=cor,
         )
         self._tela = self.modelo.vertices_em_tela(
             yaw=self.camera["yaw"],
@@ -273,8 +292,8 @@ class Viewer3DDocker(DockWidget):
         self.preview.setPixmap(QtGui.QPixmap.fromImage(imagem))
 
     def orbitar(self, dx, dy):
-        self.camera["yaw"] = (self.camera["yaw"] - dx * 0.5) % 360.0
-        self.camera["pitch"] = max(-89.0, min(89.0, self.camera["pitch"] - dy * 0.5))
+        self.camera["yaw"] = (self.camera["yaw"] + dx * 0.5) % 360.0
+        self.camera["pitch"] = max(-89.0, min(89.0, self.camera["pitch"] + dy * 0.5))
         self.agendar_render()
 
     def aplicar_zoom(self, fator):
@@ -327,6 +346,11 @@ class Viewer3DDocker(DockWidget):
     def _limpar_layout(self, layout):
         while layout.count():
             item = layout.takeAt(0)
+            filho = item.layout()
+            if filho is not None:
+                self._limpar_layout(filho)
+                filho.deleteLater()
+                continue
             widget = item.widget()
             if widget is not None:
                 widget.deleteLater()
@@ -417,6 +441,7 @@ class Viewer3DDocker(DockWidget):
             return
         largura = documento.width()
         altura = documento.height()
+        estilo, cor = self._estilo()
         svg = self.modelo.renderizar(
             self._rotacoes(),
             yaw=self.camera["yaw"],
@@ -424,6 +449,8 @@ class Viewer3DDocker(DockWidget):
             zoom=self.camera["zoom"],
             largura=largura,
             altura=altura,
+            estilo=estilo,
+            cor=cor,
         )
         renderer = QSvgRenderer(QtCore.QByteArray(svg.encode("utf-8")))
         imagem = QImage(largura, altura, IMAGE_FORMAT_RGBA8888)

@@ -76,6 +76,9 @@ def main():
     parser.add_argument("--altura", type=int, default=700)
     parser.add_argument("--cor", default=None)
     parser.add_argument("--fundo", default=None)
+    parser.add_argument(
+        "--estilo", choices=("sombreado", "chapado"), default="sombreado"
+    )
     argumentos = parser.parse_args()
 
     modelo = modelo3d.Modelo.carregar(argumentos.modelo)
@@ -91,6 +94,7 @@ def main():
         altura=argumentos.altura,
         cor=argumentos.cor,
         fundo=argumentos.fundo,
+        estilo=argumentos.estilo,
     )
     with open(argumentos.saida, "w", encoding="utf-8") as arquivo:
         arquivo.write(svg)

@@ -28,12 +28,20 @@ def _argumentos():
         argv = argv[argv.index("--") + 1:]
     else:
         argv = []
+    decimar = None
+    if "--decimar" in argv:
+        posicao = argv.index("--decimar")
+        try:
+            decimar = float(argv[posicao + 1])
+        except (IndexError, ValueError):
+            raise SystemExit("--decimar espera uma fração entre 0 e 1 (ex.: 0.35)")
+        del argv[posicao:posicao + 2]
     if len(argv) < 2:
         raise SystemExit(
             "uso: blender -b --factory-startup --python scripts/exportar-modelo3d.py "
-            "-- entrada.fbx saida.json"
+            "-- entrada.fbx saida.json [--decimar 0.35]"
         )
-    return argv[0], argv[1]
+    return argv[0], argv[1], decimar
 
 
 def _matriz_lista(matriz):
@@ -59,7 +67,7 @@ def _ossos_em_ordem(armadura):
 
 
 def main():
-    entrada, saida = _argumentos()
+    entrada, saida, decimar = _argumentos()
 
     bpy.ops.wm.read_factory_settings(use_empty=True)
     bpy.ops.import_scene.fbx(filepath=entrada)
@@ -77,6 +85,15 @@ def main():
             )
         )
     malha, armadura = malhas[0], armaduras[0]
+
+    if decimar is not None:
+        if not 0.0 < decimar < 1.0:
+            raise SystemExit("--decimar espera uma fração entre 0 e 1 (ex.: 0.35)")
+        modificador = malha.modifiers.new("Decimar", "DECIMATE")
+        modificador.ratio = decimar
+        bpy.context.view_layer.objects.active = malha
+        malha.select_set(True)
+        bpy.ops.object.modifier_apply(modifier=modificador.name)
 
     ossos = _ossos_em_ordem(armadura)
     indice_do_osso = {osso.name: indice for indice, osso in enumerate(ossos)}
