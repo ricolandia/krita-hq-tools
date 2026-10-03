@@ -8,6 +8,18 @@ para o Krita 6 (PyQt6).
 Os quatro documentos originais de contexto do projeto estão em
 `docs/contexto/`.
 
+## Capturas
+
+<img src="Screenshots/01-baloes.png" width="380" alt="Docker de balões com o kit handdrawn do autor">
+
+| Páginas | Biblioteca | Pincéis |
+|---|---|---|
+| ![Gerenciador de páginas](Screenshots/00-paginas.png) | ![Biblioteca do projeto](Screenshots/02-biblioteca.png) | ![Pincéis e slots](Screenshots/03-pinceis.png) |
+
+| Retículas e linhas de ação | Onomatopeias | Paletas |
+|---|---|---|
+| ![Retículas e linhas de ação](Screenshots/04-reticulas.png) | ![Onomatopeias](Screenshots/05-onomatopeias.png) | ![Paletas](Screenshots/06-paletas.png) |
+
 ## Módulos
 
 | Módulo | O que faz |
