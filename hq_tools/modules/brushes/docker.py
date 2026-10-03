@@ -116,13 +116,6 @@ class BrushesDocker(DockWidget):
         )
         button_suggest.clicked.connect(self.apply_suggestions)
         buttons.addWidget(button_suggest)
-        button_bundle = ui.botao(
-            "Instalar bundle...",
-            "Copia um .bundle (ex.: Cityscape, Pesi's Watercolors) para o Krita",
-            icone_chave="salvar",
-        )
-        button_bundle.clicked.connect(self.install_bundle)
-        buttons.addWidget(button_bundle)
         layout.addLayout(buttons)
 
         hint = ui.rotulo(
@@ -170,17 +163,27 @@ class BrushesDocker(DockWidget):
         )
         button_install.clicked.connect(self.install_pack)
         buttons.addWidget(button_install)
+        button_bundle = ui.botao(
+            "Instalar bundle...",
+            "Copia um .bundle (ex.: Cityscape, Pesi's Watercolors) para o Krita",
+            icone_chave="salvar",
+        )
+        button_bundle.clicked.connect(self.install_bundle)
+        buttons.addWidget(button_bundle)
+        layout.addLayout(buttons)
+
+        buttons_extra = widgets.QHBoxLayout()
         button_license = ui.botao(
             "Ver licença", "Mostra a licença (e a autoria) do pack selecionado."
         )
         button_license.clicked.connect(self.view_pack_license)
-        buttons.addWidget(button_license)
+        buttons_extra.addWidget(button_license)
         button_refresh = ui.botao(
             "Atualizar", "Relê os packs instalados e os do usuário.", icone_chave="atualizar"
         )
         button_refresh.clicked.connect(self._refresh_packs)
-        buttons.addWidget(button_refresh)
-        layout.addLayout(buttons)
+        buttons_extra.addWidget(button_refresh)
+        layout.addLayout(buttons_extra)
 
         hint = ui.rotulo(
             "Packs da comunidade incluídos com licença verificada (créditos em "

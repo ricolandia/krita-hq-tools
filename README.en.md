@@ -30,10 +30,10 @@ The four original context documents of the project are in `docs/contexto/`
 | Screentones and hatching | Screentone presets with real LPI (cell computed from the document DPI), applied as a non-destructive fill layer inside the panel group, halftone as a Halftone filter mask over painted tone, tone with Krita patterns, CMYK per-channel color halftone, editing the applied screentone, empty mask to reveal by painting, show area, reuse of identical tones, pattern position and effect/speed lines. |
 | Balloons | Catalog of SVG vector balloons (the author's hand-drawn kit and CC0 samples on first run, own folder), one-click insert into the active group, `text` layer option for CPMT, a button that opens the native "Symbol Libraries" docker and installs the included comic fonts. |
 | Onomatopoeia | Catalog of SVG sound effects (3 samples, own folder), inserted as vectors; draw your own in Inkscape. |
-| Project library | Create your own balloons, panels and onomatopoeia inside Krita: "Create new resource" opens a 15 x 15 cm document at 300 dpi; "Save resource from document" exports the active layer as SVG (vector) or transparent PNG (painting, trimmed by the layer) to the library; double-click inserts it into the active group. |
+| Project library | Create your own balloons, panels and onomatopoeia inside Krita: "Create new resource" opens a 15 x 15 cm document at 300 dpi; "Save resource from document" exports the active layer as SVG (vector) or transparent PNG (painting, trimmed by the layer) to the library; double-click inserts it into the active group; Rename, Duplicate and Delete organize the folder. |
 | Palettes | Comic and artistic templates (tones, ink, skin, sky, vegetation, flat colors, Zorn, portrait, landscape, dawn, night, earth, pastel, watercolor, gouache, acrylic, retro, BD, superhero, manga, sepia), applied to the foreground/background color, installed into Krita and previewed from the installed palettes. |
 | Pages | Manager with internal `.kra` thumbnails: "New project..." uses the saved page folder (writes comicConfig.json and creates the project library), "Open project..." reads a CPMT `comicConfig.json` and "Folder..." opens any folder; "Create next page" opens a dialog (A4/A5/A3/strip format, DPI and strip panels), generates the page with automatic margin guides and refreshes the grid; "Set page template" uses the current page or a Krita comic template (BD, US, manga...) as the model; "Reference layer" marks the selected layer and "Import reference (PNG)" inserts a locked reference into the active group. |
-| Brushes | Suggested sets (Sketching, Inking, Watercolor/Gouache, Acrylic/Oil, Screentones) with thumbnail + name cards built from the brush presets installed in Krita; 16 slots with configurable shortcuts; brush bundle installer; "Packs" tab with community brushes with verified licenses (one-click install and license display). |
+| Brushes | Suggested sets (Sketching, Inking, Watercolor/Gouache, Acrylic/Oil, Screentones) with thumbnail + name cards built from the brush presets installed in Krita; 16 slots with configurable shortcuts; "Packs" tab with community brushes with verified licenses (one-click install and license display) and the brush bundle installer. |
 
 ## Comic kit (fonts and free balloons)
 
@@ -107,7 +107,8 @@ automatically, and you can ungroup whenever you want).
 7. **Project library**: choose "Vector" or "Painting", "Create new resource"
    opens the 15 x 15 cm document at 300 dpi; draw, "Save resource from
    document" and insert with a double-click. Paintings come out as transparent
-   PNG trimmed by the active layer.
+   PNG trimmed by the active layer. Rename, Duplicate and Delete organize the
+   list.
 
 ## Script syntax
 

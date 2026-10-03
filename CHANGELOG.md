@@ -1,5 +1,12 @@
 # Changelog
 
+## [Não publicado]
+
+- Docker de pincéis: "Instalar bundle..." saiu da fileira inferior e entrou
+  na aba "Packs", junto dos demais instaladores.
+- Biblioteca do projeto: "Renomear...", "Duplicar" e "Apagar" operam o recurso
+  selecionado direto no docker, com confirmação ao apagar.
+
 ## [0.6.2] — 2026-10-03
 
 Primeira versão pública. Reúne a auditoria de 2026-09-30 (quatro lotes, ver

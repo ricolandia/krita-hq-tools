@@ -102,8 +102,53 @@ Trabalhar no Blender, renderizar a referência por painel e importar no quadro
 O botão "Camada de referência" do HQ Tools (marca com rótulo de cor, trava e
 baixa opacidade) foi aprovado para entrar nesse fluxo.
 
-## Pendência de verificação do autor (26/09)
+## Revisão da lista de sugestões (03/10/2026)
 
-- Botão "Instalar bundle..." pouco visível no docker de pincéis (fileira
-  inferior, junto de "Atualizar presets"/"Preencher slots"). O autor vai
-  verificar; sugestão registrada: mover para a aba "Packs" com ícone próprio.
+Revisão dos recursos possíveis a partir do que já existe no plugin, do mais
+fácil ao mais difícil. As estimativas são de engenharia; arte e conteúdo
+entram à parte. O item nº 1 das pendências continua sendo o Krita 6
+(validação e ferramentas novas de texto/painéis), pré-requisito do balão
+paramétrico.
+
+### Entraram no plugin (03/10)
+
+- **Gestão da biblioteca**: "Renomear...", "Duplicar" e "Apagar" operam o
+  recurso selecionado direto no docker (antes só havia criar, salvar e
+  inserir).
+- **"Instalar bundle..." na aba "Packs"** do docker de pincéis, junto dos
+  demais instaladores (ver pendência resolvida abaixo).
+
+### Anotadas, ainda fora
+
+- **Lettering nas páginas geradas**: o gerador desenha as falas como `<text>`
+  sans-serif simples; usar os balões e as fontes do kit deixaria o storyboard
+  mais perto da arte final. Parente do item "Atualizar textos das páginas
+  geradas" (SESSION.md).
+- **Preset de "estilo de painel"**: um clique aplica sombra + contorno +
+  retícula coerentes na página, reaproveitando os presets do módulo de
+  retículas. Diferente da "hachura por presets de pincel", que é desenho à
+  mão.
+- **Exportar o conjunto próprio como bundle**: viabilidade incerta; avaliar o
+  formato `.bundle` do Krita antes de estimar.
+- **Clique direto no canvas**: a PoC de ~20 linhas (event filter no
+  `canvasWidget` + transformações do `Canvas`) desbloquearia o balde por
+  clique e o reposicionamento da cauda por arrasto. Continua como v1.1 do
+  fillbucket.
+
+### Correções de rota (o que não é lacuna)
+
+- Exportação e lote de páginas ficam no CPMT (decisão vigente no SESSION);
+  exportar pelo manager do plugin é mudança de escopo, não lacuna.
+- Exportação rápida de página dentro do plugin exigiria código novo
+  (`exportImage`), não reuso do `saveAs`, que grava `.kra`.
+- PDF multi-página não tem caminho nativo no Krita; exigiria PDF em Python
+  puro (zlib) ou ferramenta externa.
+- Apagador vetorial por interseção: fora de escopo confirmado (a API de
+  vetores não expõe trim por interseção).
+
+## Pendência resolvida (03/10/2026)
+
+- Botão "Instalar bundle..." pouco visível na fileira inferior do docker de
+  pincéis (junto de "Atualizar presets"/"Preencher slots"). **Feito**: o botão
+  mudou para a aba "Packs", junto de "Instalar pack selecionado"; a fileira
+  inferior ficou com as ações de presets e slots.

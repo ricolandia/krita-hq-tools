@@ -185,6 +185,14 @@ Escopo que **não** foi mexido, de propósito: `QToolButton` dos slots e dos
 cartões (tem reordenação por arrastar e clique direito, que é comportamento, não
 aparência), tipografia das listas de miniaturas, tamanho dos ícones da lista.
 
+## Melhorias pós-release (03/10/2026, sem release ainda)
+
+- Biblioteca do projeto: "Renomear...", "Duplicar" e "Apagar" o recurso
+  selecionado direto no docker, sem sair para o gerenciador de arquivos.
+- Docker de pincéis: "Instalar bundle..." na aba "Packs".
+- `docs/IDEIAS-FUTURAS.md` revisado: nova seção "Revisão da lista de
+  sugestões" com o que entrou, o que fica anotado e as correções de rota.
+
 ## Comandos
 
 ```bash
@@ -274,8 +282,8 @@ Espelho no Trilium: subnota "Lista do autor (a criar)" (`FoIRvo2ztN0D`).
 - Presets próprios de hachura à mão (pincel para hachurar por cima da retícula).
 - Avaliar conjuntos de pincéis próprios para os slots, além dos nativos e dos
   packs.
-- Verificar a visibilidade do botão "Instalar bundle..." no docker de pincéis
-  (sugestão: mover para a aba "Packs").
+- **Feito (03/10):** "Instalar bundle..." saiu da fileira inferior do docker
+  de pincéis para a aba "Packs", junto de "Instalar pack selecionado".
 - Como criar (ou pedir a adaptação de) pincéis: subnota do Trilium "Como
   criar pincéis e traços (tutorial)" (`Z5UzRfufJAVV`).
 

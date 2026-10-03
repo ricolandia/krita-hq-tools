@@ -7,6 +7,7 @@ painéis como camada vetorial.
 
 import os
 import re
+import shutil
 import tempfile
 import time
 import unicodedata
@@ -91,6 +92,57 @@ def listar_recursos(base, tipo):
         if name.lower().endswith((".svg", ".png")):
             resultado.append((os.path.splitext(name)[0], os.path.join(folder, name)))
     return resultado
+
+
+def renomear_recurso(path, novo_nome):
+    """Renomeia o arquivo do recurso, preservando a extensão.
+
+    Devolve o novo caminho. Se o nome normalizado for o mesmo, devolve o
+    caminho original sem tocar no arquivo; se já houver outro recurso com o
+    nome pedido, levanta ``FileExistsError`` (nada é sobrescrito).
+    """
+    folder = os.path.dirname(path)
+    extensao = os.path.splitext(path)[1].lower()
+    destino = os.path.join(folder, "{0}{1}".format(slugify(novo_nome), extensao))
+    if os.path.abspath(destino) == os.path.abspath(path):
+        return path
+    if os.path.exists(destino):
+        raise FileExistsError(
+            "Já existe um recurso chamado {0}.".format(os.path.basename(destino))
+        )
+    os.rename(path, destino)
+    return destino
+
+
+def duplicar_recurso(path, novo_nome=None):
+    """Copia o recurso na mesma pasta e devolve o caminho da cópia.
+
+    Sem ``novo_nome``, usa o nome atual com o sufixo ``-copia`` (e número, se
+    precisar). Com ``novo_nome``, recusa sobrescrever um recurso existente.
+    """
+    folder = os.path.dirname(path)
+    extensao = os.path.splitext(path)[1]
+    if novo_nome:
+        destino = os.path.join(folder, "{0}{1}".format(slugify(novo_nome), extensao))
+        if os.path.exists(destino):
+            raise FileExistsError(
+                "Já existe um recurso chamado {0}.".format(os.path.basename(destino))
+            )
+    else:
+        base = os.path.splitext(os.path.basename(path))[0]
+        destino = caminho_livre(folder, "{0}-copia".format(base), extensao)
+    shutil.copy2(path, destino)
+    return destino
+
+
+def apagar_recurso(path):
+    """Apaga o arquivo do recurso (a confirmação é responsabilidade da interface).
+
+    Só aceita SVG ou PNG, para um caminho errado não levar outro arquivo junto.
+    """
+    if os.path.splitext(path)[1].lower() not in (".svg", ".png"):
+        raise ValueError("O arquivo não é um recurso (SVG ou PNG).")
+    os.remove(path)
 
 
 def tamanho_novo_documento(cm=TAMANHO_CM, dpi=DPI_PADRAO):

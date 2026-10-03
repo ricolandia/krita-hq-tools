@@ -72,6 +72,58 @@ class TestBiblioteca(unittest.TestCase):
         self.assertTrue(primeiro.endswith(".png"))
         self.assertNotEqual(primeiro, segundo)
 
+    def test_renomear_recurso(self):
+        path = core.salvar_recurso("<svg/>", self.base, "balao", "Antes")
+        novo = core.renomear_recurso(path, "Depois")
+        self.assertFalse(os.path.exists(path))
+        self.assertEqual(os.path.basename(novo), "depois.svg")
+        self.assertEqual(core.listar_recursos(self.base, "balao")[0][0], "depois")
+
+    def test_renomear_para_o_mesmo_nome_nao_mexe(self):
+        path = core.salvar_recurso("<svg/>", self.base, "balao", "Igual")
+        self.assertEqual(core.renomear_recurso(path, "Igual"), path)
+        self.assertTrue(os.path.isfile(path))
+
+    def test_renomear_recusa_colisao(self):
+        primeiro = core.salvar_recurso("<svg/>", self.base, "balao", "Um")
+        core.salvar_recurso("<svg/>", self.base, "balao", "Dois")
+        with self.assertRaises(FileExistsError):
+            core.renomear_recurso(primeiro, "Dois")
+        self.assertTrue(os.path.isfile(primeiro))
+
+    def test_duplicar_recurso_gera_sufixo(self):
+        path = core.salvar_recurso("<svg/>", self.base, "balao", "Original")
+        copia = core.duplicar_recurso(path)
+        self.assertNotEqual(copia, path)
+        self.assertEqual(os.path.basename(copia), "original-copia.svg")
+        nomes = sorted(nome for nome, _ in core.listar_recursos(self.base, "balao"))
+        self.assertEqual(nomes, ["original", "original-copia"])
+
+    def test_duplicar_recurso_com_nome(self):
+        path = core.salvar_recurso("<svg/>", self.base, "balao", "Base")
+        copia = core.duplicar_recurso(path, "Copia nova")
+        self.assertTrue(copia.endswith("copia-nova.svg"))
+
+    def test_duplicar_preserva_extensao_png(self):
+        path = core.salvar_bytes(b"\x89PNG", self.base, "balao", "Pintura", ".png")
+        copia = core.duplicar_recurso(path)
+        self.assertTrue(copia.endswith(".png"))
+        self.assertNotEqual(copia, path)
+
+    def test_apagar_recurso(self):
+        path = core.salvar_recurso("<svg/>", self.base, "balao", "Some")
+        core.apagar_recurso(path)
+        self.assertFalse(os.path.exists(path))
+        self.assertEqual(core.listar_recursos(self.base, "balao"), [])
+
+    def test_apagar_recusa_extensao_estranha(self):
+        path = os.path.join(self.base, "nota.txt")
+        with open(path, "w") as handle:
+            handle.write("nao é recurso")
+        with self.assertRaises(ValueError):
+            core.apagar_recurso(path)
+        self.assertTrue(os.path.isfile(path))
+
 
 if __name__ == "__main__":
     unittest.main()

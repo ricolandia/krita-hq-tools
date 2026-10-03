@@ -4,7 +4,8 @@ O autor pode criar o recurso como vetorial (camada de formas) ou como pintura
 (camada de desenho comum). O vetorial é salvo como SVG (``toSvg``); a pintura
 é salva como PNG transparente recortado pela própria camada ativa. Os dois
 tipos aparecem na lista e são inseridos no grupo ativo com um duplo clique
-(SVG vira camada vetorial; PNG vira camada de pintura).
+(SVG vira camada vetorial; PNG vira camada de pintura). A lista também
+renomeia, duplica e apaga o recurso selecionado, sem sair do Krita.
 """
 
 import os
@@ -160,12 +161,35 @@ class BibliotecaDocker(DockWidget):
         button_insert.clicked.connect(self.insert_resource)
         buttons.addWidget(button_insert)
         list_layout.addLayout(buttons)
+
+        gerir = widgets.QHBoxLayout()
+        button_rename = ui.botao(
+            "Renomear...",
+            "Renomeia o arquivo do recurso selecionado, preservando a extensão.",
+        )
+        button_rename.clicked.connect(self.rename_resource)
+        gerir.addWidget(button_rename)
+        button_duplicate = ui.botao(
+            "Duplicar",
+            "Cria uma cópia do recurso selecionado na mesma pasta.",
+            icone_chave="novo",
+        )
+        button_duplicate.clicked.connect(self.duplicate_resource)
+        gerir.addWidget(button_duplicate)
+        button_delete = ui.botao(
+            "Apagar",
+            "Apaga o arquivo do recurso selecionado; pede confirmação antes.",
+        )
+        button_delete.clicked.connect(self.delete_resource)
+        gerir.addWidget(button_delete)
+        list_layout.addLayout(gerir)
         layout.addWidget(group_list, 1)
 
         hint = ui.rotulo(
             "1) Escolha o tipo e 'Criar novo recurso'. 2) Desenhe na camada "
             "(formas/texto ou pincel). 3) 'Salvar recurso do documento' guarda "
-            "como SVG ou PNG transparente. 4) Duplo clique insere no grupo ativo.")
+            "como SVG ou PNG transparente. 4) Duplo clique insere no grupo ativo; "
+            "Renomear, Duplicar e Apagar organizam a pasta.")
         layout.addWidget(hint)
 
         self.setWidget(main)
@@ -387,6 +411,64 @@ class BibliotecaDocker(DockWidget):
             self._insert_paint(document, path, item.text())
         else:
             self._insert_vector(document, path, item.text())
+
+    def _recurso_selecionado(self):
+        item = self.list_items.currentItem()
+        if item is None:
+            helpers.show_message("Escolha um recurso na lista.")
+            return None
+        return item.text(), item.data(USER_ROLE)
+
+    def rename_resource(self):
+        selecionado = self._recurso_selecionado()
+        if selecionado is None:
+            return
+        nome, path = selecionado
+        novo, ok = QtWidgets.QInputDialog.getText(
+            self.widget(), "Renomear recurso", "Novo nome:", text=nome
+        )
+        if not ok or not novo.strip():
+            return
+        try:
+            lib.renomear_recurso(path, novo.strip())
+        except OSError as error:
+            helpers.show_info("Biblioteca", "Falha ao renomear: {0}".format(error))
+            return
+        self.refresh()
+
+    def duplicate_resource(self):
+        selecionado = self._recurso_selecionado()
+        if selecionado is None:
+            return
+        _, path = selecionado
+        try:
+            copia = lib.duplicar_recurso(path)
+        except OSError as error:
+            helpers.show_info("Biblioteca", "Falha ao duplicar: {0}".format(error))
+            return
+        self.refresh()
+        helpers.show_message("Cópia criada: {0}".format(os.path.basename(copia)))
+
+    def delete_resource(self):
+        selecionado = self._recurso_selecionado()
+        if selecionado is None:
+            return
+        nome, path = selecionado
+        answer = QtWidgets.QMessageBox.question(
+            self.widget(),
+            "Apagar recurso?",
+            "Apagar '{0}'? O arquivo sai da pasta da biblioteca.".format(nome),
+            DIALOG_YES | DIALOG_NO,
+            DIALOG_NO,
+        )
+        if answer != DIALOG_YES:
+            return
+        try:
+            lib.apagar_recurso(path)
+        except (OSError, ValueError) as error:
+            helpers.show_info("Biblioteca", "Falha ao apagar: {0}".format(error))
+            return
+        self.refresh()
 
     def _insert_vector(self, document, path, nome):
         try:
