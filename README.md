@@ -22,6 +22,10 @@ Os quatro documentos originais de contexto do projeto estão em
 |---|---|---|
 | ![Retículas e linhas de ação](Screenshots/04-reticulas.png) | ![Onomatopeias](Screenshots/05-onomatopeias.png) | ![Paletas](Screenshots/06-paletas.png) |
 
+| Visualizador 3D |
+|---|
+| ![Docker 3D com o manequim e os controles de corpo, pose, estilo e juntas](Screenshots/07-3d.png) |
+
 ## Módulos
 
 | Módulo | O que faz |

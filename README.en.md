@@ -23,6 +23,10 @@ The four original context documents of the project are in `docs/contexto/`
 |---|---|---|
 | ![Screentones and action lines](Screenshots/04-reticulas.png) | ![Onomatopoeia](Screenshots/05-onomatopeias.png) | ![Palettes](Screenshots/06-paletas.png) |
 
+| 3D viewer |
+|---|
+| ![3D docker with the mannequin and body, pose, style and joint controls](Screenshots/07-3d.png) |
+
 ## Modules
 
 | Module | What it does |
