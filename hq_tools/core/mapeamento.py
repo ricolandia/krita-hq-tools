@@ -38,6 +38,46 @@ def widget_para_imagem(ponto, centro_widget, centro_imagem, zoom,
     )
 
 
+def imagem_para_widget(ponto, centro_widget, centro_imagem, zoom,
+                       rotacao=0.0, pan=(0.0, 0.0), espelhado=False):
+    """Converte um ponto em pixels da imagem para coordenadas do widget.
+
+    Inversa de :func:`widget_para_imagem`; serve para posicionar a janela
+    flutuante sobre a seleção (que vem em pixels da imagem).
+    """
+    dx = (ponto[0] - centro_imagem[0]) * zoom
+    dy = (ponto[1] - centro_imagem[1]) * zoom
+    radianos = math.radians(rotacao)
+    cosseno, seno = math.cos(radianos), math.sin(radianos)
+    girado_x = dx * cosseno - dy * seno
+    girado_y = dx * seno + dy * cosseno
+    if espelhado:
+        girado_x = -girado_x
+    return (
+        centro_widget[0] + girado_x + pan[0],
+        centro_widget[1] + girado_y + pan[1],
+    )
+
+
+def retangulo_para_widget(retangulo, centro_widget, centro_imagem, zoom,
+                          rotacao=0.0, pan=(0.0, 0.0), espelhado=False):
+    """Retângulo em pixels da imagem para o widget (caixa envolvente)."""
+    x, y, w, h = retangulo
+    cantos = (
+        imagem_para_widget((x, y), centro_widget, centro_imagem, zoom, rotacao, pan, espelhado),
+        imagem_para_widget((x + w, y), centro_widget, centro_imagem, zoom, rotacao, pan, espelhado),
+        imagem_para_widget((x, y + h), centro_widget, centro_imagem, zoom, rotacao, pan, espelhado),
+        imagem_para_widget((x + w, y + h), centro_widget, centro_imagem, zoom, rotacao, pan, espelhado),
+    )
+    xs = [canto[0] for canto in cantos]
+    ys = [canto[1] for canto in cantos]
+    x0 = int(math.floor(min(xs)))
+    y0 = int(math.floor(min(ys)))
+    x1 = int(math.ceil(max(xs)))
+    y1 = int(math.ceil(max(ys)))
+    return x0, y0, max(1, x1 - x0), max(1, y1 - y0)
+
+
 def retangulo_para_imagem(retangulo, centro_widget, centro_imagem, zoom,
                           rotacao=0.0, pan=(0.0, 0.0), espelhado=False):
     """Retângulo (x, y, w, h) do widget em pixels da imagem (x, y, w, h).

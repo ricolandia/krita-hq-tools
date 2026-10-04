@@ -232,9 +232,14 @@ class _Flutuante(QtWidgets.QWidget):
         self.setCursor(CURSOR_SIZE_ALL)
         self._pixmap = None
         self._opacidade = 0.8
+        self._aspecto = None
         self._arrastando = False
         self._redimensionando = False
         self._ultimo = None
+
+    @property
+    def arrastando(self):
+        return self._arrastando or self._redimensionando
 
     def definir_pixmap(self, pixmap):
         self._pixmap = pixmap
@@ -243,6 +248,18 @@ class _Flutuante(QtWidgets.QWidget):
     def definir_opacidade(self, valor):
         self._opacidade = max(0.1, min(1.0, float(valor)))
         self.update()
+
+    def definir_aspecto(self, aspecto):
+        """Trava a proporção da janela na da seleção (WYSIWYG)."""
+        try:
+            self._aspecto = max(0.05, float(aspecto)) if aspecto else None
+        except (TypeError, ValueError):
+            self._aspecto = None
+
+    def _altura_para(self, largura):
+        if self._aspecto is None:
+            return self.height()
+        return max(self.TAMANHO_MINIMO, int(round(largura / self._aspecto)))
 
     def _retangulo_alca(self):
         lado = self.LADO_ALCA
@@ -276,8 +293,9 @@ class _Flutuante(QtWidgets.QWidget):
         posicao = _posicao(evento)
         delta = posicao - self._ultimo
         if self._redimensionando:
-            largura = max(self.TAMANHO_MINIMO, self.width() + delta.x())
-            altura = max(self.TAMANHO_MINIMO, self.height() + delta.y())
+            variacao = delta.x() if abs(delta.x()) >= abs(delta.y()) else delta.y()
+            largura = max(self.TAMANHO_MINIMO, self.width() + variacao)
+            altura = max(self.TAMANHO_MINIMO, self._altura_para(largura))
             self.resize(largura, altura)
         elif self._arrastando:
             self.move(self.pos() + delta)
@@ -297,7 +315,7 @@ class _Flutuante(QtWidgets.QWidget):
             return
         fator = 1.1 if delta > 0 else 1 / 1.1
         largura = max(self.TAMANHO_MINIMO, int(round(self.width() * fator)))
-        altura = max(self.TAMANHO_MINIMO, int(round(self.height() * fator)))
+        altura = max(self.TAMANHO_MINIMO, self._altura_para(largura))
         centro = self.rect().center()
         self.resize(largura, altura)
         self.move(self.pos() + centro - self.rect().center())
@@ -325,6 +343,9 @@ class Viewer3DDocker(DockWidget):
         self._tela = []
         self._canvas = None
         self._flutuante = None
+        self._selecao_flutuante = None
+        self._offset_preview = (0, 0)
+        self._tamanho_render = (0, 0)
         self._timer = QtCore.QTimer(self)
         self._timer.setSingleShot(True)
         self._timer.setInterval(30)
@@ -423,8 +444,8 @@ class Viewer3DDocker(DockWidget):
         flutuante = widgets.QHBoxLayout()
         self.button_flutuar = ui.botao(
             "Flutuar na página",
-            "Mostra o preview flutuante sobre o canvas para posicionar a "
-            "referência; arraste e redimensione antes de inserir.",
+            "Mostra o preview sobre a seleção (desenhe uma seleção retangular "
+            "sobre o painel primeiro); arraste e redimensione à vontade.",
             icone_chave="novo",
         )
         self.button_flutuar.setCheckable(True)
@@ -454,28 +475,28 @@ class Viewer3DDocker(DockWidget):
         acoes = widgets.QHBoxLayout()
         button_layer = ui.botao(
             "Inserir como camada",
-            "Rasteriza o preview no lugar e no tamanho do flutuante (ou no "
-            "documento inteiro, sem ele); a camada entra abaixo da camada "
-            "ativa, para o esboço ficar por cima.",
+            "Insere na seleção ativa (desenhe uma seleção retangular sobre o "
+            "painel); a camada entra abaixo da camada ativa, para o esboço "
+            "ficar por cima, e a seleção é desfeita.",
             icone_chave="aplicar",
         )
         button_layer.clicked.connect(lambda: self.inserir(referencia=False))
         acoes.addWidget(button_layer)
         button_ref = ui.botao(
             "Inserir como referência",
-            "Insere o preview travado, com rótulo de cor e opacidade reduzida, "
-            "no lugar do flutuante.",
+            "Insere na seleção ativa, travado, com rótulo de cor e opacidade "
+            "reduzida, abaixo da camada ativa; a seleção é desfeita.",
         )
         button_ref.clicked.connect(lambda: self.inserir(referencia=True))
         acoes.addWidget(button_ref)
         layout.addLayout(acoes)
 
         layout.addWidget(ui.rotulo(
-            "Arraste para orbitar; Shift+arraste (ou botão do meio) desloca; "
-            "roda do mouse ou +/− dão zoom; clique numa região para abrir os "
-            "sliders. 'Flutuar na página' mostra o preview sobre o canvas "
-            "para posicionar a referência antes de inserir; a inserção entra "
-            "abaixo da camada ativa, para o esboço ficar por cima."
+            "1) Desenhe uma seleção retangular sobre o painel. 2) Ajuste a "
+            "pose e o zoom (o preview mostra exatamente o recorte que será "
+            "inserido). 3) 'Inserir' coloca a camada abaixo da ativa e "
+            "desfaz a seleção. Arraste para orbitar; Shift+arraste desloca; "
+            "roda ou +/− dão zoom; clique numa região para abrir os sliders."
         ))
 
         self.setWidget(main)
@@ -571,18 +592,24 @@ class Viewer3DDocker(DockWidget):
             return "contorno", "#141414", "#ffffff"
         return "sombreado", None, None
 
+    def _pan_em_pixels(self, largura, altura):
+        """Converte o pan relativo (fração da menor dimensão) em pixels."""
+        minimo = max(1.0, float(min(largura, altura)))
+        return self.camera["pan_x"] * minimo, self.camera["pan_y"] * minimo
+
     def _render_svg(self, largura, altura, com_fundo=True, posados=None):
         estilo, cor, fundo = self._estilo()
         if not com_fundo:
             fundo = None
         if posados is None:
             posados = self.modelo.vertices_em_pose(self._rotacoes())
+        pan_x, pan_y = self._pan_em_pixels(largura, altura)
         return self.modelo.renderizar(
             yaw=self.camera["yaw"],
             pitch=self.camera["pitch"],
             zoom=self.camera["zoom"],
-            pan_x=self.camera["pan_x"],
-            pan_y=self.camera["pan_y"],
+            pan_x=pan_x,
+            pan_y=pan_y,
             largura=largura,
             altura=altura,
             posados=posados,
@@ -601,18 +628,39 @@ class Viewer3DDocker(DockWidget):
         painter.end()
         return imagem
 
+    def _tamanho_do_preview(self):
+        """Tamanho do render: a proporção da seleção quando ela existe.
+
+        É o que garante o WYSIWYG: o preview mostra o mesmo recorte que a
+        seleção vai receber, em qualquer zoom da câmera.
+        """
+        largura = max(self.preview.width(), 200)
+        altura = max(self.preview.height(), 200)
+        documento = helpers.active_document()
+        if documento is None:
+            return largura, altura
+        selecao = helpers.selection_bounds(documento)
+        if selecao is None or selecao[2] <= 0 or selecao[3] <= 0:
+            return largura, altura
+        aspecto = selecao[2] / float(selecao[3])
+        if largura / float(altura) > aspecto:
+            largura = max(80, int(round(altura * aspecto)))
+        else:
+            altura = max(80, int(round(largura / aspecto)))
+        return largura, altura
+
     def atualizar_preview(self):
         if self.modelo is None:
             return
-        largura = max(self.preview.width(), 200)
-        altura = max(self.preview.height(), 200)
+        largura, altura = self._tamanho_do_preview()
+        pan_x, pan_y = self._pan_em_pixels(largura, altura)
         posados = self.modelo.vertices_em_pose(self._rotacoes())
         self._tela = self.modelo.vertices_em_tela(
             yaw=self.camera["yaw"],
             pitch=self.camera["pitch"],
             zoom=self.camera["zoom"],
-            pan_x=self.camera["pan_x"],
-            pan_y=self.camera["pan_y"],
+            pan_x=pan_x,
+            pan_y=pan_y,
             largura=largura,
             altura=altura,
             posados=posados,
@@ -622,7 +670,13 @@ class Viewer3DDocker(DockWidget):
         svg = self._render_svg(largura, altura, posados=posados)
         imagem = self._rasterizar(svg, largura, altura)
         self.preview.setPixmap(QtGui.QPixmap.fromImage(imagem))
+        self._tamanho_render = (largura, altura)
+        self._offset_preview = (
+            max(0, (self.preview.width() - largura) // 2),
+            max(0, (self.preview.height() - altura) // 2),
+        )
         self._atualizar_flutuante(posados)
+        self._sincronizar_flutuante()
 
     def atualizar_flutuante(self):
         self._atualizar_flutuante()
@@ -644,8 +698,18 @@ class Viewer3DDocker(DockWidget):
 
     def _criar_flutuante(self):
         view = helpers.active_view()
-        if view is None or view.document() is None:
+        documento = view.document() if view is not None else None
+        if documento is None:
             helpers.show_info("3D", "Abra um documento para usar o flutuante.")
+            self.button_flutuar.setChecked(False)
+            return
+        selecao = helpers.selection_bounds(documento)
+        if selecao is None or selecao[2] <= 0 or selecao[3] <= 0:
+            helpers.show_info(
+                "3D",
+                "Desenhe uma seleção retangular sobre o painel para usar o "
+                "flutuante.",
+            )
             self.button_flutuar.setChecked(False)
             return
         viewport = _viewport_da_view(view)
@@ -655,15 +719,10 @@ class Viewer3DDocker(DockWidget):
             return
         self._fechar_flutuante()
         self._flutuante = _Flutuante(self, viewport)
-        largura = min(320, max(160, viewport.width() // 3))
-        altura = int(largura * 1.25)
-        self._flutuante.setGeometry(
-            max(0, (viewport.width() - largura) // 2),
-            max(0, (viewport.height() - altura) // 2),
-            largura,
-            altura,
-        )
+        self._flutuante.definir_aspecto(selecao[2] / float(selecao[3]))
         self._flutuante.definir_opacidade(self.sld_opacidade.value() / 100.0)
+        self._selecao_flutuante = selecao
+        self._posicionar_flutuante(viewport, selecao)
         self._flutuante.show()
         self._flutuante.raise_()
         self.button_fixar.setEnabled(True)
@@ -671,11 +730,78 @@ class Viewer3DDocker(DockWidget):
         self.modo_fixado = False
         self._atualizar_flutuante()
 
+    def _posicionar_flutuante(self, viewport, selecao):
+        """Coloca a janela sobre a seleção, com a proporção dela."""
+        if self._flutuante is None:
+            return
+        documento = helpers.active_document()
+        if documento is None:
+            return
+        parametros = self._parametros_do_canvas(documento, viewport)
+        if parametros is None:
+            return
+        centro_widget, centro_imagem, zoom, rotacao, pan, espelhado = parametros
+        tela = mapeamento.retangulo_para_widget(
+            (selecao[0], selecao[1], selecao[2], selecao[3]),
+            centro_widget,
+            centro_imagem,
+            zoom,
+            rotacao,
+            pan,
+            espelhado,
+        )
+        aspecto = selecao[2] / float(selecao[3])
+        fator = min(
+            1.0,
+            viewport.width() / max(1.0, float(tela[2])),
+            viewport.height() / max(1.0, float(tela[3])),
+        )
+        largura = max(_Flutuante.TAMANHO_MINIMO, int(round(tela[2] * fator)))
+        altura = max(
+            _Flutuante.TAMANHO_MINIMO, int(round(largura / aspecto))
+        )
+        x = int(round(tela[0] + (tela[2] - largura) / 2.0))
+        y = int(round(tela[1] + (tela[3] - altura) / 2.0))
+        x = max(0, min(x, viewport.width() - largura))
+        y = max(0, min(y, viewport.height() - altura))
+        self._flutuante.setGeometry(x, y, largura, altura)
+
+    def _sincronizar_flutuante(self):
+        """Segue a seleção: reposiciona quando ela muda e fecha se sumir."""
+        if self._flutuante is None:
+            return
+        documento = helpers.active_document()
+        if documento is None:
+            self._cancelar_flutuante()
+            return
+        selecao = helpers.selection_bounds(documento)
+        if selecao is None or selecao[2] <= 0 or selecao[3] <= 0:
+            self._cancelar_flutuante()
+            return
+        if selecao == self._selecao_flutuante or self._flutuante.arrastando:
+            return
+        self._selecao_flutuante = selecao
+        self._flutuante.definir_aspecto(selecao[2] / float(selecao[3]))
+        viewport = self._flutuante.parentWidget()
+        if viewport is not None:
+            self._posicionar_flutuante(viewport, selecao)
+            self._atualizar_flutuante()
+
+    def _cancelar_flutuante(self):
+        """Fecha o flutuante e desmarca o botão (seleção sumiu ou mudou)."""
+        if getattr(self, "button_flutar", None) is not None:
+            try:
+                self.button_flutar.setChecked(False)
+            except RuntimeError:
+                pass
+        self._fechar_flutuante()
+
     def _fechar_flutuante(self):
         if self._flutuante is not None:
             self._flutuante.hide()
             self._flutuante.deleteLater()
             self._flutuante = None
+        self._selecao_flutuante = None
         if getattr(self, "button_fixar", None) is not None:
             try:
                 self.button_fixar.setChecked(False)
@@ -708,8 +834,11 @@ class Viewer3DDocker(DockWidget):
         self.agendar_render()
 
     def deslocar(self, dx, dy):
-        self.camera["pan_x"] += dx
-        self.camera["pan_y"] += dy
+        # Pan relativo à menor dimensão: assim o enquadramento chega igual na
+        # seleção, independente do tamanho do preview (WYSIWYG).
+        minimo = max(1.0, float(min(self.preview.width(), self.preview.height())))
+        self.camera["pan_x"] += dx / minimo
+        self.camera["pan_y"] += dy / minimo
         self.agendar_render()
 
     def enquadrar(self):
@@ -740,6 +869,15 @@ class Viewer3DDocker(DockWidget):
 
     def selecionar_em(self, x, y):
         if self.modelo is None or not self._tela:
+            return
+        x -= self._offset_preview[0]
+        y -= self._offset_preview[1]
+        if (
+            x < 0
+            or y < 0
+            or x > self._tamanho_render[0]
+            or y > self._tamanho_render[1]
+        ):
             return
         melhor = None
         for indice, (tela_x, tela_y, _) in enumerate(self._tela):
@@ -860,19 +998,20 @@ class Viewer3DDocker(DockWidget):
             if linha is not None:
                 self.juntas_layout.addLayout(linha)
 
-    def _mapear_flutuante(self, documento):
-        """Retângulo do flutuante em pixels do documento, ou None."""
-        if self._flutuante is None:
-            return None
+    def _parametros_do_canvas(self, documento, viewport):
+        """(centro_widget, centro_imagem, zoom, rotacao, pan, espelhado) ou None.
+
+        Em modo pixel (o padrão do Krita), a escala de tela é ``zoomLevel``:
+        em 100%, um pixel da imagem vira um pixel do widget. O ``72/resolution``
+        do exemplo da comunidade valia para o modo de resolução de impressão e
+        deixava o mapeamento ~4x maior em 300 dpi (a imagem "gigante").
+        """
         view = helpers.active_view()
-        if view is None:
+        canvas = view.canvas() if view is not None else None
+        if canvas is None:
             return None
-        viewport = self._flutuante.parentWidget()
-        if viewport is None:
-            return None
-        canvas = view.canvas()
         try:
-            zoom = canvas.zoomLevel() * 72.0 / documento.resolution()
+            zoom = canvas.zoomLevel()
         except (AttributeError, RuntimeError):
             return None
         if zoom <= 0:
@@ -885,28 +1024,10 @@ class Viewer3DDocker(DockWidget):
             espelhado = canvas.mirror()
         except (AttributeError, RuntimeError):
             espelhado = False
-        # Âncora pelo centro do documento + barras de rolagem, e não pelo
-        # Canvas.preferredCenter(): ele é o ponto de apoio das transformações
-        # (still point), não o centro atual do widget depois de rolar.
         centro_imagem = (documento.width() / 2.0, documento.height() / 2.0)
         pan = self._pan_do_viewport(viewport)
         centro_widget = (viewport.width() / 2.0, viewport.height() / 2.0)
-        retangulo = (
-            self._flutuante.x(),
-            self._flutuante.y(),
-            self._flutuante.width(),
-            self._flutuante.height(),
-        )
-        resultado = mapeamento.retangulo_para_imagem(
-            retangulo, centro_widget, centro_imagem, zoom, rotacao, pan, espelhado
-        )
-        helpers.log(
-            "[3D] flutuante {0} -> imagem {1} (zoom {2:.4f}, rotacao {3:.1f}, "
-            "espelhado {4}, pan {5})".format(
-                retangulo, resultado, zoom, rotacao, espelhado, pan
-            )
-        )
-        return resultado
+        return centro_widget, centro_imagem, zoom, rotacao, pan, espelhado
 
     @staticmethod
     def _pan_do_viewport(viewport):
@@ -935,30 +1056,24 @@ class Viewer3DDocker(DockWidget):
         if documento is None:
             helpers.show_info("3D", "Abra um documento para inserir o desenho.")
             return
+        selecao = helpers.selection_bounds(documento)
+        if selecao is None or selecao[2] <= 0 or selecao[3] <= 0:
+            helpers.show_info(
+                "3D",
+                "Desenhe uma seleção retangular sobre o painel de destino "
+                "para inserir.",
+            )
+            return
+        x, y, largura, altura = selecao
         ativo = documento.activeNode()
         nome_ativo = ativo.name() if ativo is not None else None
-        retangulo = self._mapear_flutuante(documento)
-        if retangulo is not None:
-            x, y, largura, altura = retangulo
-        else:
-            x, y = 0, 0
-            largura = documento.width()
-            altura = documento.height()
-        vx, vy, vw, vh = mapeamento.intersecao_com_documento(
-            (x, y, largura, altura), documento.width(), documento.height()
-        )
-        if vw <= 0 or vh <= 0:
-            helpers.show_info("3D", "O flutuante está fora do documento.")
-            return
         svg = self._render_svg(largura, altura, com_fundo=False)
         imagem = self._rasterizar(svg, largura, altura)
-        if (vx, vy, vw, vh) != (x, y, largura, altura):
-            imagem = imagem.copy(vx - x, vy - y, vw, vh)
         rgba = imagem.convertToFormat(IMAGE_FORMAT_RGBA8888)
         dados = bytes(rgba.constBits().asstring(rgba.sizeInBytes()))
         nome = helpers.unique_layer_name(documento, "3D")
         camada = documento.createNode(nome, "paintlayer")
-        if camada is None or not camada.setPixelData(dados, vx, vy, vw, vh):
+        if camada is None or not camada.setPixelData(dados, x, y, largura, altura):
             helpers.show_info("3D", "Não foi possível criar a camada.")
             return
         helpers.attach_below_active(documento, camada)
@@ -967,9 +1082,11 @@ class Viewer3DDocker(DockWidget):
             camada.setLocked(True)
             camada.setOpacity(150)
         documento.setActiveNode(camada)
+        helpers.deselect(documento)
         documento.refreshProjection()
+        self._sincronizar_flutuante()
         helpers.show_message(
-            "Camada '{0}' inserida abaixo de '{1}'{2} (para traçar por cima).".format(
+            "Camada '{0}' inserida abaixo de '{1}'{2}; seleção desfeita.".format(
                 nome,
                 nome_ativo or "camada ativa",
                 " como referência" if referencia else "",

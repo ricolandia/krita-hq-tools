@@ -2,11 +2,13 @@
 
 ## [Não publicado]
 
-- Visualizador 3D: preview flutuante sobre a página ("Flutuar na página"),
-  arrastável e redimensionável (alça no canto ou roda do mouse), com opacidade
-  e modo "Fixar" (o mouse atravessa e você desenha por baixo). A inserção usa
-  o lugar e o tamanho do flutuante, mapeados para pixels do documento, e a
-  camada entra abaixo do nó ativo, para o esboço ficar por cima.
+- Visualizador 3D: a inserção agora usa a **seleção ativa** (retângulo em
+  pixels da imagem, sem conversão de tela): desenhe uma seleção sobre o painel,
+  o preview adota a proporção dela (WYSIWYG, com zoom e deslocamento da
+  câmera) e "Inserir como camada/referência" sai no tamanho exato, abaixo do
+  nó ativo, desfazendo a seleção. "Flutuar na página" só abre com seleção e
+  aparece sobre ela (arrastável, alça/roda mantendo a proporção, opacidade e
+  "Fixar" para desenhar por baixo).
 - Páginas: o grupo "Arte" (Sketch/Color/Ink) nasce com a "Máscara dos
   painéis"; pintar fica limitado aos painéis e esconder a máscara libera a
   página inteira (sarjetas e margens).

@@ -48,6 +48,37 @@ class TestWidgetParaImagem(unittest.TestCase):
         self.assertAlmostEqual(ponto[1], 300.0, places=6)
 
 
+class TestIdaEVolta(unittest.TestCase):
+    def test_ida_e_volta_sem_transformacao(self):
+        widget = mapeamento.imagem_para_widget(
+            (120.0, 80.0), (100.0, 100.0), (500.0, 400.0), 1.0
+        )
+        volta = mapeamento.widget_para_imagem(
+            widget, (100.0, 100.0), (500.0, 400.0), 1.0
+        )
+        self.assertAlmostEqual(volta[0], 120.0, places=6)
+        self.assertAlmostEqual(volta[1], 80.0, places=6)
+
+    def test_ida_e_volta_com_zoom_pan_rotacao_espelho(self):
+        argumentos = dict(zoom=2.5, rotacao=37.0, pan=(13.0, -7.0), espelhado=True)
+        widget = mapeamento.imagem_para_widget(
+            (700.0, 300.0), (400.0, 350.0), (500.0, 400.0), **argumentos
+        )
+        volta = mapeamento.widget_para_imagem(
+            widget, (400.0, 350.0), (500.0, 400.0), **argumentos
+        )
+        self.assertAlmostEqual(volta[0], 700.0, places=6)
+        self.assertAlmostEqual(volta[1], 300.0, places=6)
+
+    def test_retangulo_para_widget(self):
+        self.assertEqual(
+            mapeamento.retangulo_para_widget(
+                (450.0, 350.0, 100.0, 80.0), (100.0, 100.0), (500.0, 400.0), 1.0
+            ),
+            (50, 50, 100, 80),
+        )
+
+
 class TestDeslocamentoDaBarra(unittest.TestCase):
     def test_centrada_e_zero(self):
         self.assertEqual(mapeamento.deslocamento_da_barra(0, 100, 50), 0.0)

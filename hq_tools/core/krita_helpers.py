@@ -205,6 +205,39 @@ def active_selection(document):
     return selection
 
 
+def selection_bounds(document):
+    """Retângulo (x, y, w, h) da seleção ativa em pixels, ou None.
+
+    É a base da inserção do visualizador 3D: a seleção já vem em pixels da
+    imagem, sem conversão de tela (zoom, rolagem, rotação).
+    """
+    selection = active_selection(document)
+    if selection is None:
+        return None
+    try:
+        return (selection.x(), selection.y(), selection.width(), selection.height())
+    except (AttributeError, RuntimeError):
+        return None
+
+
+def deselect(document=None):
+    """Desfaz a seleção ativa (ação do Krita, com fallback silencioso)."""
+    try:
+        acao = app().action("deselect")
+        if acao is not None:
+            acao.trigger()
+            return
+    except (AttributeError, RuntimeError):
+        pass
+    if document is None:
+        document = active_document()
+    if document is not None:
+        try:
+            document.setSelection(Selection())
+        except (AttributeError, RuntimeError):
+            pass
+
+
 def full_selection(document):
     """Cria uma seleção que cobre todo o documento."""
     selection = Selection()

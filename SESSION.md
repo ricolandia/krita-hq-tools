@@ -227,11 +227,14 @@ aparência), tipografia das listas de miniaturas, tamanho dos ícones da lista.
 - Corpo (03/10): `homem.json` (1591 vértices) e `mulher.json` (1605 vértices)
   com os mesmos 68 ossos e nomes, então as poses valem para os dois; seletor
   Corpo no docker.
-- Preview flutuante (03/10): "Flutuar na página" mostra o preview sobre o
-  canvas (arrasta; alça ou roda redimensionam; opacidade; "Fixar" para desenhar
-  por baixo). A inserção usa o retângulo mapeado para pixels do documento
-  (`core/mapeamento.py`, com testes) e a camada entra **abaixo** do nó ativo,
-  para o esboço ficar por cima (feedback do usuário).
+- Preview flutuante por seleção (03/10): a inserção passou a usar a **seleção
+  ativa** (retângulo em pixels da imagem, sem conversão de tela). O preview
+  adota a proporção da seleção (WYSIWYG, com zoom e pan relativos), "Flutuar
+  na página" só abre com seleção e aparece sobre ela (arrasto; alça/roda
+  mantendo a proporção; opacidade; "Fixar"); inserir coloca a camada abaixo da
+  ativa e desfaz a seleção. O mapeamento (`core/mapeamento.py`, com testes)
+  usa `zoomLevel`: em modo pixel, 100% = 1 px da imagem por px de tela (o
+  `×72/dpi` do exemplo da comunidade era o bug do "gigante").
 - Páginas (03/10): grupo "Arte" (Sketch/Color/Ink) nasce com a "Máscara dos
   painéis" (`pages/mascara.py`): pintar fica limitado aos painéis e esconder a
   máscara libera a página inteira (feedback do usuário).

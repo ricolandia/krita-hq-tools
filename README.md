@@ -42,7 +42,7 @@ Os quatro documentos originais de contexto do projeto estão em
 | Paletas | Templates de HQ e artísticas (tons, nanquim, pele, céu, vegetação, chapadas, Zorn, retrato, paisagem, amanhecer, noite, terra, pastel, aquarela, guache, acrílico, retrô, BD, super-herói, mangá, sépia), aplicação na cor de frente/fundo, instalação no Krita e visualização das paletas instaladas. |
 | Páginas | Gerenciador com miniaturas internas dos `.kra`: "Novo projeto..." usa a pasta da página salva (grava comicConfig.json e cria a biblioteca do projeto), "Abrir projeto..." lê um `comicConfig.json` do CPMT e "Pasta..." abre qualquer pasta; "Criar próxima página" abre um diálogo (formato A4/A5/A3/tirinha/americano/tankobon/quadrado/livre, DPI e painéis da tirinha), gera a página com guias de margem automáticas e atualiza a grade; "Definir modelo de página" usa a página atual ou um template de HQ do Krita (BD, EUA, mangá...) como modelo; "Camada de referência" marca a camada selecionada e "Importar referência (PNG)" insere uma referência travada no grupo ativo. As páginas novas vêm com o grupo "Arte" e a "Máscara dos painéis" (pinte só dentro; esconda a máscara para pintar fora). |
 | Pincéis | Conjuntos sugeridos (Rascunho, Contornos, Aquarela/Guache, Acrílico/Óleo, Retículas) com cartões de miniatura + nome, montados com os presets instalados no Krita; 16 slots com atalhos configuráveis; aba "Packs" com pincéis da comunidade de licença verificada (instala com um clique e mostra a licença) e o instalador de bundle. |
-| Visualizador 3D | Manequim low-poly posável (MakeHuman + Auto-Rig Pro) como referência, com escolha de corpo (Homem/Mulher) e biblioteca de poses (padrão: Idle com mãos fechadas): arraste para orbitar; a roda do mouse ou os botões −/+ dão zoom; Shift+arraste, o botão do meio ou o botão Mover deslocam o enquadramento, e "Enquadrar" centraliza; um clique numa região (cabeça, tronco, braço, perna) abre os sliders Dobrar/Abrir/Girar daquela junta. "Flutuar na página" mostra o preview sobre o canvas para posicionar e redimensionar (alça/roda, opacidade e modo fixar); a inserção sai no lugar do flutuante e a camada entra abaixo do esboço. Em teste. |
+| Visualizador 3D | Manequim low-poly posável (MakeHuman + Auto-Rig Pro) como referência, com escolha de corpo (Homem/Mulher) e biblioteca de poses (padrão: Idle com mãos fechadas): arraste para orbitar; a roda do mouse ou os botões −/+ dão zoom; Shift+arraste, o botão do meio ou o botão Mover deslocam o enquadramento, e "Enquadrar" centraliza; um clique numa região (cabeça, tronco, braço, perna) abre os sliders Dobrar/Abrir/Girar daquela junta. desenhe uma seleção sobre o painel e o preview adota a proporção dela (WYSIWYG, com zoom e deslocamento da câmera); "Flutuar na página" só abre com seleção e aparece sobre ela (arraste/redimensione, opacidade e modo fixar), e a inserção sai no tamanho exato da seleção, abaixo do esboço, desfazendo a seleção. Em teste. |
 
 ## Kit de HQ (fontes e balões livres)
 
@@ -121,9 +121,10 @@ automaticamente; você pode desagrupar quando quiser).
    Mulher) e a pose (a padrão é Idle com mãos fechadas); arraste para orbitar,
    use Shift+arraste (ou o botão Mover) para deslocar, a roda ou os botões −/+
    para o zoom e "Enquadrar" para centralizar; clique numa região do corpo para
-   posar. Use "Flutuar na página" para posicionar e redimensionar o preview
-   sobre o painel antes de inserir; "Inserir como referência" cria a camada
-   travada com opacidade reduzida.
+   posar. Desenhe uma seleção retangular sobre o painel: o preview mostra
+   exatamente o recorte (use o zoom para detalhes, como uma mão) e "Flutuar na
+   página" aparece sobre a seleção. "Inserir como camada" ou "como referência"
+   coloca no tamanho da seleção, abaixo do esboço, e desfaz a seleção.
 
 ## Desenvolvimento
 
