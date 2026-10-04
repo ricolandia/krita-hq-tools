@@ -7,7 +7,9 @@ página, e as páginas novas nascem com a máscara dos painéis (os dois pedidos
 vieram de um usuário no Krita Artists). Validado dentro do Krita pelo autor
 em 04/10/2026.
 
-![Visualizador 3D sobre a página](https://raw.githubusercontent.com/ricolandia/krita-hq-tools/main/Screenshots/09-3d-na-pagina.png)
+[![Visualizador 3D sobre a página](https://raw.githubusercontent.com/ricolandia/krita-hq-tools/main/Screenshots/09-3d-na-pagina.png)](https://player.mediadelivery.net/play/684947/263cd80f-6cad-484b-823b-e120d6167c56)
+
+▶ **Vídeo curto:** [Krita tools - update 3Dfloat](https://player.mediadelivery.net/play/684947/263cd80f-6cad-484b-823b-e120d6167c56) (o fluxo do 3D float em uso).
 
 **Como usar o 3D sobre a página:**
 
