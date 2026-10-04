@@ -830,7 +830,8 @@ class Viewer3DDocker(DockWidget):
         self.agendar_render()
 
     def aplicar_zoom(self, fator):
-        self.camera["zoom"] = max(0.3, min(4.0, self.camera["zoom"] * fator))
+        # Até 12x: dá para enquadrar detalhes (uma mão, um rosto) na seleção.
+        self.camera["zoom"] = max(0.3, min(12.0, self.camera["zoom"] * fator))
         self.agendar_render()
 
     def deslocar(self, dx, dy):
