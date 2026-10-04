@@ -16,9 +16,9 @@ The four original context documents of the project are in `docs/contexto/`
 
 **3D viewer over the page:** pick the body and pose, draw a rectangular selection over the target panel (the preview adopts its aspect ratio and shows the exact crop, with up to 12x zoom for details), use "Float on page" to see it over the panel and "Insert as layer" or "as reference": the layer lands at the selection size, below the sketch, and the selection is cleared.
 
-[<img src="Screenshots/09-3d-na-pagina.png" width="720" alt="Click to watch the short video 'Krita tools - update 3Dfloat'">](https://player.mediadelivery.net/play/684947/263cd80f-6cad-484b-823b-e120d6167c56)
+[<img src="Screenshots/09-3d-na-pagina.png" width="720" alt="Click to watch the short video 'Krita tools - update 3Dfloat'">](https://youtu.be/0rfDIr2QTDE)
 
-▶ **Short video:** [Krita tools - update 3Dfloat](https://player.mediadelivery.net/play/684947/263cd80f-6cad-484b-823b-e120d6167c56) (the 3D float flow in action).
+▶ **Short video:** [Krita tools - update 3Dfloat](https://youtu.be/0rfDIr2QTDE) (the 3D float flow in action).
 
 [<img src="Screenshots/08-demo.png" width="720" alt="Watch the HQ Tools demo (1-minute video)">](https://youtu.be/B9KYYyLdHF0)
 
