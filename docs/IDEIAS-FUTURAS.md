@@ -4,6 +4,10 @@ Registro das propostas avaliadas (ex.: pasta `Novas_ideias/`) que ainda não
 foram integradas. Cada item traz o veredito e as condições para entrar no
 plugin.
 
+**Prioridade atual (03/10/2026):** a biblioteca de poses do visualizador 3D:
+catalogar as novas poses, dividir em corpo e mãos, "Salvar pose atual" e
+miniatura no seletor. O Gantt atualizado está no Trilium (nota do roadmap).
+
 ## Proposta avaliada: balde com fechamento de falhas (`fillbucket`)
 
 Fonte: `Novas_ideias/hq_tools_fillbucket_proposta/` (núcleo `core/gapclose.py`
