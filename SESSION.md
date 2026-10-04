@@ -1,7 +1,8 @@
 # SESSION — HQ Tools (Krita-Comics-Plugin)
 
-Fonte da verdade do projeto. Atualizado em 2026-10-03 (v0.7.0 **publicada**:
-release "Latest" no GitHub, tag `v0.7.0`).
+Fonte da verdade do projeto. Atualizado em 2026-10-04 (v0.7.2 **publicada**:
+3D por seleção com preview flutuante, máscara dos painéis e compatibilidade
+Windows).
 
 Espelho no Trilium (VPS): nota **"HQ Tools - Plugin Krita"** (`JVRkycXWq0KN`,
 em Apps e Jogos), com as subnotas Estado e decisões, Instalação e uso,
@@ -30,7 +31,7 @@ conclusão da pesquisa está em `docs/contexto/` (os 4 arquivos originais).
 - **Paletas:** docker próprio com templates `.gpl`.
 - Licença MIT; docs em `.md` na pasta do projeto (regra de documentação).
 
-## Estado (v0.6.2 publicada; v0.7.0 em preparo)
+## Estado (v0.7.2 publicada)
 
 Feito:
 
