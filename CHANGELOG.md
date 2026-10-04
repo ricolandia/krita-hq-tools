@@ -1,5 +1,14 @@
 # Changelog
 
+## [Não publicado]
+
+- Ícone: o `ui.painel` aplica o ícone também no docker (abas e janelas
+  flutuantes); READMEs PT/EN com o ícone no topo e social preview em
+  `assets/social-preview.png`.
+- Documentação: o README deixa de anunciar o gerador de páginas a partir de
+  roteiro (a aba saiu da interface na v0.3.0; o fluxo continua no código como
+  referência, registrado em `docs/ROTEIRO-SINTAXE.md`).
+
 ## [0.7.0] — 2026-10-03
 
 Segunda versão pública. Entra o **visualizador 3D** (a Rota A do

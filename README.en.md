@@ -5,10 +5,9 @@
 [Português](README.md) · **English**
 
 Krita plugin with screentones and hatching, vector speech balloons, palettes,
-a page manager with thumbnails, a page generator from script and brush
-shortcuts. Built for Krita 5.3.4 (AppImage, PyQt5) with preparation for
-Krita 6 (PyQt6). The project documentation is written in Portuguese; this file
-is the English overview.
+a page manager with thumbnails and brush shortcuts. Built for Krita 5.3.4
+(AppImage, PyQt5) with preparation for Krita 6 (PyQt6). The project
+documentation is written in Portuguese; this file is the English overview.
 
 The four original context documents of the project are in `docs/contexto/`
 (Portuguese).
@@ -125,19 +124,6 @@ automatically, and you can ungroup whenever you want).
    Shift+drag (or the Move button) to pan, the wheel or the −/+ buttons to
    zoom and "Fit" to recenter; click a body region to pose; "Insert as
    reference" creates the locked layer with reduced opacity.
-
-## Script syntax
-
-```
-pagina 1
-formato A4
-layout grade2x2
-fala p1: texto da fala
-narracao p1: texto de narração
-```
-
-Full reference in `docs/ROTEIRO-SINTAXE.md` (Portuguese). The script keywords
-are in Portuguese, as above.
 
 ## Development
 

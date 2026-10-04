@@ -5,9 +5,8 @@
 **Português** · [English](README.en.md)
 
 Plugin do Krita com retículas e hachuras, balões vetoriais, paletas,
-gerenciador de páginas com miniaturas, gerador de páginas a partir de roteiro e
-atalhos de pincel. Feito para o Krita 5.3.4 (AppImage, PyQt5) com preparação
-para o Krita 6 (PyQt6).
+gerenciador de páginas com miniaturas e atalhos de pincel. Feito para o
+Krita 5.3.4 (AppImage, PyQt5) com preparação para o Krita 6 (PyQt6).
 
 Os quatro documentos originais de contexto do projeto estão em
 `docs/contexto/`.
@@ -124,18 +123,6 @@ automaticamente; você pode desagrupar quando quiser).
    para o zoom e "Enquadrar" para centralizar; clique numa região do corpo para
    posar; "Inserir como referência" cria a camada travada com opacidade
    reduzida.
-
-## Sintaxe do roteiro
-
-```
-pagina 1
-formato A4
-layout grade2x2
-fala p1: texto da fala
-narracao p1: texto de narração
-```
-
-Referência completa em `docs/ROTEIRO-SINTAXE.md`.
 
 ## Desenvolvimento
 
