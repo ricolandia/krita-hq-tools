@@ -8,10 +8,10 @@ import copy
 import json
 import os
 import shutil
-import sys
 import tempfile
 import time
 
+from .erros import escrever_erro
 from .paths import CONFIG_PATH, ensure_user_dirs
 
 DEFAULT_CONFIG = {
@@ -99,7 +99,7 @@ class Config:
             stamp = time.strftime("%Y%m%d-%H%M%S")
             backup = "{0}.ilegivel-{1}".format(self.path, stamp)
             shutil.copy2(self.path, backup)
-            sys.stderr.write(
+            escrever_erro(
                 "[hq_tools] config.json ilegível; cópia em {0}\n".format(backup)
             )
         except OSError:

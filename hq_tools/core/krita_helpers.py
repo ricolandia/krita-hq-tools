@@ -1,11 +1,11 @@
 """Funções utilitárias sobre a API do Krita usadas por todos os módulos."""
 
 import contextlib
-import sys
 
 from krita import InfoObject, Krita, Selection
 
 from .compat import WAIT_CURSOR, QIcon, QtCore, QtWidgets
+from .erros import escrever_erro
 
 
 def app():
@@ -45,11 +45,7 @@ def log(text):
     Usado em pontos onde antes o erro era engolido em silêncio, para o autor
     conseguir diagnosticar sem o plugin travar.
     """
-    try:
-        sys.stderr.write("[hq_tools] {0}\n".format(text))
-        sys.stderr.flush()
-    except (AttributeError, ValueError, OSError):
-        pass
+    escrever_erro("[hq_tools] {0}\n".format(text), flush=True)
 
 
 def show_message(text, timeout=4000):

@@ -1,14 +1,13 @@
 """Imports de Qt com compatibilidade entre PyQt5 (Krita 5.x) e PyQt6 (Krita 6.x)."""
 
-import sys
-
+from .erros import escrever_erro
 from .qt_probe import escolher as _escolher_qt
 from .qt_probe import versao_do_krita
 
 _KRITA_QT = versao_do_krita()
 _USAR_PYQT6 = _escolher_qt(_KRITA_QT) >= 6
 if _KRITA_QT is not None and not _USAR_PYQT6:
-    sys.stderr.write(
+    escrever_erro(
         "[hq_tools] Krita {0} detectado: usando PyQt5\n".format(_KRITA_QT)
     )
 
@@ -17,7 +16,7 @@ if _USAR_PYQT6:  # Krita 6
         from PyQt6 import QtCore, QtGui, QtWidgets
         from PyQt6.QtCore import pyqtSignal, pyqtSlot
     except ImportError as _erro:  # pragma: no cover
-        sys.stderr.write(
+        escrever_erro(
             "[hq_tools] Krita {0} pede PyQt6 e ele não está disponível: "
             "{1}\n".format(_KRITA_QT, _erro)
         )

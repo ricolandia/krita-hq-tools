@@ -342,7 +342,11 @@ Espelho no Trilium: subnota "Lista do autor (a criar)" (`FoIRvo2ztN0D`).
 - Social preview do GitHub: gerado em `assets/social-preview.png` (1200x630);
   subir em Settings > Social preview do repositório (a API não expõe isso).
 - Ícone nos dockers: o `ui.painel` agora aplica o ícone também no docker
-  (não só no widget interno); vale para janelas flutuantes e abas agrupadas. Versão no Bunny Stream (library 684947,
+  (não só no widget interno); vale para janelas flutuantes e abas agrupadas.
+- Correção Windows (v0.7.1): no Krita GUI do Windows `sys.stderr` é `None` e a
+  escrita na importação derrubava o plugin ("Could not import hq_tools");
+  agora tudo passa por `core/erros.escrever_erro`, com teste e regra estática.
+  Reportado pelo usuário `tayet` (Windows, Krita 5.x). Versão no Bunny Stream (library 684947,
   `56b74fac-e794-4c8a-b6e2-6eb6cd0ee4e0`) usada nos embeds do site.
 - **Página própria + post (03/10):** página **`/hq-tools/`** (PT+EN) no
   ricolandia.com, no modelo do Fonte (hero, vídeo, 8 módulos, destaque 3D,

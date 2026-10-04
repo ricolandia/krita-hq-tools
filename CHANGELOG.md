@@ -1,10 +1,26 @@
 # Changelog
 
-## [Não publicado]
+## [0.7.1] — 2026-10-03
+
+Correção para Windows. No Krita do Windows (aplicativo gráfico sem console)
+`sys.stderr` é `None`, e o plugin escrevia nele durante a importação: o HQ
+Tools inteiro falhava com "Could not import hq_tools". Todas as escritas de
+diagnóstico agora passam por um helper que confere se o stream existe.
+
+- Novo `hq_tools/core/erros.py` (`escrever_erro`), usado por `compat.py`,
+  `config.py` e `krita_helpers.log`.
+- Testes: escrita com `sys.stderr = None` e regra estática que proíbe
+  `sys.stderr` cru no código de runtime.
+
+Também entram os ajustes feitos depois da 0.7.0:
 
 - Ícone: o `ui.painel` aplica o ícone também no docker (abas e janelas
   flutuantes); READMEs PT/EN com o ícone no topo e social preview em
   `assets/social-preview.png`.
+- Paletas: avisos claros nas duas abas (Aplicar na frente/fundo x Instalar) e
+  duplo clique no swatch para aplicar na frente.
+- INSTALL: o visualizador 3D não tem dependências extras (modelos e poses vão
+  no ZIP; o Blender só é usado pelo autor).
 - Documentação: o README deixa de anunciar o gerador de páginas a partir de
   roteiro (a aba saiu da interface na v0.3.0; o fluxo continua no código como
   referência, registrado em `docs/ROTEIRO-SINTAXE.md`).
