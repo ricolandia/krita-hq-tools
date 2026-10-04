@@ -77,6 +77,9 @@ class PalettesDocker(DockWidget):
         self.list_swatches.setUniformItemSizes(True)
         self.list_swatches.setResizeMode(LIST_ADJUST)
         self.list_swatches.setMovement(LIST_STATIC)
+        self.list_swatches.itemDoubleClicked.connect(
+            lambda item: self.apply_swatch(True)
+        )
         layout.addWidget(self.list_swatches, 1)
 
         layout.addWidget(ui.separador())
@@ -97,6 +100,13 @@ class PalettesDocker(DockWidget):
         button_folder.clicked.connect(self.open_krita_folder)
         buttons2.addWidget(button_folder)
         layout.addLayout(buttons2)
+
+        layout.addWidget(ui.rotulo(
+            "Escolha um swatch e use Aplicar na frente/fundo (ou duplo clique "
+            "no swatch). A cor vale para pincéis que usam a cor de frente. "
+            "Instalar copia as paletas para o Krita: elas aparecem no docker "
+            "de paletas depois de reiniciar."
+        ))
 
         return tab
 
@@ -121,6 +131,13 @@ class PalettesDocker(DockWidget):
         else:  # pragma: no cover
             layout.addWidget(ui.rotulo("PaletteView indisponível nesta versão do Krita."))
             self.palette_view = None
+
+        layout.addWidget(ui.rotulo(
+            "Esta aba só mostra as paletas instaladas. Para pintar, escolha a "
+            "cor no docker de paletas do Krita (ou use Aplicar na frente na "
+            "aba Templates); paletas recém-instaladas só aparecem depois de "
+            "reiniciar o Krita."
+        ))
 
         return tab
 
@@ -203,7 +220,7 @@ class PalettesDocker(DockWidget):
                 continue
         helpers.show_message(
             "{0} paletas instaladas. Reinicie o Krita para vê-las no docker "
-            "de paletas.".format(installed)
+            "de paletas; lá, clicar numa cor define a cor de frente.".format(installed)
         )
 
     def open_krita_folder(self):
