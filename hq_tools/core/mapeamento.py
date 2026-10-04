@@ -11,6 +11,16 @@ barras de rolagem.
 import math
 
 
+def deslocamento_da_barra(minimo, maximo, valor):
+    """Deslocamento (em px do widget) de uma barra de rolagem, relativo ao centro.
+
+    A barra centrada devolve 0; rolada para o fim, um valor negativo. É a
+    mesma conta que os exemplos da comunidade usam para mapear o canvas.
+    """
+    meio = (minimo + maximo) / 2.0
+    return -(valor - meio)
+
+
 def widget_para_imagem(ponto, centro_widget, centro_imagem, zoom,
                        rotacao=0.0, pan=(0.0, 0.0), espelhado=False):
     """Converte um ponto do widget para pixels da imagem."""

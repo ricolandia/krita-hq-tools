@@ -48,6 +48,20 @@ class TestWidgetParaImagem(unittest.TestCase):
         self.assertAlmostEqual(ponto[1], 300.0, places=6)
 
 
+class TestDeslocamentoDaBarra(unittest.TestCase):
+    def test_centrada_e_zero(self):
+        self.assertEqual(mapeamento.deslocamento_da_barra(0, 100, 50), 0.0)
+
+    def test_rolada_para_o_fim_e_negativa(self):
+        self.assertEqual(mapeamento.deslocamento_da_barra(0, 100, 100), -50.0)
+
+    def test_rolada_para_o_inicio_e_positiva(self):
+        self.assertEqual(mapeamento.deslocamento_da_barra(0, 100, 0), 50.0)
+
+    def test_sem_rolagem(self):
+        self.assertEqual(mapeamento.deslocamento_da_barra(0, 0, 0), 0.0)
+
+
 class TestRetanguloParaImagem(unittest.TestCase):
     def test_sem_rotacao(self):
         self.assertEqual(

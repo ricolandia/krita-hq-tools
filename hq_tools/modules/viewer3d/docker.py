@@ -455,7 +455,8 @@ class Viewer3DDocker(DockWidget):
         button_layer = ui.botao(
             "Inserir como camada",
             "Rasteriza o preview no lugar e no tamanho do flutuante (ou no "
-            "documento inteiro, sem ele) e insere abaixo da camada ativa.",
+            "documento inteiro, sem ele); a camada entra abaixo da camada "
+            "ativa, para o esboço ficar por cima.",
             icone_chave="aplicar",
         )
         button_layer.clicked.connect(lambda: self.inserir(referencia=False))
@@ -473,7 +474,8 @@ class Viewer3DDocker(DockWidget):
             "Arraste para orbitar; Shift+arraste (ou botão do meio) desloca; "
             "roda do mouse ou +/− dão zoom; clique numa região para abrir os "
             "sliders. 'Flutuar na página' mostra o preview sobre o canvas "
-            "para posicionar a referência antes de inserir."
+            "para posicionar a referência antes de inserir; a inserção entra "
+            "abaixo da camada ativa, para o esboço ficar por cima."
         ))
 
         self.setWidget(main)
@@ -883,13 +885,11 @@ class Viewer3DDocker(DockWidget):
             espelhado = canvas.mirror()
         except (AttributeError, RuntimeError):
             espelhado = False
-        try:
-            centro = canvas.preferredCenter()
-            centro_imagem = (centro.x(), centro.y())
-            pan = (0.0, 0.0)
-        except (AttributeError, RuntimeError):
-            centro_imagem = (documento.width() / 2.0, documento.height() / 2.0)
-            pan = self._pan_do_viewport(viewport)
+        # Âncora pelo centro do documento + barras de rolagem, e não pelo
+        # Canvas.preferredCenter(): ele é o ponto de apoio das transformações
+        # (still point), não o centro atual do widget depois de rolar.
+        centro_imagem = (documento.width() / 2.0, documento.height() / 2.0)
+        pan = self._pan_do_viewport(viewport)
         centro_widget = (viewport.width() / 2.0, viewport.height() / 2.0)
         retangulo = (
             self._flutuante.x(),
@@ -897,9 +897,16 @@ class Viewer3DDocker(DockWidget):
             self._flutuante.width(),
             self._flutuante.height(),
         )
-        return mapeamento.retangulo_para_imagem(
+        resultado = mapeamento.retangulo_para_imagem(
             retangulo, centro_widget, centro_imagem, zoom, rotacao, pan, espelhado
         )
+        helpers.log(
+            "[3D] flutuante {0} -> imagem {1} (zoom {2:.4f}, rotacao {3:.1f}, "
+            "espelhado {4}, pan {5})".format(
+                retangulo, resultado, zoom, rotacao, espelhado, pan
+            )
+        )
+        return resultado
 
     @staticmethod
     def _pan_do_viewport(viewport):
@@ -907,16 +914,18 @@ class Viewer3DDocker(DockWidget):
         if area is None:
             return (0.0, 0.0)
         try:
-            def deslocamento(barra):
-                meio = (barra.minimum() + barra.maximum()) / 2.0
-                return -(barra.value() - meio)
-
-            return (
-                deslocamento(area.horizontalScrollBar()),
-                deslocamento(area.verticalScrollBar()),
-            )
+            horizontal = area.horizontalScrollBar()
+            vertical = area.verticalScrollBar()
         except (AttributeError, RuntimeError):
             return (0.0, 0.0)
+        return (
+            mapeamento.deslocamento_da_barra(
+                horizontal.minimum(), horizontal.maximum(), horizontal.value()
+            ),
+            mapeamento.deslocamento_da_barra(
+                vertical.minimum(), vertical.maximum(), vertical.value()
+            ),
+        )
 
     def inserir(self, referencia=False):
         if self.modelo is None:
@@ -926,6 +935,8 @@ class Viewer3DDocker(DockWidget):
         if documento is None:
             helpers.show_info("3D", "Abra um documento para inserir o desenho.")
             return
+        ativo = documento.activeNode()
+        nome_ativo = ativo.name() if ativo is not None else None
         retangulo = self._mapear_flutuante(documento)
         if retangulo is not None:
             x, y, largura, altura = retangulo
@@ -958,7 +969,9 @@ class Viewer3DDocker(DockWidget):
         documento.setActiveNode(camada)
         documento.refreshProjection()
         helpers.show_message(
-            "Camada '{0}' inserida{1}.".format(
-                nome, " como referência" if referencia else ""
+            "Camada '{0}' inserida abaixo de '{1}'{2} (para traçar por cima).".format(
+                nome,
+                nome_ativo or "camada ativa",
+                " como referência" if referencia else "",
             )
         )
