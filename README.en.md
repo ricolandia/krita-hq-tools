@@ -20,7 +20,9 @@ The four original context documents of the project are in `docs/contexto/`
 
 ▶ **Short video:** [Krita tools - update 3Dfloat](https://youtu.be/0rfDIr2QTDE) (the 3D float flow in action).
 
-[<img src="Screenshots/08-demo.png" width="720" alt="Watch the HQ Tools demo (1-minute video)">](https://youtu.be/B9KYYyLdHF0)
+[<img src="Screenshots/08-demo.png" width="720" alt="Click to watch the short video 'All features' (first release)">](https://youtu.be/B9KYYyLdHF0)
+
+▶ **Short video:** [All features](https://youtu.be/B9KYYyLdHF0) (the first release demo).
 
 ## Screenshots
 

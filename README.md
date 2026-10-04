@@ -19,7 +19,9 @@ Os quatro documentos originais de contexto do projeto estão em
 
 ▶ **Vídeo curto:** [Krita tools - update 3Dfloat](https://youtu.be/0rfDIr2QTDE) (o fluxo do 3D float em uso).
 
-[<img src="Screenshots/08-demo.png" width="720" alt="Assista ao demo do HQ Tools (vídeo de 1 minuto)">](https://youtu.be/B9KYYyLdHF0)
+[<img src="Screenshots/08-demo.png" width="720" alt="Clique para assistir ao vídeo curto 'Todos os recursos' (primeiro release)">](https://youtu.be/B9KYYyLdHF0)
+
+▶ **Vídeo curto:** [Todos os recursos](https://youtu.be/B9KYYyLdHF0) (o demo do primeiro release).
 
 ## Capturas
 
