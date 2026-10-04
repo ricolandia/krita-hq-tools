@@ -13,6 +13,10 @@ Os quatro documentos originais de contexto do projeto estão em
 
 ## Demo
 
+**Visualizador 3D sobre a página:** escolha o corpo e a pose, desenhe uma seleção retangular sobre o painel de destino (o preview adota a proporção dela e mostra o recorte exato, com zoom de até 12x para detalhes), use "Flutuar na página" para ver sobre o painel e "Inserir como camada" ou "como referência": a camada sai no tamanho da seleção, abaixo do esboço, e a seleção é desfeita.
+
+<img src="Screenshots/09-3d-na-pagina.png" width="720" alt="Manequim do visualizador 3D inserido como referência sobre um painel da página, com o docker HQ Tools: 3D aberto">
+
 [<img src="Screenshots/08-demo.png" width="720" alt="Assista ao demo do HQ Tools (vídeo de 1 minuto)">](https://youtu.be/B9KYYyLdHF0)
 
 ## Capturas

@@ -1,17 +1,44 @@
 # Changelog
 
-## [Não publicado]
+## [0.7.2] — 2026-10-04
 
-- Visualizador 3D: a inserção agora usa a **seleção ativa** (retângulo em
-  pixels da imagem, sem conversão de tela): desenhe uma seleção sobre o painel,
-  o preview adota a proporção dela (WYSIWYG, com zoom e deslocamento da
-  câmera) e "Inserir como camada/referência" sai no tamanho exato, abaixo do
-  nó ativo, desfazendo a seleção. "Flutuar na página" só abre com seleção e
-  aparece sobre ela (arrastável, alça/roda mantendo a proporção, opacidade e
-  "Fixar" para desenhar por baixo).
-- Páginas: o grupo "Arte" (Sketch/Color/Ink) nasce com a "Máscara dos
-  painéis"; pintar fica limitado aos painéis e esconder a máscara libera a
-  página inteira (sarjetas e margens).
+O visualizador 3D ganha o fluxo por seleção e o preview flutuante sobre a
+página, e as páginas novas nascem com a máscara dos painéis (os dois pedidos
+vieram de um usuário no Krita Artists). Validado dentro do Krita pelo autor
+em 04/10/2026.
+
+![Visualizador 3D sobre a página](https://raw.githubusercontent.com/ricolandia/krita-hq-tools/main/Screenshots/09-3d-na-pagina.png)
+
+**Como usar o 3D sobre a página:**
+
+1. Abra o docker "HQ Tools: 3D" e escolha o corpo e a pose.
+2. Desenhe uma seleção retangular com a ferramenta de seleção sobre o painel
+   de destino.
+3. Ajuste a pose e o zoom (até 12x, para detalhes como uma mão): o preview
+   adota a proporção da seleção e mostra exatamente o recorte que será
+   inserido.
+4. "Flutuar na página" mostra o preview sobre a seleção (arraste; alça ou roda
+   redimensionam mantendo a proporção; opacidade; "Fixar" para desenhar por
+   baixo).
+5. "Inserir como camada" ou "Inserir como referência": a camada sai no tamanho
+   exato da seleção, abaixo da camada ativa (o esboço fica por cima), e a
+   seleção é desfeita.
+
+### Visualizador 3D
+
+- A inserção usa a **seleção ativa** (retângulo em pixels da imagem, sem
+  conversão de tela): o preview adota a proporção dela (WYSIWYG, com zoom e
+  deslocamento da câmera) e a camada entra abaixo do nó ativo.
+- "Flutuar na página" só abre com seleção e aparece sobre ela.
+
+### Páginas
+
+- O grupo "Arte" (Sketch/Color/Ink) nasce com a "Máscara dos painéis": pintar
+  fica limitado aos painéis e esconder a máscara libera a página inteira
+  (sarjetas e margens).
+
+### Correções
+
 - Seleção: o libkis não tem `byteCount()`; a checagem antiga caía no `except`
   e considerava **toda** seleção vazia. `selection_vazia` agora usa
   `width()`/`height()`, o que conserta a inserção do 3D por seleção e a
