@@ -181,14 +181,15 @@ def selection_vazia(selection):
     """Diz se a seleção não tem pixels (ou não existe).
 
     No Krita ``document.selection()`` devolve um objeto de seleção mesmo sem
-    nada selecionado. Só ``byteCount()`` diz se há área de verdade: testar
-    ``is not None`` fazia o plugin criar máscara de 0 px, e o filtro passava a
-    não fazer nada sem explicar por quê.
+    nada selecionado. O libkis **não tem** ``byteCount()`` (a versão anterior
+    usava esse nome, caía no ``except`` e considerava toda seleção vazia);
+    ``width()``/``height()`` devolvem o retângulo exato da seleção, 0 quando
+    não há área.
     """
     if selection is None:
         return True
     try:
-        return selection.byteCount() == 0
+        return selection.width() <= 0 or selection.height() <= 0
     except (AttributeError, RuntimeError, TypeError):
         return True
 

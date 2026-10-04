@@ -165,5 +165,51 @@ class TestLeituraDeTexto(unittest.TestCase):
             self.helpers.read_text_file(self.os.path.join(self.pasta, "nao-existe"))
 
 
+class SelecaoFalsa:
+    """Seleção de mentira com a API do libkis (x/y/width/height)."""
+
+    def __init__(self, x=0, y=0, largura=0, altura=0):
+        self._x = x
+        self._y = y
+        self._largura = largura
+        self._altura = altura
+
+    def x(self):
+        return self._x
+
+    def y(self):
+        return self._y
+
+    def width(self):
+        return self._largura
+
+    def height(self):
+        return self._altura
+
+
+class TestSelectionVazia(unittest.TestCase):
+    def setUp(self):
+        self.helpers = importar_helpers()
+
+    def test_none_e_vazia(self):
+        self.assertTrue(self.helpers.selection_vazia(None))
+
+    def test_sem_area_e_vazia(self):
+        self.assertTrue(self.helpers.selection_vazia(SelecaoFalsa()))
+
+    def test_com_area_nao_e_vazia(self):
+        self.assertFalse(self.helpers.selection_vazia(SelecaoFalsa(10, 20, 100, 80)))
+
+    def test_objeto_sem_api_e_vazio(self):
+        self.assertTrue(self.helpers.selection_vazia(object()))
+
+    def test_bounds_da_selecao(self):
+        selecao = SelecaoFalsa(10, 20, 100, 80)
+        documento = type("Documento", (), {"selection": lambda self: selecao})()
+        self.assertEqual(
+            self.helpers.selection_bounds(documento), (10, 20, 100, 80)
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

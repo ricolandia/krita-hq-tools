@@ -12,6 +12,10 @@
 - Páginas: o grupo "Arte" (Sketch/Color/Ink) nasce com a "Máscara dos
   painéis"; pintar fica limitado aos painéis e esconder a máscara libera a
   página inteira (sarjetas e margens).
+- Seleção: o libkis não tem `byteCount()`; a checagem antiga caía no `except`
+  e considerava **toda** seleção vazia. `selection_vazia` agora usa
+  `width()`/`height()`, o que conserta a inserção do 3D por seleção e a
+  máscara de retículas com "Usar a seleção ativa".
 - Windows: os caminhos do Krita são resolvidos por sistema (`%APPDATA%\krita`
   no Windows, `~/Library/Application Support/krita` no macOS), as fontes são
   registradas no HKCU, packs/bundles/templates usam a pasta certa e o
