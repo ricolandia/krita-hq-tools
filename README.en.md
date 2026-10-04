@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/icon-light-128.png" width="96" alt="HQ Tools icon"></p>
+
 # HQ Tools: comics tools for Krita
 
 [Português](README.md) · **English**

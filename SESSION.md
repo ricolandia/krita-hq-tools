@@ -1,7 +1,7 @@
 # SESSION — HQ Tools (Krita-Comics-Plugin)
 
-Fonte da verdade do projeto. Atualizado em 2026-10-03 (v0.7.0 em preparo; a
-v0.6.2 segue publicada).
+Fonte da verdade do projeto. Atualizado em 2026-10-03 (v0.7.0 **publicada**:
+release "Latest" no GitHub, tag `v0.7.0`).
 
 Espelho no Trilium (VPS): nota **"HQ Tools - Plugin Krita"** (`JVRkycXWq0KN`,
 em Apps e Jogos), com as subnotas Estado e decisões, Instalação e uso,
@@ -339,6 +339,20 @@ Espelho no Trilium: subnota "Lista do autor (a criar)" (`FoIRvo2ztN0D`).
 - Vídeo demo: **publicado** no YouTube em 03/10 (https://youtu.be/B9KYYyLdHF0);
   capa em `Screenshots/08-demo.png`, seção "Demo" nos READMEs PT/EN e roteiro
   em `docs/ROTEIRO-VIDEO.md`.
+- Social preview do GitHub: gerado em `assets/social-preview.png` (1200x630);
+  subir em Settings > Social preview do repositório (a API não expõe isso).
+- Ícone nos dockers: o `ui.painel` agora aplica o ícone também no docker
+  (não só no widget interno); vale para janelas flutuantes e abas agrupadas. Versão no Bunny Stream (library 684947,
+  `56b74fac-e794-4c8a-b6e2-6eb6cd0ee4e0`) usada nos embeds do site.
+- **Página própria + post (03/10):** página **`/hq-tools/`** (PT+EN) no
+  ricolandia.com, no modelo do Fonte (hero, vídeo, 8 módulos, destaque 3D,
+  galeria, kit, instalação, FAQ, JSON-LD), e post **`hq-tools-krita`** (PT+EN).
+  Pacote de divulgação em
+  `ricolandia-novo/review/distribuicao/2026-10-03-hq-tools-krita.md`.
+  **✅ Publicados (03/10):** página e post no ar; newsletter (campanhas 18/19),
+  Fediverse (bolha.us + ursal.zone) e microposts PT/EN gerados pela conta
+  opencode-go em `ricolandia-novo/scripts/microposts/hq-tools-krita.txt`.
+  O Lab ganhou a 3ª coluna "HQ Tools" em Ferramentas Autorais.
 - Banner ou capa para o repositório e redes (próximo passo, mesmo fluxo).
 - Capturas e GIFs: roteiro pronto em `docs/ROTEIRO-CAPTURAS.md` (10 cenas com
   formato e nomes de arquivo).

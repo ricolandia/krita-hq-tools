@@ -112,6 +112,9 @@ def painel(pai=None, margem=MARGEM, espaco=GAP):
     """
     widget = QtWidgets.QWidget(pai)
     if os.path.isfile(ICONE_PATH):
-        widget.setWindowIcon(QtGui.QIcon(ICONE_PATH))
+        icone = QtGui.QIcon(ICONE_PATH)
+        widget.setWindowIcon(icone)
+        if pai is not None:
+            pai.setWindowIcon(icone)
     layout = QtWidgets.QVBoxLayout(widget)
     return widget, espacamento(layout, margem, espaco)
