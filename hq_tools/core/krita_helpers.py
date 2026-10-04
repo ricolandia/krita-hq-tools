@@ -4,6 +4,7 @@ import contextlib
 
 from krita import InfoObject, Krita, Selection
 
+from .camadas import ordem_com_no_abaixo
 from .compat import WAIT_CURSOR, QIcon, QtCore, QtWidgets
 from .erros import escrever_erro
 
@@ -243,6 +244,38 @@ def attach(document, node, parent=None, above=None):
     result = parent.addChildNode(node, above)
     document.refreshProjection()
     return result
+
+
+def attach_below_active(document, node, parent=None):
+    """Insere o nó logo abaixo do nó ativo, no mesmo grupo.
+
+    Feedback do usuário: a referência 3D entra abaixo do esboço, para poder
+    traçar por cima. Se o nó ativo for um grupo, mantém o comportamento
+    normal (entra no grupo). O Krita não tem "inserir abaixo": o nó entra no
+    topo e a lista é reordenada com ``setChildNodes`` (ordem base -> topo,
+    confirmada em ``libs/libkis/Node.cpp``).
+    """
+    ativo = document.activeNode()
+    if ativo is None or ativo.type() == "grouplayer":
+        return attach(document, node, parent=parent)
+    if parent is None:
+        parent = ativo.parentNode() or document.rootNode()
+
+    def chave(item):
+        try:
+            return str(item.uniqueId())
+        except (AttributeError, RuntimeError):
+            return str(id(item))
+
+    parent.addChildNode(node, None)
+    ordem = ordem_com_no_abaixo(parent.childNodes(), ativo, node, chave=chave)
+    if ordem is not None:
+        try:
+            parent.setChildNodes(ordem)
+        except (AttributeError, RuntimeError):
+            pass
+    document.refreshProjection()
+    return node
 
 
 def make_info_object(properties):

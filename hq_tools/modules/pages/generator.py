@@ -2,9 +2,9 @@
 
 Cada página vira um documento em 300 dpi (configurável) com a mesma estrutura
 dos templates de HQ do Krita: grupo da página, camada vetorial ``panels`` com os
-retângulos dos painéis, camadas Sketch/Color/Ink, contorno multiplicado e uma
-camada ``text`` com as falas e narrações. As camadas ``panels`` e ``text`` são
-lidas pelo CPMT na exportação ACBF/EPUB.
+retângulos dos painéis, grupo ``Arte`` com Sketch/Color/Ink e a máscara dos
+painéis, contorno multiplicado e uma camada ``text`` com as falas e narrações.
+As camadas ``panels`` e ``text`` são lidas pelo CPMT na exportação ACBF/EPUB.
 """
 
 import os
@@ -12,6 +12,7 @@ import os
 from krita import Krita
 
 from ...core import krita_helpers as helpers
+from . import mascara
 from . import roteiro
 
 
@@ -134,10 +135,21 @@ def _build_document(page, title, panel_svg, text_svg, width_px, height_px, dpi):
     group.addChildNode(panels, None)
     panels.addShapesFromSvg(panel_svg)
 
-    for name in ("Sketch", "Color", "Ink"):
-        layer = document.createNode(name, "paintlayer")
-        if layer is not None:
-            group.addChildNode(layer, None)
+    arte = document.createGroupLayer("Arte")
+    if arte is not None:
+        group.addChildNode(arte, None)
+        for name in ("Sketch", "Color", "Ink"):
+            layer = document.createNode(name, "paintlayer")
+            if layer is not None:
+                arte.addChildNode(layer, None)
+        paineis = page.get("panels") or []
+        criar_mascara = getattr(document, "createTransparencyMask", None)
+        if paineis and criar_mascara is not None:
+            mascara_node = criar_mascara("Máscara dos painéis")
+            if mascara_node is not None:
+                dados = mascara.mascara_dos_paineis(paineis, width_px, height_px)
+                mascara_node.setPixelData(dados, 0, 0, width_px, height_px)
+                arte.addChildNode(mascara_node, None)
 
     outline = document.createCloneLayer("panels contorno", panels)
     if outline is not None:

@@ -6,9 +6,12 @@ on:
 
 jobs:
   unit:
-    runs-on: ubuntu-latest
+    # O plugin roda em Windows também; o job de lá garante que os módulos
+    # puros (caminhos, mapeamento, máscara, parser) não dependem de Linux.
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [ubuntu-latest, windows-latest]
         python-version: ["3.11", "3.13"]
     steps:
       - uses: actions/checkout@v4
@@ -24,15 +27,19 @@ jobs:
       - name: Dependências do script de vetorização
         run: python -m pip install --quiet numpy Pillow
       - name: Conferir que o teste do vetorizador não pulou
-        run: |
-          python -m unittest tests.test_vetorizacao.TestVetorizador -v 2>&1 | tee /tmp/vet.txt
-          if grep -q "skipped" /tmp/vet.txt; then
-            echo "::error::o teste do vetorizador pulou; a dependência (numpy/Pillow) faltou"
-            exit 1
-          fi
+        # Em Python, e não com tee/grep: o job também roda no Windows.
+        run: >-
+          python -c "import subprocess, sys;
+          r = subprocess.run([sys.executable, '-m', 'unittest',
+          'tests.test_vetorizacao.TestVetorizador', '-v'],
+          capture_output=True, text=True);
+          saida = r.stdout + r.stderr;
+          print(saida);
+          sys.exit(1 if 'skipped' in saida else r.returncode)"
       - name: Rodar testes do núcleo (fora do Krita)
         run: python -m unittest discover -s tests -v
       - name: Validar que o ZIP instala (estrutura mínima)
+        if: runner.os == 'Linux'
         run: |
           bash scripts/build-zip.sh
           python -m zipfile -t dist/hq_tools-*.zip

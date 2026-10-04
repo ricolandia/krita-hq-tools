@@ -32,7 +32,7 @@ from ...core.compat import (
 )
 from ...core import ui
 from ...core.config import Config
-from ...core.paths import BRUSHES_KIT_DIR
+from ...core.paths import BRUSHES_KIT_DIR, KRITA_HOME
 from . import SLOT_COUNT, register_docker
 from . import packs as packs_lib
 from .sets import BRUSH_SETS, slot_suggestions, suggest_sets
@@ -263,8 +263,7 @@ class BrushesDocker(DockWidget):
             self.list_packs.addItem(item)
 
     def _pack_destinos(self):
-        base = os.path.join(os.path.expanduser("~"), ".local", "share", "krita")
-        return {tipo: os.path.join(base, tipo) for tipo in packs_lib.TIPOS}
+        return {tipo: os.path.join(KRITA_HOME, tipo) for tipo in packs_lib.TIPOS}
 
     def install_pack(self):
         item = self.list_packs.currentItem()
@@ -410,7 +409,7 @@ class BrushesDocker(DockWidget):
         )
         if not path:
             return
-        target_dir = os.path.join(os.path.expanduser("~"), ".local", "share", "krita")
+        target_dir = KRITA_HOME
         try:
             os.makedirs(target_dir, exist_ok=True)
             shutil.copy2(path, os.path.join(target_dir, os.path.basename(path)))

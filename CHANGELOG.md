@@ -1,5 +1,21 @@
 # Changelog
 
+## [Não publicado]
+
+- Visualizador 3D: preview flutuante sobre a página ("Flutuar na página"),
+  arrastável e redimensionável (alça no canto ou roda do mouse), com opacidade
+  e modo "Fixar" (o mouse atravessa e você desenha por baixo). A inserção usa
+  o lugar e o tamanho do flutuante, mapeados para pixels do documento, e a
+  camada entra abaixo do nó ativo, para o esboço ficar por cima.
+- Páginas: o grupo "Arte" (Sketch/Color/Ink) nasce com a "Máscara dos
+  painéis"; pintar fica limitado aos painéis e esconder a máscara libera a
+  página inteira (sarjetas e margens).
+- Windows: os caminhos do Krita são resolvidos por sistema (`%APPDATA%\krita`
+  no Windows, `~/Library/Application Support/krita` no macOS), as fontes são
+  registradas no HKCU, packs/bundles/templates usam a pasta certa e o
+  `fc-cache` roda só no Linux. O CI agora também testa os módulos puros no
+  Windows.
+
 ## [0.7.1] — 2026-10-03
 
 Correção para Windows. No Krita do Windows (aplicativo gráfico sem console)

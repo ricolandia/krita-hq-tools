@@ -41,9 +41,9 @@ The four original context documents of the project are in `docs/contexto/`
 | Onomatopoeia | Catalog of SVG sound effects (3 samples, own folder), inserted as vectors; draw your own in Inkscape. |
 | Project library | Create your own balloons, panels and onomatopoeia inside Krita: "Create new resource" opens a 15 x 15 cm document at 300 dpi; "Save resource from document" exports the active layer as SVG (vector) or transparent PNG (painting, trimmed by the layer) to the library; double-click inserts it into the active group; Rename, Duplicate and Delete organize the folder. |
 | Palettes | Comic and artistic templates (tones, ink, skin, sky, vegetation, flat colors, Zorn, portrait, landscape, dawn, night, earth, pastel, watercolor, gouache, acrylic, retro, BD, superhero, manga, sepia), applied to the foreground/background color, installed into Krita and previewed from the installed palettes. |
-| Pages | Manager with internal `.kra` thumbnails: "New project..." uses the saved page folder (writes comicConfig.json and creates the project library), "Open project..." reads a CPMT `comicConfig.json` and "Folder..." opens any folder; "Create next page" opens a dialog (A4/A5/A3/strip format, DPI and strip panels), generates the page with automatic margin guides and refreshes the grid; "Set page template" uses the current page or a Krita comic template (BD, US, manga...) as the model; "Reference layer" marks the selected layer and "Import reference (PNG)" inserts a locked reference into the active group. |
+| Pages | Manager with internal `.kra` thumbnails: "New project..." uses the saved page folder (writes comicConfig.json and creates the project library), "Open project..." reads a CPMT `comicConfig.json` and "Folder..." opens any folder; "Create next page" opens a dialog (A4/A5/A3/strip format, DPI and strip panels), generates the page with automatic margin guides and refreshes the grid; "Set page template" uses the current page or a Krita comic template (BD, US, manga...) as the model; "Reference layer" marks the selected layer and "Import reference (PNG)" inserts a locked reference into the active group. New pages come with the "Arte" group and the "Panel mask" (paint only inside; hide the mask to paint outside). |
 | Brushes | Suggested sets (Sketching, Inking, Watercolor/Gouache, Acrylic/Oil, Screentones) with thumbnail + name cards built from the brush presets installed in Krita; 16 slots with configurable shortcuts; "Packs" tab with community brushes with verified licenses (one-click install and license display) and the brush bundle installer. |
-| 3D viewer | Posable low-poly mannequin (MakeHuman + Auto-Rig Pro) as reference, with body choice (Man/Woman) and a pose library (default: Idle with closed hands): drag to orbit; the mouse wheel or the −/+ buttons zoom; Shift+drag, the middle mouse button or the Move button pan the framing, and "Fit" recenters; click a region (head, torso, arm, leg) to open Bend/Open/Twist sliders for that joint; inserts into the document as a raster layer or as a locked reference. In testing. |
+| 3D viewer | Posable low-poly mannequin (MakeHuman + Auto-Rig Pro) as reference, with body choice (Man/Woman) and a pose library (default: Idle with closed hands): drag to orbit; the mouse wheel or the −/+ buttons zoom; Shift+drag, the middle mouse button or the Move button pan the framing, and "Fit" recenters; click a region (head, torso, arm, leg) to open Bend/Open/Twist sliders for that joint. "Float on page" shows the preview over the canvas to position and resize it (handle/wheel, opacity and lock mode); the insertion lands where the floating preview is and the layer goes below the sketch. In testing. |
 
 ## Comic kit (fonts and free balloons)
 
@@ -122,8 +122,9 @@ automatically, and you can ungroup whenever you want).
 8. **3D viewer**: in the "HQ Tools: 3D" docker, choose the body (Man or Woman)
    and the pose (default: Idle with closed hands); drag to orbit, use
    Shift+drag (or the Move button) to pan, the wheel or the −/+ buttons to
-   zoom and "Fit" to recenter; click a body region to pose; "Insert as
-   reference" creates the locked layer with reduced opacity.
+   zoom and "Fit" to recenter; click a body region to pose. Use "Float on
+   page" to position and resize the preview over the panel before inserting;
+   "Insert as reference" creates the locked layer with reduced opacity.
 
 ## Development
 

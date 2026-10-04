@@ -30,9 +30,10 @@ já tem o repositório e quer desenvolver, veja `scripts/install-dev.sh` e o
    `hq_tools.action` para a pasta `actions` do Krita (veja a tabela de pastas
    abaixo) e reinicie. Os atalhos aparecem em Configurar Krita > Atalhos >
    Scripts > HQ Tools (pincel 1 a 16).
-7. Ícone do plugin (opcional): para o ícone aparecer no Gerenciador de plugins
-   Python, copie o PNG de `<pykrita>/hq_tools/resources/icon-256.png` para
-   `~/.local/share/icons/hicolor/256x256/apps/hq_tools.png` e reinicie o Krita.
+7. Ícone do plugin (opcional, Linux): para o ícone aparecer no Gerenciador de
+   plugins Python, copie o PNG de `<pykrita>/hq_tools/resources/icon-256.png`
+   para `~/.local/share/icons/hicolor/256x256/apps/hq_tools.png` e reinicie o
+   Krita. No Windows e no macOS o ícone do gerenciador depende do tema.
 
 ## Instalação manual (sem o diálogo de importação)
 
@@ -47,8 +48,10 @@ Depois ative o plugin no Gerenciador de plugins Python e reinicie o Krita.
 
 | Tipo de instalação | `pykrita` | `actions` |
 |---|---|---|
-| AppImage / pacote comum | `~/.local/share/krita/pykrita/` | `~/.local/share/krita/actions/` |
+| AppImage / pacote comum (Linux) | `~/.local/share/krita/pykrita/` | `~/.local/share/krita/actions/` |
 | Flatpak | `~/.var/app/org.kde.krita/data/krita/pykrita/` | `~/.var/app/org.kde.krita/data/krita/actions/` |
+| Windows | `%APPDATA%\krita\pykrita\` | `%APPDATA%\krita\actions\` |
+| macOS | `~/Library/Application Support/krita/pykrita/` | `~/Library/Application Support/krita/actions/` |
 
 ## Primeiros passos
 
@@ -67,18 +70,25 @@ gerenciador de plugins) e no `README.md` do projeto.
 
 ## Onde o plugin guarda os dados
 
-Tudo em `~/.local/share/krita/hq_tools/` (ou `~/.var/app/org.kde.krita/data/
-krita/hq_tools/` no Flatpak):
+Na pasta de dados do Krita, que muda por sistema:
+
+| Sistema | Pasta base |
+|---|---|
+| Linux | `~/.local/share/krita/` (Flatpak: `~/.var/app/org.kde.krita/data/krita/`) |
+| Windows | `%APPDATA%\krita\` |
+| macOS | `~/Library/Application Support/krita/` |
+
+Dentro dela:
 
 | Dado | Pasta |
 |---|---|
-| Configuração e presets de retícula do usuário | `~/.local/share/krita/hq_tools/` (`config.json`, `screentone_presets.json`) |
-| Balões e onomatopeias próprios | `~/.local/share/krita/hq_tools/balloons/` e `onomatopeias/` |
-| Modelos de página | `~/.local/share/krita/hq_tools/modelos/` |
-| Fontes de HQ instaladas | `~/.local/share/fonts/hq_tools/` |
-| Padrões do kit (tom com padrão) | `~/.local/share/krita/patterns/` |
-| Paletas instaladas | `~/.local/share/krita/palettes/` |
-| Packs de pincel da comunidade | `~/.local/share/krita/{paintoppresets,brushes,patterns,palettes}` |
+| Configuração e presets de retícula do usuário | `hq_tools/` (`config.json`, `screentone_presets.json`) |
+| Balões e onomatopeias próprios | `hq_tools/balloons/` e `hq_tools/onomatopeias/` |
+| Modelos de página | `hq_tools/modelos/` |
+| Fontes de HQ instaladas | Linux: `~/.local/share/fonts/hq_tools/` · Windows: `%LOCALAPPDATA%\Microsoft\Windows\Fonts` (registro em HKCU) · macOS: `~/Library/Fonts` |
+| Padrões do kit (tom com padrão) | `patterns/` |
+| Paletas instaladas | `palettes/` |
+| Packs de pincel da comunidade | `{paintoppresets,brushes,patterns,palettes}` |
 
 ## Kit que acompanha o plugin
 

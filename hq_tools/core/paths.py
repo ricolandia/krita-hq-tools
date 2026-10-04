@@ -1,18 +1,59 @@
-"""Caminhos de dados do plugin (pasta do usuário e cache)."""
+"""Caminhos de dados do plugin (pasta do usuário e cache).
+
+A pasta de recursos do Krita muda por sistema: ``%APPDATA%\\krita`` no Windows
+(a mesma do ``pykrita``), ``~/Library/Application Support/krita`` no macOS e
+``~/.local/share/krita`` no Linux (dentro do sandbox no Flatpak).
+"""
 
 import os
+import sys
 
 HOME = os.path.expanduser("~")
+
+
+def _pasta_do_krita():
+    if sys.platform.startswith("win"):
+        base = os.environ.get("APPDATA") or os.path.join(HOME, "AppData", "Roaming")
+        return os.path.join(base, "krita")
+    if sys.platform == "darwin":
+        return os.path.join(HOME, "Library", "Application Support", "krita")
+    return os.path.join(HOME, ".local", "share", "krita")
+
+
+def _pasta_de_cache():
+    if sys.platform.startswith("win"):
+        base = os.environ.get("LOCALAPPDATA") or os.path.join(HOME, "AppData", "Local")
+        return os.path.join(base, "hq_tools", "cache")
+    if sys.platform == "darwin":
+        return os.path.join(HOME, "Library", "Caches", "hq_tools")
+    return os.path.join(HOME, ".cache", "hq_tools")
+
+
+def _pasta_de_fontes():
+    if sys.platform.startswith("win"):
+        base = os.environ.get("LOCALAPPDATA") or os.path.join(HOME, "AppData", "Local")
+        return os.path.join(base, "Microsoft", "Windows", "Fonts")
+    if sys.platform == "darwin":
+        return os.path.join(HOME, "Library", "Fonts")
+    return os.path.join(HOME, ".local", "share", "fonts")
+
+
+KRITA_HOME = _pasta_do_krita()
+FONTS_DIR = _pasta_de_fontes()
+if sys.platform.startswith("win") or sys.platform == "darwin":
+    FONTS_TARGET = FONTS_DIR
+else:
+    FONTS_TARGET = os.path.join(FONTS_DIR, "hq_tools")
 
 PACKAGE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODULES_DIR = os.path.join(PACKAGE_DIR, "modules")
 RESOURCES_DIR = os.path.join(PACKAGE_DIR, "resources")
 BRUSHES_KIT_DIR = os.path.join(RESOURCES_DIR, "brushes")
 PATTERNS_KIT_DIR = os.path.join(RESOURCES_DIR, "patterns")
-KRITA_PATTERNS_DIR = os.path.join(HOME, ".local", "share", "krita", "patterns")
+KRITA_PATTERNS_DIR = os.path.join(KRITA_HOME, "patterns")
 
-USER_DIR = os.path.join(HOME, ".local", "share", "krita", "hq_tools")
-CACHE_DIR = os.path.join(HOME, ".cache", "hq_tools")
+USER_DIR = os.path.join(KRITA_HOME, "hq_tools")
+CACHE_DIR = _pasta_de_cache()
 BALLOONS_DIR = os.path.join(USER_DIR, "balloons")
 ONOMATOPEIAS_DIR = os.path.join(USER_DIR, "onomatopeias")
 BIBLIOTECA_DIR = os.path.join(USER_DIR, "biblioteca")
@@ -25,7 +66,7 @@ VIEWER3D_MODELOS = (
 VIEWER3D_POSES_DIR = os.path.join(VIEWER3D_DIR, "poses")
 VIEWER3D_POSE_PADRAO = "idle_maos_fechadas.json"
 ICONE_PATH = os.path.join(RESOURCES_DIR, "icon.png")
-KRITA_PALETTES_DIR = os.path.join(HOME, ".local", "share", "krita", "palettes")
+KRITA_PALETTES_DIR = os.path.join(KRITA_HOME, "palettes")
 CONFIG_PATH = os.path.join(USER_DIR, "config.json")
 
 

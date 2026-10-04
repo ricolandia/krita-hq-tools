@@ -9,6 +9,7 @@ Inclui também a instalação das fontes de HQ que acompanham o plugin.
 import os
 import shutil
 import subprocess
+import sys
 
 from krita import DockWidget, Krita
 
@@ -29,7 +30,7 @@ from ...core.compat import (
 )
 from ...core.config import Config
 from ...core import ui
-from ...core.paths import BALLOONS_DIR, mesma_copia
+from ...core.paths import BALLOONS_DIR, FONTS_TARGET, mesma_copia
 
 SAMPLES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "samples")
 KIT_CC0_DIR = os.path.join(
@@ -39,9 +40,6 @@ KIT_CC0_DIR = os.path.join(
 )
 KIT_FONTS_DIR = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "resources", "fonts"
-)
-FONTS_TARGET = os.path.join(
-    os.path.expanduser("~"), ".local", "share", "fonts", "hq_tools"
 )
 
 
@@ -318,6 +316,7 @@ class BalloonsDocker(DockWidget):
             except OSError:
                 continue
         if instaladas:
+            self._registrar_fontes_windows(instaladas)
             self._atualizar_cache_de_fontes()
         if not instaladas:
             helpers.show_message(
@@ -330,13 +329,38 @@ class BalloonsDocker(DockWidget):
         )
 
     @staticmethod
+    def _registrar_fontes_windows(nomes):
+        """Registra as fontes no Windows (instalação por usuário).
+
+        Copiar o arquivo para a pasta de fontes do usuário não basta: o
+        Windows precisa da entrada em ``HKCU`` para listar a fonte.
+        """
+        if not sys.platform.startswith("win"):
+            return
+        try:
+            import winreg
+        except ImportError:  # pragma: no cover
+            return
+        chave = r"Software\Microsoft\Windows NT\CurrentVersion\Fonts"
+        try:
+            with winreg.CreateKey(winreg.HKEY_CURRENT_USER, chave) as registro:
+                for nome in nomes:
+                    caminho = os.path.join(FONTS_TARGET, nome)
+                    winreg.SetValueEx(registro, nome, 0, winreg.REG_SZ, caminho)
+        except OSError:
+            pass
+
+    @staticmethod
     def _atualizar_cache_de_fontes():
-        """Roda o ``fc-cache`` só na pasta do kit, sem ``-f``.
+        """Roda o ``fc-cache`` (só no Linux) na pasta do kit, sem ``-f``.
 
         ``-f`` reconstrói o cache inteiro do sistema, o que numa máquina com
         muitas fontes leva dezenas de segundos. Como as fontes acabou de
-        mudar, o cache incremental da pasta já basta.
+        mudar, o cache incremental da pasta já basta. No Windows a fonte é
+        registrada no registro; no macOS o sistema varre a pasta sozinho.
         """
+        if not sys.platform.startswith("linux"):
+            return
         with helpers.cursor_espera():
             try:
                 subprocess.run(

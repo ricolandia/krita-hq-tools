@@ -5,8 +5,13 @@ lido em Python puro (``core/modelo3d.py``); o Blender não é dependência em
 tempo de execução. Arraste no preview para orbitar, use a roda para o zoom e
 clique numa parte do corpo: os sliders daquela região aparecem. "Dobrar",
 "Abrir" e "Girar" são mapeados para os eixos reais do rig (neste Auto-Rig Pro:
-Z, X e Y). A inserção no documento é raster: o preview vira uma camada de
-pintura, opcionalmente marcada como referência (travada, opacidade 150).
+Z, X e Y).
+
+"Flutuar na página" mostra o preview sobre o canvas, arrastável e
+redimensionável (alça no canto ou roda), com opacidade e modo fixado
+(click-through). "Inserir como camada/referência" rasteriza no lugar do
+flutuante, mapeado para pixels do documento, e entra logo abaixo do nó ativo
+para o esboço ficar por cima.
 """
 
 import os
@@ -14,14 +19,21 @@ import os
 from krita import DockWidget
 
 from ...core import krita_helpers as helpers
+from ...core import mapeamento
 from ...core import modelo3d
 from ...core import ui
 from ...core.compat import (
     ALIGN_CENTER,
+    CURSOR_ARROW,
+    CURSOR_SIZE_ALL,
+    CURSOR_SIZE_FDIAG,
     IMAGE_FORMAT_RGBA8888,
     QImage,
     QSvgRenderer,
     TRANSPARENT,
+    WA_NO_SYSTEM_BACKGROUND,
+    WA_TRANSLUCENT_BACKGROUND,
+    WA_TRANSPARENT_FOR_MOUSE,
     QtCore,
     QtGui,
     QtWidgets,
@@ -37,6 +49,8 @@ LIMITE_SLIDER = 120
 ORIENTACAO_HORIZONTAL = getattr(
     getattr(QtCore.Qt, "Orientation", QtCore.Qt), "Horizontal"
 )
+
+PEN_STYLE_DASH = getattr(getattr(QtCore.Qt, "PenStyle", QtCore.Qt), "DashLine")
 
 REGIOES = (
     ("cabeca", "Cabeça", ("neck.x", "head.x")),
@@ -130,6 +144,29 @@ def _shift_pressionado(evento):
     return bool(evento.modifiers() & shift)
 
 
+def _viewport_da_view(view):
+    """Viewport do canvas da view ativa (para ancorar o flutuante), ou None."""
+    try:
+        janela = view.window()
+        q_janela = janela.qwindow()
+    except (AttributeError, RuntimeError):
+        return None
+    central = q_janela.centralWidget() if q_janela is not None else None
+    area_mdi = central.findChild(QtWidgets.QMdiArea) if central is not None else None
+    if area_mdi is None:
+        return None
+    subjanelas = area_mdi.subWindowList()
+    views = list(janela.views())
+    for indice, sub in enumerate(subjanelas):
+        if indice < len(views) and views[indice] == view:
+            area = sub.widget().findChild(QtWidgets.QAbstractScrollArea)
+            return area.viewport() if area is not None else None
+    if subjanelas:
+        area = subjanelas[0].widget().findChild(QtWidgets.QAbstractScrollArea)
+        return area.viewport() if area is not None else None
+    return None
+
+
 class _Preview(QtWidgets.QLabel):
     """Área do preview: arrastar orbita, roda dá zoom, clique seleciona."""
 
@@ -180,6 +217,93 @@ class _Preview(QtWidgets.QLabel):
             self.docker.aplicar_zoom(1.1 if delta > 0 else 1 / 1.1)
 
 
+class _Flutuante(QtWidgets.QWidget):
+    """Preview 3D flutuante sobre o canvas: arrasta, redimensiona, opacidade."""
+
+    LADO_ALCA = 16
+    TAMANHO_MINIMO = 60
+
+    def __init__(self, docker, pai):
+        super().__init__(pai)
+        self.docker = docker
+        self.setAttribute(WA_TRANSLUCENT_BACKGROUND)
+        self.setAttribute(WA_NO_SYSTEM_BACKGROUND)
+        self.setAutoFillBackground(False)
+        self.setCursor(CURSOR_SIZE_ALL)
+        self._pixmap = None
+        self._opacidade = 0.8
+        self._arrastando = False
+        self._redimensionando = False
+        self._ultimo = None
+
+    def definir_pixmap(self, pixmap):
+        self._pixmap = pixmap
+        self.update()
+
+    def definir_opacidade(self, valor):
+        self._opacidade = max(0.1, min(1.0, float(valor)))
+        self.update()
+
+    def _retangulo_alca(self):
+        lado = self.LADO_ALCA
+        return QtCore.QRect(self.width() - lado, self.height() - lado, lado, lado)
+
+    def paintEvent(self, evento):
+        painter = QtGui.QPainter(self)
+        if self._pixmap is not None:
+            painter.setOpacity(self._opacidade)
+            painter.drawPixmap(self.rect(), self._pixmap)
+            painter.setOpacity(1.0)
+        if not self.docker.modo_fixado:
+            caneta = QtGui.QPen(QtGui.QColor(20, 20, 20, 170))
+            caneta.setStyle(PEN_STYLE_DASH)
+            painter.setPen(caneta)
+            painter.drawRect(self.rect().adjusted(0, 0, -1, -1))
+            painter.fillRect(self._retangulo_alca(), QtGui.QColor(20, 20, 20, 170))
+        painter.end()
+
+    def mousePressEvent(self, evento):
+        posicao = _posicao(evento)
+        self._ultimo = posicao
+        self._redimensionando = self._retangulo_alca().contains(posicao)
+        self._arrastando = not self._redimensionando
+        if self._redimensionando:
+            self.setCursor(CURSOR_SIZE_FDIAG)
+
+    def mouseMoveEvent(self, evento):
+        if self._ultimo is None:
+            return
+        posicao = _posicao(evento)
+        delta = posicao - self._ultimo
+        if self._redimensionando:
+            largura = max(self.TAMANHO_MINIMO, self.width() + delta.x())
+            altura = max(self.TAMANHO_MINIMO, self.height() + delta.y())
+            self.resize(largura, altura)
+        elif self._arrastando:
+            self.move(self.pos() + delta)
+        self._ultimo = posicao
+
+    def mouseReleaseEvent(self, evento):
+        if self._redimensionando:
+            self.docker.atualizar_flutuante()
+        self._ultimo = None
+        self._arrastando = False
+        self._redimensionando = False
+        self.setCursor(CURSOR_SIZE_ALL if not self.docker.modo_fixado else CURSOR_ARROW)
+
+    def wheelEvent(self, evento):
+        delta = evento.angleDelta().y()
+        if not delta:
+            return
+        fator = 1.1 if delta > 0 else 1 / 1.1
+        largura = max(self.TAMANHO_MINIMO, int(round(self.width() * fator)))
+        altura = max(self.TAMANHO_MINIMO, int(round(self.height() * fator)))
+        centro = self.rect().center()
+        self.resize(largura, altura)
+        self.move(self.pos() + centro - self.rect().center())
+        self.docker.atualizar_flutuante()
+
+
 class Viewer3DDocker(DockWidget):
     def __init__(self):
         super().__init__()
@@ -190,6 +314,7 @@ class Viewer3DDocker(DockWidget):
         self.semantica = {}
         self.pose_atual = None
         self.modo_mover = False
+        self.modo_fixado = False
         self.camera = {
             "yaw": 0.0,
             "pitch": -10.0,
@@ -198,15 +323,23 @@ class Viewer3DDocker(DockWidget):
             "pan_y": 0.0,
         }
         self._tela = []
+        self._canvas = None
+        self._flutuante = None
         self._timer = QtCore.QTimer(self)
         self._timer.setSingleShot(True)
         self._timer.setInterval(30)
         self._timer.timeout.connect(self.atualizar_preview)
         self._build_ui()
+        try:
+            self.widget().destroyed.connect(self._fechar_flutuante)
+        except (AttributeError, TypeError):
+            pass
         self._carregar_modelo(aplicar_padrao=True)
 
     def canvasChanged(self, canvas):
-        pass
+        self._canvas = canvas
+        if self._flutuante is not None:
+            self._criar_flutuante()
 
     def _build_ui(self):
         widgets = QtWidgets
@@ -287,17 +420,50 @@ class Viewer3DDocker(DockWidget):
         posse.addWidget(self.button_move)
         layout.addLayout(posse)
 
+        flutuante = widgets.QHBoxLayout()
+        self.button_flutuar = ui.botao(
+            "Flutuar na página",
+            "Mostra o preview flutuante sobre o canvas para posicionar a "
+            "referência; arraste e redimensione antes de inserir.",
+            icone_chave="novo",
+        )
+        self.button_flutuar.setCheckable(True)
+        self.button_flutuar.toggled.connect(self._alternar_flutuar)
+        flutuante.addWidget(self.button_flutuar)
+        self.button_fixar = ui.botao(
+            "Fixar",
+            "Com o flutuante fixado, o mouse atravessa e você desenha por baixo.",
+        )
+        self.button_fixar.setCheckable(True)
+        self.button_fixar.setEnabled(False)
+        self.button_fixar.toggled.connect(self._alternar_fixar)
+        flutuante.addWidget(self.button_fixar)
+        layout.addLayout(flutuante)
+
+        opacidade = widgets.QHBoxLayout()
+        opacidade.addWidget(ui.rotulo("Opacidade:"))
+        self.sld_opacidade = widgets.QSlider(ORIENTACAO_HORIZONTAL)
+        self.sld_opacidade.setRange(20, 100)
+        self.sld_opacidade.setValue(80)
+        self.lbl_opacidade = ui.rotulo_info("80%")
+        self.sld_opacidade.valueChanged.connect(self._mudar_opacidade)
+        opacidade.addWidget(self.sld_opacidade, 1)
+        opacidade.addWidget(self.lbl_opacidade)
+        layout.addLayout(opacidade)
+
         acoes = widgets.QHBoxLayout()
         button_layer = ui.botao(
             "Inserir como camada",
-            "Rasteriza o preview na resolução do documento e insere no grupo ativo.",
+            "Rasteriza o preview no lugar e no tamanho do flutuante (ou no "
+            "documento inteiro, sem ele) e insere abaixo da camada ativa.",
             icone_chave="aplicar",
         )
         button_layer.clicked.connect(lambda: self.inserir(referencia=False))
         acoes.addWidget(button_layer)
         button_ref = ui.botao(
             "Inserir como referência",
-            "Insere o preview travado, com rótulo de cor e opacidade reduzida.",
+            "Insere o preview travado, com rótulo de cor e opacidade reduzida, "
+            "no lugar do flutuante.",
         )
         button_ref.clicked.connect(lambda: self.inserir(referencia=True))
         acoes.addWidget(button_ref)
@@ -306,7 +472,8 @@ class Viewer3DDocker(DockWidget):
         layout.addWidget(ui.rotulo(
             "Arraste para orbitar; Shift+arraste (ou botão do meio) desloca; "
             "roda do mouse ou +/− dão zoom; clique numa região para abrir os "
-            "sliders. Dobrar/Abrir/Girar seguem os eixos do rig."
+            "sliders. 'Flutuar na página' mostra o preview sobre o canvas "
+            "para posicionar a referência antes de inserir."
         ))
 
         self.setWidget(main)
@@ -402,15 +569,13 @@ class Viewer3DDocker(DockWidget):
             return "contorno", "#141414", "#ffffff"
         return "sombreado", None, None
 
-    def atualizar_preview(self):
-        if self.modelo is None:
-            return
-        largura = max(self.preview.width(), 200)
-        altura = max(self.preview.height(), 200)
-        rotacoes = self._rotacoes()
-        posados = self.modelo.vertices_em_pose(rotacoes)
+    def _render_svg(self, largura, altura, com_fundo=True, posados=None):
         estilo, cor, fundo = self._estilo()
-        svg = self.modelo.renderizar(
+        if not com_fundo:
+            fundo = None
+        if posados is None:
+            posados = self.modelo.vertices_em_pose(self._rotacoes())
+        return self.modelo.renderizar(
             yaw=self.camera["yaw"],
             pitch=self.camera["pitch"],
             zoom=self.camera["zoom"],
@@ -423,6 +588,23 @@ class Viewer3DDocker(DockWidget):
             cor=cor,
             fundo=fundo,
         )
+
+    @staticmethod
+    def _rasterizar(svg, largura, altura):
+        renderer = QSvgRenderer(QtCore.QByteArray(svg.encode("utf-8")))
+        imagem = QImage(largura, altura, IMAGE_FORMAT_RGBA8888)
+        imagem.fill(TRANSPARENT)
+        painter = QtGui.QPainter(imagem)
+        renderer.render(painter)
+        painter.end()
+        return imagem
+
+    def atualizar_preview(self):
+        if self.modelo is None:
+            return
+        largura = max(self.preview.width(), 200)
+        altura = max(self.preview.height(), 200)
+        posados = self.modelo.vertices_em_pose(self._rotacoes())
         self._tela = self.modelo.vertices_em_tela(
             yaw=self.camera["yaw"],
             pitch=self.camera["pitch"],
@@ -435,13 +617,84 @@ class Viewer3DDocker(DockWidget):
         )
         if QSvgRenderer is None:
             return
-        renderer = QSvgRenderer(QtCore.QByteArray(svg.encode("utf-8")))
-        imagem = QImage(largura, altura, IMAGE_FORMAT_RGBA8888)
-        imagem.fill(TRANSPARENT)
-        painter = QtGui.QPainter(imagem)
-        renderer.render(painter)
-        painter.end()
+        svg = self._render_svg(largura, altura, posados=posados)
+        imagem = self._rasterizar(svg, largura, altura)
         self.preview.setPixmap(QtGui.QPixmap.fromImage(imagem))
+        self._atualizar_flutuante(posados)
+
+    def atualizar_flutuante(self):
+        self._atualizar_flutuante()
+
+    def _atualizar_flutuante(self, posados=None):
+        if self._flutuante is None or QSvgRenderer is None or self.modelo is None:
+            return
+        largura = max(self._flutuante.width(), 60)
+        altura = max(self._flutuante.height(), 60)
+        svg = self._render_svg(largura, altura, com_fundo=False, posados=posados)
+        imagem = self._rasterizar(svg, largura, altura)
+        self._flutuante.definir_pixmap(QtGui.QPixmap.fromImage(imagem))
+
+    def _alternar_flutuar(self, ligado):
+        if ligado:
+            self._criar_flutuante()
+        else:
+            self._fechar_flutuante()
+
+    def _criar_flutuante(self):
+        view = helpers.active_view()
+        if view is None or view.document() is None:
+            helpers.show_info("3D", "Abra um documento para usar o flutuante.")
+            self.button_flutuar.setChecked(False)
+            return
+        viewport = _viewport_da_view(view)
+        if viewport is None:
+            helpers.show_info("3D", "Não foi possível ancorar o flutuante nesta janela.")
+            self.button_flutuar.setChecked(False)
+            return
+        self._fechar_flutuante()
+        self._flutuante = _Flutuante(self, viewport)
+        largura = min(320, max(160, viewport.width() // 3))
+        altura = int(largura * 1.25)
+        self._flutuante.setGeometry(
+            max(0, (viewport.width() - largura) // 2),
+            max(0, (viewport.height() - altura) // 2),
+            largura,
+            altura,
+        )
+        self._flutuante.definir_opacidade(self.sld_opacidade.value() / 100.0)
+        self._flutuante.show()
+        self._flutuante.raise_()
+        self.button_fixar.setEnabled(True)
+        self.button_fixar.setChecked(False)
+        self.modo_fixado = False
+        self._atualizar_flutuante()
+
+    def _fechar_flutuante(self):
+        if self._flutuante is not None:
+            self._flutuante.hide()
+            self._flutuante.deleteLater()
+            self._flutuante = None
+        if getattr(self, "button_fixar", None) is not None:
+            try:
+                self.button_fixar.setChecked(False)
+                self.button_fixar.setEnabled(False)
+            except RuntimeError:
+                pass
+        self.modo_fixado = False
+
+    def _alternar_fixar(self, ligado):
+        self.modo_fixado = bool(ligado)
+        if self._flutuante is not None:
+            self._flutuante.setAttribute(WA_TRANSPARENT_FOR_MOUSE, self.modo_fixado)
+            self._flutuante.setCursor(
+                CURSOR_ARROW if self.modo_fixado else CURSOR_SIZE_ALL
+            )
+            self._flutuante.update()
+
+    def _mudar_opacidade(self, valor):
+        self.lbl_opacidade.setText("{0}%".format(valor))
+        if self._flutuante is not None:
+            self._flutuante.definir_opacidade(valor / 100.0)
 
     def orbitar(self, dx, dy):
         self.camera["yaw"] = (self.camera["yaw"] + dx * 0.5) % 360.0
@@ -605,6 +858,66 @@ class Viewer3DDocker(DockWidget):
             if linha is not None:
                 self.juntas_layout.addLayout(linha)
 
+    def _mapear_flutuante(self, documento):
+        """Retângulo do flutuante em pixels do documento, ou None."""
+        if self._flutuante is None:
+            return None
+        view = helpers.active_view()
+        if view is None:
+            return None
+        viewport = self._flutuante.parentWidget()
+        if viewport is None:
+            return None
+        canvas = view.canvas()
+        try:
+            zoom = canvas.zoomLevel() * 72.0 / documento.resolution()
+        except (AttributeError, RuntimeError):
+            return None
+        if zoom <= 0:
+            return None
+        try:
+            rotacao = canvas.rotation()
+        except (AttributeError, RuntimeError):
+            rotacao = 0.0
+        try:
+            espelhado = canvas.mirror()
+        except (AttributeError, RuntimeError):
+            espelhado = False
+        try:
+            centro = canvas.preferredCenter()
+            centro_imagem = (centro.x(), centro.y())
+            pan = (0.0, 0.0)
+        except (AttributeError, RuntimeError):
+            centro_imagem = (documento.width() / 2.0, documento.height() / 2.0)
+            pan = self._pan_do_viewport(viewport)
+        centro_widget = (viewport.width() / 2.0, viewport.height() / 2.0)
+        retangulo = (
+            self._flutuante.x(),
+            self._flutuante.y(),
+            self._flutuante.width(),
+            self._flutuante.height(),
+        )
+        return mapeamento.retangulo_para_imagem(
+            retangulo, centro_widget, centro_imagem, zoom, rotacao, pan, espelhado
+        )
+
+    @staticmethod
+    def _pan_do_viewport(viewport):
+        area = viewport.parentWidget()
+        if area is None:
+            return (0.0, 0.0)
+        try:
+            def deslocamento(barra):
+                meio = (barra.minimum() + barra.maximum()) / 2.0
+                return -(barra.value() - meio)
+
+            return (
+                deslocamento(area.horizontalScrollBar()),
+                deslocamento(area.verticalScrollBar()),
+            )
+        except (AttributeError, RuntimeError):
+            return (0.0, 0.0)
+
     def inserir(self, referencia=False):
         if self.modelo is None:
             helpers.show_info("3D", "O modelo não está disponível.")
@@ -613,35 +926,31 @@ class Viewer3DDocker(DockWidget):
         if documento is None:
             helpers.show_info("3D", "Abra um documento para inserir o desenho.")
             return
-        largura = documento.width()
-        altura = documento.height()
-        estilo, cor, _ = self._estilo()
-        svg = self.modelo.renderizar(
-            self._rotacoes(),
-            yaw=self.camera["yaw"],
-            pitch=self.camera["pitch"],
-            zoom=self.camera["zoom"],
-            pan_x=self.camera["pan_x"],
-            pan_y=self.camera["pan_y"],
-            largura=largura,
-            altura=altura,
-            estilo=estilo,
-            cor=cor,
+        retangulo = self._mapear_flutuante(documento)
+        if retangulo is not None:
+            x, y, largura, altura = retangulo
+        else:
+            x, y = 0, 0
+            largura = documento.width()
+            altura = documento.height()
+        vx, vy, vw, vh = mapeamento.intersecao_com_documento(
+            (x, y, largura, altura), documento.width(), documento.height()
         )
-        renderer = QSvgRenderer(QtCore.QByteArray(svg.encode("utf-8")))
-        imagem = QImage(largura, altura, IMAGE_FORMAT_RGBA8888)
-        imagem.fill(TRANSPARENT)
-        painter = QtGui.QPainter(imagem)
-        renderer.render(painter)
-        painter.end()
+        if vw <= 0 or vh <= 0:
+            helpers.show_info("3D", "O flutuante está fora do documento.")
+            return
+        svg = self._render_svg(largura, altura, com_fundo=False)
+        imagem = self._rasterizar(svg, largura, altura)
+        if (vx, vy, vw, vh) != (x, y, largura, altura):
+            imagem = imagem.copy(vx - x, vy - y, vw, vh)
         rgba = imagem.convertToFormat(IMAGE_FORMAT_RGBA8888)
         dados = bytes(rgba.constBits().asstring(rgba.sizeInBytes()))
         nome = helpers.unique_layer_name(documento, "3D")
         camada = documento.createNode(nome, "paintlayer")
-        if camada is None or not camada.setPixelData(dados, 0, 0, largura, altura):
+        if camada is None or not camada.setPixelData(dados, vx, vy, vw, vh):
             helpers.show_info("3D", "Não foi possível criar a camada.")
             return
-        helpers.attach(documento, camada)
+        helpers.attach_below_active(documento, camada)
         if referencia:
             camada.setColorLabel(1)
             camada.setLocked(True)

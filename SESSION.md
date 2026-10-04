@@ -217,7 +217,8 @@ aparência), tipografia das listas de miniaturas, tamanho dos ícones da lista.
 - Ícone: o `.desktop` ganhou `Icon=hq_tools` e o `scripts/install-icons.sh`
   instala os PNGs no tema hicolor; os dockers também recebem o ícone pelo
   `ui.painel`. Sem a linha `Icon=`, o gerenciador de plugins não mostrava nada.
-- Suíte: 220 testes (30 do visualizador 3D).
+- Suíte: 246 testes (30 do visualizador 3D + 20 dos módulos novos de
+  mapeamento/máscara/ordem de camadas).
 - Biblioteca de poses (03/10): `scripts/exportar-poses3d.py` extrai as rotações
   locais de um FBX animado (frame 1) e converte para Dobrar/Abrir/Girar;
   validado contra o Blender com desvio máximo de 7 mm (mediana 0). A
@@ -226,6 +227,19 @@ aparência), tipografia das listas de miniaturas, tamanho dos ícones da lista.
 - Corpo (03/10): `homem.json` (1591 vértices) e `mulher.json` (1605 vértices)
   com os mesmos 68 ossos e nomes, então as poses valem para os dois; seletor
   Corpo no docker.
+- Preview flutuante (03/10): "Flutuar na página" mostra o preview sobre o
+  canvas (arrasta; alça ou roda redimensionam; opacidade; "Fixar" para desenhar
+  por baixo). A inserção usa o retângulo mapeado para pixels do documento
+  (`core/mapeamento.py`, com testes) e a camada entra **abaixo** do nó ativo,
+  para o esboço ficar por cima (feedback do usuário).
+- Páginas (03/10): grupo "Arte" (Sketch/Color/Ink) nasce com a "Máscara dos
+  painéis" (`pages/mascara.py`): pintar fica limitado aos painéis e esconder a
+  máscara libera a página inteira (feedback do usuário).
+- Compatibilidade Windows (03/10): `paths.py` resolve a pasta do Krita por
+  sistema (`%APPDATA%\krita` no Windows, `~/Library/Application Support/krita`
+  no macOS); fontes instalam com registro no HKCU; packs, bundles e templates
+  usam `KRITA_HOME`; `fc-cache` só no Linux. O CI ganhou job no Windows para os
+  módulos puros (matriz ubuntu + windows).
 - Correções de uso (03/10): modos Silhueta (path único, sem ordenação nem
   sombreamento) e Contorno (arestas entre face da frente e de trás, com
   remoção de linhas escondidas por máscara projetada e fechamento de vãos

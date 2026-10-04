@@ -22,9 +22,15 @@ class TestPaths(unittest.TestCase):
         self.assertTrue(paths.KRITA_PALETTES_DIR.endswith("palettes"))
 
     def test_pastas_do_usuario(self):
-        self.assertTrue(paths.USER_DIR.endswith("krita/hq_tools"))
+        self.assertTrue(paths.KRITA_HOME.endswith("krita"))
+        self.assertTrue(
+            paths.USER_DIR.endswith(os.path.join("krita", "hq_tools"))
+        )
         self.assertTrue(paths.MODELOS_DIR.endswith("modelos"))
         self.assertTrue(paths.BIBLIOTECA_DIR.endswith("biblioteca"))
+
+    def test_pasta_de_fontes(self):
+        self.assertTrue(paths.FONTS_TARGET.startswith(paths.FONTS_DIR))
 
 
 if __name__ == "__main__":

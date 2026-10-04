@@ -29,7 +29,7 @@ from ...core.compat import (
 )
 from ...core.config import Config
 from ...core.cpmt import CPMTError, CPMTProject, create_project_with_page
-from ...core.paths import MODELOS_DIR
+from ...core.paths import KRITA_HOME, MODELOS_DIR
 from ...core import ui
 from ...core.thumbs import thumbnail_pixmap
 from ..biblioteca import core as biblioteca_core
@@ -613,9 +613,7 @@ class PagesDocker(DockWidget):
         prefixo = qlibrary_prefix()
         if prefixo:
             candidatos.append(os.path.join(prefixo, "share", "krita", "templates", "comics"))
-        candidatos.append(
-            os.path.join(os.path.expanduser("~"), ".local", "share", "krita", "templates", "comics")
-        )
+        candidatos.append(os.path.join(KRITA_HOME, "templates", "comics"))
         resultado = {}
         for pasta in candidatos:
             if not os.path.isdir(pasta):

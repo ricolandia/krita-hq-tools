@@ -36,8 +36,14 @@ if _USAR_PYQT6:  # Krita 6
     SMOOTH_TRANSFORMATION = QtCore.Qt.TransformationMode.SmoothTransformation
     NO_FOCUS = QtCore.Qt.FocusPolicy.NoFocus
     CURSOR_POINTING = QtCore.Qt.CursorShape.PointingHandCursor
+    CURSOR_SIZE_ALL = QtCore.Qt.CursorShape.SizeAllCursor
+    CURSOR_SIZE_FDIAG = QtCore.Qt.CursorShape.SizeFDiagCursor
+    CURSOR_ARROW = QtCore.Qt.CursorShape.ArrowCursor
     ALIGN_CENTER_FULL = QtCore.Qt.AlignmentFlag.AlignCenter
     TOOL_BUTTON_TEXT_BESIDE_ICON = QtCore.Qt.ToolButtonStyle.ToolButtonTextBesideIcon
+    WA_TRANSLUCENT_BACKGROUND = QtCore.Qt.WidgetAttribute.WA_TranslucentBackground
+    WA_NO_SYSTEM_BACKGROUND = QtCore.Qt.WidgetAttribute.WA_NoSystemBackground
+    WA_TRANSPARENT_FOR_MOUSE = QtCore.Qt.WidgetAttribute.WA_TransparentForMouseEvents
     DIALOG_YES = QtWidgets.QMessageBox.StandardButton.Yes
     DIALOG_NO = QtWidgets.QMessageBox.StandardButton.No
     DIALOG_OK = QtWidgets.QMessageBox.StandardButton.Ok
@@ -61,8 +67,14 @@ else:  # Krita 5.x
     SMOOTH_TRANSFORMATION = QtCore.Qt.SmoothTransformation
     NO_FOCUS = QtCore.Qt.NoFocus
     CURSOR_POINTING = QtCore.Qt.PointingHandCursor
+    CURSOR_SIZE_ALL = QtCore.Qt.SizeAllCursor
+    CURSOR_SIZE_FDIAG = QtCore.Qt.SizeFDiagCursor
+    CURSOR_ARROW = QtCore.Qt.ArrowCursor
     ALIGN_CENTER_FULL = QtCore.Qt.AlignCenter
     TOOL_BUTTON_TEXT_BESIDE_ICON = QtCore.Qt.ToolButtonTextBesideIcon
+    WA_TRANSLUCENT_BACKGROUND = QtCore.Qt.WA_TranslucentBackground
+    WA_NO_SYSTEM_BACKGROUND = QtCore.Qt.WA_NoSystemBackground
+    WA_TRANSPARENT_FOR_MOUSE = QtCore.Qt.WA_TransparentForMouseEvents
     DIALOG_YES = QtWidgets.QMessageBox.Yes
     DIALOG_NO = QtWidgets.QMessageBox.No
     DIALOG_OK = QtWidgets.QMessageBox.Ok
@@ -169,8 +181,14 @@ __all__ = [
     "SMOOTH_TRANSFORMATION",
     "NO_FOCUS",
     "CURSOR_POINTING",
+    "CURSOR_SIZE_ALL",
+    "CURSOR_SIZE_FDIAG",
+    "CURSOR_ARROW",
     "ALIGN_CENTER_FULL",
     "TOOL_BUTTON_TEXT_BESIDE_ICON",
+    "WA_TRANSLUCENT_BACKGROUND",
+    "WA_NO_SYSTEM_BACKGROUND",
+    "WA_TRANSPARENT_FOR_MOUSE",
     "DIALOG_YES",
     "DIALOG_NO",
     "DIALOG_OK",

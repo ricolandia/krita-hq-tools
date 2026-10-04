@@ -92,7 +92,9 @@ Viável e a mais integrada, com condições:
   inserção raster/referência. Biblioteca de poses e corpo (03/10):
   `scripts/exportar-poses3d.py` extrai as rotações de FBX animado (desvio
   máximo de 7 mm contra o Blender), `idle_maos_fechadas` é o padrão dos dois
-  corpos e `mulher.json` entrou com seletor Corpo.
+  corpos e `mulher.json` entrou com seletor Corpo. Preview flutuante (03/10):
+  "Flutuar na página" mostra o preview sobre o canvas (arrasto, alça/roda,
+  opacidade, "Fixar") e a inserção sai no lugar mapeado, abaixo do esboço.
 - **Dividir a biblioteca em corpo e mãos (anotado em 03/10):** hoje cada pose
   mistura corpo e dedos (Idle com mãos fechadas/abertas). O plano é separar em
   `poses/corpo/` (sem ossos de dedo) e `poses/maos/` (só dedos), com o

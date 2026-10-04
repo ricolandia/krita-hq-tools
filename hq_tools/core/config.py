@@ -1,7 +1,9 @@
 """Configuração persistente do plugin em JSON.
 
-O arquivo fica em ``~/.local/share/krita/hq_tools/config.json`` e guarda os
-módulos habilitados, presets do usuário, pastas e preferências de interface.
+O arquivo fica em ``hq_tools/config.json`` dentro da pasta de dados do Krita
+(``~/.local/share/krita`` no Linux, ``%APPDATA%\\krita`` no Windows,
+``~/Library/Application Support/krita`` no macOS) e guarda os módulos
+habilitados, presets do usuário, pastas e preferências de interface.
 """
 
 import copy
