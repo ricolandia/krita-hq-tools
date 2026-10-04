@@ -10,6 +10,10 @@ já tem o repositório e quer desenvolver, veja `scripts/install-dev.sh` e o
 - O plugin é testado no Krita 5.3.4; há preparação para o Krita 6 (PyQt6),
   mas a validação completa no 6 ainda não foi feita.
 - Um ZIP de release (`hq_tools-<versão>.zip`) baixado da página de releases.
+- **O visualizador 3D não tem dependências extras**: os modelos e as poses vão
+  dentro do ZIP e o plugin lê tudo em Python puro (sem numpy). O Blender é
+  usado só pelo autor para gerar os arquivos a partir dos FBX; não é preciso
+  instalá-lo, nem ter internet.
 
 ## Instalação rápida (ZIP)
 
