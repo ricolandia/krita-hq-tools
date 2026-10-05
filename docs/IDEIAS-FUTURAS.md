@@ -170,6 +170,72 @@ paramétrico.
 - Apagador vetorial por interseção: fora de escopo confirmado (a API de
   vetores não expõe trim por interseção).
 
+## Novas ideias (05/10/2026)
+
+Três ideias do autor, anotadas para avaliação. Nenhuma entra antes da
+biblioteca de poses (prioridade atual); o hub é o candidato natural a entrar
+primeiro pela facilidade.
+
+### 1. Painel de hub
+
+Um docker "HQ Tools: hub" com um botão por módulo (os 8 de hoje, mais os que
+vierem, como a biblioteca de perspectiva), no espírito de central de controle:
+
+- Cada botão **abre o docker do módulo**; clicar de novo **fecha**, e o botão
+  fica marcado (estado "aberto") enquanto a doca estiver visível.
+- Opção (checkbox) "fechar o atual ao abrir outro": marcada, abrir um módulo
+  fecha os demais (um por vez); desmarcada, vai abrindo e convivendo com os
+  outros.
+
+Notas de engenharia: no PyKrita o `DockWidget` é um `QDockWidget` (mostrar com
+`show()`, fechar com `close()`, e o sinal `visibilityChanged` sincroniza o
+estado marcado do botão). Os módulos já têm precedente de registro de
+instância (`brushes.register_docker`); o hub pode manter um registro parecido
+em vez de casar por título de janela, que é frágil (como no botão "Bibliotecas
+de símbolos"). Docker que o Krita ainda não instanciou precisa de aviso em vez
+de botão morto. Sem risco para o desenho: só mostra e esconde dockas.
+
+### 2. Biblioteca de linhas de perspectiva
+
+Docker novo no molde do visualizador 3D: catálogo de conjuntos de linhas de
+perspectiva, seleção retangular sobre o painel, preview WYSIWYG e inserção no
+tamanho da seleção (abaixo do esboço, como referência), com flutuante sobre a
+seleção para **arrastar e dar zoom** antes de assentar.
+
+Conjuntos pedidos pelo autor:
+
+- frontal (1 ponto);
+- 3 pontos;
+- dois níveis de "eyebird" (vista de pássaro);
+- 2 níveis de worm view (vista de baixo);
+- 2 níveis de curvilíneas.
+
+Cores por família de linhas (azul, cinza e laranja) para separar direções e
+horizonte. A ideia é cobrir as perspectivas mais comuns de graphic novel.
+
+Notas de engenharia: o núcleo é geometria pura, no espírito de
+`screentone/effects.py` (as linhas radiais de um foco já existem em
+`effect_lines_focus`); cada conjunto vira uma lista de segmentos com cor e o
+SVG vai para uma camada. Reusa o fluxo do 3D já validado: `mapeamento`
+(widget↔imagem), `selection_bounds`, `attach_below_active`, `deselect` e o
+padrão do flutuante (`_Flutuante`); e, aprendendo com a auditoria de 05/10, a
+inserção entra em macro de desfazer (`run_in_macro`).
+
+**Perguntas abertas:** arrastar/zoom ajusta o quê no grid (mover os pontos de
+fuga, girar o horizonte, mudar a densidade de linhas)? As cores por família
+são fixas ou escolhíveis? Inserir como vetor (editável) ou raster (mais
+simples, como o 3D)?
+
+### Relação com o que já está anotado
+
+- "Presets de assistentes por painel" (acima) é o parente próximo: lá são os
+  assistentes nativos do Krita configurados por painel; aqui são linhas
+  desenhadas como arte de referência. As duas podem conviver; decidir qual
+  resolve melhor o fluxo do autor.
+- O hub conversa com a decisão de 26/09 (dockers separados, agrupamento em
+  abas pelo próprio Krita): ele não funde os módulos, só dá um atalho de
+  abertura e fechamento.
+
 ## Pendência resolvida (03/10/2026)
 
 - Botão "Instalar bundle..." pouco visível na fileira inferior do docker de
