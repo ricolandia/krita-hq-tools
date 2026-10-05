@@ -1,5 +1,28 @@
 # Changelog
 
+## [Não publicado]
+
+### Hub
+
+- Docker "HQ Tools: hub": um botão por módulo abre e fecha a doca, com o
+  botão marcado enquanto ela está aberta (fechar pelo X do Krita também
+  desmarca). A opção "Fechar o atual ao abrir outro" alterna entre um módulo
+  por vez e as dockas convivendo. Cada docker se registra numa lista única
+  (`core/registro.py`), sem casar por título de janela.
+
+### Biblioteca de perspectiva
+
+- Docker "HQ Tools: perspectiva" com 9 conjuntos de linhas (frontal, dois e
+  três pontos, pássaro e verme em dois níveis, curvilíneas de 4 e 5 pontos):
+  escolha o conjunto, desenhe a seleção sobre o painel, use "Flutuar na
+  página" (arrasto e roda) e insira no tamanho da seleção, abaixo do esboço,
+  como camada ou referência; a inserção roda em macro (um Ctrl+Z desfaz) e
+  desfaz a seleção.
+- Assets em `hq_tools/resources/perspectivas/` (cada linha com exatamente
+  2 nós: `<line>` e arco `M`+`A`), pesquisa em `docs/PERSPECTIVAS.md`,
+  gerador `scripts/gerar-perspectivas.py` e testes em
+  `tests/test_perspectivas.py`.
+
 ## [0.7.2] — 2026-10-04
 
 O visualizador 3D ganha o fluxo por seleção e o preview flutuante sobre a

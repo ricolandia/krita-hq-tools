@@ -18,7 +18,7 @@ from ...core.compat import (
 from ...core.config import Config
 from ...core.gpl import load_gpl
 from ...core.paths import KRITA_PALETTES_DIR, mesma_copia
-from ...core import ui
+from ...core import registro, ui
 
 TEMPLATES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
 
@@ -39,6 +39,7 @@ class PalettesDocker(DockWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("HQ Tools: paletas")
+        registro.registrar("palettes", self)
         self.config = Config()
         self._palettes = {}
         self._build_ui()

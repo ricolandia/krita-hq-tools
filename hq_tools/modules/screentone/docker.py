@@ -14,7 +14,7 @@ from ...core import krita_helpers as helpers
 from ...core.compat import DIALOG_NO, DIALOG_YES, QtWidgets
 from ...core.config import Config
 from ...core.paths import USER_DIR
-from ...core import ui
+from ...core import registro, ui
 from . import core
 from . import effects
 
@@ -29,6 +29,7 @@ class ScreentoneDocker(DockWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("HQ Tools: retículas")
+        registro.registrar("screentone", self)
         self.config = Config()
         self.bundled_presets = core.load_presets(
             os.path.join(os.path.dirname(os.path.abspath(__file__)), "presets.json")

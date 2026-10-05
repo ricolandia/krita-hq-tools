@@ -67,9 +67,10 @@ VP direito, horizontais de apoio e horizonte.
 
     python3 scripts/gerar-perspectivas.py [--largura N --altura N] [--destino DIR]
 
-Padrão 900x1200 (3:4). O módulo futuro (mesmo fluxo do 3D: seleção, preview
-WYSIWYG, flutuante para arrastar e dar zoom, inserir como raster abaixo do
-esboço) vai gerar na proporção da seleção; o script já é paramétrico.
+Padrão 900x1200 (3:4). O docker `modules/perspectiva/` (mesmo fluxo do 3D:
+seleção, preview WYSIWYG, flutuante para arrastar e dar zoom, inserir como
+raster abaixo do esboço) gera na proporção da seleção; o script grava os
+assets de referência.
 
 ## Testes
 

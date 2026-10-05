@@ -1,8 +1,10 @@
 <html>
 <body>
 <h1>HQ Tools</h1>
-<p>Ferramentas de quadrinhos para o Krita: retículas e hachuras, balões vetoriais,
-paletas, gerenciador de páginas com miniaturas e atalhos de pincel.</p>
+<p>Ferramentas de quadrinhos para o Krita: retículas e hachuras, balões e
+onomatopeias vetoriais, biblioteca de recursos, visualizador 3D, biblioteca de
+perspectivas, paletas, gerenciador de páginas, pincéis com atalhos e um hub
+para abrir e fechar os módulos.</p>
 
 <h2>Instalação</h2>
 <p>Pelo Krita: <b>Ferramentas &gt; Scripts &gt; Importar plugin Python</b> e escolha o
@@ -88,6 +90,17 @@ só funcionam com seleção: rasterizam no tamanho exato dela, colocam a camada
 abaixo da camada ativa (o esboço fica por cima) e desfazem a seleção; sem
 seleção, aparece o aviso para desenhar uma.</p>
 
+<h2>Perspectiva</h2>
+<p>Biblioteca de malhas de perspectiva para inserir num painel: frontal (1
+ponto), dois e três pontos, vista de pássaro e de verme (dois níveis cada) e
+curvilíneas de 4 e 5 pontos. Escolha o conjunto, desenhe uma seleção
+retangular sobre o painel e insira: a malha sai no tamanho da seleção, abaixo
+do esboço (como camada ou como referência travada), e um Ctrl+Z desfaz.
+"Flutuar na página" mostra a malha sobre a seleção, com arrasto para mover e
+roda para redimensionar. As cores separam as famílias: azul =
+verticais/3º ponto de fuga; laranja = profundidade e eixos; cinza =
+horizontais e horizonte.</p>
+
 <h2>Paletas</h2>
 <p>Templates de HQ e artísticos (tons, nanquim, pele, céu, vegetação, chapadas,
 Zorn, retrato, paisagem, amanhecer, noite, terra, pastel, aquarela, guache,
@@ -135,6 +148,12 @@ licença e créditos em CREDITS.md. A aba "Comunidade" lista os presets desses
 packs depois de instalados. Após instalar um pack, reinicie o Krita. Na aba
 "Packs", o botão "Instalar bundle..." copia um arquivo <code>.bundle</code>
 seu para o Krita.</p>
+
+<h2>Hub</h2>
+<p>Central para abrir e fechar os módulos: um botão por docker, marcado
+enquanto a doca está aberta (clicar de novo fecha). A opção "Fechar o atual ao
+abrir outro" deixa só um módulo aberto por vez; desmarcada, as dockas vão
+abrindo juntas.</p>
 
 <h2>Configuração</h2>
 <p>As preferências ficam em <code>~/.local/share/krita/hq_tools/config.json</code>

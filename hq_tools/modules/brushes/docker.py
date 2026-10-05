@@ -30,7 +30,7 @@ from ...core.compat import (
     QtGui,
     QtWidgets,
 )
-from ...core import ui
+from ...core import registro, ui
 from ...core.config import Config
 from ...core.paths import BRUSHES_KIT_DIR, KRITA_HOME
 from . import SLOT_COUNT, register_docker
@@ -64,6 +64,7 @@ class BrushesDocker(DockWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("HQ Tools: pincéis")
+        registro.registrar("brushes", self)
         self.config = Config()
         self.resources = {}
         self.slot_names = [""] * SLOT_COUNT

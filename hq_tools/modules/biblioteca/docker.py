@@ -33,7 +33,7 @@ from ...core.compat import (
     QtWidgets,
 )
 from ...core.config import Config
-from ...core import ui
+from ...core import registro, ui
 from ...core.paths import BIBLIOTECA_DIR
 from . import core as lib
 
@@ -71,6 +71,7 @@ class BibliotecaDocker(DockWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("HQ Tools: biblioteca")
+        registro.registrar("biblioteca", self)
         self.config = Config()
         self.folder = self.config.get("biblioteca.folder") or BIBLIOTECA_DIR
         os.makedirs(self.folder, exist_ok=True)

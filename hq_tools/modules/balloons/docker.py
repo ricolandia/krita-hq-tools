@@ -29,7 +29,7 @@ from ...core.compat import (
     QtWidgets,
 )
 from ...core.config import Config
-from ...core import ui
+from ...core import registro, ui
 from ...core.paths import BALLOONS_DIR, FONTS_TARGET, mesma_copia
 
 SAMPLES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "samples")
@@ -97,6 +97,7 @@ class BalloonsDocker(DockWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("HQ Tools: balões")
+        registro.registrar("balloons", self)
         self.config = Config()
         self.folder = ensure_default_folder(self.config)
         self._build_ui()

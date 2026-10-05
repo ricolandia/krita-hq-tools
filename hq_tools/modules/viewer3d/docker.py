@@ -21,7 +21,7 @@ from krita import DockWidget
 from ...core import krita_helpers as helpers
 from ...core import mapeamento
 from ...core import modelo3d
-from ...core import ui
+from ...core import registro, ui
 from ...core.compat import (
     ALIGN_CENTER,
     CURSOR_ARROW,
@@ -326,6 +326,7 @@ class Viewer3DDocker(DockWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("HQ Tools: 3D")
+        registro.registrar("viewer3d", self)
         self.modelo = None
         self.corpo = "homem"
         self.regiao = None

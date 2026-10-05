@@ -4,9 +4,11 @@
 
 **Português** · [English](README.en.md)
 
-Plugin do Krita com retículas e hachuras, balões vetoriais, paletas,
-gerenciador de páginas com miniaturas e atalhos de pincel. Feito para o
-Krita 5.3.4 (AppImage, PyQt5) com preparação para o Krita 6 (PyQt6).
+Plugin do Krita com retículas e hachuras, balões e onomatopeias vetoriais,
+biblioteca de recursos, gerenciador de páginas, pincéis com atalhos,
+visualizador 3D, biblioteca de perspectivas e um hub para abrir e fechar os
+módulos. Feito para o Krita 5.3.4 (AppImage, PyQt5) com preparação para o
+Krita 6 (PyQt6).
 
 Os quatro documentos originais de contexto do projeto estão em
 `docs/contexto/`.

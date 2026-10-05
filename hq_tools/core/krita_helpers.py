@@ -4,6 +4,7 @@ import contextlib
 
 from krita import InfoObject, Krita, Selection
 
+from . import mapeamento
 from .camadas import ordem_com_no_abaixo
 from .compat import WAIT_CURSOR, QIcon, QtCore, QtWidgets
 from .erros import escrever_erro
@@ -336,3 +337,82 @@ def document_dpi(document):
         return float(document.xRes())
     except (AttributeError, TypeError, ValueError):
         return 300.0
+
+
+def viewport_da_view(view):
+    """Viewport do canvas da view ativa (para ancorar o flutuante), ou None.
+
+    O casamento da sub-janela com a view é por índice, como no visualizador
+    3D (o mesmo ponto a validar com dois documentos abertos, apontado na
+    auditoria de 05/10).
+    """
+    try:
+        janela = view.window()
+        q_janela = janela.qwindow()
+    except (AttributeError, RuntimeError):
+        return None
+    central = q_janela.centralWidget() if q_janela is not None else None
+    area_mdi = central.findChild(QtWidgets.QMdiArea) if central is not None else None
+    if area_mdi is None:
+        return None
+    subjanelas = area_mdi.subWindowList()
+    views = list(janela.views())
+    for indice, sub in enumerate(subjanelas):
+        if indice < len(views) and views[indice] == view:
+            area = sub.widget().findChild(QtWidgets.QAbstractScrollArea)
+            return area.viewport() if area is not None else None
+    if subjanelas:
+        area = subjanelas[0].widget().findChild(QtWidgets.QAbstractScrollArea)
+        return area.viewport() if area is not None else None
+    return None
+
+
+def pan_do_viewport(viewport):
+    """Deslocamento (px do widget) das barras de rolagem, relativo ao centro."""
+    area = viewport.parentWidget()
+    if area is None:
+        return (0.0, 0.0)
+    try:
+        horizontal = area.horizontalScrollBar()
+        vertical = area.verticalScrollBar()
+    except (AttributeError, RuntimeError):
+        return (0.0, 0.0)
+    return (
+        mapeamento.deslocamento_da_barra(
+            horizontal.minimum(), horizontal.maximum(), horizontal.value()
+        ),
+        mapeamento.deslocamento_da_barra(
+            vertical.minimum(), vertical.maximum(), vertical.value()
+        ),
+    )
+
+
+def parametros_do_canvas(documento, viewport):
+    """(centro_widget, centro_imagem, zoom, rotacao, pan, espelhado) ou None.
+
+    Em modo pixel (o padrão do Krita), a escala de tela é ``zoomLevel``: em
+    100%, um pixel da imagem vira um pixel do widget. É a mesma conta do
+    visualizador 3D, usada aqui para ancorar o flutuante sobre a seleção.
+    """
+    view = active_view()
+    canvas = view.canvas() if view is not None else None
+    if canvas is None:
+        return None
+    try:
+        zoom = canvas.zoomLevel()
+    except (AttributeError, RuntimeError):
+        return None
+    if zoom <= 0:
+        return None
+    try:
+        rotacao = canvas.rotation()
+    except (AttributeError, RuntimeError):
+        rotacao = 0.0
+    try:
+        espelhado = canvas.mirror()
+    except (AttributeError, RuntimeError):
+        espelhado = False
+    centro_imagem = (documento.width() / 2.0, documento.height() / 2.0)
+    pan = pan_do_viewport(viewport)
+    centro_widget = (viewport.width() / 2.0, viewport.height() / 2.0)
+    return centro_widget, centro_imagem, zoom, rotacao, pan, espelhado

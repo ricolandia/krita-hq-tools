@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200">
-<!-- HQ Tools: 03-tres-pontos.svg | Tres pontos: laranja = VP esquerdo; cinza = VP direito; azul = verticais (3o VP) | gerado por scripts/gerar-perspectivas.py -->
+<!-- HQ Tools: 03-tres-pontos.svg | Três pontos: laranja = VP esquerdo; cinza = VP direito; azul = verticais (3º VP) | gerado por scripts/gerar-perspectivas.py -->
 <line x1="0.0" y1="272.7" x2="450.0" y2="0.0" stroke="#e8843c" stroke-width="1.2"/>
 <line x1="0.0" y1="327.3" x2="648.0" y2="0.0" stroke="#e8843c" stroke-width="1.2"/>
 <line x1="0.0" y1="381.8" x2="900.0" y2="18.2" stroke="#e8843c" stroke-width="1.2"/>

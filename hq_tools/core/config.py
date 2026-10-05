@@ -26,6 +26,8 @@ DEFAULT_CONFIG = {
         "brushes": True,
         "biblioteca": True,
         "viewer3d": True,
+        "perspectiva": True,
+        "hub": True,
     },
     "screentone": {
         "last_preset": "Sombra média 60 LPI",
@@ -55,6 +57,12 @@ DEFAULT_CONFIG = {
     },
     "brushes": {
         "slots": [""] * 16,
+    },
+    "perspectiva": {
+        "last_preset": "01-frontal.svg",
+    },
+    "hub": {
+        "fechar_ao_abrir": False,
     },
 }
 

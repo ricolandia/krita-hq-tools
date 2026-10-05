@@ -131,10 +131,25 @@ curvilíneas 4/5; David Chelsea como referência aclamada) em
 **`hq_tools/resources/perspectivas/`**, com a regra do autor: **2 nós por
 linha** (retas `<line>`, arcos `<path>` com um único `M` e um único `A`).
 Gerador paramétrico `scripts/gerar-perspectivas.py` (padrão 900x1200; o
-docker futuro gera na proporção da seleção) e `tests/test_perspectivas.py`
+docker gera na proporção da seleção) e `tests/test_perspectivas.py`
 (inclui a sincronia byte a byte dos SVGs versionados). Cores: azul =
 verticais/3º VP, laranja = profundidade/eixos, cinza = horizontais/VP direito.
 QA de visão aprovou as geometrias e o contraste das cores.
+
+## Hub e docker de perspectiva (05/10/2026, sem release)
+
+- **Hub** (`modules/hub/`): um botão por módulo abre e fecha a doca, com o
+  estado marcado sincronizado pelo `visibilityChanged`; a opção "fechar o
+  atual ao abrir outro" fica em `hub.fechar_ao_abrir`. Cada docker se registra
+  em `core/registro.py` (o hub escuta as chegadas; nada de casar por título de
+  janela).
+- **Docker de perspectiva** (`modules/perspectiva/`): 9 conjuntos na lista
+  com miniatura, prévia na proporção da seleção, flutuante sobre a seleção
+  (arrasto e roda) e inserção raster abaixo do esboço (camada ou referência),
+  dentro de macro de desfazer (`run_in_macro`), desfazendo a seleção. O
+  núcleo puro (`linhas.py`) saiu do script, que virou só a linha de comando
+  que grava os assets.
+- Testes: 275 → 291 (registro, contagens do plugin, perspectivas).
 
 ## Auditoria de 2026-09-30 (4 lotes, sem release ainda)
 

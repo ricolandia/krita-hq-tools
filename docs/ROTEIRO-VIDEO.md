@@ -11,7 +11,7 @@ curto na tela. Duração alvo: 90 segundos (mínimo 60, máximo 120).
 
 ## Preparação
 
-- Krita 5.3.4 com os 8 dockers agrupados como abas num painel à direita
+- Krita 5.3.4 com os 10 dockers agrupados como abas num painel à direita
   (retículas, balões, onomatopeias, paletas, páginas, pincéis, biblioteca, 3D).
 - Projeto de demonstração aberto: uma página de HQ com arte simples (sem dados
   de clientes), salva numa pasta, para o gerenciador e a biblioteca já terem o

@@ -4,10 +4,12 @@
 
 [Português](README.md) · **English**
 
-Krita plugin with screentones and hatching, vector speech balloons, palettes,
-a page manager with thumbnails and brush shortcuts. Built for Krita 5.3.4
-(AppImage, PyQt5) with preparation for Krita 6 (PyQt6). The project
-documentation is written in Portuguese; this file is the English overview.
+Krita plugin with screentones and hatching, vector speech balloons and sound
+effects, an asset library, a page manager, brush shortcuts, a 3D viewer, a
+perspective line library and a hub to open and close the modules. Built for
+Krita 5.3.4 (AppImage, PyQt5) with preparation for Krita 6 (PyQt6). The
+project documentation is written in Portuguese; this file is the English
+overview.
 
 The four original context documents of the project are in `docs/contexto/`
 (Portuguese).

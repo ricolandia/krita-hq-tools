@@ -30,7 +30,7 @@ from ...core.compat import (
 from ...core.config import Config
 from ...core.cpmt import CPMTError, CPMTProject, create_project_with_page
 from ...core.paths import KRITA_HOME, MODELOS_DIR
-from ...core import ui
+from ...core import registro, ui
 from ...core.thumbs import thumbnail_pixmap
 from ..biblioteca import core as biblioteca_core
 from . import generator, guias, modelos as modelos_lib, roteiro
@@ -74,6 +74,7 @@ class PagesDocker(DockWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("HQ Tools: páginas")
+        registro.registrar("pages", self)
         self.config = Config()
         self.project = None
         self.folder = ""

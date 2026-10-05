@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200">
-<!-- HQ Tools: 09-curvilinea-5-pontos.svg | Curvilinea 5 pontos: como a de 4, mais a familia reta do VP central (laranja) | gerado por scripts/gerar-perspectivas.py -->
+<!-- HQ Tools: 09-curvilinea-5-pontos.svg | Curvilínea 5 pontos: como a de 4, mais a família reta do VP central (laranja) | gerado por scripts/gerar-perspectivas.py -->
 <path d="M 450.0 -300.0 A 3656.2 3656.2 0 0 0 450.0 1500.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
 <path d="M 450.0 -300.0 A 3656.2 3656.2 0 0 1 450.0 1500.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
 <path d="M 450.0 -300.0 A 1912.5 1912.5 0 0 0 450.0 1500.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
