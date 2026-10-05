@@ -231,8 +231,8 @@ inserção entra em macro de desfazer (`run_in_macro`).
 pesquisa e catálogo em `docs/PERSPECTIVAS.md`, gerador em
 `scripts/gerar-perspectivas.py` e testes em `tests/test_perspectivas.py`.
 O docker `modules/perspectiva/` entrou com o fluxo de seleção completo
-(inserção raster abaixo do esboço, em macro de desfazer) e o flutuante com
-arrasto e roda. Sem release ainda.
+(inserção como camada vetorial abaixo do esboço, em macro de desfazer) e o
+flutuante com arrasto e roda. Sem release ainda.
 
 **Perguntas abertas:** arrastar/zoom ajusta o quê no grid (mover os pontos de
 fuga, girar o horizonte, mudar a densidade de linhas)? As cores por família

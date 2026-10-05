@@ -129,8 +129,8 @@ class PerspectivaDocker(DockWidget):
         main, layout = ui.painel(self)
         layout.addWidget(ui.rotulo(
             "Escolha um conjunto de linhas, desenhe uma seleção retangular "
-            "sobre o painel e insira: a malha sai no tamanho da seleção, "
-            "abaixo do esboço."
+            "sobre o painel e insira: a malha sai como camada vetorial, no "
+            "tamanho da seleção, abaixo do esboço."
         ))
         self.list_presets = widgets.QListWidget()
         self.list_presets.setViewMode(ICON_MODE)
@@ -172,14 +172,15 @@ class PerspectivaDocker(DockWidget):
         botoes2 = widgets.QHBoxLayout()
         button_inserir = ui.botao(
             "Inserir no painel",
-            "Insere a malha no tamanho da seleção, abaixo da camada ativa.",
+            "Insere a malha como camada vetorial no tamanho da seleção, abaixo "
+            "da camada ativa.",
         )
         button_inserir.clicked.connect(lambda: self.inserir(False))
         botoes2.addWidget(button_inserir)
         button_referencia = ui.botao(
             "Inserir como referência",
-            "Como o inserir, mas a camada fica travada e com rótulo de cor, "
-            "no papel de referência.",
+            "Como o inserir, mas a camada vetorial fica travada e com rótulo "
+            "de cor, no papel de referência.",
         )
         button_referencia.clicked.connect(lambda: self.inserir(True))
         botoes2.addWidget(button_referencia)
@@ -382,7 +383,12 @@ class PerspectivaDocker(DockWidget):
         self._selecao_flutuante = None
 
     def inserir(self, referencia=False):
-        """Insere a malha na seleção, abaixo do esboço, dentro de uma macro."""
+        """Insere a malha como camada vetorial, abaixo do esboço, em macro.
+
+        O deslocamento vai no próprio SVG (``translate``): o Krita importa as
+        formas já na posição da seleção, em coordenadas do documento. Cada
+        linha vira uma forma de dois nós, editável.
+        """
         documento = helpers.active_document()
         if documento is None:
             helpers.show_info("Perspectiva", "Abra um documento para inserir a malha.")
@@ -402,19 +408,26 @@ class PerspectivaDocker(DockWidget):
         x, y, largura, altura = selecao
         ativo = documento.activeNode()
         nome_ativo = ativo.name() if ativo is not None else None
-        svg = linhas.gerar(arquivo, largura, altura)
-        imagem = self._rasterizar(svg, largura, altura)
-        if imagem is None:
-            helpers.show_info("Perspectiva", "Não foi possível desenhar a malha.")
-            return
-        rgba = imagem.convertToFormat(IMAGE_FORMAT_RGBA8888)
-        dados = bytes(rgba.constBits().asstring(rgba.sizeInBytes()))
+        svg = linhas.gerar(arquivo, largura, altura, deslocamento=(x, y))
         nome = helpers.unique_layer_name(documento, "Perspectiva")
 
         def _inserir_agora():
-            camada = documento.createNode(nome, "paintlayer")
-            if camada is None or not camada.setPixelData(dados, x, y, largura, altura):
-                helpers.show_info("Perspectiva", "Não foi possível criar a camada.")
+            camada = documento.createVectorLayer(nome)
+            if camada is None:
+                helpers.show_info(
+                    "Perspectiva", "Não foi possível criar a camada vetorial."
+                )
+                return False
+            formas = camada.addShapesFromSvg(svg)
+            if not formas:
+                try:
+                    documento.removeNode(camada)
+                except (AttributeError, RuntimeError):
+                    pass
+                helpers.show_info(
+                    "Perspectiva",
+                    "O SVG não gerou formas; escolha outro conjunto e tente de novo.",
+                )
                 return False
             helpers.attach_below_active(documento, camada)
             if referencia:
@@ -430,8 +443,7 @@ class PerspectivaDocker(DockWidget):
             return
         self.atualizar_flutuante()
         helpers.show_message(
-            "Perspectiva '{0}' inserida abaixo de '{1}'{2}; seleção desfeita.".format(
-                nome,
+            "Malha inserida abaixo de '{0}'{1}; seleção desfeita.".format(
                 nome_ativo or "camada ativa",
                 " como referência" if referencia else "",
             )

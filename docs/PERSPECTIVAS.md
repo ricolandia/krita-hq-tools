@@ -30,9 +30,11 @@ Paint sobre régua de perspectiva, e as construções de 4/5 pontos
 ## Construção usada nos SVGs
 
 Cada linha tem **exatamente dois nós**, um em cada ponta (pedido do autor,
-para o desenho continuar editável quando importado como vetor):
+para o desenho continuar editável quando importado como vetor no Krita).
+Tudo é `<path>` (o importador do Krita não garante `<line>` como forma):
+reta é `M` + `L`, arco é `M` + `A` (dois pontos de ancoragem e as alças).
 
-- **1/2/3 pontos**: famílias de retas; cada guia é um `<line>` recortado de
+- **1/2/3 pontos**: famílias de retas; cada guia é um caminho recortado de
   borda a borda do quadro, mesmo com o ponto de fuga fora dele.
 - **Pássaro/verme**: 3 pontos com o horizonte deslocado; o nível 2 aproxima o
   3º ponto de fuga (convergência mais forte) e o nível 1 afasta.
@@ -68,12 +70,13 @@ VP direito, horizontais de apoio e horizonte.
     python3 scripts/gerar-perspectivas.py [--largura N --altura N] [--destino DIR]
 
 Padrão 900x1200 (3:4). O docker `modules/perspectiva/` (mesmo fluxo do 3D:
-seleção, preview WYSIWYG, flutuante para arrastar e dar zoom, inserir como
-raster abaixo do esboço) gera na proporção da seleção; o script grava os
-assets de referência.
+seleção, preview WYSIWYG, flutuante para arrastar e dar zoom) insere como
+**camada vetorial** abaixo do esboço, com o deslocamento no próprio SVG
+(`translate`); o script grava os assets de referência.
 
 ## Testes
 
-`tests/test_perspectivas.py` garante que cada elemento tem exatamente dois
-nós, que só há `<line>` e `<path>`, que as cores são da paleta e que os SVGs
-versionados batem byte a byte com o gerador.
+`tests/test_perspectivas.py` garante que cada elemento é um `<path>` com
+exatamente dois nós (`M`+`L` ou `M`+`A`), que as cores são da paleta, que o
+deslocamento embrulha em `<g translate>` e que os SVGs versionados batem byte
+a byte com o gerador.

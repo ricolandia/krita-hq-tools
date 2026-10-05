@@ -1,9 +1,10 @@
 """Núcleo dos conjuntos de linhas de perspectiva (puro, sem Krita).
 
-Cada linha do SVG tem exatamente dois nós, um em cada ponta: as retas são
-``<line>`` e as curvilíneas são ``<path>`` com um único ``M`` e um único ``A``
-(dois pontos de ancoragem e as alças do arco), para o desenho continuar
-editável quando importado como vetor no Krita.
+Cada linha é um caminho com exatamente dois nós, um em cada ponta: a reta é
+``M`` + ``L`` e a curvilínea é ``M`` + ``A`` (dois pontos de ancoragem e as
+alças do arco). Tudo é ``<path>`` porque é o que o importador de SVG do Krita
+converte em forma vetorial editável; ``<line>`` não tem garantia de virar
+forma.
 
 Convenção de cores (uma família por cor, legenda no comentário de cada
 arquivo):
@@ -30,8 +31,9 @@ ESPESSURA_EIXO = 2.0
 
 
 def linha(x1, y1, x2, y2, cor, espessura=ESPESSURA):
+    """Reta entre dois nós (``M`` + ``L``): um caminho de dois pontos."""
     return (
-        '<line x1="{0:.1f}" y1="{1:.1f}" x2="{2:.1f}" y2="{3:.1f}" '
+        '<path d="M {0:.1f} {1:.1f} L {2:.1f} {3:.1f}" fill="none" '
         'stroke="{4}" stroke-width="{5:.1f}"/>'
     ).format(x1, y1, x2, y2, cor, espessura)
 
@@ -258,7 +260,17 @@ def por_arquivo(nome_arquivo):
     raise KeyError("preset desconhecido: {0}".format(nome_arquivo))
 
 
-def montar_svg(nome, elementos, largura, altura, legenda):
+def montar_svg(nome, elementos, largura, altura, legenda, deslocamento=None):
+    """SVG completo; ``deslocamento`` move o conjunto (usado na inserção)."""
+    corpo = list(elementos)
+    if deslocamento:
+        dx, dy = deslocamento
+        if dx or dy:
+            corpo = (
+                ['<g transform="translate({0:.1f} {1:.1f})">'.format(dx, dy)]
+                + corpo
+                + ["</g>"]
+            )
     return "\n".join(
         [
             '<svg xmlns="http://www.w3.org/2000/svg" width="{0}" height="{1}" '
@@ -266,17 +278,24 @@ def montar_svg(nome, elementos, largura, altura, legenda):
             "<!-- HQ Tools: {0} | {1} | gerado por scripts/gerar-perspectivas.py -->".format(
                 nome, legenda
             ),
-            *elementos,
+            *corpo,
             "</svg>",
             "",
         ]
     )
 
 
-def gerar(nome_arquivo, largura=900, altura=1200):
+def gerar(nome_arquivo, largura=900, altura=1200, deslocamento=None):
     """Texto do SVG de um preset, na proporção pedida (o docker usa a da seleção)."""
     _, construtor, legenda = por_arquivo(nome_arquivo)
-    return montar_svg(nome_arquivo, construtor(largura, altura), largura, altura, legenda)
+    return montar_svg(
+        nome_arquivo,
+        construtor(largura, altura),
+        largura,
+        altura,
+        legenda,
+        deslocamento=deslocamento,
+    )
 
 
 def gerar_todos(destino, largura=900, altura=1200):

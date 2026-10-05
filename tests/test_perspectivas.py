@@ -40,25 +40,37 @@ class TestDoisNosPorLinha(unittest.TestCase):
             arvore = self._arvore(arquivo)
             self.assertEqual(arvore.get("viewBox"), "0 0 300 400")
 
-    def test_somente_linhas_e_arcos(self):
+    def test_somente_caminhos(self):
+        # <line> não tem garantia de virar forma no importador do Krita; tudo
+        # é <path>, que vira forma vetorial de dois nós.
         for arquivo, _, _, _ in linhas.PRESETS:
             for filho in self._arvore(arquivo):
-                self.assertIn(filho.tag, (NS + "line", NS + "path"), arquivo)
+                self.assertEqual(filho.tag, NS + "path", arquivo)
 
-    def test_arcos_tem_dois_nos(self):
+    def test_dois_nos_por_linha(self):
         for arquivo, _, _, _ in linhas.PRESETS:
             for caminho in self._arvore(arquivo).findall(NS + "path"):
                 d = caminho.get("d")
                 self.assertEqual(d.count("M"), 1, arquivo)
-                self.assertEqual(d.count("A"), 1, arquivo)
-                self.assertNotIn("L", d, arquivo)
+                self.assertEqual(d.count("L") + d.count("A"), 1, arquivo)
                 self.assertNotIn("Z", d, arquivo)
 
-    def test_linhas_tem_dois_pontos(self):
+    def test_tem_retas_e_arcos(self):
+        tem_reta = tem_arco = False
         for arquivo, _, _, _ in linhas.PRESETS:
-            for linha in self._arvore(arquivo).findall(NS + "line"):
-                for atributo in ("x1", "y1", "x2", "y2"):
-                    self.assertIsNotNone(linha.get(atributo), arquivo)
+            for caminho in self._arvore(arquivo).findall(NS + "path"):
+                tem_reta = tem_reta or " L " in caminho.get("d")
+                tem_arco = tem_arco or " A " in caminho.get("d")
+        self.assertTrue(tem_reta)
+        self.assertTrue(tem_arco)
+
+    def test_deslocamento_embrulha_em_g(self):
+        svg = linhas.gerar("01-frontal.svg", 300, 400, deslocamento=(10, 20))
+        self.assertIn('translate(10.0 20.0)', svg)
+        arvore = ET.fromstring(svg)
+        grupo = arvore.find(NS + "g")
+        self.assertIsNotNone(grupo)
+        self.assertGreater(len(grupo.findall(NS + "path")), 0)
 
     def test_cores_da_paleta(self):
         for arquivo, _, _, _ in linhas.PRESETS:

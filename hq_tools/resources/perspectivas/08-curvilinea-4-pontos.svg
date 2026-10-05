@@ -32,6 +32,6 @@
 <path d="M -450.0 600.0 A 908.0 908.0 0 0 0 1350.0 600.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
 <path d="M -450.0 600.0 A 900.0 900.0 0 0 1 1350.0 600.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
 <path d="M -450.0 600.0 A 900.0 900.0 0 0 0 1350.0 600.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
-<line x1="-450.0" y1="600.0" x2="1350.0" y2="600.0" stroke="#e8843c" stroke-width="2.0"/>
-<line x1="450.0" y1="-300.0" x2="450.0" y2="1500.0" stroke="#e8843c" stroke-width="2.0"/>
+<path d="M -450.0 600.0 L 1350.0 600.0" fill="none" stroke="#e8843c" stroke-width="2.0"/>
+<path d="M 450.0 -300.0 L 450.0 1500.0" fill="none" stroke="#e8843c" stroke-width="2.0"/>
 </svg>

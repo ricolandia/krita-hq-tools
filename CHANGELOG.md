@@ -16,11 +16,11 @@
   três pontos, pássaro e verme em dois níveis, curvilíneas de 4 e 5 pontos):
   escolha o conjunto, desenhe a seleção sobre o painel, use "Flutuar na
   página" (arrasto e roda) e insira no tamanho da seleção, abaixo do esboço,
-  como camada ou referência; a inserção roda em macro (um Ctrl+Z desfaz) e
-  desfaz a seleção.
-- Assets em `hq_tools/resources/perspectivas/` (cada linha com exatamente
-  2 nós: `<line>` e arco `M`+`A`), pesquisa em `docs/PERSPECTIVAS.md`,
-  gerador `scripts/gerar-perspectivas.py` e testes em
+  como **camada vetorial** (editável, dois nós por linha) ou referência; a
+  inserção roda em macro (um Ctrl+Z desfaz) e desfaz a seleção.
+- Assets em `hq_tools/resources/perspectivas/` (cada linha é um `<path>` com
+  exatamente 2 nós: reta `M`+`L`, arco `M`+`A`), pesquisa em
+  `docs/PERSPECTIVAS.md`, gerador `scripts/gerar-perspectivas.py` e testes em
   `tests/test_perspectivas.py`.
 
 ## [0.7.2] — 2026-10-04

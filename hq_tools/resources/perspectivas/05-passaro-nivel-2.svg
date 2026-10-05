@@ -1,43 +1,43 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200">
 <!-- HQ Tools: 05-passaro-nivel-2.svg | Vista de pássaro forte: horizonte a 15% da altura, 3º VP abaixo | gerado por scripts/gerar-perspectivas.py -->
-<line x1="0.0" y1="81.8" x2="450.0" y2="0.0" stroke="#e8843c" stroke-width="1.2"/>
-<line x1="0.0" y1="136.4" x2="900.0" y2="63.6" stroke="#e8843c" stroke-width="1.2"/>
-<line x1="0.0" y1="190.9" x2="900.0" y2="209.1" stroke="#e8843c" stroke-width="1.2"/>
-<line x1="0.0" y1="245.5" x2="900.0" y2="354.5" stroke="#e8843c" stroke-width="1.2"/>
-<line x1="0.0" y1="300.0" x2="900.0" y2="500.0" stroke="#e8843c" stroke-width="1.2"/>
-<line x1="0.0" y1="354.5" x2="900.0" y2="645.5" stroke="#e8843c" stroke-width="1.2"/>
-<line x1="0.0" y1="409.1" x2="900.0" y2="790.9" stroke="#e8843c" stroke-width="1.2"/>
-<line x1="0.0" y1="463.6" x2="900.0" y2="936.4" stroke="#e8843c" stroke-width="1.2"/>
-<line x1="0.0" y1="518.2" x2="900.0" y2="1081.8" stroke="#e8843c" stroke-width="1.2"/>
-<line x1="0.0" y1="572.7" x2="862.5" y2="1200.0" stroke="#e8843c" stroke-width="1.2"/>
-<line x1="0.0" y1="627.3" x2="691.5" y2="1200.0" stroke="#e8843c" stroke-width="1.2"/>
-<line x1="0.0" y1="681.8" x2="557.6" y2="1200.0" stroke="#e8843c" stroke-width="1.2"/>
-<line x1="0.0" y1="736.4" x2="450.0" y2="1200.0" stroke="#e8843c" stroke-width="1.2"/>
-<line x1="900.0" y1="81.8" x2="450.0" y2="0.0" stroke="#b0b4ba" stroke-width="1.2"/>
-<line x1="0.0" y1="63.6" x2="900.0" y2="136.4" stroke="#b0b4ba" stroke-width="1.2"/>
-<line x1="0.0" y1="209.1" x2="900.0" y2="190.9" stroke="#b0b4ba" stroke-width="1.2"/>
-<line x1="0.0" y1="354.5" x2="900.0" y2="245.5" stroke="#b0b4ba" stroke-width="1.2"/>
-<line x1="0.0" y1="500.0" x2="900.0" y2="300.0" stroke="#b0b4ba" stroke-width="1.2"/>
-<line x1="0.0" y1="645.5" x2="900.0" y2="354.5" stroke="#b0b4ba" stroke-width="1.2"/>
-<line x1="0.0" y1="790.9" x2="900.0" y2="409.1" stroke="#b0b4ba" stroke-width="1.2"/>
-<line x1="0.0" y1="936.4" x2="900.0" y2="463.6" stroke="#b0b4ba" stroke-width="1.2"/>
-<line x1="0.0" y1="1081.8" x2="900.0" y2="518.2" stroke="#b0b4ba" stroke-width="1.2"/>
-<line x1="900.0" y1="572.7" x2="37.5" y2="1200.0" stroke="#b0b4ba" stroke-width="1.2"/>
-<line x1="900.0" y1="627.3" x2="208.5" y2="1200.0" stroke="#b0b4ba" stroke-width="1.2"/>
-<line x1="900.0" y1="681.8" x2="342.4" y2="1200.0" stroke="#b0b4ba" stroke-width="1.2"/>
-<line x1="900.0" y1="736.4" x2="450.0" y2="1200.0" stroke="#b0b4ba" stroke-width="1.2"/>
-<line x1="0.0" y1="180.0" x2="425.0" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
-<line x1="12.5" y1="0.0" x2="429.2" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
-<line x1="100.0" y1="0.0" x2="433.3" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
-<line x1="187.5" y1="0.0" x2="437.5" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
-<line x1="275.0" y1="0.0" x2="441.7" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
-<line x1="362.5" y1="0.0" x2="445.8" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
-<line x1="450.0" y1="0.0" x2="450.0" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
-<line x1="537.5" y1="0.0" x2="454.2" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
-<line x1="625.0" y1="0.0" x2="458.3" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
-<line x1="712.5" y1="0.0" x2="462.5" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
-<line x1="800.0" y1="0.0" x2="466.7" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
-<line x1="887.5" y1="0.0" x2="470.8" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
-<line x1="900.0" y1="180.0" x2="475.0" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
-<line x1="0.0" y1="180.0" x2="900.0" y2="180.0" stroke="#b0b4ba" stroke-width="2.0"/>
+<path d="M 0.0 81.8 L 450.0 0.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 136.4 L 900.0 63.6" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 190.9 L 900.0 209.1" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 245.5 L 900.0 354.5" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 300.0 L 900.0 500.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 354.5 L 900.0 645.5" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 409.1 L 900.0 790.9" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 463.6 L 900.0 936.4" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 518.2 L 900.0 1081.8" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 572.7 L 862.5 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 627.3 L 691.5 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 681.8 L 557.6 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 736.4 L 450.0 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 900.0 81.8 L 450.0 0.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 63.6 L 900.0 136.4" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 209.1 L 900.0 190.9" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 354.5 L 900.0 245.5" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 500.0 L 900.0 300.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 645.5 L 900.0 354.5" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 790.9 L 900.0 409.1" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 936.4 L 900.0 463.6" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 1081.8 L 900.0 518.2" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 900.0 572.7 L 37.5 1200.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 900.0 627.3 L 208.5 1200.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 900.0 681.8 L 342.4 1200.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 900.0 736.4 L 450.0 1200.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 180.0 L 425.0 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 12.5 0.0 L 429.2 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 100.0 0.0 L 433.3 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 187.5 0.0 L 437.5 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 275.0 0.0 L 441.7 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 362.5 0.0 L 445.8 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 450.0 0.0 L 450.0 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 537.5 0.0 L 454.2 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 625.0 0.0 L 458.3 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 712.5 0.0 L 462.5 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 800.0 0.0 L 466.7 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 887.5 0.0 L 470.8 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 900.0 180.0 L 475.0 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 0.0 180.0 L 900.0 180.0" fill="none" stroke="#b0b4ba" stroke-width="2.0"/>
 </svg>
