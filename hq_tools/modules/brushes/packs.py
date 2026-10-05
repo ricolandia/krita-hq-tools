@@ -12,6 +12,8 @@ import re
 import shutil
 import zlib
 
+from ...core import i18n
+
 TIPOS = ("paintoppresets", "brushes", "patterns", "palettes")
 FONTE_NOME = "FONTE.md"
 LICENCA_NOME = "LICENSE.txt"
@@ -236,17 +238,17 @@ def instalar_pack(pack_dir, destinos, relatorio=None):
                         # pelo autor tem prioridade.
                         if relatorio is not None:
                             relatorio.append(
-                                "mantido o seu preset (não foi possível fazer "
-                                "cópia de segurança): {0}".format(
-                                    os.path.basename(alvo)
-                                )
+                                i18n.t(
+                                    "mantido o seu preset (não foi possível fazer "
+                                    "cópia de segurança): {0}"
+                                ).format(os.path.basename(alvo))
                             )
                         continue
                     if relatorio is not None:
                         relatorio.append(
-                            "seu preset foi substituído; cópia em {0}".format(
-                                os.path.basename(backup)
-                            )
+                            i18n.t(
+                                "seu preset foi substituído; cópia em {0}"
+                            ).format(os.path.basename(backup))
                         )
                 elif os.path.isfile(alvo):
                     # Idêntico: instalar de novo só gastaria I/O.
@@ -256,7 +258,7 @@ def instalar_pack(pack_dir, destinos, relatorio=None):
             except OSError as error:
                 if relatorio is not None:
                     relatorio.append(
-                        "falha ao instalar {0}: {1}".format(
+                        i18n.t("falha ao instalar {0}: {1}").format(
                             os.path.basename(alvo), error
                         )
                     )

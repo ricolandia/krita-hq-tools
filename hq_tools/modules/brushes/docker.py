@@ -31,6 +31,7 @@ from ...core.compat import (
     QtWidgets,
 )
 from ...core import registro, ui
+from ...core import i18n
 from ...core.config import Config
 from ...core.paths import BRUSHES_KIT_DIR, KRITA_HOME
 from . import SLOT_COUNT, register_docker
@@ -63,7 +64,7 @@ def preset_icon(resource, fallback="P"):
 class BrushesDocker(DockWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("HQ Tools: pincéis")
+        self.setWindowTitle(i18n.t('HQ Tools: pincéis'))
         registro.registrar("brushes", self)
         self.config = Config()
         self.resources = {}
@@ -87,15 +88,15 @@ class BrushesDocker(DockWidget):
         for label, _ in BRUSH_SETS:
             self._add_set_tab(label)
         self._add_set_tab("Todos")
-        self.tabs.addTab(self._build_packs_tab(), "Packs")
-        self.tabs.addTab(self._build_community_tab(), "Comunidade")
+        self.tabs.addTab(self._build_packs_tab(), i18n.t('Packs'))
+        self.tabs.addTab(self._build_community_tab(), i18n.t('Comunidade'))
         layout.addWidget(self.tabs, 1)
 
-        self.slots_box = widgets.QGroupBox("Slots (atalhos em Configurar Krita > Atalhos > HQ Tools)")
+        self.slots_box = widgets.QGroupBox(i18n.t('Slots (atalhos em Configurar Krita > Atalhos > HQ Tools)'))
         slots_layout = widgets.QGridLayout(self.slots_box)
         for index in range(SLOT_COUNT):
             button = QtWidgets.QToolButton()
-            button.setText("{0}:".format(index + 1))
+            button.setText(i18n.t('{0}:').format(index + 1))
             button.setToolButtonStyle(TOOL_BUTTON_TEXT_BESIDE_ICON)
             button.setSizePolicy(SIZE_EXPANDING, SIZE_FIXED)
             button.clicked.connect(lambda checked=False, slot=index: self.activate_slot(slot))
@@ -105,23 +106,22 @@ class BrushesDocker(DockWidget):
 
         buttons = widgets.QHBoxLayout()
         button_reload = ui.botao(
-            "Atualizar presets",
-            "Relê os arquivos .kpp dos packs instalados (não reinicia o Krita).",
+            i18n.t('Atualizar presets'),
+            i18n.t('Relê os arquivos .kpp dos packs instalados (não reinicia o Krita).'),
             icone_chave="atualizar",
         )
         button_reload.clicked.connect(self.reload_presets)
         buttons.addWidget(button_reload)
         button_suggest = ui.botao(
-            "Preencher slots com sugestões",
-            "Sugere um pincel parecido com o que está selecionado para cada slot livre.",
+            i18n.t('Preencher slots com sugestões'),
+            i18n.t('Sugere um pincel parecido com o que está selecionado para cada slot livre.'),
         )
         button_suggest.clicked.connect(self.apply_suggestions)
         buttons.addWidget(button_suggest)
         layout.addLayout(buttons)
 
         hint = ui.rotulo(
-            "Clique no cartão para ativar o pincel; botão direito atribui ao slot. "
-            "Os conjuntos buscam os presets já instalados no seu Krita.")
+            i18n.t('Clique no cartão para ativar o pincel; botão direito atribui ao slot. Os conjuntos buscam os presets já instalados no seu Krita.'))
         layout.addWidget(hint)
 
         self.setWidget(main)
@@ -158,15 +158,15 @@ class BrushesDocker(DockWidget):
 
         buttons = widgets.QHBoxLayout()
         button_install = ui.botao(
-            "Instalar pack selecionado",
-            "Copia os .kpp do pack selecionado para a pasta de pincel do Krita.",
+            i18n.t('Instalar pack selecionado'),
+            i18n.t('Copia os .kpp do pack selecionado para a pasta de pincel do Krita.'),
             icone_chave="aplicar",
         )
         button_install.clicked.connect(self.install_pack)
         buttons.addWidget(button_install)
         button_bundle = ui.botao(
-            "Instalar bundle...",
-            "Copia um .bundle (ex.: Cityscape, Pesi's Watercolors) para o Krita",
+            i18n.t('Instalar bundle...'),
+            i18n.t("Copia um .bundle (ex.: Cityscape, Pesi's Watercolors) para o Krita"),
             icone_chave="salvar",
         )
         button_bundle.clicked.connect(self.install_bundle)
@@ -175,21 +175,19 @@ class BrushesDocker(DockWidget):
 
         buttons_extra = widgets.QHBoxLayout()
         button_license = ui.botao(
-            "Ver licença", "Mostra a licença (e a autoria) do pack selecionado."
+            i18n.t('Ver licença'), i18n.t('Mostra a licença (e a autoria) do pack selecionado.')
         )
         button_license.clicked.connect(self.view_pack_license)
         buttons_extra.addWidget(button_license)
         button_refresh = ui.botao(
-            "Atualizar", "Relê os packs instalados e os do usuário.", icone_chave="atualizar"
+            i18n.t('Atualizar'), i18n.t('Relê os packs instalados e os do usuário.'), icone_chave="atualizar"
         )
         button_refresh.clicked.connect(self._refresh_packs)
         buttons_extra.addWidget(button_refresh)
         layout.addLayout(buttons_extra)
 
         hint = ui.rotulo(
-            "Packs da comunidade incluídos com licença verificada (créditos em "
-            "CREDITS.md). Instalar copia os arquivos para os recursos do Krita "
-            "e exige reiniciar o programa.")
+            i18n.t('Packs da comunidade incluídos com licença verificada (créditos em CREDITS.md). Instalar copia os arquivos para os recursos do Krita e exige reiniciar o programa.'))
         layout.addWidget(hint)
         return tab
 
@@ -208,8 +206,7 @@ class BrushesDocker(DockWidget):
         self.list_community.itemDoubleClicked.connect(self.activate_item)
         layout.addWidget(self.list_community, 1)
         hint = ui.rotulo(
-            "Presets dos packs da comunidade já instalados no Krita, agrupados "
-            "por pack. Clique para ativar; os créditos estão no CREDITS.md.")
+            i18n.t('Presets dos packs da comunidade já instalados no Krita, agrupados por pack. Clique para ativar; os créditos estão no CREDITS.md.'))
         layout.addWidget(hint)
         return tab
 
@@ -245,7 +242,7 @@ class BrushesDocker(DockWidget):
                 resource = self.resources.get(recurso_nome)
                 if resource is not None:
                     item.setIcon(preset_icon(resource, recurso_nome))
-                item.setToolTip("Clique para ativar (preset instalado)")
+                item.setToolTip(i18n.t('Clique para ativar (preset instalado)'))
                 self.list_community.addItem(item)
 
     def _refresh_packs(self):
@@ -269,29 +266,31 @@ class BrushesDocker(DockWidget):
     def install_pack(self):
         item = self.list_packs.currentItem()
         if item is None:
-            helpers.show_info("Packs", "Escolha um pack na lista.")
+            helpers.show_info(i18n.t('Packs'), i18n.t('Escolha um pack na lista.'))
             return
         pack_dir = item.data(USER_ROLE)
         relatorio = []
         total = packs_lib.instalar_pack(pack_dir, self._pack_destinos(), relatorio)
         self._refresh_packs()
-        texto = "Pack instalado: {0} arquivos copiados para os recursos do Krita.".format(total)
+        texto = i18n.t(
+            "Pack instalado: {0} arquivos copiados para os recursos do Krita."
+        ).format(total)
         if relatorio:
             texto += "\n\n" + "\n".join(sorted(set(relatorio)))
-        texto += "\n\nReinicie o Krita para carregar os pincéis novos."
-        helpers.show_info("Packs", texto)
+        texto += "\n\n" + i18n.t("Reinicie o Krita para carregar os pincéis novos.")
+        helpers.show_info(i18n.t('Packs'), texto)
 
     def view_pack_license(self):
         item = self.list_packs.currentItem()
         if item is None:
-            helpers.show_info("Packs", "Escolha um pack na lista.")
+            helpers.show_info(i18n.t('Packs'), i18n.t('Escolha um pack na lista.'))
             return
         pack_dir = item.data(USER_ROLE)
         info = packs_lib.pack_info(pack_dir)
         texto = packs_lib.pack_license(pack_dir)
         QtWidgets.QMessageBox.information(
             helpers.modal_parent(),
-            "Licença de {0}".format(info.get("nome", pack_dir)),
+            i18n.t('Licença de {0}').format(info.get("nome", pack_dir)),
             texto,
         )
 
@@ -366,7 +365,7 @@ class BrushesDocker(DockWidget):
         self.slot_names[slot] = preset
         self._save_slots()
         self._refresh_slots()
-        helpers.show_message("Slot {0} = {1}".format(slot + 1, preset))
+        helpers.show_message(i18n.t('Slot {0} = {1}').format(slot + 1, preset))
 
     def activate_item(self, item):
         preset = item.data(USER_ROLE)
@@ -377,10 +376,10 @@ class BrushesDocker(DockWidget):
         view = helpers.active_view()
         resource = self.resources.get(name)
         if view is None:
-            helpers.show_message("Abra um documento para trocar de pincel.")
+            helpers.show_message(i18n.t('Abra um documento para trocar de pincel.'))
             return
         if resource is None:
-            helpers.show_message("Preset não encontrado: {0}".format(name))
+            helpers.show_message(i18n.t('Preset não encontrado: {0}').format(name))
             return
         view.activateResource(resource)
         helpers.show_message(name)
@@ -390,7 +389,7 @@ class BrushesDocker(DockWidget):
             return
         name = self.slot_names[index]
         if not name:
-            helpers.show_message("Slot {0} vazio. Clique com o botão direito em um pincel.".format(index + 1))
+            helpers.show_message(i18n.t('Slot {0} vazio. Clique com o botão direito em um pincel.').format(index + 1))
             return
         self.activate_preset(name)
 
@@ -402,11 +401,11 @@ class BrushesDocker(DockWidget):
         self.slot_names = suggested[:SLOT_COUNT]
         self._save_slots()
         self._refresh_slots()
-        helpers.show_message("Slots preenchidos com as sugestões dos conjuntos.")
+        helpers.show_message(i18n.t('Slots preenchidos com as sugestões dos conjuntos.'))
 
     def install_bundle(self):
         path, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self.widget(), "Escolher bundle de pincel (.bundle)", os.path.expanduser("~"), "*.bundle"
+            self.widget(), i18n.t('Escolher bundle de pincel (.bundle)'), os.path.expanduser("~"), "*.bundle"
         )
         if not path:
             return
@@ -415,8 +414,8 @@ class BrushesDocker(DockWidget):
             os.makedirs(target_dir, exist_ok=True)
             shutil.copy2(path, os.path.join(target_dir, os.path.basename(path)))
         except OSError as error:
-            helpers.show_message("Falha ao copiar o bundle: {0}".format(error))
+            helpers.show_message(i18n.t('Falha ao copiar o bundle: {0}').format(error))
             return
         helpers.show_message(
-            "Bundle copiado. Reinicie o Krita e confira em Recursos (presets novos)."
+            i18n.t('Bundle copiado. Reinicie o Krita e confira em Recursos (presets novos).')
         )

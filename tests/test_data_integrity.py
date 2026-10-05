@@ -14,6 +14,7 @@ import shutil
 import tempfile
 import unittest
 
+from hq_tools.core import i18n
 from hq_tools.core.config import Config
 from hq_tools.core.cpmt import CPMTError, CPMTProject, create_project_with_page
 from hq_tools.modules.brushes import packs
@@ -187,6 +188,9 @@ class TestPresetsDeReticula(unittest.TestCase):
 
 class TestPacksNaoSobrescrevemOPautor(unittest.TestCase):
     def setUp(self):
+        # O relatório de instalação é texto visível: fixa o idioma para o
+        # teste não depender do locale da máquina que roda a suíte.
+        i18n.definir_idioma(i18n.PT)
         self.pasta = tempfile.mkdtemp(prefix="hq_tools_pack_")
         self.pack = os.path.join(self.pasta, "pack", "paintoppresets")
         self.destinos = {"paintoppresets": os.path.join(self.pasta, "destino")}
@@ -196,6 +200,7 @@ class TestPacksNaoSobrescrevemOPautor(unittest.TestCase):
             handle.write(b"versao do pack")
 
     def tearDown(self):
+        i18n.definir_idioma(None)
         shutil.rmtree(self.pasta, ignore_errors=True)
 
     def destino(self, nome="A.kpp"):

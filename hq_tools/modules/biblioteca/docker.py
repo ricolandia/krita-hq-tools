@@ -34,6 +34,7 @@ from ...core.compat import (
 )
 from ...core.config import Config
 from ...core import registro, ui
+from ...core import i18n
 from ...core.paths import BIBLIOTECA_DIR
 from . import core as lib
 
@@ -70,7 +71,7 @@ def _qimage_bytes(image):
 class BibliotecaDocker(DockWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("HQ Tools: biblioteca")
+        self.setWindowTitle(i18n.t('HQ Tools: biblioteca'))
         registro.registrar("biblioteca", self)
         self.config = Config()
         self.folder = self.config.get("biblioteca.folder") or BIBLIOTECA_DIR
@@ -87,35 +88,35 @@ class BibliotecaDocker(DockWidget):
         widgets = QtWidgets
         main, layout = ui.painel(self)
 
-        group_lib = widgets.QGroupBox("Biblioteca")
+        group_lib = widgets.QGroupBox(i18n.t('Biblioteca'))
         lib_layout = ui.espacamento(widgets.QVBoxLayout(group_lib), margem=0, espaco=ui.GAP)
         folder_row = widgets.QHBoxLayout()
         self.lbl_folder = ui.rotulo_info("")
         folder_row.addWidget(self.lbl_folder, 1)
         button_pick = ui.botao(
-            "Pasta...",
-            "Escolhe a pasta de recursos (biblioteca); use Atualizar depois de adicionar arquivos.",
+            i18n.t('Pasta...'),
+            i18n.t('Escolhe a pasta de recursos (biblioteca); use Atualizar depois de adicionar arquivos.'),
             icone_chave="pasta",
         )
         button_pick.clicked.connect(self.pick_folder)
         folder_row.addWidget(button_pick)
-        button_open = ui.botao("Abrir", "Abre a pasta de recursos no explorador de arquivos.")
+        button_open = ui.botao(i18n.t('Abrir'), i18n.t('Abre a pasta de recursos no explorador de arquivos.'))
         button_open.clicked.connect(self.open_folder)
         folder_row.addWidget(button_open)
         lib_layout.addLayout(folder_row)
         layout.addWidget(group_lib)
         layout.addWidget(ui.separador())
 
-        group_new = widgets.QGroupBox("Recurso novo")
+        group_new = widgets.QGroupBox(i18n.t('Recurso novo'))
         new_layout = ui.espacamento(widgets.QHBoxLayout(group_new), margem=0, espaco=ui.GAP)
-        new_layout.addWidget(ui.rotulo("Tipo de camada:"))
+        new_layout.addWidget(ui.rotulo(i18n.t('Tipo de camada:')))
         self.cmb_camada = widgets.QComboBox()
         for rotulo, valor in MODOS_CAMADA:
             self.cmb_camada.addItem(rotulo, valor)
         new_layout.addWidget(self.cmb_camada, 1)
         button_new = ui.botao(
-            "Criar novo recurso",
-            "Abre um documento 15 x 15 cm a 300 dpi para desenhar o recurso",
+            i18n.t('Criar novo recurso'),
+            i18n.t('Abre um documento 15 x 15 cm a 300 dpi para desenhar o recurso'),
             icone_chave="novo",
         )
         button_new.clicked.connect(self.create_resource)
@@ -123,17 +124,17 @@ class BibliotecaDocker(DockWidget):
         layout.addWidget(group_new)
         layout.addWidget(ui.separador())
 
-        group_list = widgets.QGroupBox("Recursos")
+        group_list = widgets.QGroupBox(i18n.t('Recursos'))
         list_layout = ui.espacamento(widgets.QVBoxLayout(group_list), margem=0, espaco=ui.GAP)
         tipo_row = widgets.QHBoxLayout()
-        tipo_row.addWidget(ui.rotulo("Tipo:"))
+        tipo_row.addWidget(ui.rotulo(i18n.t('Tipo:')))
         self.cmb_tipo = widgets.QComboBox()
         for chave, rotulo, _ in lib.TIPOS:
             self.cmb_tipo.addItem(rotulo, chave)
         self.cmb_tipo.currentIndexChanged.connect(self.refresh)
         tipo_row.addWidget(self.cmb_tipo, 1)
         button_refresh = ui.botao(
-            "Atualizar", "Relê os recursos da pasta atual.", icone_chave="atualizar"
+            i18n.t('Atualizar'), i18n.t('Relê os recursos da pasta atual.'), icone_chave="atualizar"
         )
         button_refresh.clicked.connect(self.refresh)
         tipo_row.addWidget(button_refresh)
@@ -150,14 +151,14 @@ class BibliotecaDocker(DockWidget):
 
         buttons = widgets.QHBoxLayout()
         button_save = ui.botao(
-            "Salvar recurso do documento",
-            "Exporta a camada ativa (vetorial ou pintura) para a biblioteca",
+            i18n.t('Salvar recurso do documento'),
+            i18n.t('Exporta a camada ativa (vetorial ou pintura) para a biblioteca'),
             icone_chave="salvar",
         )
         button_save.clicked.connect(self.save_resource)
         buttons.addWidget(button_save)
         button_insert = ui.botao(
-            "Inserir selecionado", "Insere o recurso selecionado na camada ativa."
+            i18n.t('Inserir selecionado'), i18n.t('Insere o recurso selecionado na camada ativa.')
         )
         button_insert.clicked.connect(self.insert_resource)
         buttons.addWidget(button_insert)
@@ -165,21 +166,21 @@ class BibliotecaDocker(DockWidget):
 
         gerir = widgets.QHBoxLayout()
         button_rename = ui.botao(
-            "Renomear...",
-            "Renomeia o arquivo do recurso selecionado, preservando a extensão.",
+            i18n.t('Renomear...'),
+            i18n.t('Renomeia o arquivo do recurso selecionado, preservando a extensão.'),
         )
         button_rename.clicked.connect(self.rename_resource)
         gerir.addWidget(button_rename)
         button_duplicate = ui.botao(
-            "Duplicar",
-            "Cria uma cópia do recurso selecionado na mesma pasta.",
+            i18n.t('Duplicar'),
+            i18n.t('Cria uma cópia do recurso selecionado na mesma pasta.'),
             icone_chave="novo",
         )
         button_duplicate.clicked.connect(self.duplicate_resource)
         gerir.addWidget(button_duplicate)
         button_delete = ui.botao(
-            "Apagar",
-            "Apaga o arquivo do recurso selecionado; pede confirmação antes.",
+            i18n.t('Apagar'),
+            i18n.t('Apaga o arquivo do recurso selecionado; pede confirmação antes.'),
         )
         button_delete.clicked.connect(self.delete_resource)
         gerir.addWidget(button_delete)
@@ -187,17 +188,14 @@ class BibliotecaDocker(DockWidget):
         layout.addWidget(group_list, 1)
 
         hint = ui.rotulo(
-            "1) Escolha o tipo e 'Criar novo recurso'. 2) Desenhe na camada "
-            "(formas/texto ou pincel). 3) 'Salvar recurso do documento' guarda "
-            "como SVG ou PNG transparente. 4) Duplo clique insere no grupo ativo; "
-            "Renomear, Duplicar e Apagar organizam a pasta.")
+            i18n.t("1) Escolha o tipo e 'Criar novo recurso'. 2) Desenhe na camada (formas/texto ou pincel). 3) 'Salvar recurso do documento' guarda como SVG ou PNG transparente. 4) Duplo clique insere no grupo ativo; Renomear, Duplicar e Apagar organizam a pasta."))
         layout.addWidget(hint)
 
         self.setWidget(main)
 
     def pick_folder(self):
         folder = QtWidgets.QFileDialog.getExistingDirectory(
-            self.widget(), "Pasta da biblioteca", self.folder
+            self.widget(), i18n.t('Pasta da biblioteca'), self.folder
         )
         if folder:
             self.folder = folder
@@ -208,7 +206,7 @@ class BibliotecaDocker(DockWidget):
         QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(self.folder))
 
     def refresh(self):
-        self.lbl_folder.setText("Pasta: {0}".format(self.folder))
+        self.lbl_folder.setText(i18n.t('Pasta: {0}').format(self.folder))
         tipo = self.cmb_tipo.currentData()
         self.list_items.clear()
         for nome, path in lib.listar_recursos(self.folder, tipo):
@@ -233,15 +231,15 @@ class BibliotecaDocker(DockWidget):
             "RGBA", "U8", "sRGB built-in", lib.DPI_PADRAO,
         )
         if document is None:
-            helpers.show_message("Não foi possível criar o documento.")
+            helpers.show_message(i18n.t('Não foi possível criar o documento.'))
             return
         if modo == "pintura":
-            layer = document.createNode("recurso", "paintlayer")
+            layer = document.createNode(i18n.t("recurso"), "paintlayer")
             if layer is not None:
                 document.rootNode().addChildNode(layer, None)
                 document.setActiveNode(layer)
         else:
-            layer = document.createVectorLayer("recurso")
+            layer = document.createVectorLayer(i18n.t("recurso"))
             if layer is not None:
                 document.rootNode().addChildNode(layer, None)
                 document.setActiveNode(layer)
@@ -250,14 +248,12 @@ class BibliotecaDocker(DockWidget):
             # Sem view o usuário não enxergaria a camada criada nem conseguiria
             # desenhá-la; o documento ficaria oculto até o próximo Ctrl+Tab.
             helpers.show_info(
-                "Novo recurso",
-                "O documento foi criado, mas o Krita não abriu uma aba para "
-                "ele. Procure a aba do novo documento e volte aqui para salvar.",
+                i18n.t('Novo recurso'),
+                i18n.t('O documento foi criado, mas o Krita não abriu uma aba para ele. Procure a aba do novo documento e volte aqui para salvar.'),
             )
             return
         helpers.show_message(
-            "Desenhe o {0} na camada 'recurso' e use 'Salvar recurso do "
-            "documento'.".format(rotulo.lower())
+            i18n.t("Desenhe o {0} na camada 'recurso' e use 'Salvar recurso do documento'.").format(rotulo.lower())
         )
 
     def _vector_layer_with_shapes(self, document):
@@ -297,7 +293,7 @@ class BibliotecaDocker(DockWidget):
     def save_resource(self):
         document = helpers.active_document()
         if document is None:
-            helpers.show_info("Biblioteca", "Abra o documento do recurso desenhado.")
+            helpers.show_info(i18n.t('Biblioteca'), i18n.t('Abra o documento do recurso desenhado.'))
             return
         tipo = self.cmb_tipo.currentData()
         rotulo = lib.TIPO_CHAVE[tipo]
@@ -312,17 +308,17 @@ class BibliotecaDocker(DockWidget):
         layer = self._vector_layer_with_shapes(document)
         if layer is None:
             helpers.show_info(
-                "Biblioteca",
-                "O documento não tem uma camada vetorial com formas.",
+                i18n.t('Biblioteca'),
+                i18n.t('O documento não tem uma camada vetorial com formas.'),
             )
             return
         try:
             svg = layer.toSvg()
         except (AttributeError, RuntimeError) as error:
-            helpers.show_info("Biblioteca", "Não foi possível exportar: {0}".format(error))
+            helpers.show_info(i18n.t('Biblioteca'), i18n.t('Não foi possível exportar: {0}').format(error))
             return
         if not svg or "<svg" not in svg.lower():
-            helpers.show_info("Biblioteca", "A camada vetorial está vazia.")
+            helpers.show_info(i18n.t('Biblioteca'), i18n.t('A camada vetorial está vazia.'))
             return
         nome, ok = QtWidgets.QInputDialog.getText(
             self.widget(), "Salvar {0}".format(rotulo.lower()),
@@ -333,41 +329,40 @@ class BibliotecaDocker(DockWidget):
         try:
             path = lib.salvar_recurso(svg, self.folder, tipo, nome.strip())
         except OSError as error:
-            helpers.show_info("Biblioteca", "Falha ao salvar: {0}".format(error))
+            helpers.show_info(i18n.t('Biblioteca'), i18n.t('Falha ao salvar: {0}').format(error))
             return
         self.refresh()
         self._ask_close(document)
-        helpers.show_info("Biblioteca", "Recurso salvo: {0}".format(os.path.basename(path)))
+        helpers.show_info(i18n.t('Biblioteca'), i18n.t('Recurso salvo: {0}').format(os.path.basename(path)))
 
     def _save_paint(self, document, tipo, rotulo):
         layer = self._paint_layer_with_content(document)
         if layer is None:
             helpers.show_info(
-                "Biblioteca",
-                "O documento não tem uma camada de pintura com conteúdo.",
+                i18n.t('Biblioteca'),
+                i18n.t('O documento não tem uma camada de pintura com conteúdo.'),
             )
             return
         if document.colorModel() != "RGBA" or document.colorDepth() != "U8":
             helpers.show_info(
-                "Biblioteca",
-                "O documento não é RGBA 8 bits; exporte a camada como PNG "
-                "manualmente (Camada > Importar/Exportar).",
+                i18n.t('Biblioteca'),
+                i18n.t('O documento não é RGBA 8 bits; exporte a camada como PNG manualmente (Camada > Importar/Exportar).'),
             )
             return
         try:
             bounds = layer.bounds()
         except (AttributeError, RuntimeError):
-            helpers.show_info("Biblioteca", "Não foi possível ler a camada.")
+            helpers.show_info(i18n.t('Biblioteca'), i18n.t('Não foi possível ler a camada.'))
             return
         if bounds is None or bounds.isEmpty():
-            helpers.show_info("Biblioteca", "A camada de pintura está vazia.")
+            helpers.show_info(i18n.t('Biblioteca'), i18n.t('A camada de pintura está vazia.'))
             return
         data = layer.pixelData(bounds.x(), bounds.y(), bounds.width(), bounds.height())
         image = QImage(
             bytes(data), bounds.width(), bounds.height(), IMAGE_FORMAT_RGBA8888
         )
         if image.isNull():
-            helpers.show_info("Biblioteca", "Não foi possível montar a imagem.")
+            helpers.show_info(i18n.t('Biblioteca'), i18n.t('Não foi possível montar a imagem.'))
             return
         nome, ok = QtWidgets.QInputDialog.getText(
             self.widget(), "Salvar {0}".format(rotulo.lower()),
@@ -381,17 +376,17 @@ class BibliotecaDocker(DockWidget):
             if not image.save(path, "PNG"):
                 raise OSError("PNG não gravado")
         except OSError as error:
-            helpers.show_info("Biblioteca", "Falha ao salvar: {0}".format(error))
+            helpers.show_info(i18n.t('Biblioteca'), i18n.t('Falha ao salvar: {0}').format(error))
             return
         self.refresh()
         self._ask_close(document)
-        helpers.show_info("Biblioteca", "Recurso salvo: {0}".format(os.path.basename(path)))
+        helpers.show_info(i18n.t('Biblioteca'), i18n.t('Recurso salvo: {0}').format(os.path.basename(path)))
 
     def _ask_close(self, document):
         answer = QtWidgets.QMessageBox.question(
             self.widget(),
-            "Fechar documento?",
-            "Recurso salvo. Fechar o documento de desenho?",
+            i18n.t('Fechar documento?'),
+            i18n.t('Recurso salvo. Fechar o documento de desenho?'),
             DIALOG_YES | DIALOG_NO,
         )
         if answer == DIALOG_YES:
@@ -401,11 +396,11 @@ class BibliotecaDocker(DockWidget):
     def insert_resource(self):
         document = helpers.active_document()
         if document is None:
-            helpers.show_message("Abra um documento para inserir o recurso.")
+            helpers.show_message(i18n.t('Abra um documento para inserir o recurso.'))
             return
         item = self.list_items.currentItem()
         if item is None:
-            helpers.show_message("Escolha um recurso na lista.")
+            helpers.show_message(i18n.t('Escolha um recurso na lista.'))
             return
         path = item.data(USER_ROLE)
         if path.lower().endswith(".png"):
@@ -416,7 +411,7 @@ class BibliotecaDocker(DockWidget):
     def _recurso_selecionado(self):
         item = self.list_items.currentItem()
         if item is None:
-            helpers.show_message("Escolha um recurso na lista.")
+            helpers.show_message(i18n.t('Escolha um recurso na lista.'))
             return None
         return item.text(), item.data(USER_ROLE)
 
@@ -433,7 +428,7 @@ class BibliotecaDocker(DockWidget):
         try:
             lib.renomear_recurso(path, novo.strip())
         except OSError as error:
-            helpers.show_info("Biblioteca", "Falha ao renomear: {0}".format(error))
+            helpers.show_info(i18n.t('Biblioteca'), i18n.t('Falha ao renomear: {0}').format(error))
             return
         self.refresh()
 
@@ -445,10 +440,10 @@ class BibliotecaDocker(DockWidget):
         try:
             copia = lib.duplicar_recurso(path)
         except OSError as error:
-            helpers.show_info("Biblioteca", "Falha ao duplicar: {0}".format(error))
+            helpers.show_info(i18n.t('Biblioteca'), i18n.t('Falha ao duplicar: {0}').format(error))
             return
         self.refresh()
-        helpers.show_message("Cópia criada: {0}".format(os.path.basename(copia)))
+        helpers.show_message(i18n.t('Cópia criada: {0}').format(os.path.basename(copia)))
 
     def delete_resource(self):
         selecionado = self._recurso_selecionado()
@@ -457,8 +452,8 @@ class BibliotecaDocker(DockWidget):
         nome, path = selecionado
         answer = QtWidgets.QMessageBox.question(
             self.widget(),
-            "Apagar recurso?",
-            "Apagar '{0}'? O arquivo sai da pasta da biblioteca.".format(nome),
+            i18n.t('Apagar recurso?'),
+            i18n.t("Apagar '{0}'? O arquivo sai da pasta da biblioteca.").format(nome),
             DIALOG_YES | DIALOG_NO,
             DIALOG_NO,
         )
@@ -467,7 +462,7 @@ class BibliotecaDocker(DockWidget):
         try:
             lib.apagar_recurso(path)
         except (OSError, ValueError) as error:
-            helpers.show_info("Biblioteca", "Falha ao apagar: {0}".format(error))
+            helpers.show_info(i18n.t('Biblioteca'), i18n.t('Falha ao apagar: {0}').format(error))
             return
         self.refresh()
 
@@ -475,25 +470,25 @@ class BibliotecaDocker(DockWidget):
         try:
             svg = helpers.read_text_file(path)
         except OSError:
-            helpers.show_message("Não foi possível ler o arquivo.")
+            helpers.show_message(i18n.t('Não foi possível ler o arquivo.'))
             return
         name = helpers.unique_layer_name(document, nome)
         layer = document.createVectorLayer(name)
         if layer is None:
-            helpers.show_message("Não foi possível criar a camada vetorial.")
+            helpers.show_message(i18n.t('Não foi possível criar a camada vetorial.'))
             return
         shapes = layer.addShapesFromSvg(svg)
         if not shapes:
-            helpers.show_message("O SVG não gerou formas.")
+            helpers.show_message(i18n.t('O SVG não gerou formas.'))
             return
         helpers.attach(document, layer)
         document.setActiveNode(layer)
-        helpers.show_message("Recurso inserido: {0}".format(nome))
+        helpers.show_message(i18n.t('Recurso inserido: {0}').format(nome))
 
     def _insert_paint(self, document, path, nome):
         image = QImage(path)
         if image.isNull():
-            helpers.show_message("Não foi possível ler o PNG.")
+            helpers.show_message(i18n.t('Não foi possível ler o PNG.'))
             return
         rgba = image.convertToFormat(IMAGE_FORMAT_RGBA8888)
         width = rgba.width()
@@ -501,7 +496,7 @@ class BibliotecaDocker(DockWidget):
         name = helpers.unique_layer_name(document, nome)
         layer = document.createNode(name, "paintlayer")
         if layer is None:
-            helpers.show_message("Não foi possível criar a camada de pintura.")
+            helpers.show_message(i18n.t('Não foi possível criar a camada de pintura.'))
             return
         data = _qimage_bytes(rgba)
         if not layer.setPixelData(data, 0, 0, width, height):
@@ -509,11 +504,11 @@ class BibliotecaDocker(DockWidget):
                 name, path, "ToImageSize", "Bilinear"
             )
             if file_layer is None:
-                helpers.show_message("Não foi possível inserir o PNG.")
+                helpers.show_message(i18n.t('Não foi possível inserir o PNG.'))
                 return
             helpers.attach(document, file_layer)
             document.setActiveNode(file_layer)
         else:
             helpers.attach(document, layer)
             document.setActiveNode(layer)
-        helpers.show_message("Recurso inserido: {0}".format(nome))
+        helpers.show_message(i18n.t('Recurso inserido: {0}').format(nome))

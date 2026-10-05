@@ -137,6 +137,21 @@ docker gera na proporção da seleção) e `tests/test_perspectivas.py`
 verticais/3º VP, laranja = profundidade/eixos, cinza = horizontais/VP direito.
 QA de visão aprovou as geometrias e o contraste das cores.
 
+## Idioma (i18n) e docs EN (05/10/2026, sem release)
+
+- **Interface PT/EN**: `core/i18n.py` com `t(texto)` (chave = string PT) e o
+  dicionário em `core/i18n_en.py` (373 entradas); idioma pelo locale do
+  sistema (`pt*` = português, resto = inglês) e `HQ_TOOLS_IDIOMA=pt|en` para
+  forçar. Todas as strings visíveis dos 10 dockers, do `plugin.py` e do
+  relatório dos packs passam por `i18n.t`; o `tests/test_i18n.py` varre o
+  código por chamadas `i18n.t("...")` e exige tradução para cada uma (e
+  nenhuma chave órfã, o que pega erro de digitação na chave).
+- **Docs EN**: `hq_tools/hq_tools_manual.en.html` e `INSTALL.en.md`; READMEs
+  apontam para as versões certas e o `build-zip.sh` leva os dois docs EN no
+  ZIP.
+- Correção de arrasto do flutuante da perspectiva (o delta não era
+  atualizado e a janela pulava).
+
 ## Hub e docker de perspectiva (v0.8.0, 05/10/2026)
 
 - **Hub** (`modules/hub/`): um botão por módulo abre e fecha a doca, com o

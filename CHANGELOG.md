@@ -1,5 +1,25 @@
 # Changelog
 
+## [Não publicado]
+
+### Idioma (PT/EN)
+
+- A interface dos dockers agora fala português ou inglês, seguindo o idioma
+  do sistema (locale `pt*` usa português; o resto usa inglês); a variável de
+  ambiente `HQ_TOOLS_IDIOMA` (`pt`/`en`) força um idioma. Todas as strings
+  visíveis (títulos, botões, dicas e mensagens) passam pela camada
+  `core/i18n.py` (`i18n.t`), com o dicionário em `core/i18n_en.py` e o teste
+  `tests/test_i18n.py` exigindo tradução para cada string (e nenhuma chave
+  órfã).
+- Documentação em inglês: `hq_tools/hq_tools_manual.en.html` e
+  `INSTALL.en.md`, com os links nos READMEs; o ZIP passa a levar também o
+  `README.en.md` e o `INSTALL.en.md`.
+
+### Correções
+
+- O arrasto do flutuante da perspectiva não atualizava o delta e a janela
+  pulava; agora o movimento acompanha o mouse.
+
 ## [0.8.0] — 2026-10-05
 
 Duas frentes novas: o **hub** para abrir e fechar os módulos e a **biblioteca

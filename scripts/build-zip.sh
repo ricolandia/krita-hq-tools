@@ -23,7 +23,15 @@ itens = ["hq_tools", "hq_tools.desktop", "hq_tools.action"]
 # terceiros (13 fontes sob OFL, brushes de packs comunitários) sem a obrigação
 # de declarar autoria e licença. A INSTALL.md também vai, porque é o passo a
 # passo da instalação manual que o autor lê no celular, sem acesso ao GitHub.
-documentos = ["LICENSE", "CREDITS.md", "README.md", "CHANGELOG.md", "INSTALL.md"]
+documentos = [
+    "LICENSE",
+    "CREDITS.md",
+    "README.md",
+    "README.en.md",
+    "CHANGELOG.md",
+    "INSTALL.md",
+    "INSTALL.en.md",
+]
 faltando = [nome for nome in documentos if not os.path.isfile(nome)]
 if faltando:
     # Falha, e não aviso: o ZIP redistribui fontes de terceiros (13 fontes sob

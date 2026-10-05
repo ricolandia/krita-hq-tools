@@ -11,6 +11,7 @@ from krita import DockWidget
 
 from ...core import krita_helpers as helpers
 from ...core import registro, ui
+from ...core import i18n
 from ...core.compat import QtWidgets
 from ...core.config import Config
 
@@ -34,7 +35,7 @@ def _lista_de_modulos():
     except ImportError:  # pragma: no cover - fora do Krita
         return []
     return [
-        (chave, ROTULOS.get(chave, chave))
+        (chave, i18n.t(ROTULOS.get(chave, chave)))
         for chave, _, _, _ in MODULOS
         if chave != "hub"
     ]
@@ -43,7 +44,7 @@ def _lista_de_modulos():
 class HubDocker(DockWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("HQ Tools: hub")
+        self.setWindowTitle(i18n.t('HQ Tools: hub'))
         self.config = Config()
         self._botoes = {}
         self._build_ui()
@@ -59,14 +60,13 @@ class HubDocker(DockWidget):
         widgets = QtWidgets
         main, layout = ui.painel(self)
         layout.addWidget(ui.rotulo(
-            "Abra e feche os módulos do HQ Tools por aqui. O botão fica marcado "
-            "enquanto a doca está aberta; clicar de novo fecha."
+            i18n.t('Abra e feche os módulos do HQ Tools por aqui. O botão fica marcado enquanto a doca está aberta; clicar de novo fecha.')
         ))
         grade = ui.espacamento(widgets.QGridLayout(), margem=0)
         for indice, (chave, rotulo) in enumerate(_lista_de_modulos()):
             botao = ui.botao(
                 rotulo,
-                "Abre ou fecha o docker {0}.".format(rotulo),
+                i18n.t('Abre ou fecha o docker {0}.').format(rotulo),
             )
             botao.setCheckable(True)
             botao.clicked.connect(
@@ -75,10 +75,9 @@ class HubDocker(DockWidget):
             self._botoes[chave] = botao
             grade.addWidget(botao, indice // 2, indice % 2)
         layout.addLayout(grade)
-        self.chk_fechar = widgets.QCheckBox("Fechar o atual ao abrir outro")
+        self.chk_fechar = widgets.QCheckBox(i18n.t('Fechar o atual ao abrir outro'))
         self.chk_fechar.setToolTip(
-            "Marcado, abrir um módulo fecha os outros; desmarcado, eles vão "
-            "abrindo juntos."
+            i18n.t('Marcado, abrir um módulo fecha os outros; desmarcado, eles vão abrindo juntos.')
         )
         self.chk_fechar.setChecked(bool(self.config.get("hub.fechar_ao_abrir", False)))
         self.chk_fechar.toggled.connect(
@@ -86,8 +85,7 @@ class HubDocker(DockWidget):
         )
         layout.addWidget(self.chk_fechar)
         layout.addWidget(ui.rotulo(
-            "Módulo desligado nas configurações não carrega, e o botão fica "
-            "desabilitado."
+            i18n.t('Módulo desligado nas configurações não carrega, e o botão fica desabilitado.')
         ))
         layout.addStretch(1)
         self.setWidget(main)
@@ -120,8 +118,7 @@ class HubDocker(DockWidget):
             if docker is None:
                 botao.setChecked(False)
                 botao.setToolTip(
-                    "O módulo não está carregado (desligado nas configurações "
-                    "ou com erro no import)."
+                    i18n.t('O módulo não está carregado (desligado nas configurações ou com erro no import).')
                 )
                 continue
             botao.setChecked(self._visivel(docker))
@@ -130,7 +127,7 @@ class HubDocker(DockWidget):
         docker = registro.obter(chave)
         if docker is None:
             helpers.show_message(
-                "Módulo indisponível; confira as configurações do HQ Tools."
+                i18n.t('Módulo indisponível; confira as configurações do HQ Tools.')
             )
             self._atualizar_botoes()
             return
@@ -151,5 +148,5 @@ class HubDocker(DockWidget):
                 docker.show()
                 docker.raise_()
             except (AttributeError, RuntimeError):
-                helpers.show_message("Não foi possível abrir o módulo.")
+                helpers.show_message(i18n.t('Não foi possível abrir o módulo.'))
         self._atualizar_botoes()

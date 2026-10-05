@@ -30,6 +30,7 @@ from ...core.compat import (
 )
 from ...core.config import Config
 from ...core import registro, ui
+from ...core import i18n
 from ...core.paths import BALLOONS_DIR, FONTS_TARGET, mesma_copia
 
 SAMPLES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "samples")
@@ -96,7 +97,7 @@ def render_svg_thumbnail(path, size=120):
 class BalloonsDocker(DockWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("HQ Tools: balões")
+        self.setWindowTitle(i18n.t('HQ Tools: balões'))
         registro.registrar("balloons", self)
         self.config = Config()
         self.folder = ensure_default_folder(self.config)
@@ -114,13 +115,13 @@ class BalloonsDocker(DockWidget):
         self.lbl_folder = ui.rotulo_info("")
         folder_row.addWidget(self.lbl_folder, 1)
         button_pick = ui.botao(
-            "Pasta...",
-            "Escolhe a pasta de modelos de balão; use Atualizar depois de adicionar SVGs.",
+            i18n.t('Pasta...'),
+            i18n.t('Escolhe a pasta de modelos de balão; use Atualizar depois de adicionar SVGs.'),
             icone_chave="pasta",
         )
         button_pick.clicked.connect(self.pick_folder)
         folder_row.addWidget(button_pick)
-        button_open = ui.botao("Abrir", "Abre a pasta de modelos no explorador de arquivos.")
+        button_open = ui.botao(i18n.t('Abrir'), i18n.t('Abre a pasta de modelos no explorador de arquivos.'))
         button_open.clicked.connect(self.open_folder)
         folder_row.addWidget(button_open)
         layout.addLayout(folder_row)
@@ -135,7 +136,7 @@ class BalloonsDocker(DockWidget):
         layout.addWidget(self.list_balloons, 1)
 
         self.chk_text_layer = widgets.QCheckBox(
-            "Nomear a camada como 'text' (para o CPMT)"
+            i18n.t("Nomear a camada como 'text' (para o CPMT)")
         )
         self.chk_text_layer.setChecked(
             bool(self.config.get("balloons.insert_as_text_layer", False))
@@ -144,12 +145,12 @@ class BalloonsDocker(DockWidget):
 
         buttons = widgets.QHBoxLayout()
         button_insert = ui.botao(
-            "Inserir balão", "Insere o modelo selecionado no grupo ou camada ativa."
+            i18n.t('Inserir balão'), i18n.t('Insere o modelo selecionado no grupo ou camada ativa.')
         )
         button_insert.clicked.connect(self.insert_balloon)
         buttons.addWidget(button_insert)
         button_refresh = ui.botao(
-            "Atualizar", "Relê os modelos da pasta atual.", icone_chave="atualizar"
+            i18n.t('Atualizar'), i18n.t('Relê os modelos da pasta atual.'), icone_chave="atualizar"
         )
         button_refresh.clicked.connect(self.refresh)
         buttons.addWidget(button_refresh)
@@ -157,14 +158,14 @@ class BalloonsDocker(DockWidget):
 
         kit_row = widgets.QHBoxLayout()
         button_symbols = ui.botao(
-            "Símbolos do Krita",
-            "Abre o docker nativo 'Bibliotecas de símbolos' do Krita",
+            i18n.t('Símbolos do Krita'),
+            i18n.t("Abre o docker nativo 'Bibliotecas de símbolos' do Krita"),
         )
         button_symbols.clicked.connect(self.open_native_symbols_docker)
         kit_row.addWidget(button_symbols)
         button_fonts = ui.botao(
-            "Instalar fontes de HQ",
-            "Copia as fontes inclusas (OFL) para o sistema e atualiza o cache",
+            i18n.t('Instalar fontes de HQ'),
+            i18n.t('Copia as fontes inclusas (OFL) para o sistema e atualiza o cache'),
             icone_chave="salvar",
         )
         button_fonts.clicked.connect(self.install_kit_fonts)
@@ -172,16 +173,14 @@ class BalloonsDocker(DockWidget):
         layout.addLayout(kit_row)
 
         hint = ui.rotulo(
-            "Os modelos são SVGs comuns: você pode desenhar os seus (Inkscape) e "
-            "salvá-los na pasta acima. Clique duas vezes para inserir no grupo "
-            "ativo.")
+            i18n.t('Os modelos são SVGs comuns: você pode desenhar os seus (Inkscape) e salvá-los na pasta acima. Clique duas vezes para inserir no grupo ativo.'))
         layout.addWidget(hint)
 
         self.setWidget(main)
 
     def pick_folder(self):
         folder = QtWidgets.QFileDialog.getExistingDirectory(
-            self.widget(), "Pasta de balões", self.folder
+            self.widget(), i18n.t('Pasta de balões'), self.folder
         )
         if folder:
             self.folder = folder
@@ -194,7 +193,7 @@ class BalloonsDocker(DockWidget):
         )
 
     def refresh(self):
-        self.lbl_folder.setText("Pasta: {0}".format(self.folder))
+        self.lbl_folder.setText(i18n.t('Pasta: {0}').format(self.folder))
         self.list_balloons.clear()
         try:
             names = sorted(os.listdir(self.folder))
@@ -203,7 +202,7 @@ class BalloonsDocker(DockWidget):
             # o kit sumiu.
             names = []
             self.lbl_folder.setText(
-                "Pasta: {0} (não pôde ser lida: {1})".format(self.folder, erro)
+                i18n.t('Pasta: {0} (não pôde ser lida: {1})').format(self.folder, erro)
             )
         for name in names:
             if not name.lower().endswith(".svg"):
@@ -225,23 +224,23 @@ class BalloonsDocker(DockWidget):
     def _insert_balloon(self):
         document = helpers.active_document()
         if document is None:
-            helpers.show_message("Abra um documento para inserir o balão.")
+            helpers.show_message(i18n.t('Abra um documento para inserir o balão.'))
             return
         item = self.list_balloons.currentItem()
         if item is None:
-            helpers.show_message("Escolha um balão na lista.")
+            helpers.show_message(i18n.t('Escolha um balão na lista.'))
             return
         path = item.data(USER_ROLE)
         try:
             svg = helpers.read_text_file(path)
         except OSError:
-            helpers.show_message("Não foi possível ler o arquivo do balão.")
+            helpers.show_message(i18n.t('Não foi possível ler o arquivo do balão.'))
             return
         base = "text" if self.chk_text_layer.isChecked() else item.text()
         name = helpers.unique_layer_name(document, base)
         layer = document.createVectorLayer(name)
         if layer is None:
-            helpers.show_message("Não foi possível criar a camada vetorial.")
+            helpers.show_message(i18n.t('Não foi possível criar a camada vetorial.'))
             return
         shapes = layer.addShapesFromSvg(svg)
         if not shapes:
@@ -250,7 +249,7 @@ class BalloonsDocker(DockWidget):
             # encontrar e apagar à mão.
             self._descartar_camada(document, layer)
             helpers.show_message(
-                "O SVG não gerou formas. Verifique o arquivo (use formas e texto)."
+                i18n.t('O SVG não gerou formas. Verifique o arquivo (use formas e texto).')
             )
             return
         helpers.attach(document, layer)
@@ -258,7 +257,7 @@ class BalloonsDocker(DockWidget):
         self.config.set(
             "balloons.insert_as_text_layer", self.chk_text_layer.isChecked()
         )
-        helpers.show_message("Balão inserido: {0}".format(item.text()))
+        helpers.show_message(i18n.t('Balão inserido: {0}').format(item.text()))
 
     @staticmethod
     def _descartar_camada(document, layer):
@@ -271,18 +270,17 @@ class BalloonsDocker(DockWidget):
         """Mostra o docker nativo 'Bibliotecas de símbolos' do Krita."""
         window = Krita.instance().activeWindow()
         if window is None:
-            helpers.show_message("Abra uma janela do Krita primeiro.")
+            helpers.show_message(i18n.t('Abra uma janela do Krita primeiro.'))
             return
         for dock in window.dockers():
             title = str(dock.windowTitle()).lower()
             if any(token in title for token in ("symbol", "símbolo", "simbolo")):
                 dock.show()
                 dock.raise_()
-                helpers.show_message("Docker de símbolos do Krita aberto.")
+                helpers.show_message(i18n.t('Docker de símbolos do Krita aberto.'))
                 return
         helpers.show_message(
-            "Docker 'Bibliotecas de símbolos' não encontrado; habilite em "
-            "Configurações > Dockers."
+            i18n.t("Docker 'Bibliotecas de símbolos' não encontrado; habilite em Configurações > Dockers.")
         )
 
     def install_kit_fonts(self):
@@ -294,12 +292,12 @@ class BalloonsDocker(DockWidget):
         interface travada nos segundos do ``fc-cache -f``.
         """
         if not os.path.isdir(KIT_FONTS_DIR):
-            helpers.show_message("Pasta de fontes não encontrada no plugin.")
+            helpers.show_message(i18n.t('Pasta de fontes não encontrada no plugin.'))
             return
         try:
             os.makedirs(FONTS_TARGET, exist_ok=True)
         except OSError as error:
-            helpers.show_message("Falha ao criar a pasta de fontes: {0}".format(error))
+            helpers.show_message(i18n.t('Falha ao criar a pasta de fontes: {0}').format(error))
             return
         instaladas = []
         ignoradas = 0
@@ -321,12 +319,11 @@ class BalloonsDocker(DockWidget):
             self._atualizar_cache_de_fontes()
         if not instaladas:
             helpers.show_message(
-                "As {0} fonte(s) do kit já estão instaladas.".format(ignoradas)
+                i18n.t('As {0} fonte(s) do kit já estão instaladas.').format(ignoradas)
             )
             return
         helpers.show_message(
-            "{0} fonte(s) instalada(s) ({1} já estavam). Reinicie o Krita para "
-            "listá-las na ferramenta de texto.".format(len(instaladas), ignoradas)
+            i18n.t('{0} fonte(s) instalada(s) ({1} já estavam). Reinicie o Krita para listá-las na ferramenta de texto.').format(len(instaladas), ignoradas)
         )
 
     @staticmethod

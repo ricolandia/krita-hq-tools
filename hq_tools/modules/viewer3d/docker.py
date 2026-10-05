@@ -22,6 +22,7 @@ from ...core import krita_helpers as helpers
 from ...core import mapeamento
 from ...core import modelo3d
 from ...core import registro, ui
+from ...core import i18n
 from ...core.compat import (
     ALIGN_CENTER,
     CURSOR_ARROW,
@@ -325,7 +326,7 @@ class _Flutuante(QtWidgets.QWidget):
 class Viewer3DDocker(DockWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("HQ Tools: 3D")
+        self.setWindowTitle(i18n.t('HQ Tools: 3D'))
         registro.registrar("viewer3d", self)
         self.modelo = None
         self.corpo = "homem"
@@ -371,14 +372,14 @@ class Viewer3DDocker(DockWidget):
         layout.addWidget(self.preview, 1)
 
         layout.addWidget(ui.rotulo(
-            "Clique sobre a parte do corpo que deseja rotacionar."
+            i18n.t('Clique sobre a parte do corpo que deseja rotacionar.')
         ))
 
-        self.lbl_regiao = ui.rotulo_info("Nenhuma região selecionada.")
+        self.lbl_regiao = ui.rotulo_info(i18n.t('Nenhuma região selecionada.'))
         layout.addWidget(self.lbl_regiao)
 
         corpo_row = widgets.QHBoxLayout()
-        corpo_row.addWidget(ui.rotulo("Corpo:"))
+        corpo_row.addWidget(ui.rotulo(i18n.t('Corpo:')))
         self.cmb_corpo = widgets.QComboBox()
         for chave, rotulo, _ in VIEWER3D_MODELOS:
             self.cmb_corpo.addItem(rotulo, chave)
@@ -387,23 +388,23 @@ class Viewer3DDocker(DockWidget):
         layout.addLayout(corpo_row)
 
         pose_row = widgets.QHBoxLayout()
-        pose_row.addWidget(ui.rotulo("Pose:"))
+        pose_row.addWidget(ui.rotulo(i18n.t('Pose:')))
         self.cmb_pose = widgets.QComboBox()
         self.cmb_pose.currentIndexChanged.connect(self._mudar_pose)
         pose_row.addWidget(self.cmb_pose, 1)
         layout.addLayout(pose_row)
 
         estilo_row = widgets.QHBoxLayout()
-        estilo_row.addWidget(ui.rotulo("Estilo:"))
+        estilo_row.addWidget(ui.rotulo(i18n.t('Estilo:')))
         self.cmb_estilo = widgets.QComboBox()
-        self.cmb_estilo.addItem("Sombreado", "sombreado")
-        self.cmb_estilo.addItem("Silhueta", "silhueta")
-        self.cmb_estilo.addItem("Contorno", "contorno")
+        self.cmb_estilo.addItem(i18n.t('Sombreado'), "sombreado")
+        self.cmb_estilo.addItem(i18n.t('Silhueta'), "silhueta")
+        self.cmb_estilo.addItem(i18n.t('Contorno'), "contorno")
         self.cmb_estilo.currentIndexChanged.connect(self.agendar_render)
         estilo_row.addWidget(self.cmb_estilo, 1)
         layout.addLayout(estilo_row)
 
-        self.grupo_juntas = widgets.QGroupBox("Juntas")
+        self.grupo_juntas = widgets.QGroupBox(i18n.t('Juntas'))
         self.juntas_layout = ui.espacamento(
             widgets.QVBoxLayout(self.grupo_juntas), margem=0, espaco=ui.GAP
         )
@@ -411,31 +412,30 @@ class Viewer3DDocker(DockWidget):
 
         cameras = widgets.QHBoxLayout()
         button_front = ui.botao(
-            "Frente", "Volta à vista frontal (ângulo, zoom e enquadramento)."
+            i18n.t('Frente'), i18n.t('Volta à vista frontal (ângulo, zoom e enquadramento).')
         )
         button_front.clicked.connect(self.reset_camera)
         cameras.addWidget(button_front)
         button_fit = ui.botao(
-            "Enquadrar", "Centraliza o modelo e volta ao zoom 1, sem mudar o ângulo."
+            i18n.t('Enquadrar'), i18n.t('Centraliza o modelo e volta ao zoom 1, sem mudar o ângulo.')
         )
         button_fit.clicked.connect(self.enquadrar)
         cameras.addWidget(button_fit)
-        button_zoom_out = ui.botao("−", "Diminui o zoom.")
+        button_zoom_out = ui.botao(i18n.t('−'), i18n.t('Diminui o zoom.'))
         button_zoom_out.clicked.connect(lambda: self.aplicar_zoom(0.8))
         cameras.addWidget(button_zoom_out)
-        button_zoom_in = ui.botao("+", "Aumenta o zoom.")
+        button_zoom_in = ui.botao(i18n.t('+'), i18n.t('Aumenta o zoom.'))
         button_zoom_in.clicked.connect(lambda: self.aplicar_zoom(1.25))
         cameras.addWidget(button_zoom_in)
         layout.addLayout(cameras)
 
         posse = widgets.QHBoxLayout()
-        button_reset = ui.botao("Limpar pose", "Zera todas as juntas.")
+        button_reset = ui.botao(i18n.t('Limpar pose'), i18n.t('Zera todas as juntas.'))
         button_reset.clicked.connect(self.limpar_pose)
         posse.addWidget(button_reset)
         self.button_move = ui.botao(
-            "Mover",
-            "Ligado, arrastar desloca o enquadramento em vez de girar "
-            "(ou use Shift/botão do meio).",
+            i18n.t('Mover'),
+            i18n.t('Ligado, arrastar desloca o enquadramento em vez de girar (ou use Shift/botão do meio).'),
         )
         self.button_move.setCheckable(True)
         self.button_move.toggled.connect(self._alternar_mover)
@@ -444,17 +444,16 @@ class Viewer3DDocker(DockWidget):
 
         flutuante = widgets.QHBoxLayout()
         self.button_flutuar = ui.botao(
-            "Flutuar na página",
-            "Mostra o preview sobre a seleção (desenhe uma seleção retangular "
-            "sobre o painel primeiro); arraste e redimensione à vontade.",
+            i18n.t('Flutuar na página'),
+            i18n.t('Mostra o preview sobre a seleção (desenhe uma seleção retangular sobre o painel primeiro); arraste e redimensione à vontade.'),
             icone_chave="novo",
         )
         self.button_flutuar.setCheckable(True)
         self.button_flutuar.toggled.connect(self._alternar_flutuar)
         flutuante.addWidget(self.button_flutuar)
         self.button_fixar = ui.botao(
-            "Fixar",
-            "Com o flutuante fixado, o mouse atravessa e você desenha por baixo.",
+            i18n.t('Fixar'),
+            i18n.t('Com o flutuante fixado, o mouse atravessa e você desenha por baixo.'),
         )
         self.button_fixar.setCheckable(True)
         self.button_fixar.setEnabled(False)
@@ -463,11 +462,11 @@ class Viewer3DDocker(DockWidget):
         layout.addLayout(flutuante)
 
         opacidade = widgets.QHBoxLayout()
-        opacidade.addWidget(ui.rotulo("Opacidade:"))
+        opacidade.addWidget(ui.rotulo(i18n.t('Opacidade:')))
         self.sld_opacidade = widgets.QSlider(ORIENTACAO_HORIZONTAL)
         self.sld_opacidade.setRange(20, 100)
         self.sld_opacidade.setValue(80)
-        self.lbl_opacidade = ui.rotulo_info("80%")
+        self.lbl_opacidade = ui.rotulo_info(i18n.t('80%'))
         self.sld_opacidade.valueChanged.connect(self._mudar_opacidade)
         opacidade.addWidget(self.sld_opacidade, 1)
         opacidade.addWidget(self.lbl_opacidade)
@@ -475,29 +474,22 @@ class Viewer3DDocker(DockWidget):
 
         acoes = widgets.QHBoxLayout()
         button_layer = ui.botao(
-            "Inserir como camada",
-            "Insere na seleção ativa (desenhe uma seleção retangular sobre o "
-            "painel); a camada entra abaixo da camada ativa, para o esboço "
-            "ficar por cima, e a seleção é desfeita.",
+            i18n.t('Inserir como camada'),
+            i18n.t('Insere na seleção ativa (desenhe uma seleção retangular sobre o painel); a camada entra abaixo da camada ativa, para o esboço ficar por cima, e a seleção é desfeita.'),
             icone_chave="aplicar",
         )
         button_layer.clicked.connect(lambda: self.inserir(referencia=False))
         acoes.addWidget(button_layer)
         button_ref = ui.botao(
-            "Inserir como referência",
-            "Insere na seleção ativa, travado, com rótulo de cor e opacidade "
-            "reduzida, abaixo da camada ativa; a seleção é desfeita.",
+            i18n.t('Inserir como referência'),
+            i18n.t('Insere na seleção ativa, travado, com rótulo de cor e opacidade reduzida, abaixo da camada ativa; a seleção é desfeita.'),
         )
         button_ref.clicked.connect(lambda: self.inserir(referencia=True))
         acoes.addWidget(button_ref)
         layout.addLayout(acoes)
 
         layout.addWidget(ui.rotulo(
-            "1) Desenhe uma seleção retangular sobre o painel. 2) Ajuste a "
-            "pose e o zoom (o preview mostra exatamente o recorte que será "
-            "inserido). 3) 'Inserir' coloca a camada abaixo da ativa e "
-            "desfaz a seleção. Arraste para orbitar; Shift+arraste desloca; "
-            "roda ou +/− dão zoom; clique numa região para abrir os sliders."
+            i18n.t("1) Desenhe uma seleção retangular sobre o painel. 2) Ajuste a pose e o zoom (o preview mostra exatamente o recorte que será inserido). 3) 'Inserir' coloca a camada abaixo da ativa e desfaz a seleção. Arraste para orbitar; Shift+arraste desloca; roda ou +/− dão zoom; clique numa região para abrir os sliders.")
         ))
 
         self.setWidget(main)
@@ -512,7 +504,7 @@ class Viewer3DDocker(DockWidget):
         try:
             self.modelo = modelo3d.Modelo.carregar(self._caminho_do_corpo(self.corpo))
         except (OSError, ValueError) as error:
-            self.lbl_regiao.setText("Modelo 3D indisponível: {0}".format(error))
+            self.lbl_regiao.setText(i18n.t('Modelo 3D indisponível: {0}').format(error))
             return
         self._popular_poses()
         if aplicar_padrao:
@@ -526,7 +518,7 @@ class Viewer3DDocker(DockWidget):
     def _popular_poses(self):
         self.cmb_pose.blockSignals(True)
         self.cmb_pose.clear()
-        self.cmb_pose.addItem("—", None)
+        self.cmb_pose.addItem(i18n.t('—'), None)
         try:
             arquivos = sorted(os.listdir(VIEWER3D_POSES_DIR))
         except OSError:
@@ -567,7 +559,7 @@ class Viewer3DDocker(DockWidget):
         try:
             dados = modelo3d.carregar_pose(os.path.join(VIEWER3D_POSES_DIR, arquivo))
         except (OSError, ValueError) as error:
-            helpers.show_info("3D", "Não foi possível ler a pose: {0}".format(error))
+            helpers.show_info(i18n.t('3D'), i18n.t('Não foi possível ler a pose: {0}').format(error))
             return
         self.semantica = {
             osso: dict(valores) for osso, valores in dados.get("ossos", {}).items()
@@ -701,21 +693,20 @@ class Viewer3DDocker(DockWidget):
         view = helpers.active_view()
         documento = view.document() if view is not None else None
         if documento is None:
-            helpers.show_info("3D", "Abra um documento para usar o flutuante.")
+            helpers.show_info(i18n.t('3D'), i18n.t('Abra um documento para usar o flutuante.'))
             self.button_flutuar.setChecked(False)
             return
         selecao = helpers.selection_bounds(documento)
         if selecao is None or selecao[2] <= 0 or selecao[3] <= 0:
             helpers.show_info(
-                "3D",
-                "Desenhe uma seleção retangular sobre o painel para usar o "
-                "flutuante.",
+                i18n.t('3D'),
+                i18n.t('Desenhe uma seleção retangular sobre o painel para usar o flutuante.'),
             )
             self.button_flutuar.setChecked(False)
             return
         viewport = _viewport_da_view(view)
         if viewport is None:
-            helpers.show_info("3D", "Não foi possível ancorar o flutuante nesta janela.")
+            helpers.show_info(i18n.t('3D'), i18n.t('Não foi possível ancorar o flutuante nesta janela.'))
             self.button_flutuar.setChecked(False)
             return
         self._fechar_flutuante()
@@ -821,7 +812,7 @@ class Viewer3DDocker(DockWidget):
             self._flutuante.update()
 
     def _mudar_opacidade(self, valor):
-        self.lbl_opacidade.setText("{0}%".format(valor))
+        self.lbl_opacidade.setText(i18n.t('{0}%').format(valor))
         if self._flutuante is not None:
             self._flutuante.definir_opacidade(valor / 100.0)
 
@@ -931,7 +922,7 @@ class Viewer3DDocker(DockWidget):
         slider = widgets.QSlider(ORIENTACAO_HORIZONTAL)
         slider.setRange(-LIMITE_SLIDER, LIMITE_SLIDER)
         slider.setValue(int(self.semantica.get(osso, {}).get(chave, 0)))
-        valor = ui.rotulo_info("0°")
+        valor = ui.rotulo_info(i18n.t('0°'))
         slider.valueChanged.connect(
             lambda novo, o=osso, c=chave, etiqueta=valor: self._mudar_junta(
                 o, c, novo, etiqueta
@@ -943,7 +934,7 @@ class Viewer3DDocker(DockWidget):
 
     def _mudar_junta(self, osso, chave, valor, etiqueta):
         self.semantica.setdefault(osso, {})[chave] = float(valor)
-        etiqueta.setText("{0}°".format(valor))
+        etiqueta.setText(i18n.t('{0}°').format(valor))
         self.agendar_render()
 
     def _linha_dedos(self, lado):
@@ -957,11 +948,11 @@ class Viewer3DDocker(DockWidget):
             return None
         widgets = QtWidgets
         linha = widgets.QHBoxLayout()
-        linha.addWidget(ui.rotulo("Dedos · Dobrar"))
+        linha.addWidget(ui.rotulo(i18n.t('Dedos · Dobrar')))
         slider = widgets.QSlider(ORIENTACAO_HORIZONTAL)
         slider.setRange(-LIMITE_SLIDER, LIMITE_SLIDER)
         slider.setValue(int(self.semantica.get(ossos[0], {}).get("dobrar", 0)))
-        valor = ui.rotulo_info("0°")
+        valor = ui.rotulo_info(i18n.t('0°'))
         slider.valueChanged.connect(
             lambda novo, alvos=tuple(ossos), etiqueta=valor: self._mudar_dedos(
                 alvos, novo, etiqueta
@@ -974,7 +965,7 @@ class Viewer3DDocker(DockWidget):
     def _mudar_dedos(self, ossos, valor, etiqueta):
         for osso in ossos:
             self.semantica.setdefault(osso, {})["dobrar"] = float(valor)
-        etiqueta.setText("{0}°".format(valor))
+        etiqueta.setText(i18n.t('{0}°').format(valor))
         self.agendar_render()
 
     def _montar_sliders(self):
@@ -988,7 +979,7 @@ class Viewer3DDocker(DockWidget):
         else:
             return
         self.grupo_juntas.setTitle("Juntas: {0}".format(nome))
-        self.lbl_regiao.setText("Região: {0}".format(nome))
+        self.lbl_regiao.setText(i18n.t('Região: {0}').format(nome))
         for osso in ossos:
             for eixo in EIXOS_POR_BASE.get(_base(osso), ("dobrar",)):
                 self.juntas_layout.addLayout(self._linha_slider(
@@ -1052,18 +1043,17 @@ class Viewer3DDocker(DockWidget):
 
     def inserir(self, referencia=False):
         if self.modelo is None:
-            helpers.show_info("3D", "O modelo não está disponível.")
+            helpers.show_info(i18n.t('3D'), i18n.t('O modelo não está disponível.'))
             return
         documento = helpers.active_document()
         if documento is None:
-            helpers.show_info("3D", "Abra um documento para inserir o desenho.")
+            helpers.show_info(i18n.t('3D'), i18n.t('Abra um documento para inserir o desenho.'))
             return
         selecao = helpers.selection_bounds(documento)
         if selecao is None or selecao[2] <= 0 or selecao[3] <= 0:
             helpers.show_info(
-                "3D",
-                "Desenhe uma seleção retangular sobre o painel de destino "
-                "para inserir.",
+                i18n.t('3D'),
+                i18n.t('Desenhe uma seleção retangular sobre o painel de destino para inserir.'),
             )
             return
         x, y, largura, altura = selecao
@@ -1076,7 +1066,7 @@ class Viewer3DDocker(DockWidget):
         nome = helpers.unique_layer_name(documento, "3D")
         camada = documento.createNode(nome, "paintlayer")
         if camada is None or not camada.setPixelData(dados, x, y, largura, altura):
-            helpers.show_info("3D", "Não foi possível criar a camada.")
+            helpers.show_info(i18n.t('3D'), i18n.t('Não foi possível criar a camada.'))
             return
         helpers.attach_below_active(documento, camada)
         if referencia:
@@ -1088,7 +1078,7 @@ class Viewer3DDocker(DockWidget):
         documento.refreshProjection()
         self._sincronizar_flutuante()
         helpers.show_message(
-            "Camada '{0}' inserida abaixo de '{1}'{2}; seleção desfeita.".format(
+            i18n.t("Camada '{0}' inserida abaixo de '{1}'{2}; seleção desfeita.").format(
                 nome,
                 nome_ativo or "camada ativa",
                 " como referência" if referencia else "",

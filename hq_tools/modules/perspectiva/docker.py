@@ -12,6 +12,7 @@ from krita import DockWidget
 
 from ...core import krita_helpers as helpers
 from ...core import mapeamento, registro, ui
+from ...core import i18n
 from ...core.compat import (
     ALIGN_CENTER,
     CURSOR_SIZE_ALL,
@@ -91,7 +92,9 @@ class _Flutuante(QtWidgets.QWidget):
     def mouseMoveEvent(self, evento):
         if self._ultimo is None:
             return
-        self.move(self.pos() + evento.pos() - self._ultimo)
+        delta = evento.pos() - self._ultimo
+        self.move(self.pos() + delta)
+        self._ultimo = evento.pos()
 
     def mouseReleaseEvent(self, evento):
         self._ultimo = None
@@ -113,7 +116,7 @@ class _Flutuante(QtWidgets.QWidget):
 class PerspectivaDocker(DockWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("HQ Tools: perspectiva")
+        self.setWindowTitle(i18n.t('HQ Tools: perspectiva'))
         self.config = Config()
         self._flutuante = None
         self._selecao_flutuante = None
@@ -128,9 +131,7 @@ class PerspectivaDocker(DockWidget):
         widgets = QtWidgets
         main, layout = ui.painel(self)
         layout.addWidget(ui.rotulo(
-            "Escolha um conjunto de linhas, desenhe uma seleção retangular "
-            "sobre o painel e insira: a malha sai como camada vetorial, no "
-            "tamanho da seleção, abaixo do esboço."
+            i18n.t('Escolha um conjunto de linhas, desenhe uma seleção retangular sobre o painel e insira: a malha sai como camada vetorial, no tamanho da seleção, abaixo do esboço.')
         ))
         self.list_presets = widgets.QListWidget()
         self.list_presets.setViewMode(ICON_MODE)
@@ -147,22 +148,20 @@ class PerspectivaDocker(DockWidget):
         self.preview.setMinimumSize(240, 240)
         self.preview.setAlignment(ALIGN_CENTER)
         self.preview.setToolTip(
-            "Prévia do conjunto selecionado; com uma seleção ativa no Krita, "
-            "adota a proporção dela."
+            i18n.t('Prévia do conjunto selecionado; com uma seleção ativa no Krita, adota a proporção dela.')
         )
         layout.addWidget(self.preview, 1)
 
         botoes = widgets.QHBoxLayout()
         self.button_flutuar = ui.botao(
-            "Flutuar na página",
-            "Mostra a malha sobre a seleção ativa; arraste para mover e use a "
-            "roda para redimensionar.",
+            i18n.t('Flutuar na página'),
+            i18n.t('Mostra a malha sobre a seleção ativa; arraste para mover e use a roda para redimensionar.'),
         )
         self.button_flutuar.setCheckable(True)
         self.button_flutuar.toggled.connect(self._alternar_flutuar)
         botoes.addWidget(self.button_flutuar)
         button_atualizar = ui.botao(
-            "Atualizar prévia", "Relê a seleção ativa e redesenha a prévia.",
+            i18n.t('Atualizar prévia'), i18n.t('Relê a seleção ativa e redesenha a prévia.'),
             icone_chave="atualizar",
         )
         button_atualizar.clicked.connect(self.atualizar_preview)
@@ -171,24 +170,21 @@ class PerspectivaDocker(DockWidget):
 
         botoes2 = widgets.QHBoxLayout()
         button_inserir = ui.botao(
-            "Inserir no painel",
-            "Insere a malha como camada vetorial no tamanho da seleção, abaixo "
-            "da camada ativa.",
+            i18n.t('Inserir no painel'),
+            i18n.t('Insere a malha como camada vetorial no tamanho da seleção, abaixo da camada ativa.'),
         )
         button_inserir.clicked.connect(lambda: self.inserir(False))
         botoes2.addWidget(button_inserir)
         button_referencia = ui.botao(
-            "Inserir como referência",
-            "Como o inserir, mas a camada vetorial fica travada e com rótulo "
-            "de cor, no papel de referência.",
+            i18n.t('Inserir como referência'),
+            i18n.t('Como o inserir, mas a camada vetorial fica travada e com rótulo de cor, no papel de referência.'),
         )
         button_referencia.clicked.connect(lambda: self.inserir(True))
         botoes2.addWidget(button_referencia)
         layout.addLayout(botoes2)
 
         layout.addWidget(ui.rotulo(
-            "Cores das famílias: azul = verticais/3º ponto de fuga; laranja = "
-            "profundidade e eixos; cinza = horizontais e horizonte."
+            i18n.t('Cores das famílias: azul = verticais/3º ponto de fuga; laranja = profundidade e eixos; cinza = horizontais e horizonte.')
         ))
         self.setWidget(main)
 
@@ -197,9 +193,9 @@ class PerspectivaDocker(DockWidget):
         ultimo = self.config.get("perspectiva.last_preset")
         selecionar = 0
         for indice, (arquivo, titulo, _, legenda) in enumerate(linhas.PRESETS):
-            item = QtWidgets.QListWidgetItem(titulo)
+            item = QtWidgets.QListWidgetItem(i18n.t(titulo))
             item.setData(USER_ROLE, arquivo)
-            item.setToolTip(legenda)
+            item.setToolTip(i18n.t(legenda))
             pixmap = self._miniatura(arquivo)
             if pixmap is not None:
                 item.setIcon(QtGui.QIcon(pixmap))
@@ -280,22 +276,21 @@ class PerspectivaDocker(DockWidget):
         view = helpers.active_view()
         documento = view.document() if view is not None else None
         if documento is None:
-            helpers.show_info("Perspectiva", "Abra um documento para usar o flutuante.")
+            helpers.show_info(i18n.t('Perspectiva'), i18n.t('Abra um documento para usar o flutuante.'))
             self.button_flutuar.setChecked(False)
             return
         selecao = helpers.selection_bounds(documento)
         if selecao is None or selecao[2] <= 0 or selecao[3] <= 0:
             helpers.show_info(
-                "Perspectiva",
-                "Desenhe uma seleção retangular sobre o painel para usar o "
-                "flutuante.",
+                i18n.t('Perspectiva'),
+                i18n.t('Desenhe uma seleção retangular sobre o painel para usar o flutuante.'),
             )
             self.button_flutuar.setChecked(False)
             return
         viewport = helpers.viewport_da_view(view)
         if viewport is None:
             helpers.show_info(
-                "Perspectiva", "Não foi possível ancorar o flutuante nesta janela."
+                i18n.t('Perspectiva'), i18n.t('Não foi possível ancorar o flutuante nesta janela.')
             )
             self.button_flutuar.setChecked(False)
             return
@@ -391,18 +386,17 @@ class PerspectivaDocker(DockWidget):
         """
         documento = helpers.active_document()
         if documento is None:
-            helpers.show_info("Perspectiva", "Abra um documento para inserir a malha.")
+            helpers.show_info(i18n.t('Perspectiva'), i18n.t('Abra um documento para inserir a malha.'))
             return
         arquivo = self._preset_atual()
         if not arquivo:
-            helpers.show_info("Perspectiva", "Escolha um conjunto na lista.")
+            helpers.show_info(i18n.t('Perspectiva'), i18n.t('Escolha um conjunto na lista.'))
             return
         selecao = helpers.selection_bounds(documento)
         if selecao is None or selecao[2] <= 0 or selecao[3] <= 0:
             helpers.show_info(
-                "Perspectiva",
-                "Desenhe uma seleção retangular sobre o painel de destino para "
-                "inserir.",
+                i18n.t('Perspectiva'),
+                i18n.t('Desenhe uma seleção retangular sobre o painel de destino para inserir.'),
             )
             return
         x, y, largura, altura = selecao
@@ -415,7 +409,7 @@ class PerspectivaDocker(DockWidget):
             camada = documento.createVectorLayer(nome)
             if camada is None:
                 helpers.show_info(
-                    "Perspectiva", "Não foi possível criar a camada vetorial."
+                    i18n.t('Perspectiva'), i18n.t('Não foi possível criar a camada vetorial.')
                 )
                 return False
             formas = camada.addShapesFromSvg(svg)
@@ -425,8 +419,8 @@ class PerspectivaDocker(DockWidget):
                 except (AttributeError, RuntimeError):
                     pass
                 helpers.show_info(
-                    "Perspectiva",
-                    "O SVG não gerou formas; escolha outro conjunto e tente de novo.",
+                    i18n.t('Perspectiva'),
+                    i18n.t('O SVG não gerou formas; escolha outro conjunto e tente de novo.'),
                 )
                 return False
             helpers.attach_below_active(documento, camada)
@@ -445,7 +439,7 @@ class PerspectivaDocker(DockWidget):
         # janela e desmarca o botão, em vez de deixar a malha antiga na tela.
         self._cancelar_flutuante()
         helpers.show_message(
-            "Malha inserida abaixo de '{0}'{1}; seleção desfeita.".format(
+            i18n.t("Malha inserida abaixo de '{0}'{1}; seleção desfeita.").format(
                 nome_ativo or "camada ativa",
                 " como referência" if referencia else "",
             )

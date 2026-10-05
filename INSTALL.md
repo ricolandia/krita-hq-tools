@@ -67,7 +67,15 @@ Depois ative o plugin no Gerenciador de plugins Python e reinicie o Krita.
    (16 slots com atalhos).
 
 O manual completo de uso fica em `hq_tools_manual.html` (mostrado no próprio
-gerenciador de plugins) e no `README.md` do projeto.
+gerenciador de plugins) e no `README.md` do projeto. Versões em inglês:
+`hq_tools_manual.en.html` e `INSTALL.en.md`.
+
+## Idioma da interface
+
+Os dockers seguem o idioma do sistema (o Krita segue o locale por padrão):
+qualquer locale de português usa português; o resto usa inglês. Para forçar um
+idioma, defina a variável de ambiente `HQ_TOOLS_IDIOMA` como `pt` ou `en`
+antes de abrir o Krita.
 
 ## Onde o plugin guarda os dados
 

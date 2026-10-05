@@ -15,6 +15,7 @@ from ...core.compat import DIALOG_NO, DIALOG_YES, QtWidgets
 from ...core.config import Config
 from ...core.paths import USER_DIR
 from ...core import registro, ui
+from ...core import i18n
 from . import core
 from . import effects
 
@@ -28,7 +29,7 @@ EFFECT_MODES = (("Foco (linhas de velocidade)", "focus"), ("Paralelas (linhas de
 class ScreentoneDocker(DockWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("HQ Tools: retículas")
+        self.setWindowTitle(i18n.t('HQ Tools: retículas'))
         registro.registrar("screentone", self)
         self.config = Config()
         self.bundled_presets = core.load_presets(
@@ -54,8 +55,8 @@ class ScreentoneDocker(DockWidget):
         main, layout = ui.painel(self)
         self.tabs = widgets.QTabWidget()
         layout.addWidget(self.tabs, 1)
-        self.tabs.addTab(self._build_tones_tab(), "Retículas")
-        self.tabs.addTab(self._build_effects_tab(), "Linhas de efeito")
+        self.tabs.addTab(self._build_tones_tab(), i18n.t('Retículas'))
+        self.tabs.addTab(self._build_effects_tab(), i18n.t('Linhas de efeito'))
         self.setWidget(main)
         self._sync_colors()
         self._update_info()
@@ -68,14 +69,14 @@ class ScreentoneDocker(DockWidget):
         layout = ui.espacamento(widgets.QVBoxLayout(tab))
 
         preset_row = widgets.QHBoxLayout()
-        preset_row.addWidget(ui.rotulo("Preset:"))
+        preset_row.addWidget(ui.rotulo(i18n.t('Preset:')))
         self.cmb_preset = widgets.QComboBox()
         self.cmb_preset.currentIndexChanged.connect(self._on_preset_changed)
         preset_row.addWidget(self.cmb_preset, 1)
-        button_save = ui.botao("Salvar como...", "Salva o preset atual na pasta de presets do usuário.", icone_chave="salvar")
+        button_save = ui.botao(i18n.t('Salvar como...'), i18n.t('Salva o preset atual na pasta de presets do usuário.'), icone_chave="salvar")
         button_save.clicked.connect(self._save_preset)
         preset_row.addWidget(button_save)
-        button_delete = ui.botao("Excluir", "Exclui o preset selecionado do usuário.", icone_chave=None)
+        button_delete = ui.botao(i18n.t('Excluir'), i18n.t('Exclui o preset selecionado do usuário.'), icone_chave=None)
         button_delete.clicked.connect(self._delete_preset)
         preset_row.addWidget(button_delete)
         layout.addLayout(preset_row)
@@ -147,21 +148,21 @@ class ScreentoneDocker(DockWidget):
         self.spin_hardness.setSuffix("%")
         form.addRow("Dureza (meio-tom):", self.spin_hardness)
 
-        self.chk_align = widgets.QCheckBox("Alinhar à grade de pixels")
+        self.chk_align = widgets.QCheckBox(i18n.t('Alinhar à grade de pixels'))
         form.addRow("", self.chk_align)
 
-        self.chk_invert = widgets.QCheckBox("Inverter (pontos brancos)")
+        self.chk_invert = widgets.QCheckBox(i18n.t('Inverter (pontos brancos)'))
         form.addRow("", self.chk_invert)
 
         pattern_row = widgets.QHBoxLayout()
-        self.chk_pattern = widgets.QCheckBox("Usar padrão do Krita")
+        self.chk_pattern = widgets.QCheckBox(i18n.t('Usar padrão do Krita'))
         self.chk_pattern.toggled.connect(self._update_pattern_enabled)
         pattern_row.addWidget(self.chk_pattern)
         self.cmb_krita_pattern = widgets.QComboBox()
         pattern_row.addWidget(self.cmb_krita_pattern, 1)
         form.addRow("Tom por padrão:", pattern_row)
 
-        self.chk_selection = widgets.QCheckBox("Usar a seleção ativa como máscara")
+        self.chk_selection = widgets.QCheckBox(i18n.t('Usar a seleção ativa como máscara'))
         self.chk_selection.setChecked(True)
         form.addRow("", self.chk_selection)
 
@@ -170,7 +171,7 @@ class ScreentoneDocker(DockWidget):
             self.cmb_mask.addItem(label, value)
         form.addRow("Aplicação:", self.cmb_mask)
 
-        self.chk_reuse = widgets.QCheckBox("Reutilizar retícula idêntica já existente")
+        self.chk_reuse = widgets.QCheckBox(i18n.t('Reutilizar retícula idêntica já existente'))
         self.chk_reuse.setChecked(True)
         form.addRow("", self.chk_reuse)
 
@@ -182,14 +183,14 @@ class ScreentoneDocker(DockWidget):
         # Botões só com a cor (o papel é pintado por _sync_colors), sem altura
         # fixa: quem manda no tamanho é o tema do Krita.
         colors_row = widgets.QHBoxLayout()
-        colors_row.addWidget(ui.rotulo("Frente:"))
+        colors_row.addWidget(ui.rotulo(i18n.t('Frente:')))
         self.btn_fg = ui.botao(
-            "", "Escolhe a cor da frente (o que sai do pincel)."
+            "", i18n.t('Escolhe a cor da frente (o que sai do pincel).')
         )
         self.btn_fg.clicked.connect(lambda: self._pick_color("fg"))
         colors_row.addWidget(self.btn_fg, 1)
-        colors_row.addWidget(ui.rotulo("Fundo:"))
-        self.btn_bg = ui.botao("", "Escolhe a cor do fundo (o que fica embaixo).")
+        colors_row.addWidget(ui.rotulo(i18n.t('Fundo:')))
+        self.btn_bg = ui.botao("", i18n.t('Escolhe a cor do fundo (o que fica embaixo).'))
         self.btn_bg.clicked.connect(lambda: self._pick_color("bg"))
         colors_row.addWidget(self.btn_bg, 1)
         form.addRow("Cores:", colors_row)
@@ -203,16 +204,16 @@ class ScreentoneDocker(DockWidget):
         layout.addWidget(self.lbl_info)
 
         button_fill = ui.botao(
-            "Aplicar retícula (camada de preenchimento)",
-            "Cria uma camada com o padrão repetido na tela, dentro do grupo ativo.",
+            i18n.t('Aplicar retícula (camada de preenchimento)'),
+            i18n.t('Cria uma camada com o padrão repetido na tela, dentro do grupo ativo.'),
             icone_chave="aplicar",
         )
         button_fill.clicked.connect(self.apply_fill)
         layout.addWidget(button_fill)
 
         button_halftone = ui.botao(
-            "Aplicar meio-tom (máscara de filtro)",
-            "Cria a retícula como máscara de filtro: pintar aplica a textura.",
+            i18n.t('Aplicar meio-tom (máscara de filtro)'),
+            i18n.t('Cria a retícula como máscara de filtro: pintar aplica a textura.'),
             icone_chave="aplicar",
         )
         button_halftone.clicked.connect(self.apply_halftone)
@@ -221,29 +222,26 @@ class ScreentoneDocker(DockWidget):
 
         edit_row = widgets.QHBoxLayout()
         button_edit = ui.botao(
-            "Editar selecionada",
-            "Carrega as opções da camada ou máscara de retícula ativa.",
+            i18n.t('Editar selecionada'),
+            i18n.t('Carrega as opções da camada ou máscara de retícula ativa.'),
         )
         button_edit.clicked.connect(self.edit_selected)
         edit_row.addWidget(button_edit)
         button_area = ui.botao(
-            "Mostrar área",
-            "Transforma a máscara de retícula ativa em seleção, para pintar só nela.",
+            i18n.t('Mostrar área'),
+            i18n.t('Transforma a máscara de retícula ativa em seleção, para pintar só nela.'),
         )
         button_area.clicked.connect(self.show_area)
         edit_row.addWidget(button_area)
         layout.addLayout(edit_row)
 
         hint = ui.rotulo(
-            "A retícula entra dentro do grupo ativo. 'Editar selecionada' carrega "
-            "as opções da camada/máscara ativa; 'Mostrar área' transforma a "
-            "máscara em seleção.")
+            i18n.t("A retícula entra dentro do grupo ativo. 'Editar selecionada' carrega as opções da camada/máscara ativa; 'Mostrar área' transforma a máscara em seleção."))
         layout.addWidget(hint)
 
         button_patterns = ui.botao(
-            "Instalar padrões e texturas (kit)",
-            "Copia os padrões próprios do kit (papéis, retículas, hachuras) "
-            "para os padrões do Krita",
+            i18n.t('Instalar padrões e texturas (kit)'),
+            i18n.t('Copia os padrões próprios do kit (papéis, retículas, hachuras) para os padrões do Krita'),
             icone_chave="salvar",
         )
         button_patterns.clicked.connect(self.install_kit_patterns)
@@ -329,16 +327,15 @@ class ScreentoneDocker(DockWidget):
         layout.addLayout(form)
 
         button_effects = ui.botao(
-            "Inserir linhas de efeito",
-            "Cria a camada vetorial de linhas de velocidade ou de efeito.",
+            i18n.t('Inserir linhas de efeito'),
+            i18n.t('Cria a camada vetorial de linhas de velocidade ou de efeito.'),
             icone_chave="aplicar",
         )
         button_effects.clicked.connect(self.insert_effect_lines)
         layout.addWidget(button_effects)
 
         hint = ui.rotulo(
-            "Foco: linhas radiais saindo de um ponto (linhas de velocidade). "
-            "Paralelas: linhas preenchendo a região indicada. A camada é vetorial.")
+            i18n.t('Foco: linhas radiais saindo de um ponto (linhas de velocidade). Paralelas: linhas preenchendo a região indicada. A camada é vetorial.'))
         layout.addWidget(hint)
         layout.addStretch(1)
         return tab
@@ -602,7 +599,7 @@ class ScreentoneDocker(DockWidget):
     def _apply_fill(self):
         document = helpers.active_document()
         if document is None:
-            helpers.show_message("Abra um documento para aplicar a retícula.")
+            helpers.show_message(i18n.t('Abra um documento para aplicar a retícula.'))
             return
         preset = self.current_preset()
         dpi = helpers.document_dpi(document)
@@ -620,7 +617,7 @@ class ScreentoneDocker(DockWidget):
                 selection = self._update_selection(document)
                 if selection is not None:
                     self._set_selection_mask(document, target, selection)
-                helpers.show_message("Retícula atualizada: {0}.".format(target.name()))
+                helpers.show_message(i18n.t('Retícula atualizada: {0}.').format(target.name()))
                 return
 
         selection = self._apply_selection(document)
@@ -635,20 +632,20 @@ class ScreentoneDocker(DockWidget):
             if existing is not None:
                 self._set_selection_mask(document, existing, selection)
                 document.refreshProjection()
-                helpers.show_message("Retícula idêntica reutilizada em '{0}'.".format(existing.name()))
+                helpers.show_message(i18n.t("Retícula idêntica reutilizada em '{0}'.").format(existing.name()))
                 return
 
         info = helpers.make_info_object(properties)
         name = helpers.unique_layer_name(document, self.edit_name.text() or "Retícula")
         layer = document.createFillLayer(name, generator, info, selection)
         if layer is None:
-            helpers.show_message("Gerador indisponível nesta versão do Krita.")
+            helpers.show_message(i18n.t('Gerador indisponível nesta versão do Krita.'))
             return
         helpers.attach(document, layer)
         if self.cmb_mask.currentData() == "empty":
             self._set_selection_mask(document, layer, Selection())
         document.setActiveNode(layer)
-        helpers.show_message("Retícula aplicada: {0} a {1} LPI.".format(preset["name"], preset["lpi"]))
+        helpers.show_message(i18n.t('Retícula aplicada: {0} a {1} LPI.').format(preset["name"], preset["lpi"]))
 
     def apply_halftone(self):
         """Aplica o meio-tom numa macro: um Ctrl+Z desfaz tudo."""
@@ -658,15 +655,15 @@ class ScreentoneDocker(DockWidget):
     def _apply_halftone(self):
         document = helpers.active_document()
         if document is None:
-            helpers.show_message("Abra um documento para aplicar o meio-tom.")
+            helpers.show_message(i18n.t('Abra um documento para aplicar o meio-tom.'))
             return
         node = document.activeNode()
         if node is None:
-            helpers.show_message("Selecione a camada com o tom pintado.")
+            helpers.show_message(i18n.t('Selecione a camada com o tom pintado.'))
             return
         halftone = helpers.find_filter(*core.HALFTONE_FILTER_NAMES)
         if halftone is None:
-            helpers.show_message("Filtro Halftone indisponível nesta versão do Krita.")
+            helpers.show_message(i18n.t('Filtro Halftone indisponível nesta versão do Krita.'))
             return
         preset = self.current_preset()
         dpi = helpers.document_dpi(document)
@@ -685,7 +682,7 @@ class ScreentoneDocker(DockWidget):
         self._edit_mask_id = None
         if target is not None and target.type() == "filtermask":
             if self._update_filter_mask(document, target, properties):
-                helpers.show_message("Meio-tom atualizado.")
+                helpers.show_message(i18n.t('Meio-tom atualizado.'))
                 return
 
         configuration = halftone.configuration()
@@ -700,11 +697,11 @@ class ScreentoneDocker(DockWidget):
         else:
             mask = document.createFilterMask("Meio-tom", halftone, node)
         if mask is None:
-            helpers.show_message("Não foi possível criar a máscara de meio-tom.")
+            helpers.show_message(i18n.t('Não foi possível criar a máscara de meio-tom.'))
             return
         node.addChildNode(mask, None)
         document.refreshProjection()
-        helpers.show_message("Meio-tom aplicado na camada ativa.")
+        helpers.show_message(i18n.t('Meio-tom aplicado na camada ativa.'))
 
     def _set_screentone_fields(self, props):
         for key, default in (
@@ -780,12 +777,12 @@ class ScreentoneDocker(DockWidget):
             self._update_pattern_enabled()
             self._set_screentone_fields(props)
             return
-        helpers.show_message("A camada usa o gerador '{0}', sem edição aqui.".format(generator))
+        helpers.show_message(i18n.t("A camada usa o gerador '{0}', sem edição aqui.").format(generator))
 
     def _populate_mask(self, mask):
         halftone_filter = mask.filter()
         if halftone_filter is None:
-            helpers.show_message("Não foi possível ler a máscara.")
+            helpers.show_message(i18n.t('Não foi possível ler a máscara.'))
             return
         props = halftone_filter.configuration().properties()
         mode = props.get("mode", "intensity")
@@ -821,11 +818,11 @@ class ScreentoneDocker(DockWidget):
     def edit_selected(self):
         document = helpers.active_document()
         if document is None:
-            helpers.show_message("Abra um documento para editar a retícula.")
+            helpers.show_message(i18n.t('Abra um documento para editar a retícula.'))
             return
         node = document.activeNode()
         if node is None:
-            helpers.show_message("Selecione a camada de retícula ou a máscara de meio-tom.")
+            helpers.show_message(i18n.t('Selecione a camada de retícula ou a máscara de meio-tom.'))
             return
         # Só uma edição pendente por vez. Sem limpar o outro id, editar uma
         # máscara depois de uma camada deixava o alvo antigo no lugar, e o
@@ -836,30 +833,30 @@ class ScreentoneDocker(DockWidget):
         if node.type() == "filllayer":
             self._edit_fill_id = self._node_id(node)
             self._populate_fill(node)
-            helpers.show_message("Opções carregadas; use Aplicar retícula para atualizar.")
+            helpers.show_message(i18n.t('Opções carregadas; use Aplicar retícula para atualizar.'))
         elif node.type() == "filtermask":
             self._edit_mask_id = self._node_id(node)
             self._populate_mask(node)
-            helpers.show_message("Opções carregadas; use Aplicar meio-tom para atualizar.")
+            helpers.show_message(i18n.t('Opções carregadas; use Aplicar meio-tom para atualizar.'))
         else:
-            helpers.show_message("Selecione a camada de retícula ou a máscara de meio-tom.")
+            helpers.show_message(i18n.t('Selecione a camada de retícula ou a máscara de meio-tom.'))
 
     def show_area(self):
         document = helpers.active_document()
         if document is None:
-            helpers.show_message("Abra um documento.")
+            helpers.show_message(i18n.t('Abra um documento.'))
             return
         node = document.activeNode()
         if node is None or node.type() != "filllayer":
-            helpers.show_message("Selecione a camada de retícula para mostrar a área.")
+            helpers.show_message(i18n.t('Selecione a camada de retícula para mostrar a área.'))
             return
         for child in node.childNodes():
             if child.type() == "selectionmask" and child.selection() is not None:
                 document.setSelection(child.selection())
                 document.refreshProjection()
-                helpers.show_message("Área da retícula carregada como seleção.")
+                helpers.show_message(i18n.t('Área da retícula carregada como seleção.'))
                 return
-        helpers.show_message("A camada não tem máscara de seleção.")
+        helpers.show_message(i18n.t('A camada não tem máscara de seleção.'))
 
     def insert_effect_lines(self):
         """Insere as linhas de efeito numa macro: um Ctrl+Z desfaz tudo."""
@@ -869,7 +866,7 @@ class ScreentoneDocker(DockWidget):
     def _insert_effect_lines(self):
         document = helpers.active_document()
         if document is None:
-            helpers.show_message("Abra um documento para inserir as linhas.")
+            helpers.show_message(i18n.t('Abra um documento para inserir as linhas.'))
             return
         width = document.width()
         height = document.height()
@@ -898,21 +895,21 @@ class ScreentoneDocker(DockWidget):
             )
 
         if not lines:
-            helpers.show_message("Nenhuma linha gerada; ajuste os parâmetros.")
+            helpers.show_message(i18n.t('Nenhuma linha gerada; ajuste os parâmetros.'))
             return
         svg = effects.lines_to_svg(lines, width, height, dpi)
         name = helpers.unique_layer_name(document, "Linhas de efeito")
         layer = document.createVectorLayer(name)
         if layer is None:
-            helpers.show_message("Não foi possível criar a camada vetorial.")
+            helpers.show_message(i18n.t('Não foi possível criar a camada vetorial.'))
             return
         shapes = layer.addShapesFromSvg(svg)
         if not shapes:
-            helpers.show_message("Não foi possível gerar as formas das linhas.")
+            helpers.show_message(i18n.t('Não foi possível gerar as formas das linhas.'))
             return
         helpers.attach(document, layer)
         document.setActiveNode(layer)
-        helpers.show_message("{0} linhas inseridas.".format(len(lines)))
+        helpers.show_message(i18n.t('{0} linhas inseridas.').format(len(lines)))
 
     # ------------------------------------------------------------------ presets
 
@@ -923,12 +920,12 @@ class ScreentoneDocker(DockWidget):
         from ...core.paths import KRITA_PATTERNS_DIR, PATTERNS_KIT_DIR
 
         if not os.path.isdir(PATTERNS_KIT_DIR):
-            helpers.show_info("Padrões", "Pasta de padrões não encontrada no plugin.")
+            helpers.show_info(i18n.t('Padrões'), i18n.t('Pasta de padrões não encontrada no plugin.'))
             return
         try:
             os.makedirs(KRITA_PATTERNS_DIR, exist_ok=True)
         except OSError as error:
-            helpers.show_info("Padrões", "Falha ao criar a pasta: {0}".format(error))
+            helpers.show_info(i18n.t('Padrões'), i18n.t('Falha ao criar a pasta: {0}').format(error))
             return
         instalados = 0
         for nome in sorted(os.listdir(PATTERNS_KIT_DIR)):
@@ -943,9 +940,8 @@ class ScreentoneDocker(DockWidget):
                     continue
         self._reload_patterns()
         helpers.show_info(
-            "Padrões",
-            "{0} padrões instalados. Reinicie o Krita para usá-los no modo "
-            "'tom com padrão' e nos pincéis.".format(instalados),
+            i18n.t('Padrões'),
+            i18n.t("{0} padrões instalados. Reinicie o Krita para usá-los no modo 'tom com padrão' e nos pincéis.").format(instalados),
         )
 
     def _save_preset(self):
@@ -960,19 +956,19 @@ class ScreentoneDocker(DockWidget):
         self.user_presets.append(preset)
         core.save_presets(USER_PRESETS_PATH, self.user_presets)
         self._reload_presets()
-        helpers.show_message("Preset salvo: {0}".format(preset["name"]))
+        helpers.show_message(i18n.t('Preset salvo: {0}').format(preset["name"]))
 
     def _delete_preset(self):
         preset = self.cmb_preset.currentData()
         if not preset:
             return
         if preset not in self.user_presets:
-            helpers.show_message("Presets de fábrica não podem ser excluídos.")
+            helpers.show_message(i18n.t('Presets de fábrica não podem ser excluídos.'))
             return
         answer = QtWidgets.QMessageBox.question(
             self.widget(),
-            "Excluir preset",
-            "Excluir o preset '{0}'?".format(preset["name"]),
+            i18n.t('Excluir preset'),
+            i18n.t("Excluir o preset '{0}'?").format(preset["name"]),
             DIALOG_YES | DIALOG_NO,
         )
         if answer != DIALOG_YES:

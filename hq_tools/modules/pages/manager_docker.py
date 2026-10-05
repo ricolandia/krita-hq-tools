@@ -31,6 +31,7 @@ from ...core.config import Config
 from ...core.cpmt import CPMTError, CPMTProject, create_project_with_page
 from ...core.paths import KRITA_HOME, MODELOS_DIR
 from ...core import registro, ui
+from ...core import i18n
 from ...core.thumbs import thumbnail_pixmap
 from ..biblioteca import core as biblioteca_core
 from . import generator, guias, modelos as modelos_lib, roteiro
@@ -73,7 +74,7 @@ class PageListWidget(QtWidgets.QListWidget):
 class PagesDocker(DockWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("HQ Tools: páginas")
+        self.setWindowTitle(i18n.t('HQ Tools: páginas'))
         registro.registrar("pages", self)
         self.config = Config()
         self.project = None
@@ -94,55 +95,52 @@ class PagesDocker(DockWidget):
         if last_folder and os.path.isdir(last_folder):
             self.project = None
             self.folder = last_folder
-            self.lbl_project.setText("Projeto: {0}".format(last_folder))
+            self.lbl_project.setText(i18n.t('Projeto: {0}').format(last_folder))
             self.refresh()
 
     def _build_ui(self):
         widgets = QtWidgets
         main, layout = ui.painel(self)
 
-        group_project = widgets.QGroupBox("Projeto")
+        group_project = widgets.QGroupBox(i18n.t('Projeto'))
         project_layout = ui.espacamento(widgets.QVBoxLayout(group_project), margem=0, espaco=ui.GAP)
         self.lbl_project = ui.rotulo_info(
-            "Nenhum projeto aberto. Crie um projeto a partir da página salva, "
-            "abra um comicConfig.json do CPMT ou abra uma pasta com .kra.")
+            i18n.t('Nenhum projeto aberto. Crie um projeto a partir da página salva, abra um comicConfig.json do CPMT ou abra uma pasta com .kra.'))
         project_layout.addWidget(self.lbl_project)
         row = widgets.QHBoxLayout()
-        button_new = ui.botao("Novo projeto...", "Usa a pasta da página atual salva como pasta do projeto.", icone_chave="novo")
+        button_new = ui.botao(i18n.t('Novo projeto...'), i18n.t('Usa a pasta da página atual salva como pasta do projeto.'), icone_chave="novo")
         button_new.clicked.connect(self.new_project)
         row.addWidget(button_new)
-        button_open = ui.botao("Abrir projeto...", "Abre o comicConfig.json de um projeto CPMT", icone_chave="abrir")
+        button_open = ui.botao(i18n.t('Abrir projeto...'), i18n.t('Abre o comicConfig.json de um projeto CPMT'), icone_chave="abrir")
         button_open.clicked.connect(self.pick_project)
         row.addWidget(button_open)
-        button_folder = ui.botao("Pasta...", "Abre uma pasta com arquivos .kra", icone_chave="pasta")
+        button_folder = ui.botao(i18n.t('Pasta...'), i18n.t('Abre uma pasta com arquivos .kra'), icone_chave="pasta")
         button_folder.clicked.connect(self.pick_folder)
         row.addWidget(button_folder)
         project_layout.addLayout(row)
         layout.addWidget(group_project)
 
-        group_page = widgets.QGroupBox("Página")
+        group_page = widgets.QGroupBox(i18n.t('Página'))
         page_layout = ui.espacamento(widgets.QVBoxLayout(group_page), margem=0, espaco=ui.GAP)
         row_page = widgets.QHBoxLayout()
         button_new_page = ui.botao(
-            "Criar próxima página",
-            "Cria uma página nova (formato, DPI, modelo) na pasta do projeto",
+            i18n.t('Criar próxima página'),
+            i18n.t('Cria uma página nova (formato, DPI, modelo) na pasta do projeto'),
             icone_chave="novo",
         )
         button_new_page.clicked.connect(self.create_next_page)
         row_page.addWidget(button_new_page)
         button_guides = ui.botao(
-            "Guias de margem",
-            "Cria 12 guias no documento ativo (0,5 / 1 / 1,5 cm por lado); "
-            "substitui as guias existentes",
+            i18n.t('Guias de margem'),
+            i18n.t('Cria as guias de margem no documento ativo (0,5 / 1 / 1,5 cm por lado), mantendo as guias existentes'),
         )
         button_guides.clicked.connect(self.create_margin_guides)
         row_page.addWidget(button_guides)
         page_layout.addLayout(row_page)
         row_model = widgets.QHBoxLayout()
         button_model = ui.botao(
-            "Definir modelo de página...",
-            "Usa a página atual ou um template de HQ do Krita como modelo "
-            "para as próximas páginas",
+            i18n.t('Definir modelo de página...'),
+            i18n.t('Usa a página atual ou um template de HQ do Krita como modelo para as próximas páginas'),
         )
         button_model.clicked.connect(self.define_model)
         row_model.addWidget(button_model)
@@ -152,18 +150,17 @@ class PagesDocker(DockWidget):
         layout.addWidget(group_page)
         layout.addWidget(ui.separador())
 
-        group_ref = widgets.QGroupBox("Referência")
+        group_ref = widgets.QGroupBox(i18n.t('Referência'))
         ref_layout = ui.espacamento(widgets.QHBoxLayout(group_ref), margem=0, espaco=ui.GAP)
         button_ref = ui.botao(
-            "Camada de referência",
-            "Marca a camada selecionada como referência (rótulo, trava e "
-            "opacidade reduzida)",
+            i18n.t('Camada de referência'),
+            i18n.t('Marca a camada selecionada como referência (rótulo, trava e opacidade reduzida)'),
         )
         button_ref.clicked.connect(self.mark_reference_layer)
         ref_layout.addWidget(button_ref)
         button_import = ui.botao(
-            "Importar referência (PNG)...",
-            "Insere um PNG como camada de referência travada no grupo ativo",
+            i18n.t('Importar referência (PNG)...'),
+            i18n.t('Insere um PNG como camada de referência travada no grupo ativo'),
             icone_chave="abrir",
         )
         button_import.clicked.connect(self.import_reference)
@@ -171,16 +168,16 @@ class PagesDocker(DockWidget):
         layout.addWidget(group_ref)
         layout.addWidget(ui.separador())
 
-        group_list = widgets.QGroupBox("Páginas")
+        group_list = widgets.QGroupBox(i18n.t('Páginas'))
         list_layout = ui.espacamento(widgets.QVBoxLayout(group_list), margem=0, espaco=ui.GAP)
         row2 = widgets.QHBoxLayout()
         button_refresh = ui.botao(
-            "Atualizar miniaturas", "Regera as miniaturas das páginas.", icone_chave="atualizar"
+            i18n.t('Atualizar miniaturas'), i18n.t('Regera as miniaturas das páginas.'), icone_chave="atualizar"
         )
         button_refresh.clicked.connect(self.refresh)
         row2.addWidget(button_refresh)
         button_open_folder = ui.botao(
-            "Abrir pasta", "Abre a pasta do projeto atual no explorador.", icone_chave="pasta"
+            i18n.t('Abrir pasta'), i18n.t('Abre a pasta do projeto atual no explorador.'), icone_chave="pasta"
         )
         button_open_folder.clicked.connect(self.open_current_folder)
         row2.addWidget(button_open_folder)
@@ -200,8 +197,7 @@ class PagesDocker(DockWidget):
         layout.addWidget(group_list, 1)
 
         hint = ui.rotulo(
-            "Clique duas vezes para abrir a página. Arraste para reordenar "
-            "(a ordem é salva no projeto CPMT quando aberto por ele).")
+            i18n.t('Clique duas vezes para abrir a página. Arraste para reordenar (a ordem é salva no projeto CPMT quando aberto por ele).'))
         layout.addWidget(hint)
 
         self.setWidget(main)
@@ -214,16 +210,15 @@ class PagesDocker(DockWidget):
         document = helpers.active_document()
         if document is None:
             helpers.show_info(
-                "Novo projeto",
-                "Abra e salve a página antes de criar o projeto.",
+                i18n.t('Novo projeto'),
+                i18n.t('Abra e salve a página antes de criar o projeto.'),
             )
             return
         if not document.fileName():
             answer = QtWidgets.QMessageBox.question(
                 self.widget(),
-                "Novo projeto",
-                "Salve a página atual em uma pasta. Essa pasta será a pasta "
-                "do projeto.\n\nSalvar a página agora?",
+                i18n.t('Novo projeto'),
+                i18n.t('Salve a página atual em uma pasta. Essa pasta será a pasta do projeto.\n\nSalvar a página agora?'),
                 DIALOG_YES | DIALOG_NO,
             )
             if answer != DIALOG_YES:
@@ -240,8 +235,8 @@ class PagesDocker(DockWidget):
                 path += ".kra"
             if not document.saveAs(path):
                 helpers.show_info(
-                    "Novo projeto",
-                    "Não foi possível salvar a página.",
+                    i18n.t('Novo projeto'),
+                    i18n.t('Não foi possível salvar a página.'),
                 )
                 return
         folder = os.path.dirname(document.fileName())
@@ -252,8 +247,8 @@ class PagesDocker(DockWidget):
                 os.makedirs(os.path.join(biblio, sub), exist_ok=True)
             except OSError as error:
                 helpers.show_info(
-                    "Novo projeto",
-                    "Não foi possível criar a biblioteca: {0}".format(error),
+                    i18n.t('Novo projeto'),
+                    i18n.t('Não foi possível criar a biblioteca: {0}').format(error),
                 )
                 return
         if CPMTProject.is_project(folder):
@@ -264,8 +259,8 @@ class PagesDocker(DockWidget):
                     project.register_pages([page_name])
             except (OSError, ValueError) as error:
                 helpers.show_info(
-                    "Novo projeto",
-                    "Não foi possível abrir o projeto existente: {0}".format(error),
+                    i18n.t('Novo projeto'),
+                    i18n.t('Não foi possível abrir o projeto existente: {0}').format(error),
                 )
                 return
             aviso = "Projeto existente atualizado em {0}."
@@ -274,15 +269,15 @@ class PagesDocker(DockWidget):
                 create_project_with_page(folder, page_name, os.path.basename(folder))
             except (OSError, CPMTError) as error:
                 helpers.show_info(
-                    "Novo projeto",
-                    "Não foi possível gravar o projeto: {0}".format(error),
+                    i18n.t('Novo projeto'),
+                    i18n.t('Não foi possível gravar o projeto: {0}').format(error),
                 )
                 return
             aviso = "Projeto criado em {0}."
         self.config.set("biblioteca.folder", biblio)
         self._load_project(os.path.join(folder, "comicConfig.json"))
         helpers.show_info(
-            "Novo projeto",
+            i18n.t('Novo projeto'),
             aviso.format(folder) + "\n\nA biblioteca (balões, painéis e "
             "onomatopeias) fica na subpasta 'biblioteca'.",
         )
@@ -290,7 +285,7 @@ class PagesDocker(DockWidget):
     def pick_project(self):
         path, _ = QtWidgets.QFileDialog.getOpenFileName(
             self.widget(),
-            "Abrir comicConfig.json do CPMT",
+            i18n.t('Abrir comicConfig.json do CPMT'),
             self.folder or os.path.expanduser("~"),
             "comicConfig.json",
         )
@@ -299,24 +294,24 @@ class PagesDocker(DockWidget):
 
     def pick_folder(self):
         folder = QtWidgets.QFileDialog.getExistingDirectory(
-            self.widget(), "Pasta com páginas .kra", self.folder or os.path.expanduser("~")
+            self.widget(), i18n.t('Pasta com páginas .kra'), self.folder or os.path.expanduser("~")
         )
         if folder:
             self.project = None
             self.folder = folder
             self.config.set("pages.last_folder", folder)
-            self.lbl_project.setText("Projeto: {0}".format(folder))
+            self.lbl_project.setText(i18n.t('Projeto: {0}').format(folder))
             self.refresh()
 
     def _load_project(self, config_path):
         try:
             self.project = CPMTProject(os.path.dirname(config_path))
         except (OSError, ValueError):
-            helpers.show_message("Não foi possível abrir o projeto CPMT.")
+            helpers.show_message(i18n.t('Não foi possível abrir o projeto CPMT.'))
             return
         self.folder = self.project.pages_dir()
         self.lbl_project.setText(
-            "Projeto: {0} ({1} páginas)".format(
+            i18n.t('Projeto: {0} ({1} páginas)').format(
                 self.project.project_name, len(self.project.page_relatives())
             )
         )
@@ -329,7 +324,7 @@ class PagesDocker(DockWidget):
         """Diálogo de nova página; devolve opções ou None se cancelado."""
         widgets = QtWidgets
         dialog = widgets.QDialog(self.widget())
-        dialog.setWindowTitle("Criar página")
+        dialog.setWindowTitle(i18n.t('Criar página'))
         form = widgets.QFormLayout(dialog)
 
         cmb_formato = widgets.QComboBox()
@@ -355,9 +350,9 @@ class PagesDocker(DockWidget):
         spin_h.setValue(210)
         spin_h.setSuffix(" mm")
         row_livre = widgets.QHBoxLayout()
-        row_livre.addWidget(ui.rotulo("L:"))
+        row_livre.addWidget(ui.rotulo(i18n.t('L:')))
         row_livre.addWidget(spin_w)
-        row_livre.addWidget(ui.rotulo("A:"))
+        row_livre.addWidget(ui.rotulo(i18n.t('A:')))
         row_livre.addWidget(spin_h)
         form.addRow("Livre:", row_livre)
 
@@ -375,15 +370,15 @@ class PagesDocker(DockWidget):
         _update_enabled()
 
         modelo_path = self.config.get("pages.model") or ""
-        chk_modelo = widgets.QCheckBox("Usar modelo de página")
+        chk_modelo = widgets.QCheckBox(i18n.t('Usar modelo de página'))
         chk_modelo.setChecked(bool(self.config.get("pages.use_model", False)))
         chk_modelo.setEnabled(bool(modelo_path) and os.path.isfile(modelo_path))
         form.addRow("", chk_modelo)
 
         buttons_row = widgets.QHBoxLayout()
-        button_ok = ui.botao("Criar", "Cria a pasta do projeto e a primeira página.")
+        button_ok = ui.botao(i18n.t('Criar'), i18n.t('Cria a pasta do projeto e a primeira página.'))
         button_ok.setDefault(True)
-        button_cancel = ui.botao("Cancelar", "Fecha a janela sem criar nada.")
+        button_cancel = ui.botao(i18n.t('Cancelar'), i18n.t('Fecha a janela sem criar nada.'))
         button_ok.clicked.connect(dialog.accept)
         button_cancel.clicked.connect(dialog.reject)
         buttons_row.addStretch(1)
@@ -411,7 +406,7 @@ class PagesDocker(DockWidget):
     def create_next_page(self):
         """Cria uma página nova na pasta do projeto e atualiza a grade."""
         if not self.folder:
-            helpers.show_info("Nova página", "Crie ou abra um projeto primeiro.")
+            helpers.show_info(i18n.t('Nova página'), i18n.t('Crie ou abra um projeto primeiro.'))
             return
         opcoes = self._new_page_dialog()
         if opcoes is None:
@@ -465,7 +460,7 @@ class PagesDocker(DockWidget):
                 document.setModified(False)
             except (OSError, RuntimeError) as error:
                 helpers.show_info(
-                    "Nova página", "Falha ao usar o modelo: {0}".format(error)
+                    i18n.t('Nova página'), i18n.t('Falha ao usar o modelo: {0}').format(error)
                 )
                 # A cópia do modelo foi colada em `path` antes da falha: sem
                 # remover, sobra um .kra na pasta de páginas que não está na
@@ -493,7 +488,7 @@ class PagesDocker(DockWidget):
                 self.apply_margin_guides(document)
                 generator.save_page(document, path)
             except (RuntimeError, OSError) as error:
-                helpers.show_info("Nova página", "Falha ao criar a página: {0}".format(error))
+                helpers.show_info(i18n.t('Nova página'), i18n.t('Falha ao criar a página: {0}').format(error))
                 return
 
         registrada = True
@@ -507,12 +502,11 @@ class PagesDocker(DockWidget):
                 )
         self.refresh()
         if registrada:
-            helpers.show_info("Nova página", "Página criada: {0}".format(filename))
+            helpers.show_info(i18n.t('Nova página'), i18n.t('Página criada: {0}').format(filename))
         else:
             helpers.show_info(
-                "Nova página",
-                "Página criada ({0}), mas não foi possível registrá-la no "
-                "projeto; confira a lista do CPMT.".format(filename),
+                i18n.t('Nova página'),
+                i18n.t('Página criada ({0}), mas não foi possível registrá-la no projeto; confira a lista do CPMT.').format(filename),
             )
 
     def _proximo_indice_livre(self):
@@ -612,12 +606,11 @@ class PagesDocker(DockWidget):
     def create_margin_guides(self):
         document = helpers.active_document()
         if document is None:
-            helpers.show_message("Abra a página para criar as guias.")
+            helpers.show_message(i18n.t('Abra a página para criar as guias.'))
             return
         self.apply_margin_guides(document)
         helpers.show_message(
-            "Guias de margem criadas (0,5 / 1 / 1,5 cm por lado), mantendo as "
-            "guias existentes."
+            i18n.t('Guias de margem criadas (0,5 / 1 / 1,5 cm por lado), mantendo as guias existentes.')
         )
 
     # ------------------------------------------------------------------ modelo
@@ -625,9 +618,9 @@ class PagesDocker(DockWidget):
     def _refresh_model_label(self):
         modelo = self.config.get("pages.model") or ""
         if modelo and os.path.isfile(modelo):
-            self.lbl_model.setText("Modelo: {0}".format(os.path.basename(modelo)))
+            self.lbl_model.setText(i18n.t('Modelo: {0}').format(os.path.basename(modelo)))
         else:
-            self.lbl_model.setText("Sem modelo definido (gera o padrão).")
+            self.lbl_model.setText(i18n.t('Sem modelo definido (gera o padrão).'))
 
     def _listar_templates_krita(self):
         """Templates de HQ do Krita: prefixo do Qt e pasta de templates do usuário."""
@@ -684,19 +677,19 @@ class PagesDocker(DockWidget):
         """Escolhe o modelo de página: página atual salva ou template do Krita."""
         widgets = QtWidgets
         dialog = widgets.QDialog(self.widget())
-        dialog.setWindowTitle("Definir modelo de página")
+        dialog.setWindowTitle(i18n.t('Definir modelo de página'))
         layout = ui.espacamento(widgets.QVBoxLayout(dialog), margem=0, espaco=ui.GAP)
         layout.addWidget(
             ui.rotulo(
-                "O modelo é copiado para {0} e usado pelas próximas páginas.".format(
+                i18n.t('O modelo é copiado para {0} e usado pelas próximas páginas.').format(
                     MODELOS_DIR
                 )
             )
         )
         cmb = widgets.QComboBox()
-        cmb.addItem("Página atual (precisa estar salva)", "atual")
+        cmb.addItem(i18n.t('Página atual (precisa estar salva)'), "atual")
         for nome, caminho in self._listar_templates_krita().items():
-            cmb.addItem("Template do Krita: {0}".format(nome), caminho)
+            cmb.addItem(i18n.t('Template do Krita: {0}').format(nome), caminho)
         nomes_por_slug = modelos_lib.nome_por_slug()
         if os.path.isdir(MODELOS_DIR):
             for nome in sorted(os.listdir(MODELOS_DIR)):
@@ -706,11 +699,11 @@ class PagesDocker(DockWidget):
                 rotulo = nomes_por_slug.get(slug_arquivo, nome)
                 caminho = os.path.join(MODELOS_DIR, nome)
                 if cmb.findData(caminho) < 0:
-                    cmb.addItem("HQ Tools: {0}".format(rotulo), caminho)
+                    cmb.addItem(i18n.t('HQ Tools: {0}').format(rotulo), caminho)
         gerar_row = widgets.QHBoxLayout()
         button_gerar = ui.botao(
-            "Gerar modelos padrão do HQ Tools",
-            "Cria A4, A3, tirinhas (1-3) e grades (2x2, 3x3) na pasta de modelos",
+            i18n.t('Gerar modelos padrão do HQ Tools'),
+            i18n.t('Cria A4, A3, tirinhas (1-3) e grades (2x2, 3x3) na pasta de modelos'),
             icone_chave="novo",
         )
         gerar_row.addWidget(button_gerar)
@@ -719,19 +712,19 @@ class PagesDocker(DockWidget):
             gerados = self._gerar_modelos_padrao()
             for nome, caminho in gerados:
                 if cmb.findData(caminho) < 0:
-                    cmb.addItem("HQ Tools: {0}".format(nome), caminho)
+                    cmb.addItem(i18n.t('HQ Tools: {0}').format(nome), caminho)
             helpers.show_info(
-                "Modelo de página",
-                "{0} modelos gerados em {1}.".format(len(gerados), MODELOS_DIR),
+                i18n.t('Modelo de página'),
+                i18n.t('{0} modelos gerados em {1}.').format(len(gerados), MODELOS_DIR),
             )
 
         button_gerar.clicked.connect(_gerar_agora)
         layout.addLayout(gerar_row)
         layout.addWidget(cmb)
         buttons_row = widgets.QHBoxLayout()
-        button_ok = ui.botao("Usar como modelo", "Usa o modelo escolhido nas próximas páginas.")
+        button_ok = ui.botao(i18n.t('Usar como modelo'), i18n.t('Usa o modelo escolhido nas próximas páginas.'))
         button_ok.setDefault(True)
-        button_cancel = ui.botao("Cancelar", "Fecha a janela sem escolher modelo.")
+        button_cancel = ui.botao(i18n.t('Cancelar'), i18n.t('Fecha a janela sem escolher modelo.'))
         button_ok.clicked.connect(dialog.accept)
         button_cancel.clicked.connect(dialog.reject)
         buttons_row.addStretch(1)
@@ -746,15 +739,15 @@ class PagesDocker(DockWidget):
             document = helpers.active_document()
             if document is None or not document.fileName():
                 helpers.show_info(
-                    "Modelo de página",
-                    "Salve a página atual antes de usá-la como modelo.",
+                    i18n.t('Modelo de página'),
+                    i18n.t('Salve a página atual antes de usá-la como modelo.'),
                 )
                 return
             origem = document.fileName()
         else:
             origem = escolha if os.path.isfile(escolha) else None
             if not origem:
-                helpers.show_info("Modelo de página", "Modelo não encontrado.")
+                helpers.show_info(i18n.t('Modelo de página'), i18n.t('Modelo não encontrado.'))
                 return
         os.makedirs(MODELOS_DIR, exist_ok=True)
         base = os.path.basename(origem)
@@ -765,15 +758,14 @@ class PagesDocker(DockWidget):
         try:
             shutil.copy2(origem, destino)
         except OSError as error:
-            helpers.show_info("Modelo de página", "Falha ao copiar: {0}".format(error))
+            helpers.show_info(i18n.t('Modelo de página'), i18n.t('Falha ao copiar: {0}').format(error))
             return
         self.config.set("pages.model", destino)
         self.config.set("pages.use_model", True)
         self._refresh_model_label()
         helpers.show_info(
-            "Modelo de página",
-            "Modelo definido: {0}.\n\nAs próximas páginas usarão este modelo "
-            "(formato/DPI escolhidos no diálogo adaptam tamanho e tirinha).".format(
+            i18n.t('Modelo de página'),
+            i18n.t('Modelo definido: {0}.\n\nAs próximas páginas usarão este modelo (formato/DPI escolhidos no diálogo adaptam tamanho e tirinha).').format(
                 os.path.basename(destino)
             ),
         )
@@ -784,37 +776,37 @@ class PagesDocker(DockWidget):
         """Marca a camada selecionada como referência (rótulo, trava, opacidade)."""
         document = helpers.active_document()
         if document is None:
-            helpers.show_info("Referência", "Abra um documento.")
+            helpers.show_info(i18n.t('Referência'), i18n.t('Abra um documento.'))
             return
         node = document.activeNode()
         if node is None:
-            helpers.show_info("Referência", "Selecione a camada a marcar.")
+            helpers.show_info(i18n.t('Referência'), i18n.t('Selecione a camada a marcar.'))
             return
         node.setColorLabel(1)
         node.setLocked(True)
         node.setOpacity(150)
         document.refreshProjection()
         helpers.show_info(
-            "Referência",
-            "Camada '{0}' marcada como referência (travada).".format(node.name()),
+            i18n.t('Referência'),
+            i18n.t("Camada '{0}' marcada como referência (travada).").format(node.name()),
         )
 
     def import_reference(self):
         """Importa um PNG como camada de referência travada no grupo ativo."""
         path, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self.widget(), "Referência (PNG)", os.path.expanduser("~"), "PNG (*.png)"
+            self.widget(), i18n.t('Referência (PNG)'), os.path.expanduser("~"), "PNG (*.png)"
         )
         if not path:
             return
         document = helpers.active_document()
         if document is None:
-            helpers.show_info("Referência", "Abra a página para importar.")
+            helpers.show_info(i18n.t('Referência'), i18n.t('Abra a página para importar.'))
             return
         parent, above = helpers.target_container(document)
         nome = helpers.unique_layer_name(document, "Referência")
         layer = document.createFileLayer(nome, path, "ToImageSize", "Bilinear")
         if layer is None:
-            helpers.show_info("Referência", "Não foi possível criar a camada.")
+            helpers.show_info(i18n.t('Referência'), i18n.t('Não foi possível criar a camada.'))
             return
         parent.addChildNode(layer, above)
         layer.setLocked(True)
@@ -822,8 +814,8 @@ class PagesDocker(DockWidget):
         layer.setColorLabel(1)
         document.refreshProjection()
         helpers.show_info(
-            "Referência",
-            "Referência importada e travada no grupo ativo: {0}".format(
+            i18n.t('Referência'),
+            i18n.t('Referência importada e travada no grupo ativo: {0}').format(
                 os.path.basename(path)
             ),
         )
@@ -833,7 +825,7 @@ class PagesDocker(DockWidget):
     def open_current_folder(self):
         folder = self.folder
         if not folder:
-            helpers.show_message("Crie ou abra um projeto primeiro.")
+            helpers.show_message(i18n.t('Crie ou abra um projeto primeiro.'))
             return
         os.makedirs(folder, exist_ok=True)
         QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(folder))
@@ -872,7 +864,7 @@ class PagesDocker(DockWidget):
             self._loading = False
         if self.project is not None:
             self.lbl_project.setText(
-                "Projeto: {0} ({1} páginas)".format(
+                i18n.t('Projeto: {0} ({1} páginas)').format(
                     self.project.project_name, self.list_pages.count()
                 )
             )
@@ -899,8 +891,8 @@ class PagesDocker(DockWidget):
             self.project.set_page_order(ordered)
         except (OSError, CPMTError) as error:
             helpers.show_info(
-                "Ordem das páginas",
-                "Não foi possível gravar a nova ordem: {0}".format(error),
+                i18n.t('Ordem das páginas'),
+                i18n.t('Não foi possível gravar a nova ordem: {0}').format(error),
             )
             self._loading = True
             try:
@@ -909,11 +901,11 @@ class PagesDocker(DockWidget):
                 self._loading = False
             return
         self.lbl_project.setText(
-            "Projeto: {0} ({1} páginas)".format(
+            i18n.t('Projeto: {0} ({1} páginas)').format(
                 self.project.project_name, self.list_pages.count()
             )
         )
-        helpers.show_message("Ordem das páginas atualizada no projeto.")
+        helpers.show_message(i18n.t('Ordem das páginas atualizada no projeto.'))
 
     def open_page(self, item):
         relative = item.data(USER_ROLE)
@@ -923,11 +915,11 @@ class PagesDocker(DockWidget):
         elif self.folder:
             path = os.path.join(self.folder, relative)
         if not os.path.isfile(path):
-            helpers.show_message("Arquivo não encontrado: {0}".format(path))
+            helpers.show_message(i18n.t('Arquivo não encontrado: {0}').format(path))
             return
         document = Krita.instance().openDocument(path)
         if document is None:
-            helpers.show_message("Não foi possível abrir a página.")
+            helpers.show_message(i18n.t('Não foi possível abrir a página.'))
             return
         window = Krita.instance().activeWindow()
         if window is not None:

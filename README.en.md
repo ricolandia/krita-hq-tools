@@ -83,7 +83,7 @@ The plugin ships a kit with licenses documented in `CREDITS.md`:
 ## Installation
 
 Complete end-user guide (ZIP, manual, Flatpak, uninstall and troubleshooting):
-**`INSTALL.md`** (in Portuguese).
+**`INSTALL.en.md`**.
 
 Development mode (edit and test straight from the repository):
 

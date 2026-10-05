@@ -7,6 +7,7 @@ configuração salva em ``~/.local/share/krita/hq_tools``.
 
 from krita import DockWidgetFactory, DockWidgetFactoryBase, Extension, Krita
 
+from .core import i18n
 from .core.config import Config
 from .core.krita_helpers import log
 
@@ -117,7 +118,7 @@ class HQTools(Extension):
             try:
                 action = window.createAction(
                     "hq_tools_brush_{0}".format(index + 1),
-                    "HQ Tools: pincel {0}".format(index + 1),
+                    i18n.t("HQ Tools: pincel {0}").format(index + 1),
                     "tools/scripts/hq_tools",
                 )
                 action.triggered.connect(

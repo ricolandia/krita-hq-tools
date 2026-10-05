@@ -1,0 +1,171 @@
+<html>
+<body>
+<h1>HQ Tools</h1>
+<p>Comic tools for Krita: screentones and hatching, vector balloons and sound
+effects, an asset library, a 3D viewer, a perspective library, palettes, a
+page manager, brushes with shortcuts and a hub to open and close the modules.</p>
+
+<h2>Installation</h2>
+<p>In Krita: <b>Tools &gt; Scripts &gt; Import Python plugin</b> and pick the
+ZIP file. Then enable the plugin in <b>Configure Krita &gt; Python Plugin
+Manager</b> and restart Krita.</p>
+<p>If you installed from the ZIP, also copy <code>hq_tools.action</code>
+(included in the ZIP) into <code>~/.local/share/krita/actions/</code> so the
+default brush shortcuts show up in Configure Krita &gt; Shortcuts. In
+development mode, <code>scripts/install-dev.sh</code> does that
+automatically.</p>
+<p>The dockers show up in <b>Settings &gt; Dockers</b> with the "HQ Tools"
+prefix. To use them as tabs in a single panel, drag one docker over another:
+Krita groups them automatically and you can ungroup by dragging back.</p>
+
+<h2>Screentones and hatching</h2>
+<p>Applies the native Screentone generator as a (non-destructive) fill layer
+inside the active group, optionally limited by the selection. The frequency is
+given in lines per inch (LPI) and the plugin computes the cell size from the
+document DPI; the X/Y position field shifts the screen without moving the
+layer. "Edit selected" loads the options of the selected screentone or mask;
+applying again updates the same layer/mask in place. The "Empty mask (reveal
+by painting)" mode creates the tone invisible and painting on the mask reveals
+it. "Show area" turns the mask into a selection. "Reuse identical screentone"
+avoids duplicating the same tone (a different position counts as a different
+tone). The "Install patterns and textures (kit)" button copies 11 own patterns
+(papers, screentones, manga screentone, hatching, grain) into Krita; they show
+up in "tone with pattern" mode.</p>
+<p>Halftone applies the Halftone filter as a mask on the active layer,
+converting painted tone into dots or lines; on a CMYK document, the
+"Per-channel colors" mode uses the printing angles (15/75/0/45). For
+cross-hatch, apply preset A and then B at complementary angles.</p>
+<p>The "Effect lines" tab inserts speed (focus) or parallel lines as a vector
+layer.</p>
+
+<h2>Balloons</h2>
+<p>Shows the SVG models from a folder (by default,
+<code>~/.local/share/krita/hq_tools/balloons</code>, with samples and public
+domain balloons on first run). Double-click to insert the balloon into the
+active group as a vector layer. You can draw your own balloons and save them
+into that folder. The "Krita symbols" button opens Krita's native docker for
+the installed libraries, and "Install comic fonts" installs the included fonts
+(12 OFL families: Bangers, Comic Relief, Patrick Hand, Comic Neue, Londrina
+Solid/Shadow/Outline/Sketch, Nanum Pen Script, Gaegu and Boogaloo, with
+credits in CREDITS.md).</p>
+
+<h2>Sound effects</h2>
+<p>Catalog of sound effects (8 samples) in
+<code>~/.local/share/krita/hq_tools/onomatopeias</code>. Double-click to
+insert as a vector layer into the active group; draw your own models in
+Inkscape and save them as SVG in the folder.</p>
+
+<h2>Project library</h2>
+<p>Create your own balloons, panels and sound effects inside Krita: pick the
+layer type (Vector or Paint) and "Create new resource" opens a 15 x 15 cm
+square document at 300 dpi. Vector: draw with shapes and text and save as SVG.
+Paint: draw with a brush and save as a transparent PNG, trimmed by the active
+layer. The resource shows up in the list and is inserted into the active group
+with a double-click (PNG becomes a paint layer). The library folder can be
+changed; when you create a project through the manager, the library lives in
+the <code>biblioteca</code> subfolder of the project folder. Rename, Duplicate
+and Delete act on the selected resource; delete asks for confirmation.</p>
+
+<h2>3D viewer</h2>
+<p>The "HQ Tools: 3D" docker brings a posable low-poly mannequin (MakeHuman
+mesh with Auto-Rig Pro rig) to use as pose reference. Pick the body (Man or
+Woman) and the pose from the library (the default is Idle with closed hands;
+new poses come in as files in the <code>poses/</code> folder). Drag on the
+preview to orbit; Shift+drag (or the middle button, or the "Move" button) pans
+the framing; the mouse wheel or the +/− buttons zoom, and "Fit" centers.
+Click a body part: the sliders for that region appear. "Bend", "Open" and
+"Twist" follow the rig axes (on this rig: Z, X and Y, respectively); on the
+arm there is also a slider that bends all fingers at once. The Style selector
+switches between Shaded, Silhouette (flat) and Outline (silhouette line only);
+on the last two the preview gets a paper background so the shape shows up in
+any theme.
+The insertion flow starts with a selection: draw a rectangle with the
+selection tool over the target panel. The preview adopts the selection aspect
+ratio and shows exactly the crop that will be inserted (camera zoom and pan
+included). "Float on page" only works with an active selection: the window
+appears over the selection, draggable and resizable (handle or wheel, keeping
+the aspect ratio), with opacity and the "Lock" button to draw underneath.
+"Insert as layer" and "Insert as reference" also only work with a selection:
+they rasterize at its exact size, place the layer below the active layer (the
+sketch stays on top) and clear the selection; without a selection, a warning
+asks you to draw one.</p>
+
+<h2>Perspective</h2>
+<p>Library of perspective grids to insert into a panel: one-point (frontal),
+two- and three-point, bird's and worm's eye (two levels each) and 4- and
+5-point curvilinear. Pick the set, draw a rectangular selection over the panel
+and insert: the grid lands as a vector layer (each line with two nodes,
+editable) at the selection size, below the sketch; the "Insert as reference"
+option keeps the layer locked, and one Ctrl+Z undoes it. "Float on page" shows
+the grid over the selection, with drag to move and wheel to resize. The colors
+separate the families: blue = verticals/3rd vanishing point; orange = depth
+and axes; gray = horizontals and horizon.</p>
+
+<h2>Palettes</h2>
+<p>Comic and artistic templates (tones, ink, skin, sky, vegetation, flat
+colors, Zorn, portrait, landscape, dawn, night, earth, pastel, watercolor,
+gouache, acrylic, retro, BD, superhero, manga, sepia, values, screentone
+chart) applied directly to the foreground or background color. Pick a swatch
+and use "Apply to foreground"/"Apply to background" (double-click applies to
+the foreground); the color applies to brushes that use the foreground color,
+presets with their own brush color ignore it. The "Install into Krita" button
+copies the files into Krita's palettes folder: after a restart they show up in
+Krita's palettes docker, where clicking a color sets the foreground color. The
+second HQ Tools tab only shows the installed palettes.</p>
+
+<h2>Pages</h2>
+<p>The manager works with the project folder: "New project..." uses the folder
+of the current saved page (if the page is not saved, the warning "Save the
+current page in a folder. That folder becomes the project folder." appears).
+The plugin creates the CPMT <code>comicConfig.json</code> and the library and
+export subfolders in the folder. "Open project..." reads a CPMT project and
+"Folder..." opens any folder with <code>.kra</code> files. "Create next page"
+opens a dialog with format (A4, A5, A3, strip, American, tankobon, square or
+free in mm), DPI and the number of strip panels; the page is born with the
+margin guides (0.5 / 1 / 1.5 cm per side) already applied. "Set page
+template..." uses the current page or a Krita comic template as the base for
+the next pages (A3 resizes; strip becomes a horizontal strip); the "Generate
+HQ Tools standard models" button creates own models on the spot (A4, A3,
+strips 1-3 and grids 2x2/3x3) with margin guides.
+References: "Reference layer" marks the selected layer and "Import reference
+(PNG)" inserts a locked reference into the active group. It shows the internal
+thumbnails, opens with a double-click and allows reordering by dragging. The
+option to name the balloon layer <code>text</code> makes CPMT use the content
+in ACBF/EPUB export. Generated pages come with the "Arte" group
+(Sketch/Color/Ink) and the "Panel mask": painting is limited to the panels;
+hide the mask in the layers docker to also paint in the gutters and margins.</p>
+
+<h2>Brushes</h2>
+<p>The sets (Sketching, Inking, Watercolor/Gouache, Acrylic/Oil, Screentones)
+build cards from the presets already installed in your Krita; click the card
+to activate and right-click assigns it to one of the sixteen slots, with
+shortcuts in <b>Configure Krita &gt; Shortcuts &gt; Scripts &gt; HQ Tools</b>
+(actions "HQ Tools: brush 1" to "brush 16"). The "Packs" tab brings community
+brushes with verified licenses (Deevad v8.2, David Revoy, CC-BY 4.0; Krita
+Watercolor Set, Vasco Basqué, CC-0), installable with one click; each pack has
+its license and credits in CREDITS.md. The "Community" tab lists the presets
+from those packs after they are installed. After installing a pack, restart
+Krita. On the "Packs" tab, the "Install bundle..." button copies your own
+<code>.bundle</code> file into Krita.</p>
+
+<h2>Hub</h2>
+<p>Control center to open and close the modules: one button per docker,
+checked while the dock is open (click again to close). The "Close the current
+one when opening another" option keeps only one module open at a time;
+unchecked, the docks open together.</p>
+
+<h2>Configuration</h2>
+<p>Preferences live in <code>~/.local/share/krita/hq_tools/config.json</code>
+and the user screentone presets in
+<code>~/.local/share/krita/hq_tools/screentone_presets.json</code>. Each
+module can be turned off in the <code>modules</code> key of the configuration
+file (Krita must be restarted). The interface follows the system language
+(Portuguese locale uses Portuguese, everything else uses English); the
+environment variable <code>HQ_TOOLS_IDIOMA=pt|en</code> forces a
+language.</p>
+
+<h2>License</h2>
+<p>MIT. The plugin uses Krita's native features (the Screentone generator and
+Halftone filter, by Deif Lou, and the CPMT, by the Krita team).</p>
+</body>
+</html>
