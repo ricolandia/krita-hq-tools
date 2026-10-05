@@ -167,14 +167,25 @@ def espelhar(valores):
 
 
 def pose_maos_por_lado(valores, lado):
-    """Pose de mão no lado pedido: como está, espelhada ou nas duas mãos."""
+    """Pose de mão no lado pedido: direita, espelhada ou nas duas mãos.
+
+    O seletor manda: os valores de mão esquerda que venham no arquivo são
+    descartados antes de aplicar o lado. As poses antigas (migradas do Idle)
+    guardavam os dois lados, e sem esta normalização o seletor não teria o que
+    mudar (direita, esquerda e ambas saíam iguais).
+    """
+    direita = {
+        osso: dict(junta)
+        for osso, junta in (valores or {}).items()
+        if not osso.endswith(".l")
+    }
     if lado == LADO_ESQUERDA:
-        return espelhar(valores)
+        return espelhar(direita)
     if lado == LADO_AMBAS:
-        resultado = {osso: dict(junta) for osso, junta in (valores or {}).items()}
-        resultado.update(espelhar(valores))
+        resultado = {osso: dict(junta) for osso, junta in direita.items()}
+        resultado.update(espelhar(direita))
         return resultado
-    return {osso: dict(junta) for osso, junta in (valores or {}).items()}
+    return direita
 
 
 EIXOS = {"x": 0, "y": 1, "z": 2}

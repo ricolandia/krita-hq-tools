@@ -286,15 +286,33 @@ class TestEspelhoDePose(unittest.TestCase):
             {"hand.r": {"girar": 10.0}, "hand.l": {"girar": -10.0}},
         )
 
+    def test_pose_maos_com_os_dois_lados_respeita_o_seletor(self):
+        # As poses antigas guardavam os dois lados; o seletor tem que mandar
+        # (a esquerda do arquivo é descartada antes de aplicar o lado).
+        misto = {"hand.r": {"girar": 10.0}, "hand.l": {"girar": 99.0}}
+        self.assertEqual(
+            modelo3d.pose_maos_por_lado(misto, modelo3d.LADO_DIREITA),
+            {"hand.r": {"girar": 10.0}},
+        )
+        self.assertEqual(
+            modelo3d.pose_maos_por_lado(misto, modelo3d.LADO_ESQUERDA),
+            {"hand.l": {"girar": -10.0}},
+        )
+        self.assertEqual(
+            modelo3d.pose_maos_por_lado(misto, modelo3d.LADO_AMBAS),
+            {"hand.r": {"girar": 10.0}, "hand.l": {"girar": -10.0}},
+        )
+
     def test_poses_de_mao_do_repositorio_sao_da_direita(self):
         pasta = os.path.join(
             RAIZ, "hq_tools", "modules", "viewer3d", "poses", "maos"
         )
-        for nome in ("segura.json",):
-            caminho = os.path.join(pasta, nome)
-            if not os.path.isfile(caminho):
-                continue
-            ossos = modelo3d.carregar_pose(caminho)["ossos"]
+        arquivos = [
+            nome for nome in sorted(os.listdir(pasta)) if nome.endswith(".json")
+        ]
+        self.assertTrue(arquivos)
+        for nome in arquivos:
+            ossos = modelo3d.carregar_pose(os.path.join(pasta, nome))["ossos"]
             self.assertTrue(ossos, nome)
             for nome_osso in ossos:
                 self.assertTrue(nome_osso.endswith(".r"), nome_osso)

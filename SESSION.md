@@ -146,6 +146,11 @@ QA de visão aprovou as geometrias e o contraste das cores.
 - Docker: combos "Modelo:", "Corpo:", "Mãos:" e "Mão:" (Direita/Esquerda/
   Ambas) com `modelo3d.pose_maos_por_lado` (espelho = troca de lado com
   `girar` negado, validado contra o Idle real); "Limpar pose" volta ao padrão.
+- Correção (relato do autor): só a pose "Segura" respondia ao seletor porque
+  `fechada`/`abertas` guardavam os dois lados no arquivo. O
+  `pose_maos_por_lado` agora descarta a esquerda do arquivo antes de aplicar o
+  lado (o seletor manda) e os dois JSONs foram normalizados para a direita;
+  padrão do seletor em "Ambas" para o Idle continuar com as duas mãos fechadas.
 - Exportador robusto: `--parte`, entrada `.blend` e escolha da armadura por
   interseção com os ossos do modelo (o joinha v1 trazia 2 rigs; ficou de fora,
   o autor vai refazer a pose).

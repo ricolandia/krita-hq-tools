@@ -9,9 +9,12 @@
   Segura, autorais para a mão direita), com dois combos no docker: "Corpo:" e
   "Mãos:".
 - Novo seletor "Mão:" (Direita / Esquerda / Ambas): a pose de mão pode ser
-  espelhada para a esquerda (o espelho troca o lado e nega o giro).
-- "Limpar pose" volta ao padrão (Idle + Fechadas). Sem miniaturas por
-  enquanto: os combos são listas com os nomes das poses.
+  espelhada para a esquerda (o espelho troca o lado e nega o giro). O seletor
+  normaliza a pose para a mão direita antes de aplicar o lado; as poses
+  migradas guardavam os dois lados e, sem isso, "Direita", "Esquerda" e
+  "Ambas" saíam iguais.
+- "Limpar pose" volta ao padrão (Idle + Fechadas, nas duas mãos). Sem
+  miniaturas por enquanto: os combos são listas com os nomes das poses.
 - Exportador de poses (`scripts/exportar-poses3d.py`): opção `--parte
   corpo|maos|tudo`, entrada `.blend` e escolha automática da armadura
   principal quando o arquivo traz mais de um rig.

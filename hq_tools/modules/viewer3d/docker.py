@@ -336,7 +336,9 @@ class Viewer3DDocker(DockWidget):
         self.semantica = {}
         self.pose_corpo = VIEWER3D_POSE_CORPO_PADRAO
         self.pose_maos = VIEWER3D_POSE_MAOS_PADRAO
-        self.lado_mao = modelo3d.LADO_DIREITA
+        # Padrão "ambas": o Idle de trabalho fica com as duas mãos fechadas,
+        # como antes da separação; o seletor troca para um lado só.
+        self.lado_mao = modelo3d.LADO_AMBAS
         self.modo_mover = False
         self.modo_fixado = False
         self.camera = {
@@ -901,10 +903,10 @@ class Viewer3DDocker(DockWidget):
         self.agendar_render()
 
     def limpar_pose(self):
-        """Volta ao padrão: Idle + Fechadas, na mão direita."""
+        """Volta ao padrão: Idle + Fechadas, nas duas mãos."""
         self.pose_corpo = VIEWER3D_POSE_CORPO_PADRAO
         self.pose_maos = VIEWER3D_POSE_MAOS_PADRAO
-        self.lado_mao = modelo3d.LADO_DIREITA
+        self.lado_mao = modelo3d.LADO_AMBAS
         self._sincronizar_combos()
         self._aplicar_poses()
 
