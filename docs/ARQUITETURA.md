@@ -1,6 +1,6 @@
 # Arquitetura do HQ Tools
 
-Plugin do Krita (Python) para produção de quadrinhos, com sete módulos
+Plugin do Krita (Python) para produção de quadrinhos, com oito módulos
 habilitáveis e um núcleo compartilhado. Alvo: Krita 5.3.4 (AppImage, PyQt5,
 Python 3.13); o núcleo de compatibilidade prepara a migração para o Krita 6
 (PyQt6).

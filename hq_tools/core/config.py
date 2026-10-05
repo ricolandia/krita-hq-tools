@@ -25,6 +25,7 @@ DEFAULT_CONFIG = {
         "pages": True,
         "brushes": True,
         "biblioteca": True,
+        "viewer3d": True,
     },
     "screentone": {
         "last_preset": "Sombra média 60 LPI",

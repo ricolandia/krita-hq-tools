@@ -5,7 +5,7 @@ Material para o README, a release e a página de exemplo no site. Salvar tudo em
 
 ## Preparação
 
-- Krita 5.3.4 com o HQ Tools instalado e os 7 dockers agrupados como abas num
+- Krita 5.3.4 com o HQ Tools instalado e os 8 dockers agrupados como abas num
   painel à direita.
 - Abrir um projeto de demonstração (uma HQ curta de 3 a 6 páginas serve para
   todas as cenas).

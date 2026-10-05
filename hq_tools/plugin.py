@@ -1,7 +1,8 @@
 """Registro do plugin HQ Tools no Krita.
 
-Cada módulo (retículas, balões, paletas, páginas, pincéis) registra o seu
-docker aqui, conforme a configuração salva em ``~/.local/share/krita/hq_tools``.
+Cada módulo (retículas, balões, onomatopeias, paletas, páginas, biblioteca,
+pincéis e o 3D) registra o seu docker aqui, conforme a configuração salva em
+``~/.local/share/krita/hq_tools``.
 """
 
 from krita import DockWidgetFactory, DockWidgetFactoryBase, Extension, Krita

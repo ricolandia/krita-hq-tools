@@ -10,6 +10,7 @@ que são carregadas na inicialização do programa.
 import os
 import re
 import shutil
+import zlib
 
 TIPOS = ("paintoppresets", "brushes", "patterns", "palettes")
 FONTE_NOME = "FONTE.md"
@@ -88,8 +89,37 @@ def preset_names(pack_dir):
     return nomes
 
 
+def _texto_do_chunk(tipo, dados):
+    """Texto de um chunk de texto do PNG (tEXt, zTXt ou iTXt)."""
+    try:
+        if tipo == "tEXt":
+            return dados.decode("utf-8", "replace")
+        if tipo == "zTXt":
+            corte = dados.find(b"\0")
+            if corte < 0 or corte + 2 > len(dados):
+                return None
+            return zlib.decompress(dados[corte + 2:]).decode("utf-8", "replace")
+        if tipo == "iTXt":
+            partes = dados.split(b"\0", 5)
+            if len(partes) < 6:
+                return None
+            if partes[1] == b"\x01":
+                return zlib.decompress(partes[5]).decode("utf-8", "replace")
+            return partes[5].decode("utf-8", "replace")
+    except (ValueError, UnicodeDecodeError, zlib.error):
+        return None
+    return None
+
+
 def _preset_chunk_xml(caminho):
-    """Extrai o XML do chunk tEXt 'preset' de um .kpp (PNG com anotação)."""
+    """Extrai o XML do chunk 'preset' de um .kpp (PNG com anotação).
+
+    O Krita grava o XML em ``tEXt`` na maioria dos presets, mas usa ``zTXt``
+    (comprimido) em alguns (3 do pack do Deevad) e ``iTXt`` é aceito por
+    outros geradores. O auditor de packs já lia os três; aqui faltava, e o
+    preset ficava sem nome interno (o fallback pelo nome do arquivo salvava
+    só quando os dois coincidem).
+    """
     try:
         with open(caminho, "rb") as handle:
             dados = handle.read()
@@ -101,12 +131,14 @@ def _preset_chunk_xml(caminho):
     while offset + 8 <= len(dados):
         tamanho = int.from_bytes(dados[offset:offset + 4], "big")
         tipo = dados[offset + 4:offset + 8].decode("latin1", "replace")
-        if tipo == "tEXt":
-            texto = dados[offset + 8:offset + 8 + tamanho]
-            if texto.startswith(b"preset\0"):
-                return texto[len(b"preset\0"):].decode("utf-8", "replace")
         if tipo == "IEND":
             break
+        if tipo in ("tEXt", "zTXt", "iTXt"):
+            conteudo = dados[offset + 8:offset + 8 + tamanho]
+            if conteudo.startswith(b"preset\0"):
+                texto = _texto_do_chunk(tipo, conteudo)
+                if texto:
+                    return texto
         offset += 12 + tamanho
     return None
 

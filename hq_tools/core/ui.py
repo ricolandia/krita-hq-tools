@@ -1,7 +1,7 @@
 """Camada de widgets compartilhada: um lugar só para o visual dos dockers.
 
 Até a v0.6.2 cada docker criava os widgets por conta própria, e a diferença
-ficou visível: 52 botões, 11 com ícone e 22 com tooltip, espalhados por 7
+ficou visível: 52 botões, 11 com ícone e 22 com tooltip, espalhados por 8
 arquivos escritos em momentos diferentes. O docker de páginas tem 10 tooltips e
 5 ícones; o de retículas, que é o maior, tem 1 tooltip e nenhum ícone. Nada
 impedia a divergência, porque não havia regra: cada botão decidia sozinho.
@@ -108,7 +108,7 @@ def espacamento(layout, margem=MARGEM, espaco=GAP):
 def painel(pai=None, margem=MARGEM, espaco=GAP):
     """``(widget, layout vertical)`` já com o espaçamento da casa.
 
-    Os 7 dockers abriam com as mesmas duas linhas; agora abrem com uma.
+    Os 8 dockers abriam com as mesmas duas linhas; agora abrem com uma.
     """
     widget = QtWidgets.QWidget(pai)
     if os.path.isfile(ICONE_PATH):

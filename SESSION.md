@@ -99,6 +99,29 @@ Pendente (validação dentro do Krita):
 - Kit do autor: lista de modelos na pasta de balões e a inserção no grupo
   ativo (conferir também uma cauda com base aberta, para emendar no corpo).
 
+## Auditoria de 2026-10-05 (3 frentes + quick wins, sem release ainda)
+
+Auditoria por três frentes novas (Python, Krita/libkis e design), com o
+sistema de packs em profundidade e QA visual das capturas. Relatório em
+**`docs/AUDITORIA-2026-10-05.md`**. Nenhum achado da gravidade dos lotes de
+30/09: o que apareceu agora é de borda.
+
+Quick wins aplicados (275 testes verdes):
+
+- `viewer3d` entrou no `DEFAULT_CONFIG` (não aparecia para desligar no config).
+- `paths.py` respeita `XDG_DATA_HOME`/`XDG_CACHE_HOME` no Linux (Flatpak,
+  como a tabela do `INSTALL.md` promete).
+- "Criar próxima página" avisa quando o registro no CPMT falha.
+- `packs.py` lê o XML do preset em `zTXt`/`iTXt` (3 presets do Deevad usam
+  `zTXt`; antes ficavam sem nome interno).
+- "Guias de margem" mescla com as guias existentes (`pages/guias.py`, puro).
+- "Instalar no Krita" das paletas pula as que já são a mesma cópia.
+- Sete abas internas passaram a usar a escala de espaçamento (`ui.espacamento`).
+- Contagem de módulos (8) corrigida nos docs e docstrings.
+
+A validar no Krita: flutuante do 3D com dois documentos abertos, Ctrl+Z na
+inserção do 3D e da biblioteca, guias mescladas e margens das abas.
+
 ## Auditoria de 2026-09-30 (4 lotes, sem release ainda)
 
 Auditoria por quatro frentes (correção, desempenho, robustez, testes/docs),

@@ -17,7 +17,7 @@ from ...core.compat import (
 )
 from ...core.config import Config
 from ...core.gpl import load_gpl
-from ...core.paths import KRITA_PALETTES_DIR
+from ...core.paths import KRITA_PALETTES_DIR, mesma_copia
 from ...core import ui
 
 TEMPLATES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates")
@@ -60,7 +60,7 @@ class PalettesDocker(DockWidget):
     def _build_templates_tab(self):
         widgets = QtWidgets
         tab = widgets.QWidget()
-        layout = widgets.QVBoxLayout(tab)
+        layout = ui.espacamento(widgets.QVBoxLayout(tab))
 
         row = widgets.QHBoxLayout()
         row.addWidget(ui.rotulo("Template:"))
@@ -113,7 +113,7 @@ class PalettesDocker(DockWidget):
     def _build_krita_tab(self):
         widgets = QtWidgets
         tab = widgets.QWidget()
-        layout = widgets.QVBoxLayout(tab)
+        layout = ui.espacamento(widgets.QVBoxLayout(tab))
 
         row = widgets.QHBoxLayout()
         row.addWidget(ui.rotulo("Paleta:"))
@@ -208,19 +208,30 @@ class PalettesDocker(DockWidget):
             view.setBackGroundColor(managed)
 
     def install_templates(self):
+        """Copia os templates para o Krita, pulando os que já são a mesma cópia."""
         os.makedirs(KRITA_PALETTES_DIR, exist_ok=True)
         installed = 0
+        ignoradas = 0
         for name in self._template_files():
             source = os.path.join(TEMPLATES_DIR, name)
             target = os.path.join(KRITA_PALETTES_DIR, name)
             try:
+                if mesma_copia(source, target):
+                    ignoradas += 1
+                    continue
                 shutil.copy2(source, target)
                 installed += 1
             except OSError:
                 continue
+        if not installed:
+            helpers.show_message(
+                "As {0} paleta(s) já estão instaladas.".format(ignoradas)
+            )
+            return
         helpers.show_message(
-            "{0} paletas instaladas. Reinicie o Krita para vê-las no docker "
-            "de paletas; lá, clicar numa cor define a cor de frente.".format(installed)
+            "{0} paletas instaladas ({1} já estavam). Reinicie o Krita para "
+            "vê-las no docker de paletas; lá, clicar numa cor define a cor de "
+            "frente.".format(installed, ignoradas)
         )
 
     def open_krita_folder(self):

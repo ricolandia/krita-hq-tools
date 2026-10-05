@@ -76,3 +76,46 @@ class TestMesmaCopia(unittest.TestCase):
             handle.write(b"")
         os.utime(self.destino, (0, 0))
         self.assertFalse(mesma_copia(self.origem, self.destino))
+
+
+class TestPastasPorSistema(unittest.TestCase):
+    """No Linux o XDG manda: é o que o Flatpak define (tabela do INSTALL.md)."""
+
+    def test_linux_sem_xdg(self):
+        self.assertEqual(
+            paths._pasta_do_krita("linux", {}, "/home/x"),
+            os.path.join("/home/x", ".local", "share", "krita"),
+        )
+
+    def test_linux_com_xdg_data(self):
+        ambiente = {"XDG_DATA_HOME": "/home/x/.var/app/org.kde.krita/data"}
+        self.assertEqual(
+            paths._pasta_do_krita("linux", ambiente, "/home/x"),
+            os.path.join(ambiente["XDG_DATA_HOME"], "krita"),
+        )
+
+    def test_linux_cache_com_xdg(self):
+        ambiente = {"XDG_CACHE_HOME": "/home/x/.var/app/org.kde.krita/cache"}
+        self.assertEqual(
+            paths._pasta_de_cache("linux", ambiente, "/home/x"),
+            os.path.join(ambiente["XDG_CACHE_HOME"], "hq_tools"),
+        )
+
+    def test_linux_cache_sem_xdg(self):
+        self.assertEqual(
+            paths._pasta_de_cache("linux", {}, "/home/x"),
+            os.path.join("/home/x", ".cache", "hq_tools"),
+        )
+
+    def test_windows_usa_appdata(self):
+        ambiente = {"APPDATA": os.path.join("C:", "Users", "x", "AppData", "Roaming")}
+        self.assertEqual(
+            paths._pasta_do_krita("win32", ambiente, os.path.join("C:", "Users", "x")),
+            os.path.join(ambiente["APPDATA"], "krita"),
+        )
+
+    def test_macos(self):
+        self.assertEqual(
+            paths._pasta_do_krita("darwin", {}, "/Users/x"),
+            os.path.join("/Users/x", "Library", "Application Support", "krita"),
+        )

@@ -128,7 +128,7 @@ class BrushesDocker(DockWidget):
     def _add_set_tab(self, label):
         widgets = QtWidgets
         tab = widgets.QWidget()
-        layout = widgets.QVBoxLayout(tab)
+        layout = ui.espacamento(widgets.QVBoxLayout(tab))
         list_widget = widgets.QListWidget()
         list_widget.setViewMode(ICON_MODE)
         list_widget.setIconSize(QtCore.QSize(72, 72))
@@ -149,7 +149,7 @@ class BrushesDocker(DockWidget):
     def _build_packs_tab(self):
         widgets = QtWidgets
         tab = widgets.QWidget()
-        layout = widgets.QVBoxLayout(tab)
+        layout = ui.espacamento(widgets.QVBoxLayout(tab))
 
         self.list_packs = widgets.QListWidget()
         self.list_packs.setSelectionMode(SINGLE_SELECTION)
@@ -196,7 +196,7 @@ class BrushesDocker(DockWidget):
         """Presets dos packs da comunidade já instalados no Krita."""
         widgets = QtWidgets
         tab = widgets.QWidget()
-        layout = widgets.QVBoxLayout(tab)
+        layout = ui.espacamento(widgets.QVBoxLayout(tab))
         self.list_community = widgets.QListWidget()
         self.list_community.setViewMode(ICON_MODE)
         self.list_community.setIconSize(QtCore.QSize(72, 72))

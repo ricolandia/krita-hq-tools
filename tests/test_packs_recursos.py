@@ -20,6 +20,8 @@ import tempfile
 import unittest
 import zlib
 
+from hq_tools.modules.brushes import packs
+
 REPO = pathlib.Path(__file__).resolve().parent.parent
 SCRIPT = REPO / "scripts" / "auditar-packs.py"
 
@@ -105,6 +107,50 @@ class TestExtracaoDePreset(unittest.TestCase):
             caminho = pathlib.Path(pasta) / "p.kpp"
             caminho.write_bytes(b"isto nao e um png")
             self.assertEqual("", aud.xml_do_preset(caminho))
+
+
+class TestNomeInternoDoPreset(unittest.TestCase):
+    """O runtime (packs.py) tem que ler o mesmo que o auditor: tEXt e zTXt."""
+
+    XML = '<Preset paintopid="paintbrush" name="Nome Interno"></Preset>'
+
+    def _escrever(self, pasta, comprimido):
+        caminho = pathlib.Path(pasta) / "p.kpp"
+        caminho.write_bytes(kpp(self.XML, comprimido=comprimido))
+        return str(caminho)
+
+    def test_text_simples(self):
+        with tempfile.TemporaryDirectory() as pasta:
+            self.assertEqual(
+                packs._preset_internal_name(self._escrever(pasta, False)),
+                "Nome Interno",
+            )
+
+    def test_ztxt_comprimido(self):
+        # 3 presets do pack do Deevad guardam o XML em zTXt.
+        with tempfile.TemporaryDirectory() as pasta:
+            self.assertEqual(
+                packs._preset_internal_name(self._escrever(pasta, True)),
+                "Nome Interno",
+            )
+
+    def test_alias_acha_nome_interno_diferente_do_arquivo(self):
+        with tempfile.TemporaryDirectory() as pasta:
+            presets = pathlib.Path(pasta) / "paintoppresets"
+            presets.mkdir()
+            (presets / "arquivo-diferente.kpp").write_bytes(
+                kpp(self.XML, comprimido=True)
+            )
+            self.assertEqual(
+                packs.preset_aliases(pasta),
+                [("arquivo-diferente", "Nome Interno")],
+            )
+
+    def test_arquivo_que_nao_e_png(self):
+        with tempfile.TemporaryDirectory() as pasta:
+            caminho = pathlib.Path(pasta) / "p.kpp"
+            caminho.write_bytes(b"isto nao e um png")
+            self.assertIsNone(packs._preset_internal_name(str(caminho)))
 
 
 class TestAuditoriaDePack(unittest.TestCase):

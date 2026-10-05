@@ -33,7 +33,7 @@ from ...core.paths import KRITA_HOME, MODELOS_DIR
 from ...core import ui
 from ...core.thumbs import thumbnail_pixmap
 from ..biblioteca import core as biblioteca_core
-from . import generator, modelos as modelos_lib, roteiro
+from . import generator, guias, modelos as modelos_lib, roteiro
 
 FORMATO_ITENS = (
     ("A4", "A4"),
@@ -495,10 +495,24 @@ class PagesDocker(DockWidget):
                 helpers.show_info("Nova página", "Falha ao criar a página: {0}".format(error))
                 return
 
+        registrada = True
         if self.project is not None:
-            self.project.register_pages([relative])
+            try:
+                self.project.register_pages([relative])
+            except (OSError, CPMTError) as error:
+                registrada = False
+                helpers.log(
+                    "página criada, mas registro no CPMT falhou: {0}".format(error)
+                )
         self.refresh()
-        helpers.show_info("Nova página", "Página criada: {0}".format(filename))
+        if registrada:
+            helpers.show_info("Nova página", "Página criada: {0}".format(filename))
+        else:
+            helpers.show_info(
+                "Nova página",
+                "Página criada ({0}), mas não foi possível registrá-la no "
+                "projeto; confira a lista do CPMT.".format(filename),
+            )
 
     def _proximo_indice_livre(self):
         """Próximo número de página livre (sem sobrescrever buracos)."""
@@ -577,18 +591,22 @@ class PagesDocker(DockWidget):
             target.addChildNode(clone, nova)
 
     def apply_margin_guides(self, document):
-        """Cria 12 guias no documento: 0,5 / 1 / 1,5 cm por lado."""
+        """Cria as guias de margem sem apagar as guias que o autor já tinha.
+
+        O libkis troca a lista inteira a cada chamada; mesclar com as guias
+        atuais preserva perspectiva, sangria e corte.
+        """
         dpi = helpers.document_dpi(document)
         width = document.width()
         height = document.height()
-        verticais = []
-        horizontais = []
-        for margem in (0.5, 1.0, 1.5):
-            px = float(margem) * dpi / 2.54
-            verticais.extend([px, width - px])
-            horizontais.extend([px, height - px])
-        document.setVerticalGuides(sorted(set(round(v, 3) for v in verticais)))
-        document.setHorizontalGuides(sorted(set(round(v, 3) for v in horizontais)))
+        verticais, horizontais = guias.posicoes_de_margem(width, height, dpi)
+        try:
+            existentes_v = list(document.verticalGuides())
+            existentes_h = list(document.horizontalGuides())
+        except (AttributeError, RuntimeError, TypeError):
+            existentes_v, existentes_h = [], []
+        document.setVerticalGuides(guias.mesclar(existentes_v, verticais))
+        document.setHorizontalGuides(guias.mesclar(existentes_h, horizontais))
 
     def create_margin_guides(self):
         document = helpers.active_document()
@@ -596,7 +614,10 @@ class PagesDocker(DockWidget):
             helpers.show_message("Abra a página para criar as guias.")
             return
         self.apply_margin_guides(document)
-        helpers.show_message("Guias de margem criadas (0,5 / 1 / 1,5 cm por lado).")
+        helpers.show_message(
+            "Guias de margem criadas (0,5 / 1 / 1,5 cm por lado), mantendo as "
+            "guias existentes."
+        )
 
     # ------------------------------------------------------------------ modelo
 

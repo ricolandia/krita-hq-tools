@@ -64,7 +64,7 @@ class ScreentoneDocker(DockWidget):
     def _build_tones_tab(self):
         widgets = QtWidgets
         tab = widgets.QWidget()
-        layout = widgets.QVBoxLayout(tab)
+        layout = ui.espacamento(widgets.QVBoxLayout(tab))
 
         preset_row = widgets.QHBoxLayout()
         preset_row.addWidget(ui.rotulo("Preset:"))
@@ -253,7 +253,7 @@ class ScreentoneDocker(DockWidget):
     def _build_effects_tab(self):
         widgets = QtWidgets
         tab = widgets.QWidget()
-        layout = widgets.QVBoxLayout(tab)
+        layout = ui.espacamento(widgets.QVBoxLayout(tab))
 
         form = widgets.QFormLayout()
         self.cmb_effect = widgets.QComboBox()

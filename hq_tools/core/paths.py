@@ -11,22 +11,36 @@ import sys
 HOME = os.path.expanduser("~")
 
 
-def _pasta_do_krita():
-    if sys.platform.startswith("win"):
-        base = os.environ.get("APPDATA") or os.path.join(HOME, "AppData", "Roaming")
+def _pasta_do_krita(plataforma=None, ambiente=None, home=None):
+    """Pasta de dados do Krita por sistema.
+
+    No Linux o ``XDG_DATA_HOME`` manda quando existe: é o que o Flatpak define
+    (``~/.var/app/org.kde.krita/data``) e o que a tabela do ``INSTALL.md``
+    promete. Sem a variável, segue ``~/.local/share/krita``.
+    """
+    plataforma = sys.platform if plataforma is None else plataforma
+    ambiente = os.environ if ambiente is None else ambiente
+    home = HOME if home is None else home
+    if plataforma.startswith("win"):
+        base = ambiente.get("APPDATA") or os.path.join(home, "AppData", "Roaming")
         return os.path.join(base, "krita")
-    if sys.platform == "darwin":
-        return os.path.join(HOME, "Library", "Application Support", "krita")
-    return os.path.join(HOME, ".local", "share", "krita")
+    if plataforma == "darwin":
+        return os.path.join(home, "Library", "Application Support", "krita")
+    dados = ambiente.get("XDG_DATA_HOME") or os.path.join(home, ".local", "share")
+    return os.path.join(dados, "krita")
 
 
-def _pasta_de_cache():
-    if sys.platform.startswith("win"):
-        base = os.environ.get("LOCALAPPDATA") or os.path.join(HOME, "AppData", "Local")
+def _pasta_de_cache(plataforma=None, ambiente=None, home=None):
+    plataforma = sys.platform if plataforma is None else plataforma
+    ambiente = os.environ if ambiente is None else ambiente
+    home = HOME if home is None else home
+    if plataforma.startswith("win"):
+        base = ambiente.get("LOCALAPPDATA") or os.path.join(home, "AppData", "Local")
         return os.path.join(base, "hq_tools", "cache")
-    if sys.platform == "darwin":
-        return os.path.join(HOME, "Library", "Caches", "hq_tools")
-    return os.path.join(HOME, ".cache", "hq_tools")
+    if plataforma == "darwin":
+        return os.path.join(home, "Library", "Caches", "hq_tools")
+    cache = ambiente.get("XDG_CACHE_HOME") or os.path.join(home, ".cache")
+    return os.path.join(cache, "hq_tools")
 
 
 def _pasta_de_fontes():
