@@ -164,6 +164,11 @@ Tudo em `~/.local/share/krita/hq_tools/`:
 - `screentone_presets.json` (presets de retícula do usuário);
 - `balloons/` (modelos de balão, com amostras na primeira execução).
 
+A interface segue o idioma do sistema: locale de português usa português, o
+resto usa inglês; a variável de ambiente `HQ_TOOLS_IDIOMA=pt|en` força um
+idioma. O manual e o guia de instalação têm versões em inglês
+(`hq_tools_manual.en.html`, `INSTALL.en.md`).
+
 ## Licença
 
 MIT. Usa recursos nativos do Krita: gerador Screentone e filtro Halftone

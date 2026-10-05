@@ -1,6 +1,6 @@
 # Changelog
 
-## [Não publicado]
+## [0.9.0] — 2026-10-05
 
 ### Idioma (PT/EN)
 

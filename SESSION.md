@@ -1,8 +1,8 @@
 # SESSION — HQ Tools (Krita-Comics-Plugin)
 
-Fonte da verdade do projeto. Atualizado em 2026-10-05 (v0.8.0 **publicada**:
-hub dos módulos e biblioteca de linhas de perspectiva, com os quick wins da
-auditoria de 05/10).
+Fonte da verdade do projeto. Atualizado em 2026-10-05 (v0.9.0 **publicada**:
+interface PT/EN nos dockers, manual e INSTALL em inglês, além do hub e da
+biblioteca de perspectiva da 0.8.0).
 
 Espelho no Trilium (VPS): nota **"HQ Tools - Plugin Krita"** (`JVRkycXWq0KN`,
 em Apps e Jogos), com as subnotas Estado e decisões, Instalação e uso,
@@ -31,7 +31,7 @@ conclusão da pesquisa está em `docs/contexto/` (os 4 arquivos originais).
 - **Paletas:** docker próprio com templates `.gpl`.
 - Licença MIT; docs em `.md` na pasta do projeto (regra de documentação).
 
-## Estado (v0.8.0 publicada)
+## Estado (v0.9.0 publicada)
 
 Feito:
 
@@ -137,7 +137,7 @@ docker gera na proporção da seleção) e `tests/test_perspectivas.py`
 verticais/3º VP, laranja = profundidade/eixos, cinza = horizontais/VP direito.
 QA de visão aprovou as geometrias e o contraste das cores.
 
-## Idioma (i18n) e docs EN (05/10/2026, sem release)
+## Idioma (i18n) e docs EN (v0.9.0, 05/10/2026)
 
 - **Interface PT/EN**: `core/i18n.py` com `t(texto)` (chave = string PT) e o
   dicionário em `core/i18n_en.py` (373 entradas); idioma pelo locale do
