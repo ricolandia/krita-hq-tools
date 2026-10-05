@@ -122,6 +122,20 @@ Quick wins aplicados (275 testes verdes):
 A validar no Krita: flutuante do 3D com dois documentos abertos, Ctrl+Z na
 inserção do 3D e da biblioteca, guias mescladas e margens das abas.
 
+## Perspectivas: pesquisa + 9 conjuntos de linhas (05/10/2026, sem release)
+
+Primeira entrega da ideia "biblioteca de linhas de perspectiva": pesquisa das
+perspectivas mais usadas em quadrinhos (1/2/3 pontos, pássaro/verme,
+curvilíneas 4/5; David Chelsea como referência aclamada) em
+**`docs/PERSPECTIVAS.md`**, e os 9 conjuntos em
+**`hq_tools/resources/perspectivas/`**, com a regra do autor: **2 nós por
+linha** (retas `<line>`, arcos `<path>` com um único `M` e um único `A`).
+Gerador paramétrico `scripts/gerar-perspectivas.py` (padrão 900x1200; o
+docker futuro gera na proporção da seleção) e `tests/test_perspectivas.py`
+(inclui a sincronia byte a byte dos SVGs versionados). Cores: azul =
+verticais/3º VP, laranja = profundidade/eixos, cinza = horizontais/VP direito.
+QA de visão aprovou as geometrias e o contraste das cores.
+
 ## Auditoria de 2026-09-30 (4 lotes, sem release ainda)
 
 Auditoria por quatro frentes (correção, desempenho, robustez, testes/docs),

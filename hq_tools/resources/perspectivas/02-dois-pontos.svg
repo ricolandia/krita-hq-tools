@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200">
+<!-- HQ Tools: 02-dois-pontos.svg | Dois pontos: laranja = VP esquerdo; cinza = VP direito; azul = verticais | gerado por scripts/gerar-perspectivas.py -->
+<line x1="0.0" y1="272.7" x2="450.0" y2="0.0" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="0.0" y1="327.3" x2="648.0" y2="0.0" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="0.0" y1="381.8" x2="900.0" y2="18.2" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="0.0" y1="436.4" x2="900.0" y2="163.6" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="0.0" y1="490.9" x2="900.0" y2="309.1" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="0.0" y1="545.5" x2="900.0" y2="454.5" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="0.0" y1="654.5" x2="900.0" y2="745.5" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="0.0" y1="709.1" x2="900.0" y2="890.9" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="0.0" y1="763.6" x2="900.0" y2="1036.4" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="0.0" y1="818.2" x2="900.0" y2="1181.8" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="0.0" y1="872.7" x2="648.0" y2="1200.0" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="0.0" y1="927.3" x2="450.0" y2="1200.0" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="900.0" y1="272.7" x2="450.0" y2="0.0" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="900.0" y1="327.3" x2="252.0" y2="0.0" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="0.0" y1="18.2" x2="900.0" y2="381.8" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="0.0" y1="163.6" x2="900.0" y2="436.4" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="0.0" y1="309.1" x2="900.0" y2="490.9" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="0.0" y1="454.5" x2="900.0" y2="545.5" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="0.0" y1="745.5" x2="900.0" y2="654.5" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="0.0" y1="890.9" x2="900.0" y2="709.1" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="0.0" y1="1036.4" x2="900.0" y2="763.6" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="0.0" y1="1181.8" x2="900.0" y2="818.2" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="900.0" y1="872.7" x2="252.0" y2="1200.0" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="900.0" y1="927.3" x2="450.0" y2="1200.0" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="90.0" y1="0.0" x2="90.0" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
+<line x1="180.0" y1="0.0" x2="180.0" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
+<line x1="270.0" y1="0.0" x2="270.0" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
+<line x1="360.0" y1="0.0" x2="360.0" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
+<line x1="450.0" y1="0.0" x2="450.0" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
+<line x1="540.0" y1="0.0" x2="540.0" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
+<line x1="630.0" y1="0.0" x2="630.0" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
+<line x1="720.0" y1="0.0" x2="720.0" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
+<line x1="810.0" y1="0.0" x2="810.0" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
+<line x1="0.0" y1="600.0" x2="900.0" y2="600.0" stroke="#b0b4ba" stroke-width="2.0"/>
+</svg>

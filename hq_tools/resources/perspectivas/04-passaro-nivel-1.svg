@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200">
+<!-- HQ Tools: 04-passaro-nivel-1.svg | Vista de passaro suave: horizonte a 30% da altura, 3o VP abaixo | gerado por scripts/gerar-perspectivas.py -->
+<line x1="0.0" y1="163.6" x2="450.0" y2="0.0" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="0.0" y1="218.2" x2="830.8" y2="0.0" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="0.0" y1="272.7" x2="900.0" y2="127.3" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="0.0" y1="327.3" x2="900.0" y2="272.7" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="0.0" y1="381.8" x2="900.0" y2="418.2" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="0.0" y1="436.4" x2="900.0" y2="563.6" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="0.0" y1="490.9" x2="900.0" y2="709.1" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="0.0" y1="545.5" x2="900.0" y2="854.5" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="0.0" y1="600.0" x2="900.0" y2="1000.0" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="0.0" y1="654.5" x2="900.0" y2="1145.5" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="0.0" y1="709.1" x2="759.4" y2="1200.0" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="0.0" y1="763.6" x2="583.8" y2="1200.0" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="0.0" y1="818.2" x2="450.0" y2="1200.0" stroke="#e8843c" stroke-width="1.2"/>
+<line x1="900.0" y1="163.6" x2="450.0" y2="0.0" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="900.0" y1="218.2" x2="69.2" y2="0.0" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="0.0" y1="127.3" x2="900.0" y2="272.7" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="0.0" y1="272.7" x2="900.0" y2="327.3" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="0.0" y1="418.2" x2="900.0" y2="381.8" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="0.0" y1="563.6" x2="900.0" y2="436.4" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="0.0" y1="709.1" x2="900.0" y2="490.9" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="0.0" y1="854.5" x2="900.0" y2="545.5" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="0.0" y1="1000.0" x2="900.0" y2="600.0" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="0.0" y1="1145.5" x2="900.0" y2="654.5" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="900.0" y1="709.1" x2="140.6" y2="1200.0" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="900.0" y1="763.6" x2="316.2" y2="1200.0" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="900.0" y1="818.2" x2="450.0" y2="1200.0" stroke="#b0b4ba" stroke-width="1.2"/>
+<line x1="0.0" y1="360.0" x2="225.0" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
+<line x1="0.0" y1="24.0" x2="262.5" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
+<line x1="85.7" y1="0.0" x2="300.0" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
+<line x1="176.8" y1="0.0" x2="337.5" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
+<line x1="267.9" y1="0.0" x2="375.0" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
+<line x1="358.9" y1="0.0" x2="412.5" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
+<line x1="450.0" y1="0.0" x2="450.0" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
+<line x1="541.1" y1="0.0" x2="487.5" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
+<line x1="632.1" y1="0.0" x2="525.0" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
+<line x1="723.2" y1="0.0" x2="562.5" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
+<line x1="814.3" y1="0.0" x2="600.0" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
+<line x1="900.0" y1="24.0" x2="637.5" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
+<line x1="900.0" y1="360.0" x2="675.0" y2="1200.0" stroke="#2f6fd0" stroke-width="1.2"/>
+<line x1="0.0" y1="360.0" x2="900.0" y2="360.0" stroke="#b0b4ba" stroke-width="2.0"/>
+</svg>

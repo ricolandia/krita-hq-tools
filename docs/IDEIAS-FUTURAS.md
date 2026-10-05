@@ -221,6 +221,13 @@ SVG vai para uma camada. Reusa o fluxo do 3D já validado: `mapeamento`
 padrão do flutuante (`_Flutuante`); e, aprendendo com a auditoria de 05/10, a
 inserção entra em macro de desfazer (`run_in_macro`).
 
+**Primeira entrega (05/10/2026):** os 9 conjuntos de linhas foram gerados em
+`hq_tools/resources/perspectivas/` (cada linha com exatamente 2 nós), com
+pesquisa e catálogo em `docs/PERSPECTIVAS.md`, gerador em
+`scripts/gerar-perspectivas.py` e testes em `tests/test_perspectivas.py`.
+O docker com o fluxo de seleção ainda não existe; a inserção escolhida é
+raster, como o 3D.
+
 **Perguntas abertas:** arrastar/zoom ajusta o quê no grid (mover os pontos de
 fuga, girar o horizonte, mudar a densidade de linhas)? As cores por família
 são fixas ou escolhíveis? Inserir como vetor (editável) ou raster (mais
