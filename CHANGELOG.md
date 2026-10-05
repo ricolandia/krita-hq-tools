@@ -1,6 +1,15 @@
 # Changelog
 
-## [Não publicado]
+## [0.8.0] — 2026-10-05
+
+Duas frentes novas: o **hub** para abrir e fechar os módulos e a **biblioteca
+de linhas de perspectiva**, no mesmo fluxo de seleção do visualizador 3D
+(inserção vetorial no painel). Validado dentro do Krita pelo autor em
+05/10/2026.
+
+| Hub | Perspectiva |
+|---|---|
+| ![Docker Hub com os botões que abrem e fecham os módulos](https://raw.githubusercontent.com/ricolandia/krita-hq-tools/main/Screenshots/10-hub.png) | ![Docker de perspectiva com a galeria de malhas, a prévia ampliada e os botões de inserir na seleção](https://raw.githubusercontent.com/ricolandia/krita-hq-tools/main/Screenshots/11-perspectiva.png) |
 
 ### Hub
 
@@ -23,6 +32,18 @@
   exatamente 2 nós: reta `M`+`L`, arco `M`+`A`), pesquisa em
   `docs/PERSPECTIVAS.md`, gerador `scripts/gerar-perspectivas.py` e testes em
   `tests/test_perspectivas.py`.
+
+### Correções
+
+- Caminhos do Linux respeitam `XDG_DATA_HOME`/`XDG_CACHE_HOME` (Flatpak, como
+  a tabela do `INSTALL.md` promete); `viewer3d` entrou no config padrão.
+- "Guias de margem" agora mescla com as guias existentes em vez de apagá-las;
+  "Instalar no Krita" das paletas pula as que já são a mesma cópia.
+- Presets com o XML em `zTXt`/`iTXt` (3 do pack do Deevad) passam a ser lidos
+  como no auditor de packs; "Criar próxima página" avisa quando o registro no
+  CPMT falha.
+- Sete abas internas passaram a usar a escala de espaçamento da casa, e a
+  contagem de módulos foi corrigida nos documentos.
 
 ## [0.7.2] — 2026-10-04
 

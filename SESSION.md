@@ -1,8 +1,8 @@
 # SESSION — HQ Tools (Krita-Comics-Plugin)
 
-Fonte da verdade do projeto. Atualizado em 2026-10-04 (v0.7.2 **publicada**:
-3D por seleção com preview flutuante, máscara dos painéis e compatibilidade
-Windows).
+Fonte da verdade do projeto. Atualizado em 2026-10-05 (v0.8.0 **publicada**:
+hub dos módulos e biblioteca de linhas de perspectiva, com os quick wins da
+auditoria de 05/10).
 
 Espelho no Trilium (VPS): nota **"HQ Tools - Plugin Krita"** (`JVRkycXWq0KN`,
 em Apps e Jogos), com as subnotas Estado e decisões, Instalação e uso,
@@ -31,7 +31,7 @@ conclusão da pesquisa está em `docs/contexto/` (os 4 arquivos originais).
 - **Paletas:** docker próprio com templates `.gpl`.
 - Licença MIT; docs em `.md` na pasta do projeto (regra de documentação).
 
-## Estado (v0.7.2 publicada)
+## Estado (v0.8.0 publicada)
 
 Feito:
 
@@ -122,7 +122,7 @@ Quick wins aplicados (275 testes verdes):
 A validar no Krita: flutuante do 3D com dois documentos abertos, Ctrl+Z na
 inserção do 3D e da biblioteca, guias mescladas e margens das abas.
 
-## Perspectivas: pesquisa + 9 conjuntos de linhas (05/10/2026, sem release)
+## Perspectivas: pesquisa + 9 conjuntos de linhas (v0.8.0, 05/10/2026)
 
 Primeira entrega da ideia "biblioteca de linhas de perspectiva": pesquisa das
 perspectivas mais usadas em quadrinhos (1/2/3 pontos, pássaro/verme,
@@ -137,7 +137,7 @@ docker gera na proporção da seleção) e `tests/test_perspectivas.py`
 verticais/3º VP, laranja = profundidade/eixos, cinza = horizontais/VP direito.
 QA de visão aprovou as geometrias e o contraste das cores.
 
-## Hub e docker de perspectiva (05/10/2026, sem release)
+## Hub e docker de perspectiva (v0.8.0, 05/10/2026)
 
 - **Hub** (`modules/hub/`): um botão por módulo abre e fecha a doca, com o
   estado marcado sincronizado pelo `visibilityChanged`; a opção "fechar o

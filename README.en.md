@@ -38,9 +38,13 @@ The four original context documents of the project are in `docs/contexto/`
 |---|---|---|
 | ![Screentones and action lines](Screenshots/04-reticulas.png) | ![Onomatopoeia](Screenshots/05-onomatopeias.png) | ![Palettes](Screenshots/06-paletas.png) |
 
-| 3D viewer |
+| 3D viewer | Hub |
+|---|---|
+| ![3D docker with the mannequin and body, pose, style and joint controls](Screenshots/07-3d.png) | ![Hub docker with the buttons that open and close the plugin modules](Screenshots/10-hub.png) |
+
+| Perspective library |
 |---|
-| ![3D docker with the mannequin and body, pose, style and joint controls](Screenshots/07-3d.png) |
+| ![Perspective docker with the grid gallery, the enlarged preview and the insert-into-selection buttons](Screenshots/11-perspectiva.png) |
 
 ## Modules
 
