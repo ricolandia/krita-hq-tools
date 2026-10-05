@@ -1,8 +1,8 @@
 # SESSION — HQ Tools (Krita-Comics-Plugin)
 
-Fonte da verdade do projeto. Atualizado em 2026-10-05 (v0.9.0 **publicada**:
-interface PT/EN nos dockers, manual e INSTALL em inglês, além do hub e da
-biblioteca de perspectiva da 0.8.0).
+Fonte da verdade do projeto. Atualizado em 2026-10-05 (v0.9.1 **publicada**:
+poses de corpo e mãos com espelho, linhas de efeito com a seleção ativa e
+rótulos de formulário traduzidos, além da interface PT/EN da 0.9.0).
 
 Espelho no Trilium (VPS): nota **"HQ Tools - Plugin Krita"** (`JVRkycXWq0KN`,
 em Apps e Jogos), com as subnotas Estado e decisões, Instalação e uso,
@@ -31,7 +31,7 @@ conclusão da pesquisa está em `docs/contexto/` (os 4 arquivos originais).
 - **Paletas:** docker próprio com templates `.gpl`.
 - Licença MIT; docs em `.md` na pasta do projeto (regra de documentação).
 
-## Estado (v0.9.0 publicada)
+## Estado (v0.9.1 publicada)
 
 Feito:
 
@@ -137,7 +137,7 @@ docker gera na proporção da seleção) e `tests/test_perspectivas.py`
 verticais/3º VP, laranja = profundidade/eixos, cinza = horizontais/VP direito.
 QA de visão aprovou as geometrias e o contraste das cores.
 
-## Linhas de efeito com seleção + rótulos i18n (05/10/2026, sem release)
+## Linhas de efeito com seleção + rótulos i18n (v0.9.1, 05/10/2026)
 
 - `_insert_effect_lines` usa a seleção ativa: paralelas preenchem o retângulo
   dela e as do foco saem do centro, cortadas na borda por
@@ -148,7 +148,7 @@ QA de visão aprovou as geometrias e o contraste das cores.
   duas chaves antigas órfãs (textos que mudaram).
 - Testes: 307 -> 310.
 
-## Poses: corpo e mãos (05/10/2026, sem release)
+## Poses: corpo e mãos (v0.9.1, 05/10/2026)
 
 - Biblioteca dividida: `poses/corpo/` (Idle, Voa, Anda, Corre, Pose A) e
   `poses/maos/` (Fechada, Abertas, Segura, da mão direita). As duas antigas

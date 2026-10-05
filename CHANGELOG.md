@@ -1,6 +1,10 @@
 # Changelog
 
-## [Não publicado]
+## [0.9.1] — 2026-10-05
+
+Biblioteca de poses do 3D dividida em corpo e mãos (com espelho para a mão
+esquerda), linhas de efeito usando a seleção ativa e os rótulos de formulário
+dos dockers traduzidos.
 
 ### Linhas de efeito com seleção
 
