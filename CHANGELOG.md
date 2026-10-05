@@ -1,5 +1,21 @@
 # Changelog
 
+## [Não publicado]
+
+### Poses: biblioteca de corpo e mãos
+
+- A biblioteca de poses do visualizador 3D foi dividida em `poses/corpo/`
+  (Idle, Voa, Anda, Corre e Pose A) e `poses/maos/` (Fechada, Abertas e
+  Segura, autorais para a mão direita), com dois combos no docker: "Corpo:" e
+  "Mãos:".
+- Novo seletor "Mão:" (Direita / Esquerda / Ambas): a pose de mão pode ser
+  espelhada para a esquerda (o espelho troca o lado e nega o giro).
+- "Limpar pose" volta ao padrão (Idle + Fechadas). Sem miniaturas por
+  enquanto: os combos são listas com os nomes das poses.
+- Exportador de poses (`scripts/exportar-poses3d.py`): opção `--parte
+  corpo|maos|tudo`, entrada `.blend` e escolha automática da armadura
+  principal quando o arquivo traz mais de um rig.
+
 ## [0.9.0] — 2026-10-05
 
 ### Idioma (PT/EN)

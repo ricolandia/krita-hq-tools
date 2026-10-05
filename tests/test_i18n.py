@@ -6,6 +6,7 @@ O teste de cobertura varre o código do plugin atrás de chamadas
 """
 
 import ast
+import json
 import pathlib
 import unittest
 
@@ -34,6 +35,16 @@ def strings_usadas():
                 and isinstance(no.args[0].value, str)
             ):
                 usadas.add(no.args[0].value)
+    # Os nomes das poses são chaves dinâmicas: o docker mostra o campo "nome"
+    # do JSON passando por i18n.t; entram aqui para a cobertura valer para eles.
+    for caminho in PACOTE.rglob("poses/*/*.json"):
+        try:
+            dados = json.loads(caminho.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        nome = dados.get("nome")
+        if isinstance(nome, str) and nome:
+            usadas.add(nome)
     return usadas
 
 

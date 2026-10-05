@@ -78,7 +78,10 @@ VIEWER3D_MODELOS = (
     ("mulher", "Mulher", os.path.join(VIEWER3D_DIR, "modelos", "mulher.json")),
 )
 VIEWER3D_POSES_DIR = os.path.join(VIEWER3D_DIR, "poses")
-VIEWER3D_POSE_PADRAO = "idle_maos_fechadas.json"
+VIEWER3D_POSES_CORPO_DIR = os.path.join(VIEWER3D_POSES_DIR, "corpo")
+VIEWER3D_POSES_MAOS_DIR = os.path.join(VIEWER3D_POSES_DIR, "maos")
+VIEWER3D_POSE_CORPO_PADRAO = "idle.json"
+VIEWER3D_POSE_MAOS_PADRAO = "fechada.json"
 ICONE_PATH = os.path.join(RESOURCES_DIR, "icon.png")
 KRITA_PALETTES_DIR = os.path.join(KRITA_HOME, "palettes")
 CONFIG_PATH = os.path.join(USER_DIR, "config.json")

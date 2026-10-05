@@ -24,7 +24,7 @@ MODELO_MULHER = os.path.join(
     RAIZ, "hq_tools", "modules", "viewer3d", "modelos", "mulher.json"
 )
 POSE_IDLE = os.path.join(
-    RAIZ, "hq_tools", "modules", "viewer3d", "poses", "idle_maos_fechadas.json"
+    RAIZ, "hq_tools", "modules", "viewer3d", "poses", "corpo", "idle.json"
 )
 
 
@@ -241,6 +241,78 @@ class TestManequim(unittest.TestCase):
                 json.dump({"formato": "outro", "versao": 1, "ossos": {}}, arquivo)
             with self.assertRaises(ValueError):
                 modelo3d.carregar_pose(caminho)
+
+
+class TestEspelhoDePose(unittest.TestCase):
+    """As poses de mão são da mão direita; o espelho as leva para a esquerda."""
+
+    def test_espelhar_troca_de_lado_e_nega_o_giro(self):
+        resultado = modelo3d.espelhar({"arm.r": {"dobrar": 5.0, "girar": 10.0}})
+        self.assertEqual(resultado, {"arm.l": {"dobrar": 5.0, "girar": -10.0}})
+
+    def test_espelhar_osso_sem_lado_fica_igual(self):
+        resultado = modelo3d.espelhar({"spine_01.x": {"dobrar": 2.0}})
+        self.assertEqual(resultado, {"spine_01.x": {"dobrar": 2.0}})
+
+    def test_espelhar_confere_com_o_idle_do_repositorio(self):
+        # No Idle real, os lados só diferem no sinal de "girar": espelhar os
+        # ossos .r tem que reproduzir os .l do próprio arquivo.
+        if not os.path.isfile(POSE_IDLE):
+            self.skipTest("pose idle não está no repositório")
+        ossos = modelo3d.carregar_pose(POSE_IDLE)["ossos"]
+        direita = {
+            nome: valores for nome, valores in ossos.items() if nome.endswith(".r")
+        }
+        espelhado = modelo3d.espelhar(direita)
+        self.assertTrue(espelhado)
+        for nome, valores in espelhado.items():
+            self.assertIn(nome, ossos, nome)
+            for chave, valor in valores.items():
+                self.assertAlmostEqual(
+                    valor, ossos[nome].get(chave, 0.0), places=1, msg=nome
+                )
+
+    def test_pose_maos_por_lado(self):
+        valores = {"hand.r": {"girar": 10.0}}
+        self.assertEqual(
+            modelo3d.pose_maos_por_lado(valores, modelo3d.LADO_DIREITA), valores
+        )
+        self.assertEqual(
+            modelo3d.pose_maos_por_lado(valores, modelo3d.LADO_ESQUERDA),
+            {"hand.l": {"girar": -10.0}},
+        )
+        self.assertEqual(
+            modelo3d.pose_maos_por_lado(valores, modelo3d.LADO_AMBAS),
+            {"hand.r": {"girar": 10.0}, "hand.l": {"girar": -10.0}},
+        )
+
+    def test_poses_de_mao_do_repositorio_sao_da_direita(self):
+        pasta = os.path.join(
+            RAIZ, "hq_tools", "modules", "viewer3d", "poses", "maos"
+        )
+        for nome in ("segura.json",):
+            caminho = os.path.join(pasta, nome)
+            if not os.path.isfile(caminho):
+                continue
+            ossos = modelo3d.carregar_pose(caminho)["ossos"]
+            self.assertTrue(ossos, nome)
+            for nome_osso in ossos:
+                self.assertTrue(nome_osso.endswith(".r"), nome_osso)
+
+    def test_poses_do_repositorio_separadas_por_parte(self):
+        prefixos = ("hand", "index", "middle", "pinky", "ring", "thumb")
+        corpo = modelo3d.carregar_pose(POSE_IDLE)["ossos"]
+        maos = modelo3d.carregar_pose(
+            os.path.join(RAIZ, "hq_tools", "modules", "viewer3d", "poses", "maos", "fechada.json")
+        )["ossos"]
+        self.assertTrue(corpo)
+        self.assertTrue(maos)
+        self.assertFalse(
+            [n for n in corpo if n.split(".")[0].startswith(prefixos)], "corpo com mão"
+        )
+        self.assertTrue(
+            all(n.split(".")[0].startswith(prefixos) for n in maos), "mão com corpo"
+        )
 
 
 class TestEixosSemanticos(unittest.TestCase):

@@ -137,6 +137,20 @@ docker gera na proporção da seleção) e `tests/test_perspectivas.py`
 verticais/3º VP, laranja = profundidade/eixos, cinza = horizontais/VP direito.
 QA de visão aprovou as geometrias e o contraste das cores.
 
+## Poses: corpo e mãos (05/10/2026, sem release)
+
+- Biblioteca dividida: `poses/corpo/` (Idle, Voa, Anda, Corre, Pose A) e
+  `poses/maos/` (Fechada, Abertas, Segura, da mão direita). As duas antigas
+  (idle_maos_fechadas/abertas) foram separadas em Python; as novas saíram do
+  FBX com `scripts/exportar-poses3d.py --parte`.
+- Docker: combos "Modelo:", "Corpo:", "Mãos:" e "Mão:" (Direita/Esquerda/
+  Ambas) com `modelo3d.pose_maos_por_lado` (espelho = troca de lado com
+  `girar` negado, validado contra o Idle real); "Limpar pose" volta ao padrão.
+- Exportador robusto: `--parte`, entrada `.blend` e escolha da armadura por
+  interseção com os ossos do modelo (o joinha v1 trazia 2 rigs; ficou de fora,
+  o autor vai refazer a pose).
+- Testes: 300 -> 306.
+
 ## Idioma (i18n) e docs EN (v0.9.0, 05/10/2026)
 
 - **Interface PT/EN**: `core/i18n.py` com `t(texto)` (chave = string PT) e o

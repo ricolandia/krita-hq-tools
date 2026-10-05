@@ -121,8 +121,9 @@ Comics pack e InkP/Expressive Inks.
   redistribuídos para o visualizador 3D do plugin; os FBX originais ficam
   fora do repositório.
 - `hq_tools/modules/viewer3d/poses/`: poses extraídas dos FBX animados do
-  autor (rotações locais por osso). Hoje: `idle_maos_fechadas.json` (padrão dos
-  dois corpos) e `idle_maos_abertas.json` (dedos no repouso, mãos abertas).
+  autor (valores semânticos por osso), separadas em `corpo/` (Idle, Voa, Anda,
+  Corre e Pose A) e `maos/` (Fechada, Abertas e Segura, autorais para a mão
+  direita; o docker espelha para a esquerda).
 
 ## Pastas fora do repositório
 

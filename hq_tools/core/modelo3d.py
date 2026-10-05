@@ -137,6 +137,46 @@ def carregar_pose(caminho):
     return dados
 
 
+LADO_DIREITA = "direita"
+LADO_ESQUERDA = "esquerda"
+LADO_AMBAS = "ambas"
+LADOS = (LADO_DIREITA, LADO_ESQUERDA, LADO_AMBAS)
+
+
+def espelhar(valores):
+    """Troca a pose de lado: ``.r`` vira ``.l`` (e vice-versa), ``girar`` negado.
+
+    Os valores são semânticos: ``dobrar`` e ``abrir`` já são simétricos por
+    construção (o mapa de eixos é escolhido por lado), então só o giro em
+    torno do eixo do osso troca de sinal no espelho. As poses de mão são
+    autorais para a mão direita; esta função as leva para a esquerda.
+    """
+    resultado = {}
+    for osso, junta in (valores or {}).items():
+        if osso.endswith(".r"):
+            nome = osso[:-2] + ".l"
+        elif osso.endswith(".l"):
+            nome = osso[:-2] + ".r"
+        else:
+            nome = osso
+        copia = dict(junta)
+        if "girar" in copia:
+            copia["girar"] = -float(copia["girar"])
+        resultado[nome] = copia
+    return resultado
+
+
+def pose_maos_por_lado(valores, lado):
+    """Pose de mão no lado pedido: como está, espelhada ou nas duas mãos."""
+    if lado == LADO_ESQUERDA:
+        return espelhar(valores)
+    if lado == LADO_AMBAS:
+        resultado = {osso: dict(junta) for osso, junta in (valores or {}).items()}
+        resultado.update(espelhar(valores))
+        return resultado
+    return {osso: dict(junta) for osso, junta in (valores or {}).items()}
+
+
 EIXOS = {"x": 0, "y": 1, "z": 2}
 
 

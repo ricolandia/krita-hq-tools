@@ -20,6 +20,8 @@ class TestPaths(unittest.TestCase):
         self.assertTrue(paths.PATTERNS_KIT_DIR.endswith("patterns"))
         self.assertTrue(paths.KRITA_PATTERNS_DIR.endswith("patterns"))
         self.assertTrue(paths.KRITA_PALETTES_DIR.endswith("palettes"))
+        self.assertTrue(paths.VIEWER3D_POSES_CORPO_DIR.endswith("corpo"))
+        self.assertTrue(paths.VIEWER3D_POSES_MAOS_DIR.endswith("maos"))
 
     def test_pastas_do_usuario(self):
         self.assertTrue(paths.KRITA_HOME.endswith("krita"))

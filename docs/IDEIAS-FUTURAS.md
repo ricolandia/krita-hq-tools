@@ -4,11 +4,11 @@ Registro das propostas avaliadas (ex.: pasta `Novas_ideias/`) que ainda não
 foram integradas. Cada item traz o veredito e as condições para entrar no
 plugin.
 
-**Roadmap reavaliado (05/10/2026):** prioridade: a biblioteca de poses do
-visualizador 3D (dividir em corpo e mãos, "Salvar pose atual" e miniatura no
-seletor). O estado completo, com o que já foi feito e o que vem, está na
-seção "Roadmap reavaliado" abaixo; a linha do tempo viva é a da nota do
-roadmap no Trilium.
+**Roadmap reavaliado (05/10/2026):** prioridade: o que falta da biblioteca de
+poses do visualizador 3D ("Salvar pose atual", miniatura no seletor e o
+joinha, que o autor vai refazer). O estado completo, com o que já foi feito e
+o que vem, está na seção "Roadmap reavaliado" abaixo; a linha do tempo viva é
+a da nota do roadmap no Trilium.
 
 ## Roadmap reavaliado (05/10/2026)
 
@@ -27,6 +27,9 @@ roadmap no Trilium.
   de 05/10.
 - **v0.9:** interface PT/EN nos dockers (373 strings) e documentação em
   inglês (manual e INSTALL).
+- **v0.9+ (05/10):** biblioteca de poses dividida em corpo e mãos, com o
+  espelho da mão e as poses novas (Voa, Anda, Corre, Pose A, Fechada, Abertas
+  e Segura).
 - **Fora do roadmap original:** camada de UI compartilhada (52 botões), ícone
   e social preview, vídeos demo no YouTube com roteiros de captura, CI no
   Windows, automação de release (tag → ZIP + notas do CHANGELOG), duas
@@ -34,8 +37,8 @@ roadmap no Trilium.
 
 ### Próximo (reavaliado)
 
-1. **Biblioteca de poses** (prioridade): corpo/mãos, "Salvar pose atual" e
-   miniatura no seletor; o autor está criando as poses.
+1. **Biblioteca de poses, o que falta:** "Salvar pose atual" (biblioteca do
+   usuário), miniatura no seletor e o joinha (o autor vai refazer a pose).
 2. **Validação no Krita da v0.9.0:** hub (abrir/fechar), malha de perspectiva
    (Ctrl+Z único), flutuante com dois documentos e a interface em inglês.
 3. **Krita 6:** validar o plugin no PyQt6 (pré-requisito do balão
@@ -147,12 +150,13 @@ Viável e a mais integrada, com condições:
   proporção dela (WYSIWYG) e "Flutuar na página" aparece sobre a seleção
   (arrasto, alça/roda, opacidade, "Fixar"); inserir entra abaixo do esboço e
   desfaz a seleção.
-- **Dividir a biblioteca em corpo e mãos (anotado em 03/10):** hoje cada pose
-  mistura corpo e dedos (Idle com mãos fechadas/abertas). O plano é separar em
-  `poses/corpo/` (sem ossos de dedo) e `poses/maos/` (só dedos), com o
-  extrator ganhando `--parte corpo|maos` e o docker com dois combos que se
-  combinam (pose do corpo + pose das mãos). Padrão: corpo idle + mãos fechadas.
-  Migrar as duas poses atuais para o novo formato.
+- **Dividir a biblioteca em corpo e mãos (anotado em 03/10, feito em 05/10):**
+  a biblioteca foi separada em `poses/corpo/` (Idle, Voa, Anda, Corre e Pose A)
+  e `poses/maos/` (Fechada, Abertas e Segura, autorais para a mão direita), com
+  dois combos que se combinam no docker (Corpo + Mãos) e o seletor "Mão:"
+  (Direita / Esquerda / Ambas) aplicando o espelho (troca de lado com o giro
+  negado). O extrator ganhou `--parte corpo|maos|tudo` e aceita `.blend`. O
+  joinha ficou de fora por ora (o autor vai refazer a pose).
 
 ### Rota B: Blender Layer (plugin existente)
 

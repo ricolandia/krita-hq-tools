@@ -41,8 +41,10 @@ from ...core.compat import (
 )
 from ...core.paths import (
     VIEWER3D_MODELOS,
-    VIEWER3D_POSE_PADRAO,
-    VIEWER3D_POSES_DIR,
+    VIEWER3D_POSE_CORPO_PADRAO,
+    VIEWER3D_POSE_MAOS_PADRAO,
+    VIEWER3D_POSES_CORPO_DIR,
+    VIEWER3D_POSES_MAOS_DIR,
 )
 
 LIMITE_SLIDER = 120
@@ -332,7 +334,9 @@ class Viewer3DDocker(DockWidget):
         self.corpo = "homem"
         self.regiao = None
         self.semantica = {}
-        self.pose_atual = None
+        self.pose_corpo = VIEWER3D_POSE_CORPO_PADRAO
+        self.pose_maos = VIEWER3D_POSE_MAOS_PADRAO
+        self.lado_mao = modelo3d.LADO_DIREITA
         self.modo_mover = False
         self.modo_fixado = False
         self.camera = {
@@ -378,21 +382,38 @@ class Viewer3DDocker(DockWidget):
         self.lbl_regiao = ui.rotulo_info(i18n.t('Nenhuma região selecionada.'))
         layout.addWidget(self.lbl_regiao)
 
-        corpo_row = widgets.QHBoxLayout()
-        corpo_row.addWidget(ui.rotulo(i18n.t('Corpo:')))
+        modelo_row = widgets.QHBoxLayout()
+        modelo_row.addWidget(ui.rotulo(i18n.t('Modelo:')))
         self.cmb_corpo = widgets.QComboBox()
         for chave, rotulo, _ in VIEWER3D_MODELOS:
             self.cmb_corpo.addItem(rotulo, chave)
         self.cmb_corpo.currentIndexChanged.connect(self._mudar_corpo)
-        corpo_row.addWidget(self.cmb_corpo, 1)
+        modelo_row.addWidget(self.cmb_corpo, 1)
+        layout.addLayout(modelo_row)
+
+        corpo_row = widgets.QHBoxLayout()
+        corpo_row.addWidget(ui.rotulo(i18n.t('Corpo:')))
+        self.cmb_pose_corpo = widgets.QComboBox()
+        self.cmb_pose_corpo.currentIndexChanged.connect(self._mudar_pose_corpo)
+        corpo_row.addWidget(self.cmb_pose_corpo, 1)
         layout.addLayout(corpo_row)
 
-        pose_row = widgets.QHBoxLayout()
-        pose_row.addWidget(ui.rotulo(i18n.t('Pose:')))
-        self.cmb_pose = widgets.QComboBox()
-        self.cmb_pose.currentIndexChanged.connect(self._mudar_pose)
-        pose_row.addWidget(self.cmb_pose, 1)
-        layout.addLayout(pose_row)
+        maos_row = widgets.QHBoxLayout()
+        maos_row.addWidget(ui.rotulo(i18n.t('Mãos:')))
+        self.cmb_pose_maos = widgets.QComboBox()
+        self.cmb_pose_maos.currentIndexChanged.connect(self._mudar_pose_maos)
+        maos_row.addWidget(self.cmb_pose_maos, 1)
+        layout.addLayout(maos_row)
+
+        lado_row = widgets.QHBoxLayout()
+        lado_row.addWidget(ui.rotulo(i18n.t('Mão:')))
+        self.cmb_lado = widgets.QComboBox()
+        self.cmb_lado.addItem(i18n.t('Direita'), modelo3d.LADO_DIREITA)
+        self.cmb_lado.addItem(i18n.t('Esquerda'), modelo3d.LADO_ESQUERDA)
+        self.cmb_lado.addItem(i18n.t('Ambas'), modelo3d.LADO_AMBAS)
+        self.cmb_lado.currentIndexChanged.connect(self._mudar_lado_mao)
+        lado_row.addWidget(self.cmb_lado, 1)
+        layout.addLayout(lado_row)
 
         estilo_row = widgets.QHBoxLayout()
         estilo_row.addWidget(ui.rotulo(i18n.t('Estilo:')))
@@ -508,7 +529,7 @@ class Viewer3DDocker(DockWidget):
             return
         self._popular_poses()
         if aplicar_padrao:
-            self._aplicar_pose(VIEWER3D_POSE_PADRAO)
+            self._aplicar_poses()
         if self.regiao is None:
             self._selecionar_regiao("tronco")
         else:
@@ -516,31 +537,54 @@ class Viewer3DDocker(DockWidget):
         self.atualizar_preview()
 
     def _popular_poses(self):
-        self.cmb_pose.blockSignals(True)
-        self.cmb_pose.clear()
-        self.cmb_pose.addItem(i18n.t('—'), None)
+        self._popular_combo(
+            self.cmb_pose_corpo, VIEWER3D_POSES_CORPO_DIR, self.pose_corpo
+        )
+        self._popular_combo(
+            self.cmb_pose_maos, VIEWER3D_POSES_MAOS_DIR, self.pose_maos
+        )
+
+    def _popular_combo(self, combo, pasta, atual):
+        combo.blockSignals(True)
+        combo.clear()
+        combo.addItem(i18n.t('—'), None)
         try:
-            arquivos = sorted(os.listdir(VIEWER3D_POSES_DIR))
+            arquivos = sorted(os.listdir(pasta))
         except OSError:
             arquivos = []
         for arquivo in arquivos:
             if not arquivo.endswith(".json"):
                 continue
             try:
-                dados = modelo3d.carregar_pose(os.path.join(VIEWER3D_POSES_DIR, arquivo))
-                rotulo = dados.get("nome") or arquivo[:-5]
+                dados = modelo3d.carregar_pose(os.path.join(pasta, arquivo))
+                rotulo = i18n.t(dados.get("nome") or arquivo[:-5])
             except (OSError, ValueError):
                 rotulo = arquivo[:-5]
-            self.cmb_pose.addItem(rotulo, arquivo)
-        indice = self.cmb_pose.findData(self.pose_atual)
-        self.cmb_pose.setCurrentIndex(indice if indice >= 0 else 0)
-        self.cmb_pose.blockSignals(False)
+            combo.addItem(rotulo, arquivo)
+        indice = combo.findData(atual)
+        combo.setCurrentIndex(indice if indice >= 0 else 0)
+        combo.blockSignals(False)
 
-    def _sincronizar_combo_pose(self):
-        indice = self.cmb_pose.findData(self.pose_atual)
-        self.cmb_pose.blockSignals(True)
-        self.cmb_pose.setCurrentIndex(indice if indice >= 0 else 0)
-        self.cmb_pose.blockSignals(False)
+    def _sincronizar_combos(self):
+        for combo, atual in (
+            (self.cmb_pose_corpo, self.pose_corpo),
+            (self.cmb_pose_maos, self.pose_maos),
+            (self.cmb_lado, self.lado_mao),
+        ):
+            indice = combo.findData(atual)
+            combo.blockSignals(True)
+            combo.setCurrentIndex(indice if indice >= 0 else 0)
+            combo.blockSignals(False)
+
+    def _ler_pose(self, pasta, arquivo):
+        if not arquivo:
+            return {}
+        try:
+            dados = modelo3d.carregar_pose(os.path.join(pasta, arquivo))
+        except (OSError, ValueError) as error:
+            helpers.show_info(i18n.t('3D'), i18n.t('Não foi possível ler a pose: {0}').format(error))
+            return {}
+        return dados.get("ossos", {})
 
     def _mudar_corpo(self, indice):
         chave = self.cmb_corpo.itemData(indice)
@@ -548,24 +592,27 @@ class Viewer3DDocker(DockWidget):
             self.corpo = chave
             self._carregar_modelo()
 
-    def _mudar_pose(self, indice):
-        arquivo = self.cmb_pose.itemData(indice)
-        if arquivo is None:
-            self.limpar_pose()
-            return
-        self._aplicar_pose(arquivo)
+    def _mudar_pose_corpo(self, indice):
+        self.pose_corpo = self.cmb_pose_corpo.itemData(indice)
+        self._aplicar_poses()
 
-    def _aplicar_pose(self, arquivo):
-        try:
-            dados = modelo3d.carregar_pose(os.path.join(VIEWER3D_POSES_DIR, arquivo))
-        except (OSError, ValueError) as error:
-            helpers.show_info(i18n.t('3D'), i18n.t('Não foi possível ler a pose: {0}').format(error))
-            return
-        self.semantica = {
-            osso: dict(valores) for osso, valores in dados.get("ossos", {}).items()
-        }
-        self.pose_atual = arquivo
-        self._sincronizar_combo_pose()
+    def _mudar_pose_maos(self, indice):
+        self.pose_maos = self.cmb_pose_maos.itemData(indice)
+        self._aplicar_poses()
+
+    def _mudar_lado_mao(self, indice):
+        self.lado_mao = self.cmb_lado.itemData(indice) or modelo3d.LADO_DIREITA
+        self._aplicar_poses()
+
+    def _aplicar_poses(self):
+        """Combina corpo e mãos (as mãos por cima) e redesenha."""
+        corpo = self._ler_pose(VIEWER3D_POSES_CORPO_DIR, self.pose_corpo)
+        maos = modelo3d.pose_maos_por_lado(
+            self._ler_pose(VIEWER3D_POSES_MAOS_DIR, self.pose_maos), self.lado_mao
+        )
+        self.semantica = {osso: dict(valores) for osso, valores in corpo.items()}
+        for osso, valores in maos.items():
+            self.semantica[osso] = dict(valores)
         self._montar_sliders()
         self.agendar_render()
 
@@ -854,11 +901,12 @@ class Viewer3DDocker(DockWidget):
         self.agendar_render()
 
     def limpar_pose(self):
-        self.semantica = {}
-        self.pose_atual = None
-        self._sincronizar_combo_pose()
-        self._montar_sliders()
-        self.agendar_render()
+        """Volta ao padrão: Idle + Fechadas, na mão direita."""
+        self.pose_corpo = VIEWER3D_POSE_CORPO_PADRAO
+        self.pose_maos = VIEWER3D_POSE_MAOS_PADRAO
+        self.lado_mao = modelo3d.LADO_DIREITA
+        self._sincronizar_combos()
+        self._aplicar_poses()
 
     def selecionar_em(self, x, y):
         if self.modelo is None or not self._tela:
