@@ -75,6 +75,31 @@ class TestEffectLines(unittest.TestCase):
         self.assertIn("<line", svg)
         self.assertEqual(svg.count("<line"), 3)
 
+    def test_recortar_segmentos_ao_retangulo(self):
+        # Diagonal cruzando o retângulo: fica só o trecho de dentro.
+        linhas = [{"x1": 0.0, "y1": 0.0, "x2": 100.0, "y2": 100.0, "width": 2.0}]
+        recortadas = effects.recortar_segmentos(linhas, 25.0, 25.0, 50.0, 50.0)
+        self.assertEqual(len(recortadas), 1)
+        self.assertAlmostEqual(recortadas[0]["x1"], 25.0, places=3)
+        self.assertAlmostEqual(recortadas[0]["y1"], 25.0, places=3)
+        self.assertAlmostEqual(recortadas[0]["x2"], 75.0, places=3)
+        self.assertAlmostEqual(recortadas[0]["y2"], 75.0, places=3)
+        self.assertEqual(recortadas[0]["width"], 2.0)
+
+    def test_recortar_segmentos_fora_some(self):
+        linhas = [{"x1": 0.0, "y1": 0.0, "x2": 10.0, "y2": 10.0, "width": 1.0}]
+        self.assertEqual(
+            effects.recortar_segmentos(linhas, 50.0, 50.0, 20.0, 20.0), []
+        )
+
+    def test_recortar_paralelas_nao_muda(self):
+        # As paralelas já nascem dentro da região; recortar mantém todas.
+        linhas = effects.effect_lines_parallel(
+            1000, 800, 100, 100, 400, 300, spacing=40, angle_deg=0
+        )
+        recortadas = effects.recortar_segmentos(linhas, 100, 100, 400, 300)
+        self.assertEqual(len(recortadas), len(linhas))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -334,12 +334,12 @@ class PagesDocker(DockWidget):
         index = cmb_formato.findData(atual)
         if index >= 0:
             cmb_formato.setCurrentIndex(index)
-        form.addRow("Formato:", cmb_formato)
+        form.addRow(i18n.t('Formato:'), cmb_formato)
 
         spin_dpi = widgets.QSpinBox()
         spin_dpi.setRange(72, 1200)
         spin_dpi.setValue(self.config.get_int("pages.dpi", 300))
-        form.addRow("DPI:", spin_dpi)
+        form.addRow(i18n.t('DPI:'), spin_dpi)
 
         spin_w = widgets.QDoubleSpinBox()
         spin_w.setRange(50, 600)
@@ -354,12 +354,12 @@ class PagesDocker(DockWidget):
         row_livre.addWidget(spin_w)
         row_livre.addWidget(ui.rotulo(i18n.t('A:')))
         row_livre.addWidget(spin_h)
-        form.addRow("Livre:", row_livre)
+        form.addRow(i18n.t('Livre:'), row_livre)
 
         spin_strip = widgets.QSpinBox()
         spin_strip.setRange(1, 8)
         spin_strip.setValue(self.config.get_int("pages.strip_panels", 3))
-        form.addRow("Painéis da tirinha:", spin_strip)
+        form.addRow(i18n.t('Painéis da tirinha:'), spin_strip)
 
         def _update_enabled():
             chave = cmb_formato.currentData()

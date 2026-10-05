@@ -137,6 +137,17 @@ docker gera na proporção da seleção) e `tests/test_perspectivas.py`
 verticais/3º VP, laranja = profundidade/eixos, cinza = horizontais/VP direito.
 QA de visão aprovou as geometrias e o contraste das cores.
 
+## Linhas de efeito com seleção + rótulos i18n (05/10/2026, sem release)
+
+- `_insert_effect_lines` usa a seleção ativa: paralelas preenchem o retângulo
+  dela e as do foco saem do centro, cortadas na borda por
+  `effects.recortar_segmentos` (novo, com testes); sem seleção, valem os
+  campos em porcentagem. A retícula/meio-tom já usavam a seleção como máscara.
+- Codemod do i18n ganhou `addRow` e embrulhou 31 rótulos de formulário
+  (retículas e páginas), com as traduções EN; o teste de cobertura pegou as
+  duas chaves antigas órfãs (textos que mudaram).
+- Testes: 307 -> 310.
+
 ## Poses: corpo e mãos (05/10/2026, sem release)
 
 - Biblioteca dividida: `poses/corpo/` (Idle, Voa, Anda, Corre, Pose A) e

@@ -87,20 +87,20 @@ class ScreentoneDocker(DockWidget):
         for label, value in (("Pontos", core.PATTERN_DOTS), ("Linhas", core.PATTERN_LINES)):
             self.cmb_pattern.addItem(label, value)
         self.cmb_pattern.currentIndexChanged.connect(self._reload_shapes)
-        form.addRow("Padrão:", self.cmb_pattern)
+        form.addRow(i18n.t('Padrão:'), self.cmb_pattern)
 
         self.cmb_shape = widgets.QComboBox()
-        form.addRow("Forma:", self.cmb_shape)
+        form.addRow(i18n.t('Forma:'), self.cmb_shape)
 
         self.cmb_interpolation = widgets.QComboBox()
         for label, value in core.INTERPOLATIONS:
             self.cmb_interpolation.addItem(label, value)
-        form.addRow("Interpolação:", self.cmb_interpolation)
+        form.addRow(i18n.t('Interpolação:'), self.cmb_interpolation)
 
         self.cmb_equalization = widgets.QComboBox()
         for label, value in core.EQUALIZATIONS:
             self.cmb_equalization.addItem(label, value)
-        form.addRow("Equalização:", self.cmb_equalization)
+        form.addRow(i18n.t('Equalização:'), self.cmb_equalization)
 
         frequency_row = widgets.QHBoxLayout()
         self.spin_lpi = widgets.QDoubleSpinBox()
@@ -114,13 +114,13 @@ class ScreentoneDocker(DockWidget):
             self.cmb_units.addItem(label, value)
         self.cmb_units.currentIndexChanged.connect(self._on_units_changed)
         frequency_row.addWidget(self.cmb_units, 1)
-        form.addRow("Frequência:", frequency_row)
+        form.addRow(i18n.t('Frequência:'), frequency_row)
 
         self.spin_rotation = widgets.QDoubleSpinBox()
         self.spin_rotation.setRange(0.0, 180.0)
         self.spin_rotation.setDecimals(1)
         self.spin_rotation.setSuffix("°")
-        form.addRow("Ângulo:", self.spin_rotation)
+        form.addRow(i18n.t('Ângulo:'), self.spin_rotation)
 
         position_row = widgets.QHBoxLayout()
         self.spin_pos_x = widgets.QDoubleSpinBox()
@@ -131,22 +131,22 @@ class ScreentoneDocker(DockWidget):
         self.spin_pos_y.setRange(-10000.0, 10000.0)
         self.spin_pos_y.setDecimals(0)
         position_row.addWidget(self.spin_pos_y, 1)
-        form.addRow("Posição X/Y (px):", position_row)
+        form.addRow(i18n.t('Posição X/Y (px):'), position_row)
 
         self.spin_brightness = widgets.QDoubleSpinBox()
         self.spin_brightness.setRange(0.0, 100.0)
         self.spin_brightness.setSuffix("%")
-        form.addRow("Brilho:", self.spin_brightness)
+        form.addRow(i18n.t('Brilho:'), self.spin_brightness)
 
         self.spin_contrast = widgets.QDoubleSpinBox()
         self.spin_contrast.setRange(0.0, 100.0)
         self.spin_contrast.setSuffix("%")
-        form.addRow("Contraste:", self.spin_contrast)
+        form.addRow(i18n.t('Contraste:'), self.spin_contrast)
 
         self.spin_hardness = widgets.QDoubleSpinBox()
         self.spin_hardness.setRange(0.0, 100.0)
         self.spin_hardness.setSuffix("%")
-        form.addRow("Dureza (meio-tom):", self.spin_hardness)
+        form.addRow(i18n.t('Dureza (meio-tom):'), self.spin_hardness)
 
         self.chk_align = widgets.QCheckBox(i18n.t('Alinhar à grade de pixels'))
         form.addRow("", self.chk_align)
@@ -160,7 +160,7 @@ class ScreentoneDocker(DockWidget):
         pattern_row.addWidget(self.chk_pattern)
         self.cmb_krita_pattern = widgets.QComboBox()
         pattern_row.addWidget(self.cmb_krita_pattern, 1)
-        form.addRow("Tom por padrão:", pattern_row)
+        form.addRow(i18n.t('Tom por padrão:'), pattern_row)
 
         self.chk_selection = widgets.QCheckBox(i18n.t('Usar a seleção ativa como máscara'))
         self.chk_selection.setChecked(True)
@@ -169,7 +169,7 @@ class ScreentoneDocker(DockWidget):
         self.cmb_mask = widgets.QComboBox()
         for label, value in MASK_MODES:
             self.cmb_mask.addItem(label, value)
-        form.addRow("Aplicação:", self.cmb_mask)
+        form.addRow(i18n.t('Aplicação:'), self.cmb_mask)
 
         self.chk_reuse = widgets.QCheckBox(i18n.t('Reutilizar retícula idêntica já existente'))
         self.chk_reuse.setChecked(True)
@@ -178,7 +178,7 @@ class ScreentoneDocker(DockWidget):
         self.cmb_halftone = widgets.QComboBox()
         for label, value in HALFTONE_MODES:
             self.cmb_halftone.addItem(label, value)
-        form.addRow("Meio-tom:", self.cmb_halftone)
+        form.addRow(i18n.t('Meio-tom:'), self.cmb_halftone)
 
         # Botões só com a cor (o papel é pintado por _sync_colors), sem altura
         # fixa: quem manda no tamanho é o tema do Krita.
@@ -193,10 +193,10 @@ class ScreentoneDocker(DockWidget):
         self.btn_bg = ui.botao("", i18n.t('Escolhe a cor do fundo (o que fica embaixo).'))
         self.btn_bg.clicked.connect(lambda: self._pick_color("bg"))
         colors_row.addWidget(self.btn_bg, 1)
-        form.addRow("Cores:", colors_row)
+        form.addRow(i18n.t('Cores:'), colors_row)
 
         self.edit_name = widgets.QLineEdit("Retícula")
-        form.addRow("Nome da camada:", self.edit_name)
+        form.addRow(i18n.t('Nome da camada:'), self.edit_name)
 
         layout.addLayout(form)
 
@@ -259,83 +259,83 @@ class ScreentoneDocker(DockWidget):
         for label, value in EFFECT_MODES:
             self.cmb_effect.addItem(label, value)
         self.cmb_effect.currentIndexChanged.connect(self._update_effect_enabled)
-        form.addRow("Tipo:", self.cmb_effect)
+        form.addRow(i18n.t('Tipo:'), self.cmb_effect)
 
         self.spin_focus_x = widgets.QDoubleSpinBox()
         self.spin_focus_x.setRange(0.0, 100.0)
         self.spin_focus_x.setSuffix("%")
         self.spin_focus_x.setValue(50.0)
-        form.addRow("Foco X:", self.spin_focus_x)
+        form.addRow(i18n.t('Foco X:'), self.spin_focus_x)
 
         self.spin_focus_y = widgets.QDoubleSpinBox()
         self.spin_focus_y.setRange(0.0, 100.0)
         self.spin_focus_y.setSuffix("%")
         self.spin_focus_y.setValue(50.0)
-        form.addRow("Foco Y:", self.spin_focus_y)
+        form.addRow(i18n.t('Foco Y:'), self.spin_focus_y)
 
         self.spin_lines = widgets.QSpinBox()
         self.spin_lines.setRange(2, 120)
         self.spin_lines.setValue(24)
-        form.addRow("Linhas:", self.spin_lines)
+        form.addRow(i18n.t('Linhas:'), self.spin_lines)
 
         self.spin_effect_thickness = widgets.QDoubleSpinBox()
         self.spin_effect_thickness.setRange(0.2, 20.0)
         self.spin_effect_thickness.setDecimals(1)
         self.spin_effect_thickness.setValue(2.0)
-        form.addRow("Espessura (px):", self.spin_effect_thickness)
+        form.addRow(i18n.t('Espessura (px):'), self.spin_effect_thickness)
 
         self.spin_inset = widgets.QDoubleSpinBox()
         self.spin_inset.setRange(0.0, 90.0)
         self.spin_inset.setSuffix("%")
         self.spin_inset.setValue(12.0)
-        form.addRow("Começo longe do foco:", self.spin_inset)
+        form.addRow(i18n.t('Começo longe do foco:'), self.spin_inset)
 
         self.spin_spacing = widgets.QDoubleSpinBox()
         self.spin_spacing.setRange(1.0, 200.0)
         self.spin_spacing.setDecimals(1)
         self.spin_spacing.setValue(12.0)
-        form.addRow("Espaçamento (px):", self.spin_spacing)
+        form.addRow(i18n.t('Espaçamento (px):'), self.spin_spacing)
 
         self.spin_angle = widgets.QDoubleSpinBox()
         self.spin_angle.setRange(-180.0, 180.0)
         self.spin_angle.setDecimals(1)
         self.spin_angle.setSuffix("°")
-        form.addRow("Ângulo (paralelas):", self.spin_angle)
+        form.addRow(i18n.t('Ângulo (paralelas):'), self.spin_angle)
 
         self.spin_region_x = widgets.QDoubleSpinBox()
         self.spin_region_x.setRange(0.0, 100.0)
         self.spin_region_x.setSuffix("%")
-        form.addRow("Região X:", self.spin_region_x)
+        form.addRow(i18n.t('Região X:'), self.spin_region_x)
 
         self.spin_region_y = widgets.QDoubleSpinBox()
         self.spin_region_y.setRange(0.0, 100.0)
         self.spin_region_y.setSuffix("%")
-        form.addRow("Região Y:", self.spin_region_y)
+        form.addRow(i18n.t('Região Y:'), self.spin_region_y)
 
         self.spin_region_w = widgets.QDoubleSpinBox()
         self.spin_region_w.setRange(5.0, 100.0)
         self.spin_region_w.setSuffix("%")
         self.spin_region_w.setValue(80.0)
-        form.addRow("Região Larg.:", self.spin_region_w)
+        form.addRow(i18n.t('Região Larg.:'), self.spin_region_w)
 
         self.spin_region_h = widgets.QDoubleSpinBox()
         self.spin_region_h.setRange(5.0, 100.0)
         self.spin_region_h.setSuffix("%")
         self.spin_region_h.setValue(60.0)
-        form.addRow("Região Alt.:", self.spin_region_h)
+        form.addRow(i18n.t('Região Alt.:'), self.spin_region_h)
 
         layout.addLayout(form)
 
         button_effects = ui.botao(
             i18n.t('Inserir linhas de efeito'),
-            i18n.t('Cria a camada vetorial de linhas de velocidade ou de efeito.'),
+            i18n.t('Cria a camada vetorial de linhas de velocidade ou de efeito; com uma seleção ativa, usa a área dela.'),
             icone_chave="aplicar",
         )
         button_effects.clicked.connect(self.insert_effect_lines)
         layout.addWidget(button_effects)
 
         hint = ui.rotulo(
-            i18n.t('Foco: linhas radiais saindo de um ponto (linhas de velocidade). Paralelas: linhas preenchendo a região indicada. A camada é vetorial.'))
+            i18n.t('Foco: linhas radiais saindo de um ponto (linhas de velocidade). Paralelas: linhas preenchendo a região indicada. A camada é vetorial. Com uma seleção ativa, as linhas usam a área dela (paralelas) ou o centro dela (foco), em vez dos campos abaixo.'))
         layout.addWidget(hint)
         layout.addStretch(1)
         return tab
@@ -873,7 +873,30 @@ class ScreentoneDocker(DockWidget):
         dpi = helpers.document_dpi(document)
         mode = self.cmb_effect.currentData()
 
-        if mode == "focus":
+        # Com uma seleção ativa, ela manda na área: as paralelas preenchem o
+        # retângulo e as do foco saem do centro dela, cortadas na borda. Sem
+        # seleção, valem os campos em porcentagem do documento.
+        selecao = helpers.selection_bounds(document)
+        if selecao is not None and selecao[2] > 0 and selecao[3] > 0:
+            x, y, w, h = selecao
+            if mode == "focus":
+                cx = x + w / 2.0
+                cy = y + h / 2.0
+                lines = effects.effect_lines_focus(
+                    width, height, cx, cy,
+                    count=self.spin_lines.value(),
+                    inset=self.spin_inset.value() / 100.0,
+                    thickness=self.spin_effect_thickness.value(),
+                )
+                lines = effects.recortar_segmentos(lines, x, y, w, h)
+            else:
+                lines = effects.effect_lines_parallel(
+                    width, height, x, y, w, h,
+                    spacing=self.spin_spacing.value(),
+                    angle_deg=self.spin_angle.value(),
+                    thickness=self.spin_effect_thickness.value(),
+                )
+        elif mode == "focus":
             cx = width * self.spin_focus_x.value() / 100.0
             cy = height * self.spin_focus_y.value() / 100.0
             lines = effects.effect_lines_focus(

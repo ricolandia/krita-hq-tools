@@ -2,6 +2,19 @@
 
 ## [Não publicado]
 
+### Linhas de efeito com seleção
+
+- "Inserir linhas de efeito" passa a usar a seleção ativa: as paralelas
+  preenchem o retângulo da seleção e as de foco saem do centro dela, cortadas
+  na borda (`effects.recortar_segmentos`), em vez dos campos em porcentagem do
+  documento; sem seleção, os campos continuam valendo. A camada vetorial nova
+  sai como antes.
+- A retícula de preenchimento e o meio-tom já usavam a seleção como máscara
+  (checkbox "Usar a seleção ativa como máscara"), então ali nada mudou.
+- Os rótulos dos formulários dos dockers (retículas e páginas) passaram a ser
+  traduzidos: o codemod `scripts/embrulhar-i18n.py` ganhou o `addRow` e os 31
+  rótulos entraram no dicionário EN.
+
 ### Poses: biblioteca de corpo e mãos
 
 - A biblioteca de poses do visualizador 3D foi dividida em `poses/corpo/`

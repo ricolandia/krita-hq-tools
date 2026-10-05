@@ -132,6 +132,37 @@ def effect_lines_parallel(width, height, x, y, w, h, spacing, angle_deg=0.0,
     return lines
 
 
+def recortar_segmentos(lines, x, y, w, h):
+    """Recorta os segmentos ao retângulo (a seleção ativa), mantendo a espessura.
+
+    Serve para as linhas de efeito entrarem só na área escolhida: as radiais
+    do foco são cortadas na borda do retângulo e as paralelas (que já nascem
+    dentro dele) passam intactas.
+    """
+    resultado = []
+    for line in lines:
+        x1, y1 = line["x1"], line["y1"]
+        dx = line["x2"] - x1
+        dy = line["y2"] - y1
+        bounds = _rect_line_bounds(x1, y1, dx, dy, x, y, w, h)
+        if bounds is None:
+            continue
+        t1 = max(0.0, bounds[0])
+        t2 = min(1.0, bounds[1])
+        if t1 > t2:
+            continue
+        resultado.append(
+            {
+                "x1": x1 + dx * t1,
+                "y1": y1 + dy * t1,
+                "x2": x1 + dx * t2,
+                "y2": y1 + dy * t2,
+                "width": line["width"],
+            }
+        )
+    return resultado
+
+
 def lines_to_svg(lines, width, height, dpi, color="#000000"):
     """Gera o SVG dos segmentos, com cada linha na própria espessura."""
     scale = 72.0 / float(dpi)

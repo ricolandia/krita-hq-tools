@@ -42,6 +42,7 @@ ALVOS = {
     "getOpenFileName": (1,),
     "addTab": (1,),
     "addItem": (0,),
+    "addRow": (0,),
     "QCheckBox": (0,),
     "QGroupBox": (0,),
     "botao": (0, 1),
