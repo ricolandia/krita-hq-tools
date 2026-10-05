@@ -4,9 +4,59 @@ Registro das propostas avaliadas (ex.: pasta `Novas_ideias/`) que ainda não
 foram integradas. Cada item traz o veredito e as condições para entrar no
 plugin.
 
-**Prioridade atual (03/10/2026):** a biblioteca de poses do visualizador 3D:
-catalogar as novas poses, dividir em corpo e mãos, "Salvar pose atual" e
-miniatura no seletor. O Gantt atualizado está no Trilium (nota do roadmap).
+**Roadmap reavaliado (05/10/2026):** prioridade: a biblioteca de poses do
+visualizador 3D (dividir em corpo e mãos, "Salvar pose atual" e miniatura no
+seletor). O estado completo, com o que já foi feito e o que vem, está na
+seção "Roadmap reavaliado" abaixo; a linha do tempo viva é a da nota do
+roadmap no Trilium.
+
+## Roadmap reavaliado (05/10/2026)
+
+### Feito até agora (dentro e fora do roadmap original)
+
+- **v0.1–v0.4 (set/2026):** módulos base (retículas, balões, paletas, páginas
+  com CPMT, roteiro e tirinhas).
+- **v0.5:** pincéis da comunidade (Deevad, Watercolor) com licença verificada,
+  9 famílias de fontes e aba Comunidade.
+- **v0.6:** onomatopeias, biblioteca do projeto e a auditoria de 30/09 em
+  4 lotes (dados do autor, isolamento/desfazer, desempenho, empacotamento).
+- **v0.7:** visualizador 3D completo (Rota A), máscara dos painéis no grupo
+  "Arte", compatibilidade Windows e o fluxo por seleção WYSIWYG.
+- **v0.8:** hub dos módulos e biblioteca de linhas de perspectiva (9
+  conjuntos, inserção como camada vetorial), mais os quick wins da auditoria
+  de 05/10.
+- **v0.9:** interface PT/EN nos dockers (373 strings) e documentação em
+  inglês (manual e INSTALL).
+- **Fora do roadmap original:** camada de UI compartilhada (52 botões), ícone
+  e social preview, vídeos demo no YouTube com roteiros de captura, CI no
+  Windows, automação de release (tag → ZIP + notas do CHANGELOG), duas
+  auditorias (30/09 e 05/10) e a documentação espelhada no Trilium.
+
+### Próximo (reavaliado)
+
+1. **Biblioteca de poses** (prioridade): corpo/mãos, "Salvar pose atual" e
+   miniatura no seletor; o autor está criando as poses.
+2. **Validação no Krita da v0.9.0:** hub (abrir/fechar), malha de perspectiva
+   (Ctrl+Z único), flutuante com dois documentos e a interface em inglês.
+3. **Krita 6:** validar o plugin no PyQt6 (pré-requisito do balão
+   paramétrico) e conferir dockers e i18n no 6.
+4. **Lettering nas páginas geradas:** usar os balões e as fontes do kit no
+   lugar do texto sans-serif do storyboard.
+5. **Clique direto no canvas:** PoC de ~20 linhas (event filter no
+   `canvasWidget` + transformações do Canvas); destrava o balde por clique e
+   a cauda arrastável.
+6. **Fillbucket em Python puro:** reescrever o núcleo sem numpy, com as
+   correções obrigatórias (ordem de canais, camada transparente, imports).
+7. **Balão paramétrico:** cauda reposicionável e texto que redimensiona o
+   balão (depois do Krita 6).
+8. **Avaliar e decidir:** preset de "estilo de painel", exportar o conjunto
+   próprio como bundle e os presets de assistente de perspectiva por painel
+   (com a biblioteca de perspectiva pronta, o valor caiu; decidir se sai da
+   lista).
+
+**Fora de escopo (mantido):** exportação webtoon (Batch Exporter cobre),
+preflight de impressão (Scribus), rotas B/C do 3D (Blender Layer e pose
+makers web) e apagador vetorial por interseção.
 
 ## Proposta avaliada: balde com fechamento de falhas (`fillbucket`)
 
