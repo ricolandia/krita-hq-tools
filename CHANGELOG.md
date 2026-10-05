@@ -17,7 +17,8 @@
   escolha o conjunto, desenhe a seleção sobre o painel, use "Flutuar na
   página" (arrasto e roda) e insira no tamanho da seleção, abaixo do esboço,
   como **camada vetorial** (editável, dois nós por linha) ou referência; a
-  inserção roda em macro (um Ctrl+Z desfaz) e desfaz a seleção.
+  inserção roda em macro (um Ctrl+Z desfaz), desfaz a seleção e fecha o
+  flutuante (o botão "Flutuar na página" desmarca).
 - Assets em `hq_tools/resources/perspectivas/` (cada linha é um `<path>` com
   exatamente 2 nós: reta `M`+`L`, arco `M`+`A`), pesquisa em
   `docs/PERSPECTIVAS.md`, gerador `scripts/gerar-perspectivas.py` e testes em

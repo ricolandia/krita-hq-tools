@@ -441,7 +441,9 @@ class PerspectivaDocker(DockWidget):
 
         if not helpers.run_in_macro(documento, _inserir_agora):
             return
-        self.atualizar_flutuante()
+        # A inserção desfaz a seleção, e o flutuante perde a âncora: fecha a
+        # janela e desmarca o botão, em vez de deixar a malha antiga na tela.
+        self._cancelar_flutuante()
         helpers.show_message(
             "Malha inserida abaixo de '{0}'{1}; seleção desfeita.".format(
                 nome_ativo or "camada ativa",

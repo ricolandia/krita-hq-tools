@@ -148,7 +148,8 @@ QA de visão aprovou as geometrias e o contraste das cores.
   com miniatura, prévia na proporção da seleção, flutuante sobre a seleção
   (arrasto e roda) e inserção como **camada vetorial** abaixo do esboço
   (camada ou referência), dentro de macro de desfazer (`run_in_macro`),
-  desfazendo a seleção. O deslocamento vai no SVG (`translate`), então as
+  desfazendo a seleção e fechando o flutuante (o botão desmarca). O
+  deslocamento vai no SVG (`translate`), então as
   formas entram já na posição da seleção, com dois nós por linha. O núcleo
   puro (`linhas.py`) saiu do script, que virou só a linha de comando que
   grava os assets.
