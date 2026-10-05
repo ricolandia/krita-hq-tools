@@ -150,6 +150,10 @@ QA de visão aprovou as geometrias e o contraste das cores.
   interseção com os ossos do modelo (o joinha v1 trazia 2 rigs; ficou de fora,
   o autor vai refazer a pose).
 - Testes: 300 -> 306.
+- Scripts de apoio salvos em `scripts/` (para não recriar): `gerar-gantt-roadmap.py`
+  (canvas Excalidraw do roadmap no Trilium, com `--enviar`), `embrulhar-i18n.py`
+  (codemod que embrulha strings visíveis em `i18n.t`, dry-run por padrão) e
+  `preview-poses3d.py` (prévias corpo + mãos por lado para QA, com PNG via cairosvg).
 
 ## Idioma (i18n) e docs EN (v0.9.0, 05/10/2026)
 
