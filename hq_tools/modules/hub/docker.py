@@ -1,7 +1,9 @@
 """Docker de hub: central de abertura e fechamento dos módulos.
 
 Um botão por módulo: clicar abre a doca; clicar de novo fecha, e o botão fica
-marcado enquanto a doca está visível. A opção "Fechar o atual ao abrir outro"
+marcado enquanto a doca está visível. Os botões ficam agrupados por divisores
+(Páginas/Produção, Moodboard/Biblioteca, Perspectiva/3D, Paletas/Pincéis,
+Retículas/Balões, Onomatopeias). A opção "Fechar o atual ao abrir outro"
 torna a abertura exclusiva (um módulo por vez); desmarcada, as dockas vão
 convivendo. O estado de cada botão acompanha o ``visibilityChanged`` da doca,
 então fechar pelo X do Krita também desmarca.
@@ -43,6 +45,11 @@ def _lista_de_modulos():
     ]
 
 
+def _grupos_de_modulos():
+    """Grupos (listas de (chave, rótulo)) para a grade, com divisor entre eles."""
+    return registro.agrupar(_lista_de_modulos())
+
+
 class HubDocker(DockWidget):
     def __init__(self):
         super().__init__()
@@ -65,17 +72,23 @@ class HubDocker(DockWidget):
             i18n.t('Abra e feche os módulos do HQ Tools por aqui. O botão fica marcado enquanto a doca está aberta; clicar de novo fecha.')
         ))
         grade = ui.espacamento(widgets.QGridLayout(), margem=0)
-        for indice, (chave, rotulo) in enumerate(_lista_de_modulos()):
-            botao = ui.botao(
-                rotulo,
-                i18n.t('Abre ou fecha o docker {0}.').format(rotulo),
-            )
-            botao.setCheckable(True)
-            botao.clicked.connect(
-                lambda marcado=False, chave=chave: self._alternar(chave)
-            )
-            self._botoes[chave] = botao
-            grade.addWidget(botao, indice // 2, indice % 2)
+        linha = 0
+        for indice_grupo, grupo in enumerate(_grupos_de_modulos()):
+            if indice_grupo:
+                grade.addWidget(ui.separador(), linha, 0, 1, 2)
+                linha += 1
+            for posicao, (chave, rotulo) in enumerate(grupo):
+                botao = ui.botao(
+                    rotulo,
+                    i18n.t('Abre ou fecha o docker {0}.').format(rotulo),
+                )
+                botao.setCheckable(True)
+                botao.clicked.connect(
+                    lambda marcado=False, chave=chave: self._alternar(chave)
+                )
+                self._botoes[chave] = botao
+                grade.addWidget(botao, linha + posicao // 2, posicao % 2)
+            linha += (len(grupo) + 1) // 2
         layout.addLayout(grade)
         self.chk_fechar = widgets.QCheckBox(i18n.t('Fechar o atual ao abrir outro'))
         self.chk_fechar.setToolTip(

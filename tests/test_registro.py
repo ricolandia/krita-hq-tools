@@ -54,5 +54,57 @@ class TestRegistro(unittest.TestCase):
         self.assertEqual(registro.instancias(), {})
 
 
+MODULOS = [
+    ("pages", "Páginas"),
+    ("producao", "Produção"),
+    ("moodboard", "Moodboard"),
+    ("biblioteca", "Biblioteca"),
+    ("perspectiva", "Perspectiva"),
+    ("viewer3d", "3D"),
+    ("palettes", "Paletas"),
+    ("brushes", "Pincéis"),
+    ("screentone", "Retículas"),
+    ("balloons", "Balões"),
+    ("onomatopeias", "Onomatopeias"),
+]
+
+
+class TestAgrupamento(unittest.TestCase):
+    def test_grupos_na_ordem(self):
+        grupos = registro.agrupar(MODULOS)
+        chaves = [tuple(chave for chave, _ in grupo) for grupo in grupos]
+        self.assertEqual(
+            chaves,
+            [
+                ("pages", "producao"),
+                ("moodboard", "biblioteca"),
+                ("perspectiva", "viewer3d"),
+                ("palettes", "brushes"),
+                ("screentone", "balloons"),
+                ("onomatopeias",),
+            ],
+        )
+
+    def test_todos_os_modulos_aparecem_uma_vez(self):
+        grupos = registro.agrupar(MODULOS)
+        vistas = [chave for grupo in grupos for chave, _ in grupo]
+        self.assertEqual(sorted(vistas), sorted(chave for chave, _ in MODULOS))
+        self.assertEqual(len(vistas), len(set(vistas)))
+
+    def test_modulo_fora_dos_grupos_cai_no_fim(self):
+        grupos = registro.agrupar(MODULOS + [("novo", "Novo")])
+        self.assertEqual(grupos[-1], [("novo", "Novo")])
+
+    def test_grupo_incompleto_nao_deixa_buraco(self):
+        grupos = registro.agrupar([("pages", "Páginas"), ("balloons", "Balões")])
+        self.assertEqual(
+            [tuple(chave for chave, _ in grupo) for grupo in grupos],
+            [("pages",), ("balloons",)],
+        )
+
+    def test_lista_vazia(self):
+        self.assertEqual(registro.agrupar([]), [])
+
+
 if __name__ == "__main__":
     unittest.main()

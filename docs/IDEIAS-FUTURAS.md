@@ -36,6 +36,9 @@ a da nota do roadmap no Trilium.
 - **v0.12 (06/10, publicada):** produção (checklist do roteiro por
   página/painel com três estados, meta semanal e export .md), com o
   personagem opcional na sintaxe do roteiro; validada pelo autor.
+- **v0.12.2 (06/10, publicada):** hub com divisores (agrupamento por fluxo:
+  Páginas/Produção, Moodboard/Biblioteca, Perspectiva/3D, Paletas/Pincéis,
+  Retículas/Balões e Onomatopeias), sem strings novas.
 - **Fora do roadmap original:** camada de UI compartilhada (52 botões), ícone
   e social preview, vídeos demo no YouTube com roteiros de captura, CI no
   Windows, automação de release (tag → ZIP + notas do CHANGELOG), duas
@@ -97,14 +100,6 @@ inserida num painel dentro de uma seleção. Decisões e achados:
 9. **Exportação de páginas (amadurecer, adiada em 05/10):** diálogo com cor
    (RGB/CMYK + perfil), resolução (72/96/150/300), saída (pasta de imagens ou
    PDF único) e presets web/impressão; especificação abaixo.
-10. **Hub com divisores (decidido em 06/10/2026, para o próximo release):**
-    agrupar os botões com divisores entre as duplas, na ordem pedida pelo
-    autor: Páginas/Produção, Moodboard/Biblioteca, Perspectiva/3D,
-    Paletas/Pincéis, Retículas/Balões e Onomatopeias. Viável e barato: a
-    grade do hub é de 2 colunas e o separador (`ui.separador()`) entra
-    ocupando as duas (`addWidget(separador, linha, 0, 1, 2)`); os grupos são
-    uma lista de chaves no hub, e módulo fora dela cai no fim (nada some).
-    ~20 linhas + teste do mapeamento; sem strings novas (só divisores).
 
 **Fora de escopo (mantido):** exportação webtoon (Batch Exporter cobre),
 preflight de impressão (Scribus), rotas B/C do 3D (Blender Layer e pose

@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.12.2] — 2026-10-06
+
+O hub ganhou divisores: os botões ficam agrupados por fluxo
+(Páginas/Produção, Moodboard/Biblioteca, Perspectiva/3D, Paletas/Pincéis,
+Retículas/Balões e Onomatopeias), sem mudar nada mais.
+
+**English:** the hub got dividers: the buttons are grouped by workflow
+(Pages/Production, Moodboard/Library, Perspective/3D, Palettes/Brushes,
+Screentones/Balloons and Sound effects), nothing else changed.
+
+### Hub com divisores
+
+- Os botões do hub ficam agrupados por divisores, na ordem pedida pelo autor:
+  Páginas/Produção, Moodboard/Biblioteca, Perspectiva/3D, Paletas/Pincéis,
+  Retículas/Balões e Onomatopeias; módulo fora do agrupamento cai no fim e
+  nada some.
+- O agrupamento vive em `core/registro.py` (`GRUPOS` + `agrupar`), com teste
+  próprio; sem strings novas (só divisores).
+
 ## [0.12.1] — 2026-10-06
 
 Correções de idioma e documentação: 81 strings que só existiam em português
