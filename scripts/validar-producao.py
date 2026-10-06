@@ -77,7 +77,8 @@ def executar_smoke():
 
     docker.caixa.setPlainText(ROTEIRO)
     docker.montar()
-    log("roteiro.txt salvo: {0}".format(os.path.exists(os.path.join(BASE, "roteiro.txt"))))
+    log("pasta_dados: {0!r}".format(docker.pasta_dados()))
+    log("roteiro.txt salvo: {0}".format(os.path.exists(os.path.join(BASE, "producao", "roteiro.txt"))))
     log("arvore: {0} paginas".format(docker.arvore.topLevelItemCount()))
     for indice in range(docker.arvore.topLevelItemCount()):
         item = docker.arvore.topLevelItem(indice)
@@ -96,17 +97,17 @@ def executar_smoke():
     log("apos 3 cliques: painel 1 = {0!r} (volta ao esboco)".format(item.text(1)))
     docker._item_clicado(item, 1)
     log("deixado em: {0!r}".format(item.text(1)))
-    estados, meta = prod.carregar(BASE)
+    estados, meta = prod.carregar(os.path.join(BASE, "producao"))
     log("estados salvos: {0} meta={1}".format(estados, meta))
     log("progresso: {0!r}".format(docker.lbl_progresso.text()))
 
     docker.meta.setValue(2)
     log("meta 2: {0!r}".format(docker.lbl_meta.text()))
-    estados, meta = prod.carregar(BASE)
+    estados, meta = prod.carregar(os.path.join(BASE, "producao"))
     log("meta salva: {0}".format(meta))
 
     docker.exportar_markdown()
-    caminho_md = os.path.join(BASE, "checklist.md")
+    caminho_md = os.path.join(BASE, "producao", "checklist.md")
     log("checklist.md existe: {0}".format(os.path.exists(caminho_md)))
     if os.path.exists(caminho_md):
         linhas = open(caminho_md, encoding="utf-8").read().splitlines()
@@ -127,6 +128,25 @@ def executar_smoke():
 
     log("linhas de sintaxe: {0}".format(len(producao_docker.LINHAS_SINTAXE)))
     log("exemplo de sintaxe: {0!r}".format(producao_docker.EXEMPLO.splitlines()[0]))
+
+    # 4) reabertura: uma instância nova deve reler o roteiro e os estados
+    docker2 = ProducaoDocker()
+    log("reabertura: arvore={0} paginas".format(docker2.arvore.topLevelItemCount()))
+    log("reabertura: progresso={0!r}".format(docker2.lbl_progresso.text()))
+    log("reabertura: meta={0}".format(docker2.meta.value()))
+    estados2, _ = prod.carregar(docker2.pasta_dados())
+    log("reabertura: estado 1-1={0!r}".format(estados2.get("1-1")))
+
+    # 5) sem projeto: pasta padrao do plugin e aviso de escolher a pasta
+    docker2.config.set("producao.folder", "")
+    docker3 = ProducaoDocker()
+    log("padrao: pasta_dados={0!r}".format(docker3.pasta_dados()))
+    log("padrao: aviso={0!r}".format(docker3.lbl_pasta.text()))
+    docker3.caixa.setPlainText(ROTEIRO)
+    docker3.montar()
+    log("padrao: roteiro salvo={0}".format(os.path.exists(os.path.join(docker3.pasta_dados(), "roteiro.txt"))))
+    docker4 = ProducaoDocker()
+    log("padrao: reabertura arvore={0}".format(docker4.arvore.topLevelItemCount()))
 
 
 if __name__ == "__main__" or os.environ.get("HQ_POC_AUTORUN"):

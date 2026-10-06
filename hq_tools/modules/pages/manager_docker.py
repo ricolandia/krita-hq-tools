@@ -34,6 +34,7 @@ from ...core import registro, ui
 from ...core import i18n
 from ...core.thumbs import thumbnail_pixmap
 from ..biblioteca import core as biblioteca_core
+from ..producao import core as producao_core
 from . import generator, guias, modelos as modelos_lib, roteiro
 
 FORMATO_ITENS = (
@@ -251,6 +252,15 @@ class PagesDocker(DockWidget):
                     i18n.t('Não foi possível criar a biblioteca: {0}').format(error),
                 )
                 return
+        dados_producao = os.path.join(folder, producao_core.PASTA)
+        try:
+            os.makedirs(dados_producao, exist_ok=True)
+        except OSError as error:
+            helpers.show_info(
+                i18n.t('Novo projeto'),
+                i18n.t('Não foi possível criar a pasta de produção: {0}').format(error),
+            )
+            return
         if CPMTProject.is_project(folder):
             try:
                 project = CPMTProject(folder)

@@ -25,6 +25,7 @@ from ...core.compat import (
     QtWidgets,
 )
 from ...core.config import Config
+from ...core.paths import PRODUCAO_DIR
 from . import core as prod
 
 LINHAS_SINTAXE = (
@@ -86,14 +87,31 @@ class ProducaoDocker(DockWidget):
     # ------------------------------------------------------------------ pasta
 
     def folder(self):
-        """Pasta do projeto: escolha explícita ou a última usada em Páginas."""
+        """Pasta do projeto (onde ficam as páginas .kra)."""
         escolhida = self.config.get("producao.folder")
         if escolhida:
             return escolhida
         projeto = self.config.get("pages.last_folder")
         if projeto and os.path.isdir(projeto):
             return projeto
-        return ""
+        return PRODUCAO_DIR
+
+    def pasta_dados(self):
+        """Onde ficam roteiro.txt, producao.json e checklist.md.
+
+        No projeto, na subpasta ``producao/`` (criada junto com o projeto);
+        sem projeto, na pasta padrão do plugin.
+        """
+        if self._pasta_padrao():
+            return PRODUCAO_DIR
+        return os.path.join(self.folder(), prod.PASTA)
+
+    def _pasta_padrao(self):
+        """True quando não há projeto nem escolha explícita (pasta do plugin)."""
+        if self.config.get("producao.folder"):
+            return False
+        projeto = self.config.get("pages.last_folder")
+        return not (projeto and os.path.isdir(projeto))
 
     def pick_folder(self):
         pasta = QtWidgets.QFileDialog.getExistingDirectory(
@@ -224,16 +242,21 @@ class ProducaoDocker(DockWidget):
 
     def recarregar(self):
         """Relê o roteiro e o progresso da pasta e remonta a árvore."""
-        pasta = self.folder()
-        if pasta:
-            self.lbl_pasta.setText(i18n.t('Projeto: {0}').format(pasta))
-        else:
+        pasta = self.pasta_dados()
+        try:
+            os.makedirs(pasta, exist_ok=True)
+        except OSError:
+            pass
+        if self._pasta_padrao():
             self.lbl_pasta.setText(
-                i18n.t('Nenhuma pasta de projeto: escolha em "Pasta..." ou abra um projeto em Páginas.')
+                i18n.t('Escolha a pasta do projeto em "Pasta..." (salvando provisoriamente em {0}).').format(pasta)
             )
+        else:
+            self.lbl_pasta.setText(i18n.t('Projeto: {0}').format(self.folder()))
+            self.lbl_pasta.setToolTip(i18n.t('Checklist em: {0}').format(pasta))
         self._carregando = True
-        texto = prod.carregar_roteiro(pasta) if pasta else ""
-        estados, meta = prod.carregar(pasta) if pasta else ({}, 0)
+        texto = prod.carregar_roteiro(pasta)
+        estados, meta = prod.carregar(pasta)
         self.caixa.setPlainText(texto)
         self.meta.setValue(meta)
         self._carregando = False
@@ -247,19 +270,12 @@ class ProducaoDocker(DockWidget):
     def montar(self):
         """Lê o texto, monta o checklist e salva o roteiro e os estados."""
         texto = self.caixa.toPlainText()
-        pasta = self.folder()
-        estados = {}
-        if pasta:
-            estados, _ = prod.carregar(pasta)
+        pasta = self.pasta_dados()
+        estados, _ = prod.carregar(pasta)
         try:
             self._montar(texto, estados)
         except ValueError as erro:
             helpers.show_info(i18n.t('Produção'), i18n.t('Roteiro: {0}').format(erro))
-            return
-        if not pasta:
-            helpers.show_message(
-                i18n.t('Checklist montado (sem pasta de projeto: o texto não foi salvo).')
-            )
             return
         try:
             prod.salvar_roteiro(pasta, texto)
@@ -273,6 +289,10 @@ class ProducaoDocker(DockWidget):
                 len(self.checklist), contagem["total"]
             )
         )
+        if self._pasta_padrao():
+            helpers.show_message(
+                i18n.t('Checklist salvo em {0}. Escolha a pasta do projeto para guardar junto das páginas.').format(pasta)
+            )
 
     def _montar(self, texto, estados):
         self.checklist = prod.montar(texto, estados)
@@ -410,9 +430,7 @@ class ProducaoDocker(DockWidget):
             menu.exec(self.arvore.viewport().mapToGlobal(posicao))
 
     def _salvar_estados(self):
-        pasta = self.folder()
-        if not pasta:
-            return
+        pasta = self.pasta_dados()
         try:
             prod.salvar(
                 pasta, prod.estados_do_checklist(self.checklist), self.meta.value()
@@ -481,10 +499,7 @@ class ProducaoDocker(DockWidget):
         if not self.checklist:
             helpers.show_message(i18n.t('Monte o checklist antes de exportar.'))
             return
-        pasta = self.folder()
-        if not pasta:
-            helpers.show_message(i18n.t('Escolha a pasta do projeto.'))
-            return
+        pasta = self.pasta_dados()
         rotulos = {
             "esboco": i18n.t('Esboço'),
             "arte": i18n.t('Arte'),

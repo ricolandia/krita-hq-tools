@@ -14,9 +14,13 @@
   do `LxC`; a mensagem de erro orienta os formatos aceitos.
 - Meta de painéis por semana com projeção de entrega, progresso, duplo
   clique abre a `pagina_NNN.kra` e "Exportar .md" salva o checklist em
-  Markdown; o `roteiro.txt` e o `producao.json` ficam na pasta do projeto.
+  Markdown; o `roteiro.txt` e o `producao.json` ficam na subpasta
+  `producao/` do projeto (criada junto com o projeto em Páginas).
 - Aviso da sintaxe na própria doca (dica, placeholder e o botão "Sintaxe..."
   com o formato completo), em PT e EN.
+- Sem projeto aberto, o checklist salva na pasta padrão do plugin e avisa
+  para escolher a pasta do projeto; nada se perde ao fechar o Krita (a
+  reabertura relê o roteiro, os estados e a meta).
 - Validação: smoke `scripts/validar-producao.py` no Krita 5.3.4 isolado
   (montar, ciclar estados, meta, export e abrir a página).
 

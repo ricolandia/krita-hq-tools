@@ -17,6 +17,7 @@ from ..pages import roteiro
 
 ESTADOS = ("esboco", "arte", "final")
 ESTADO_PADRAO = "esboco"
+PASTA = "producao"
 ARQUIVO_ESTADOS = "producao.json"
 ARQUIVO_ROTEIRO = "roteiro.txt"
 ARQUIVO_CHECKLIST = "checklist.md"
