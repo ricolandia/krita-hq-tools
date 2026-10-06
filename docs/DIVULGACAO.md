@@ -112,8 +112,54 @@ funções de IA; sem arte gerada por IA (ver `CREDITS.md`).
 - **Topics do repositório** (na UI do GitHub: About > engrenagem > Topics):
   `krita`, `krita-plugin`, `comics`, `comic-tools`, `webtoon`, `manga`,
   `python`, `pyqt5`, `qt`, `art-tools`, `open-source`.
-- **PR no awesome-krita** (adicionar o HQ Tools na seção Plugins).
+- **awesome-krita** (passo a passo abaixo; decisão do autor em 06/10:
+  **sem fork local**, pelo editor web do GitHub).
 - **Tip para o LibreArts**.
+
+### awesome-krita (PR pelo editor web, sem fork local)
+
+O `contributing.md` do repositório pede **PR com branch** (a "suggestion"
+de issue é só para propor seções novas); o item vai **no fim da seção
+Plugins** e a linha segue o formato `- [nome](link https) - Descrição com
+maiúscula e ponto final.` O lint (`npx awesome-lint readme.md`) não acusa
+nada novo (o repositório já tinha 2 erros antigos: o ToC e um item sem
+ponto). A linha validada é:
+
+```
+- [HQ Tools](https://github.com/ricolandia/krita-hq-tools) - Comics production toolkit for Krita: screentones and hatching, balloons, pages, brushes, 3D viewer, perspective, moodboard and production checklist.
+```
+
+Passo a passo (o fork é criado pelo próprio GitHub, sem terminal):
+
+1. Abra https://github.com/armstrongl/awesome-krita/blob/main/readme.md
+2. Clique no lápis ("Edit this file"); o GitHub avisa que vai criar um fork.
+3. No fim da seção "## Plugins" (depois da linha do Oughtasave, antes de
+   "## Textures and patterns"), cole a linha acima.
+4. "Commit changes..." > "Create a new branch for this commit and start a
+   pull request" > branch `add-hq-tools` > "Propose changes".
+5. Título do PR: `Add HQ Tools`. Corpo (sem falar de IA; a lista já tem
+   plugins com IA e o assunto só desviaria o PR):
+
+```
+Adds [HQ Tools](https://github.com/ricolandia/krita-hq-tools), an open-source (MIT) comics production toolkit for Krita.
+
+What it does: screentones and hatching (real LPI), vector balloons and sound effects, a page manager (templates, margin guides, panel mask, CPMT), brush slots with shortcuts, a poseable 3D mannequin viewer, a perspective grid library, a moodboard with linked references and a production checklist.
+
+- License: MIT
+- Krita: 5.3.4 (tested; prepared for Krita 6)
+- Latest release: https://github.com/ricolandia/krita-hq-tools/releases/latest
+- README with screenshots and short demo videos, manual in English and Portuguese
+```
+
+Alternativa (menos trabalho para o autor, mais para o mantenedor, e sem
+garantia): abrir uma issue pedindo a inclusão, com o link e a linha pronta.
+O repositório não tem formulário de issue ativo (o template existe só na
+cópia `ci/`), então seria uma issue em texto simples.
+
+Se um dia o caminho pelo terminal voltar a interessar: o clone local está em
+`~/Documentos/32_APPS_GITHUB_contribuicoes/Krita_Awesome`, na branch
+`add-hq-tools`, com o commit "Add HQ Tools to Plugins" pronto (basta criar o
+fork e apontar o remoto).
 
 ## Log de postagens
 
