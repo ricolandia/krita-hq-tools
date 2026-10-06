@@ -40,11 +40,11 @@ The four original context documents of the project are in `docs/contexto/`
 
 | 3D viewer | Hub |
 |---|---|
-| ![3D docker with the Pose, Camera and Insert tabs, a running mannequin and the joint sliders](Screenshots/07-3d.png) | ![Hub docker with the buttons that open and close all eleven modules, including Moodboard and Production](Screenshots/10-hub.png) |
+| ![3D docker with the Pose, Camera and Insert tabs, a running mannequin and the joint sliders](Screenshots/07-3d.png) | ![Hub docker with the eleven modules grouped by dividers: Pages/Production, Moodboard/Library, Perspective/3D, Palettes/Brushes, Screentones/Balloons and Sound effects](Screenshots/10-hub.png) |
 
 | Perspective library | Hub and 3D in Krita |
 |---|---|
-| ![Perspective docker with the grid gallery, the enlarged preview and the insert-into-selection buttons](Screenshots/11-perspectiva.png) | ![Krita with the hub and the 3D docker open (14 mm perspective camera, blue mannequin) and the mannequin already inserted into a page](Screenshots/12-hub-e-3d.png) |
+| ![Perspective docker with the grid gallery, the enlarged preview and the insert-into-selection buttons](Screenshots/11-perspectiva.png) | ![Krita with the hub (modules grouped by dividers) and the 3D docker open, with the pose selectors (Body: Run, Hands: Closed, Hand: Right) and the mannequin already inserted into a page](Screenshots/12-hub-e-3d.png) |
 
 | Moodboard |
 |---|

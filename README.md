@@ -39,11 +39,11 @@ Os quatro documentos originais de contexto do projeto estão em
 
 | Visualizador 3D | Hub |
 |---|---|
-| ![Docker 3D com abas Pose, Câmera e Inserir, manequim em corrida e os sliders das juntas](Screenshots/07-3d.png) | ![Docker Hub com os botões que abrem e fecham todos os onze módulos, incluindo o Moodboard e a Produção](Screenshots/10-hub.png) |
+| ![Docker 3D com abas Pose, Câmera e Inserir, manequim em corrida e os sliders das juntas](Screenshots/07-3d.png) | ![Docker Hub com os onze módulos agrupados por divisores: Páginas/Produção, Moodboard/Biblioteca, Perspectiva/3D, Paletas/Pincéis, Retículas/Balões e Onomatopeias](Screenshots/10-hub.png) |
 
 | Biblioteca de perspectivas | Hub e 3D no Krita |
 |---|---|
-| ![Docker de perspectiva com a galeria de malhas, a prévia ampliada e os botões de inserir na seleção](Screenshots/11-perspectiva.png) | ![Krita com o hub e o docker 3D abertos (câmera perspectiva de 14 mm, manequim azul) e o manequim já inserido em uma página](Screenshots/12-hub-e-3d.png) |
+| ![Docker de perspectiva com a galeria de malhas, a prévia ampliada e os botões de inserir na seleção](Screenshots/11-perspectiva.png) | ![Krita com o hub (módulos agrupados por divisores) e o docker 3D abertos, com o seletor de poses (Corpo: Corre, Mãos: Fechada, Mão: Direita) e o manequim já inserido numa página](Screenshots/12-hub-e-3d.png) |
 
 | Moodboard |
 |---|
