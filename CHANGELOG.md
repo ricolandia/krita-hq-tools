@@ -1,6 +1,14 @@
 # Changelog
 
-## [Não publicado]
+## [0.10.1] — 2026-10-05
+
+Duas correções: as cores inseridas pelo visualizador 3D (e os recursos de
+pintura da biblioteca) não trocam mais vermelho e azul, e os slots de pincéis
+caíram para 8 com opção de limpar.
+
+**English:** two fixes: colors inserted by the 3D viewer (and the library
+paint resources) no longer swap red and blue, and the brush slots are down to
+8 with a clear option.
 
 ### Pincéis: slots em 8 e como limpar
 
