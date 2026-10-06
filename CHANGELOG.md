@@ -11,6 +11,9 @@
   lentes **14 / 28 / 35 mm**: a lente mantém o enquadramento e muda só a
   convergência (14 mm dramática, 35 mm suave), e um ajuste garante que o
   conjunto continue cabendo no quadro como na ortográfica.
+- A aba Câmera ganhou o seletor **Cor:** (Padrão, Azul, Branco e Preto); a cor
+  escolhida vale no preview, no flutuante e na inserção, e também nos estilos
+  Silhueta e Contorno (antes fixos em preto).
 - `scripts/preview-modelo3d.py` ganhou `--lente` para as prévias de QA.
 
 ## [0.9.1] — 2026-10-05

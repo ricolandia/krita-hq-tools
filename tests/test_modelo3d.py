@@ -333,6 +333,24 @@ class TestEspelhoDePose(unittest.TestCase):
         )
 
 
+class TestCorDoRender(unittest.TestCase):
+    def test_cor_escolhida_aparece_no_svg(self):
+        if not os.path.isfile(MODELO_REAL):
+            self.skipTest("homem.json não está no repositório")
+        modelo = modelo3d.Modelo.carregar(MODELO_REAL)
+        svg = modelo.renderizar(
+            largura=300, altura=300, cor="#123456", estilo="chapado"
+        )
+        self.assertIn("#123456", svg)
+
+    def test_sem_cor_usa_a_padrao_do_modelo(self):
+        if not os.path.isfile(MODELO_REAL):
+            self.skipTest("homem.json não está no repositório")
+        modelo = modelo3d.Modelo.carregar(MODELO_REAL)
+        svg = modelo.renderizar(largura=300, altura=300, estilo="chapado")
+        self.assertIn(modelo.cor_padrao, svg)
+
+
 class TestLentes(unittest.TestCase):
     """Câmera ortográfica (padrão) e perspectiva com lentes."""
 

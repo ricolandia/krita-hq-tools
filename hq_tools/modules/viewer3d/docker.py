@@ -352,6 +352,9 @@ class Viewer3DDocker(DockWidget):
         # enquadramento e muda só a convergência (ver modelo3d.LENTES).
         self.perspectiva = False
         self.lente = modelo3d.LENTES[-1]
+        # None = cor padrão do modelo; qualquer outra vale no render, no
+        # flutuante e na inserção (a camada inserida é raster).
+        self.cor = None
         self._tela = []
         self._canvas = None
         self._flutuante = None
@@ -481,6 +484,17 @@ class Viewer3DDocker(DockWidget):
         self.cmb_estilo.currentIndexChanged.connect(self.agendar_render)
         estilo_row.addWidget(self.cmb_estilo, 1)
         layout.addLayout(estilo_row)
+
+        cor_row = widgets.QHBoxLayout()
+        cor_row.addWidget(ui.rotulo(i18n.t('Cor:')))
+        self.cmb_cor = widgets.QComboBox()
+        self.cmb_cor.addItem(i18n.t('Padrão'), None)
+        self.cmb_cor.addItem(i18n.t('Azul'), "#7da7d9")
+        self.cmb_cor.addItem(i18n.t('Branco'), "#ffffff")
+        self.cmb_cor.addItem(i18n.t('Preto'), "#141414")
+        self.cmb_cor.currentIndexChanged.connect(self._mudar_cor)
+        cor_row.addWidget(self.cmb_cor, 1)
+        layout.addLayout(cor_row)
 
         cameras = widgets.QHBoxLayout()
         button_front = ui.botao(
@@ -672,6 +686,10 @@ class Viewer3DDocker(DockWidget):
             self.lente = float(lente)
         self.agendar_render()
 
+    def _mudar_cor(self, indice):
+        self.cor = self.cmb_cor.itemData(indice)
+        self.agendar_render()
+
     def _atualizar_lente(self):
         self.cmb_lente.setEnabled(self.perspectiva)
 
@@ -697,11 +715,12 @@ class Viewer3DDocker(DockWidget):
 
     def _estilo(self):
         dados = self.cmb_estilo.currentData()
+        cor = self.cor
         if dados == "silhueta":
-            return "chapado", "#141414", "#ffffff"
+            return "chapado", cor or "#141414", "#ffffff"
         if dados == "contorno":
-            return "contorno", "#141414", "#ffffff"
-        return "sombreado", None, None
+            return "contorno", cor or "#141414", "#ffffff"
+        return "sombreado", cor, None
 
     def _pan_em_pixels(self, largura, altura):
         """Converte o pan relativo (fração da menor dimensão) em pixels."""
