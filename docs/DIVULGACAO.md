@@ -98,9 +98,8 @@ library, a moodboard and a production checklist. One-click install (Import
 Python Plugin); manual in EN and PT."
 
 **Links:** repositório https://github.com/ricolandia/krita-hq-tools ·
-release mais recente (asset `hq_tools-<versão>.zip`) · vídeos:
-https://youtu.be/B9KYYyLdHF0 (todos os recursos) e
-https://youtu.be/0rfDIr2QTDE (3D flutuante).
+release mais recente (asset `hq_tools-<versão>.zip`) · vídeo:
+https://youtu.be/qzLnXSGgufc (Krita HQ Tools - Update).
 
 **Instalação em 1 linha:** baixe o ZIP da release e use
 Ferramentas > Scripts > Importar plugin Python; ative em Configurar Krita >
