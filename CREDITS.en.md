@@ -142,6 +142,13 @@ These folders are the author's local working material and stay in
 The distributed package (`dist/hq_tools-<version>.zip`) carries only
 `hq_tools/`, `hq_tools.desktop`, `hq_tools.action` and the documents.
 
+## Development and transparency
+
+The plugin code was developed with AI assistance (opencode + DeepSeek) in
+the coding, with review and testing by the author. The plugin **has no AI
+features** and the kit **includes no AI-generated art**: the assets are the
+author's own or third-party under free licenses (see the sections above).
+
 ## Project and contact
 
 HQ Tools, by Ricardo Graça. Public repository:

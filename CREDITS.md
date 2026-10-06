@@ -141,6 +141,13 @@ Estas pastas são material de trabalho local do autor e ficam no `.gitignore`
 O pacote distribuído (`dist/hq_tools-<versão>.zip`) leva só `hq_tools/`,
 `hq_tools.desktop`, `hq_tools.action` e os documentos.
 
+## Desenvolvimento e transparência
+
+O código do plugin foi desenvolvido com assistência de IA (opencode +
+DeepSeek) na codificação, com revisão e testes do autor. O plugin **não tem
+funções de IA** e o kit **não inclui arte gerada por IA**: os assets são
+autorais ou de terceiros com licença livre (ver as seções acima).
+
 ## Projeto e contato
 
 HQ Tools, por Ricardo Graça. Repositório público:

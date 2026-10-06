@@ -89,6 +89,14 @@ O plugin acompanha um kit com licenças documentadas em `CREDITS.md`:
   (David Revoy, CC-BY 4.0) e Krita Watercolor Set (Vasco Basqué, CC-0),
   instaláveis com um clique, cada um com licença e créditos.
 
+## Transparência
+
+O código foi desenvolvido com assistência de IA (opencode + DeepSeek) na
+codificação. O plugin **não tem funções de IA** e o kit **não inclui arte
+gerada por IA**: os assets são autorais (balões e onomatopeias desenhados à
+mão, ícone no Penpot, padrões gerados por código) ou de terceiros com
+licença livre, listados em `CREDITS.md`.
+
 ## Instalação
 
 Guia completo para usuário final (ZIP, manual, Flatpak, desinstalação e

@@ -90,6 +90,14 @@ The plugin ships a kit with licenses documented in `CREDITS.en.md`:
   (David Revoy, CC-BY 4.0) and Krita Watercolor Set (Vasco Basqué, CC-0),
   one-click install, each with license and credits.
 
+## Transparency
+
+The code was developed with AI assistance (opencode + DeepSeek) in the
+coding. The plugin **has no AI features** and the kit **includes no
+AI-generated art**: the assets are the author's own (hand-drawn balloons and
+sound effects, icon in Penpot, code-generated patterns) or third-party under
+free licenses, listed in `CREDITS.en.md`.
+
 ## Installation
 
 Complete end-user guide (ZIP, manual, Flatpak, uninstall and troubleshooting):
