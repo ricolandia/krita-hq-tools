@@ -112,8 +112,10 @@ funções de IA; sem arte gerada por IA (ver `CREDITS.md`).
 - **Topics do repositório** (na UI do GitHub: About > engrenagem > Topics):
   `krita`, `krita-plugin`, `comics`, `comic-tools`, `webtoon`, `manga`,
   `python`, `pyqt5`, `qt`, `art-tools`, `open-source`.
-- **awesome-krita** (passo a passo abaixo; decisão do autor em 06/10:
-  **sem fork local**, pelo editor web do GitHub).
+- **awesome-krita**: PR **aberto** em 06/10 (armstrongl/awesome-krita#2,
+  1 arquivo, +1 linha na seção Plugins), aguardando a revisão do
+  mantenedor. O passo a passo abaixo fica como referência de como foi
+  feito.
 - **Tip para o LibreArts**.
 
 ### awesome-krita (PR pelo editor web, sem fork local)
@@ -172,4 +174,4 @@ fork e apontar o remoto).
 
 | Data | Canal | O que foi | Retorno |
 |---|---|---|---|
-| | | | |
+| 06/10/2026 | awesome-krita | PR #2 (armstrongl/awesome-krita#2): uma linha na seção Plugins, formato validado com `awesome-lint` | aguardando revisão do mantenedor |
