@@ -56,10 +56,36 @@ a da nota do roadmap no Trilium.
    próprio como bundle e os presets de assistente de perspectiva por painel
    (com a biblioteca de perspectiva pronta, o valor caiu; decidir se sai da
    lista).
+9. **Exportação de páginas (amadurecer, adiada em 05/10):** diálogo com cor
+   (RGB/CMYK + perfil), resolução (72/96/150/300), saída (pasta de imagens ou
+   PDF único) e presets web/impressão; especificação abaixo.
 
 **Fora de escopo (mantido):** exportação webtoon (Batch Exporter cobre),
 preflight de impressão (Scribus), rotas B/C do 3D (Blender Layer e pose
 makers web) e apagador vetorial por interseção.
+
+### Exportação de páginas (amadurecer, adiada em 05/10/2026)
+
+Pedido do autor em 05/10, adiado por precisar de um desenho maior. A ideia é
+que o artista finalize no Scribus/InDesign, então a doca entrega os assets por
+página e imposição/sangria ficam lá.
+
+- **Diálogo de exportação** ao clicar em "Exportar páginas...", com:
+  - **Cor:** RGB × CMYK (com escolha de perfil ICC; PNG é só RGB, então CMYK
+    pede TIFF/PSD/PDF com perfil embutido, e o Krita converte o documento com
+    os perfis dele);
+  - **Resolução:** 72 / 96 / 150 / 300 dpi (exige reamostragem: cópia do
+    documento com `scaleImage` ou redimensionamento depois);
+  - **Saída:** pasta com imagens por página **ou** um único PDF (e,
+    possivelmente, PSD em camadas, que o Krita exporta com camadas);
+  - **Presets:** "Web" (RGB, 96 dpi, PNG/JPG) e "Impressão" (CMYK, 300 dpi,
+    TIFF/PDF com perfil), mais o modo avançado.
+- **Tecnicamente:** esse caminho abre cada `.kra` e usa `exportImage` com um
+  `InfoObject` de opções por página (mais lento, com progresso). O extrator do
+  `mergedimage.png` (verificado em 05/10: resolução cheia, 2480x3508 a 300 dpi)
+  fica como exportação web rápida, se sobreviver.
+- **Páginas sem imagem mesclada / erros:** pular e listar no fim.
+- **Fora:** imposição, sangria e marcas de corte (Scribus).
 
 ## Proposta avaliada: balde com fechamento de falhas (`fillbucket`)
 
@@ -215,12 +241,13 @@ paramétrico.
 
 ### Correções de rota (o que não é lacuna)
 
-- Exportação e lote de páginas ficam no CPMT (decisão vigente no SESSION);
-  exportar pelo manager do plugin é mudança de escopo, não lacuna.
+- Exportação e lote de páginas ficam no CPMT (decisão vigente no SESSION).
+  Em 05/10/2026 o autor pediu exportação pela doca; o desenho maduro está na
+  seção "Exportação de páginas (amadurecer)", adiado para depois.
 - Exportação rápida de página dentro do plugin exigiria código novo
   (`exportImage`), não reuso do `saveAs`, que grava `.kra`.
-- PDF multi-página não tem caminho nativo no Krita; exigiria PDF em Python
-  puro (zlib) ou ferramenta externa.
+- PDF multi-página não tem caminho nativo no Krita; o escritor puro em Python
+  fica na especificação adiada.
 - Apagador vetorial por interseção: fora de escopo confirmado (a API de
   vetores não expõe trim por interseção).
 

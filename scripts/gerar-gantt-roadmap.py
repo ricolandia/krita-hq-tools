@@ -53,7 +53,7 @@ TAREFAS = (
     ("Clique direto no canvas (PoC)", 18, 20, COR_RAPIDO, "3 dias"),
     ("Fillbucket em Python puro (sem numpy)", 21, 26, COR_MEDIO, "6 dias"),
     ("Balão paramétrico (pós-Krita 6)", 27, 30, COR_MEDIO, "4 dias"),
-    ("Avaliar e decidir (joinha, estilo de painel, bundle)", 24, 30, COR_NEUTRO, "quando der"),
+    ("Avaliar e decidir (joinha, painel, bundle, exportação)", 24, 30, COR_NEUTRO, "quando der"),
 )
 
 DIAS = 30
