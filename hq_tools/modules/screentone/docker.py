@@ -84,8 +84,8 @@ class ScreentoneDocker(DockWidget):
         form = widgets.QFormLayout()
 
         self.cmb_pattern = widgets.QComboBox()
-        for label, value in (("Pontos", core.PATTERN_DOTS), ("Linhas", core.PATTERN_LINES)):
-            self.cmb_pattern.addItem(label, value)
+        for label, value in core.PATTERNS:
+            self.cmb_pattern.addItem(i18n.t(label), value)
         self.cmb_pattern.currentIndexChanged.connect(self._reload_shapes)
         form.addRow(i18n.t('Padrão:'), self.cmb_pattern)
 
@@ -94,12 +94,12 @@ class ScreentoneDocker(DockWidget):
 
         self.cmb_interpolation = widgets.QComboBox()
         for label, value in core.INTERPOLATIONS:
-            self.cmb_interpolation.addItem(label, value)
+            self.cmb_interpolation.addItem(i18n.t(label), value)
         form.addRow(i18n.t('Interpolação:'), self.cmb_interpolation)
 
         self.cmb_equalization = widgets.QComboBox()
         for label, value in core.EQUALIZATIONS:
-            self.cmb_equalization.addItem(label, value)
+            self.cmb_equalization.addItem(i18n.t(label), value)
         form.addRow(i18n.t('Equalização:'), self.cmb_equalization)
 
         frequency_row = widgets.QHBoxLayout()
@@ -111,7 +111,7 @@ class ScreentoneDocker(DockWidget):
         frequency_row.addWidget(self.spin_lpi, 1)
         self.cmb_units = widgets.QComboBox()
         for label, value in core.UNITS:
-            self.cmb_units.addItem(label, value)
+            self.cmb_units.addItem(i18n.t(label), value)
         self.cmb_units.currentIndexChanged.connect(self._on_units_changed)
         frequency_row.addWidget(self.cmb_units, 1)
         form.addRow(i18n.t('Frequência:'), frequency_row)
@@ -168,7 +168,7 @@ class ScreentoneDocker(DockWidget):
 
         self.cmb_mask = widgets.QComboBox()
         for label, value in MASK_MODES:
-            self.cmb_mask.addItem(label, value)
+            self.cmb_mask.addItem(i18n.t(label), value)
         form.addRow(i18n.t('Aplicação:'), self.cmb_mask)
 
         self.chk_reuse = widgets.QCheckBox(i18n.t('Reutilizar retícula idêntica já existente'))
@@ -177,7 +177,7 @@ class ScreentoneDocker(DockWidget):
 
         self.cmb_halftone = widgets.QComboBox()
         for label, value in HALFTONE_MODES:
-            self.cmb_halftone.addItem(label, value)
+            self.cmb_halftone.addItem(i18n.t(label), value)
         form.addRow(i18n.t('Meio-tom:'), self.cmb_halftone)
 
         # Botões só com a cor (o papel é pintado por _sync_colors), sem altura
@@ -257,7 +257,7 @@ class ScreentoneDocker(DockWidget):
         form = widgets.QFormLayout()
         self.cmb_effect = widgets.QComboBox()
         for label, value in EFFECT_MODES:
-            self.cmb_effect.addItem(label, value)
+            self.cmb_effect.addItem(i18n.t(label), value)
         self.cmb_effect.currentIndexChanged.connect(self._update_effect_enabled)
         form.addRow(i18n.t('Tipo:'), self.cmb_effect)
 
@@ -351,7 +351,7 @@ class ScreentoneDocker(DockWidget):
     def _reload_shapes(self):
         self.cmb_shape.clear()
         for label, value in core.shapes_for_pattern(self.cmb_pattern.currentData()):
-            self.cmb_shape.addItem(label, value)
+            self.cmb_shape.addItem(i18n.t(label), value)
 
     def _reload_presets(self):
         self.cmb_preset.blockSignals(True)
@@ -969,7 +969,7 @@ class ScreentoneDocker(DockWidget):
 
     def _save_preset(self):
         name, ok = QtWidgets.QInputDialog.getText(
-            self.widget(), "Salvar preset", "Nome do preset:"
+            self.widget(), i18n.t('Salvar preset'), i18n.t('Nome do preset:')
         )
         if not ok or not name.strip():
             return

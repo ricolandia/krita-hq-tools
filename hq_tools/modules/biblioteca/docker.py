@@ -111,7 +111,7 @@ class BibliotecaDocker(DockWidget):
         new_layout.addWidget(ui.rotulo(i18n.t('Tipo de camada:')))
         self.cmb_camada = widgets.QComboBox()
         for rotulo, valor in MODOS_CAMADA:
-            self.cmb_camada.addItem(rotulo, valor)
+            self.cmb_camada.addItem(i18n.t(rotulo), valor)
         new_layout.addWidget(self.cmb_camada, 1)
         button_new = ui.botao(
             i18n.t('Criar novo recurso'),
@@ -129,7 +129,7 @@ class BibliotecaDocker(DockWidget):
         tipo_row.addWidget(ui.rotulo(i18n.t('Tipo:')))
         self.cmb_tipo = widgets.QComboBox()
         for chave, rotulo, _ in lib.TIPOS:
-            self.cmb_tipo.addItem(rotulo, chave)
+            self.cmb_tipo.addItem(i18n.t(rotulo), chave)
         self.cmb_tipo.currentIndexChanged.connect(self.refresh)
         tipo_row.addWidget(self.cmb_tipo, 1)
         button_refresh = ui.botao(
@@ -252,7 +252,7 @@ class BibliotecaDocker(DockWidget):
             )
             return
         helpers.show_message(
-            i18n.t("Desenhe o {0} na camada 'recurso' e use 'Salvar recurso do documento'.").format(rotulo.lower())
+            i18n.t("Desenhe o {0} na camada 'recurso' e use 'Salvar recurso do documento'.").format(i18n.t(rotulo).lower())
         )
 
     def _vector_layer_with_shapes(self, document):
@@ -320,8 +320,8 @@ class BibliotecaDocker(DockWidget):
             helpers.show_info(i18n.t('Biblioteca'), i18n.t('A camada vetorial está vazia.'))
             return
         nome, ok = QtWidgets.QInputDialog.getText(
-            self.widget(), "Salvar {0}".format(rotulo.lower()),
-            "Nome do recurso:", text=lib.nome_padrao(tipo),
+            self.widget(), i18n.t('Salvar {0}').format(i18n.t(rotulo).lower()),
+            i18n.t('Nome do recurso:'), text=lib.nome_padrao(tipo),
         )
         if not ok or not nome.strip():
             return
@@ -367,8 +367,8 @@ class BibliotecaDocker(DockWidget):
             helpers.show_info(i18n.t('Biblioteca'), i18n.t('Não foi possível montar a imagem.'))
             return
         nome, ok = QtWidgets.QInputDialog.getText(
-            self.widget(), "Salvar {0}".format(rotulo.lower()),
-            "Nome do recurso:", text=lib.nome_padrao(tipo),
+            self.widget(), i18n.t('Salvar {0}').format(i18n.t(rotulo).lower()),
+            i18n.t('Nome do recurso:'), text=lib.nome_padrao(tipo),
         )
         if not ok or not nome.strip():
             return
@@ -423,7 +423,7 @@ class BibliotecaDocker(DockWidget):
             return
         nome, path = selecionado
         novo, ok = QtWidgets.QInputDialog.getText(
-            self.widget(), "Renomear recurso", "Novo nome:", text=nome
+            self.widget(), i18n.t('Renomear recurso'), i18n.t('Novo nome:'), text=nome
         )
         if not ok or not novo.strip():
             return

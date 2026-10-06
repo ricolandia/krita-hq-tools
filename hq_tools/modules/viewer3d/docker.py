@@ -1112,14 +1112,14 @@ class Viewer3DDocker(DockWidget):
     def _montar_sliders(self):
         self._limpar_layout(self.juntas_layout)
         if self.modelo is None or self.regiao is None:
-            self.grupo_juntas.setTitle("Juntas")
+            self.grupo_juntas.setTitle(i18n.t("Juntas"))
             return
         for chave, nome, ossos in REGIOES:
             if chave == self.regiao:
                 break
         else:
             return
-        self.grupo_juntas.setTitle("Juntas: {0}".format(nome))
+        self.grupo_juntas.setTitle(i18n.t("Juntas: {0}").format(nome))
         self.lbl_regiao.setText(i18n.t('Região: {0}').format(nome))
         for osso in ossos:
             for eixo in EIXOS_POR_BASE.get(_base(osso), ("dobrar",)):

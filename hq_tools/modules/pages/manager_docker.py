@@ -226,7 +226,7 @@ class PagesDocker(DockWidget):
                 return
             path, _ = QtWidgets.QFileDialog.getSaveFileName(
                 self.widget(),
-                "Salvar a página (pasta do projeto)",
+                i18n.t('Salvar a página (pasta do projeto)'),
                 self.folder or os.path.expanduser("~"),
                 "Krita (*.kra)",
             )
@@ -339,7 +339,7 @@ class PagesDocker(DockWidget):
 
         cmb_formato = widgets.QComboBox()
         for chave, rotulo in FORMATO_ITENS:
-            cmb_formato.addItem(rotulo, chave)
+            cmb_formato.addItem(i18n.t(rotulo), chave)
         atual = self.config.get("pages.format", "A4") or "A4"
         index = cmb_formato.findData(atual)
         if index >= 0:

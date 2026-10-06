@@ -11,6 +11,7 @@ import os
 
 from krita import Krita
 
+from ...core import i18n
 from ...core import krita_helpers as helpers
 from . import mascara
 from . import roteiro
@@ -112,7 +113,7 @@ def _build_document(page, title, panel_svg, text_svg, width_px, height_px, dpi):
         width_px, height_px, title, "RGBA", "U8", "sRGB built-in", float(dpi)
     )
     if document is None:
-        raise RuntimeError("Não foi possível criar o documento da página.")
+        raise RuntimeError(i18n.t("Não foi possível criar o documento da página."))
 
     root = document.rootNode()
     selection = helpers.full_selection(document)
@@ -126,12 +127,12 @@ def _build_document(page, title, panel_svg, text_svg, width_px, height_px, dpi):
 
     group = document.createGroupLayer("Page{0:02d}".format(page["index"]))
     if group is None:
-        raise RuntimeError("Não foi possível criar o grupo da página.")
+        raise RuntimeError(i18n.t("Não foi possível criar o grupo da página."))
     root.addChildNode(group, None)
 
     panels = document.createVectorLayer("panels")
     if panels is None:
-        raise RuntimeError("Não foi possível criar a camada de painéis.")
+        raise RuntimeError(i18n.t("Não foi possível criar a camada de painéis."))
     group.addChildNode(panels, None)
     panels.addShapesFromSvg(panel_svg)
 
@@ -177,7 +178,7 @@ def _save_document(document, path):
     preexistente = os.path.isfile(path)
     try:
         if not document.saveAs(path):
-            raise RuntimeError("Não foi possível salvar {0}".format(path))
+            raise RuntimeError(i18n.t("Não foi possível salvar {0}").format(path))
     except (RuntimeError, OSError):
         if not preexistente:
             try:
@@ -227,7 +228,7 @@ def generate(script_text, target_dir=None, project=None, format_override=None,
                 title = "{0} - pagina {1}".format(project.project_name, page["index"])
             else:
                 if not target_dir:
-                    raise ValueError("Informe uma pasta de destino ou um projeto CPMT.")
+                    raise ValueError(i18n.t("Informe uma pasta de destino ou um projeto CPMT."))
                 os.makedirs(target_dir, exist_ok=True)
                 filename = "{0}_{1:03d}.kra".format(name_prefix, len(created) + 1)
                 path = os.path.join(target_dir, filename)
@@ -235,8 +236,8 @@ def generate(script_text, target_dir=None, project=None, format_override=None,
 
             if os.path.exists(path):
                 raise FileExistsError(
-                    "{0} já existe. Renomeie ou apague o arquivo para não perder "
-                    "a página atual.".format(path)
+                    i18n.t("{0} já existe. Renomeie ou apague o arquivo para não perder "
+                           "a página atual.").format(path)
                 )
 
             document = _build_document(

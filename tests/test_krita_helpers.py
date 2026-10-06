@@ -9,9 +9,9 @@ import sys
 import types
 import unittest
 
-try:  # como pacote (unittest discover, pytest)
-    from . import qt_falso
-except ImportError:  # rodando o arquivo direto: python3 tests/test_x.py
+try:  # do repositório (unittest discover, pytest ou arquivo direto)
+    from tests import qt_falso
+except ImportError:  # rodando de dentro de tests/: python3 test_x.py
     import qt_falso
 
 

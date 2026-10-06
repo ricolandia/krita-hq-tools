@@ -22,6 +22,8 @@ eixo.
 
 import re
 
+from ...core import i18n
+
 FORMATS = {
     "A4": (210.0, 297.0),
     "A5": (148.0, 210.0),
@@ -95,8 +97,10 @@ def parse_layout(value):
         cols = max(1, min(6, int(match.group(2))))
         return (rows, cols)
     raise RoteiroError(
-        "Layout desconhecido: {0}. Use gradeRxC (ex.: grade3x3), LxC (ex.: 3x2) "
-        "ou um nome: quadro, splash, duplo-h, duplo-v, tira3, tira4.".format(value)
+        i18n.t(
+            "Layout desconhecido: {0}. Use gradeRxC (ex.: grade3x3), LxC (ex.: 3x2) "
+            "ou um nome: quadro, splash, duplo-h, duplo-v, tira3, tira4."
+        ).format(value)
     )
 
 
@@ -134,21 +138,21 @@ def parse_script(text):
                     break
             else:
                 raise RoteiroError(
-                    "Linha {0}: formato desconhecido '{1}'.".format(line_number, value)
+                    i18n.t("Linha {0}: formato desconhecido '{1}'.").format(line_number, value)
                 )
         elif lower.startswith("dpi"):
             value = line.split(":", 1)[-1].strip() if ":" in line else line[3:].strip()
             try:
                 current["dpi"] = max(72, min(1200, int(float(value))))
             except ValueError:
-                raise RoteiroError("Linha {0}: DPI inválido.".format(line_number))
+                raise RoteiroError(i18n.t("Linha {0}: DPI inválido.").format(line_number))
         elif lower.startswith("layout"):
             value = line.split(":", 1)[-1].strip() if ":" in line else line[6:].strip()
             try:
                 current["layout"] = "{0}x{1}".format(*parse_layout(value))
             except RoteiroError:
                 raise RoteiroError(
-                    "Linha {0}: layout desconhecido '{1}'.".format(line_number, value)
+                    i18n.t("Linha {0}: layout desconhecido '{1}'.").format(line_number, value)
                 )
         elif lower.startswith("direcao") or lower.startswith("direção"):
             value = line.split(":", 1)[-1].strip() if ":" in line else line[7:].strip()
@@ -175,7 +179,7 @@ def parse_script(text):
                 )
             else:
                 raise RoteiroError(
-                    "Linha {0}: comando não reconhecido: {1}".format(line_number, line)
+                    i18n.t("Linha {0}: comando não reconhecido: {1}").format(line_number, line)
                 )
 
     for position, page in enumerate(pages, 1):
@@ -197,7 +201,7 @@ def finalize_page(page):
         index = entry["panel"]
         if index < 1 or index > total:
             raise RoteiroError(
-                "Página {0}: fala aponta para o painel {1}, mas há {2} painéis.".format(
+                i18n.t("Página {0}: fala aponta para o painel {1}, mas há {2} painéis.").format(
                     page["index"], index, total
                 )
             )

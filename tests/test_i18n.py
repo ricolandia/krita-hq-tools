@@ -17,6 +17,38 @@ REPO = pathlib.Path(__file__).resolve().parent.parent
 PACOTE = REPO / "hq_tools"
 
 
+def _rotulos_do_ast(caminho, nome, indice=None):
+    """Rótulos de dados de um módulo (lidos por AST: os dockers importam Krita).
+
+    Aceita um dicionário (usa os valores) ou uma sequência de pares, pegando
+    a coluna ``indice`` (0 quando omitido).
+    """
+    valores = set()
+    arvore = ast.parse(caminho.read_text(encoding="utf-8"), filename=str(caminho))
+    for no in ast.walk(arvore):
+        if not isinstance(no, ast.Assign):
+            continue
+        if not any(getattr(alvo, "id", "") == nome for alvo in no.targets):
+            continue
+        try:
+            dados = ast.literal_eval(no.value)
+        except ValueError:
+            continue
+        if isinstance(dados, dict):
+            for valor in dados.values():
+                if isinstance(valor, str):
+                    valores.add(valor)
+        else:
+            for item in dados:
+                if isinstance(item, str):
+                    valores.add(item)
+                elif isinstance(item, (list, tuple)) and len(item) > (indice or 0):
+                    alvo = item[indice or 0]
+                    if isinstance(alvo, str):
+                        valores.add(alvo)
+    return valores
+
+
 def strings_usadas():
     usadas = set()
     for caminho in PACOTE.rglob("*.py"):
@@ -45,6 +77,44 @@ def strings_usadas():
         nome = dados.get("nome")
         if isinstance(nome, str) and nome:
             usadas.add(nome)
+    # Rótulos de dados mostrados por i18n.t em tempo de execução (o teste
+    # estático de t() não os vê): rótulos do hub, formatos de página, tipos da
+    # biblioteca, opções das retículas, conjuntos de pincéis e o catálogo de
+    # perspectiva.
+    usadas |= _rotulos_do_ast(PACOTE / "modules/hub/docker.py", "ROTULOS")
+    usadas |= _rotulos_do_ast(
+        PACOTE / "modules/pages/manager_docker.py", "FORMATO_ITENS", 1
+    )
+    usadas |= _rotulos_do_ast(
+        PACOTE / "modules/biblioteca/docker.py", "MODOS_CAMADA", 0
+    )
+    for nome_modo in ("MASK_MODES", "HALFTONE_MODES", "EFFECT_MODES"):
+        usadas |= _rotulos_do_ast(PACOTE / "modules/screentone/docker.py", nome_modo, 0)
+    from hq_tools.modules.perspectiva import linhas as linhas_perspectiva
+
+    for _, titulo, _, legenda in linhas_perspectiva.PRESETS:
+        usadas.add(titulo)
+        usadas.add(legenda)
+    from hq_tools.modules.brushes import sets as brushes_sets
+
+    for nome_conjunto, _ in brushes_sets.BRUSH_SETS:
+        usadas.add(nome_conjunto)
+    from hq_tools.modules.screentone import core as screentone_core
+
+    for lista in (
+        screentone_core.PATTERNS,
+        screentone_core.DOT_SHAPES,
+        screentone_core.LINE_SHAPES,
+        screentone_core.INTERPOLATIONS,
+        screentone_core.EQUALIZATIONS,
+        screentone_core.UNITS,
+    ):
+        for rotulo, _ in lista:
+            usadas.add(rotulo)
+    from hq_tools.modules.biblioteca import core as biblioteca_core
+
+    for _, rotulo, _ in biblioteca_core.TIPOS:
+        usadas.add(rotulo)
     return usadas
 
 

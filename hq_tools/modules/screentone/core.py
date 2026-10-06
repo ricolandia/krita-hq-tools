@@ -14,6 +14,11 @@ import tempfile
 PATTERN_DOTS = 0
 PATTERN_LINES = 1
 
+PATTERNS = [
+    ("Pontos", PATTERN_DOTS),
+    ("Linhas", PATTERN_LINES),
+]
+
 DOT_SHAPES = [
     ("Redondo", 0),
     ("Elipse (legado)", 1),

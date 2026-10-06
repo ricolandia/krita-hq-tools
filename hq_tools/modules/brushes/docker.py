@@ -156,7 +156,7 @@ class BrushesDocker(DockWidget):
             lambda position, widget=list_widget: self._slot_menu(widget, position)
         )
         layout.addWidget(list_widget, 1)
-        self.tabs.addTab(tab, label)
+        self.tabs.addTab(tab, i18n.t(label))
         self.tab_lists[label] = list_widget
         self.tab_sets[label] = []
 

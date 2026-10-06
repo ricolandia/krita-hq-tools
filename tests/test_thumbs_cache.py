@@ -12,8 +12,12 @@ import tempfile
 import unittest
 import zipfile
 
-from tests import qt_falso
-from tests.qt_falso import instalar as instalar_qt
+try:  # do repositório (unittest discover, pytest ou arquivo direto)
+    from tests import qt_falso
+    from tests.qt_falso import instalar as instalar_qt
+except ImportError:  # rodando de dentro de tests/: python3 test_x.py
+    import qt_falso
+    from qt_falso import instalar as instalar_qt
 
 
 def instalar_thumbs():
