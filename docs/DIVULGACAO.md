@@ -107,6 +107,46 @@ Gerenciador de plugins Python.
 **Transparência:** código com assistência de IA (opencode + DeepSeek); sem
 funções de IA; sem arte gerada por IA (ver `CREDITS.md`).
 
+## Textos prontos
+
+### LibreArts (email de pauta)
+
+Contato: alexandre.prokoudine@gmail.com (Aleksandr Prokudin, fundador).
+Enviar em inglês, curto e factual; sem falar de IA (o repositório já
+declara).
+
+**Assunto:**
+
+```
+News tip: HQ Tools, a comics production toolkit for Krita (MIT)
+```
+
+**Corpo:**
+
+```
+Hi Aleksandr,
+
+I would like to suggest a news tip: HQ Tools, an open-source (MIT) plugin for Krita aimed at comics production. It is not a brush pack; it adds a set of dockers to Krita:
+
+- Screentones and hatching with real LPI (halftone as a non-destructive filter layer, per-panel masks, action and speed lines)
+- Vector speech balloons and sound effects (hand-drawn kit plus a project library)
+- Page manager (templates, margin guides, per-panel mask, CPMT integration)
+- Brush slots with configurable shortcuts (community packs included: Deevad, Krita Watercolor Set)
+- Poseable 3D mannequin viewer (camera with lenses, insert into the selection)
+- Perspective grid library (9 sets, inserted as editable vector layers)
+- Moodboard with linked references and a production checklist (pages and panels, weekly goal, Markdown export)
+- Manual in English and Portuguese
+
+Repository: https://github.com/ricolandia/krita-hq-tools
+Latest release: https://github.com/ricolandia/krita-hq-tools/releases/latest
+License: MIT, Krita 5.3.4 (prepared for Krita 6). Screenshots and short demo videos are in the README.
+
+I am the author, a comic artist and animator from Brazil. If it fits Libre Arts, I can provide more details, images or a short walkthrough.
+
+Thanks for your time,
+Ricardo Graça
+```
+
 ## Pendências
 
 - **Topics do repositório** (na UI do GitHub: About > engrenagem > Topics):
@@ -116,7 +156,8 @@ funções de IA; sem arte gerada por IA (ver `CREDITS.md`).
   1 arquivo, +1 linha na seção Plugins), aguardando a revisão do
   mantenedor. O passo a passo abaixo fica como referência de como foi
   feito.
-- **Tip para o LibreArts**.
+- **Tip para o LibreArts**: texto pronto (seção "Textos prontos"),
+  aguardando o envio pelo autor para alexandre.prokoudine@gmail.com.
 
 ### awesome-krita (PR pelo editor web, sem fork local)
 
