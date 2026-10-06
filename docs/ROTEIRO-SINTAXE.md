@@ -45,6 +45,7 @@ fala p3: Terceiro.
 | `margem` | fração ou porcentagem (`0.05` ou `5%`) | `5%` |
 | `sarjeta` | fração ou porcentagem | `2%` |
 | `fala pN: texto` | fala de balão do painel N | |
+| `fala pN personagem: texto` | fala do painel N com o personagem (opcional) | |
 | `narracao pN: texto` | narração (caixa) do painel N | |
 
 Layouts nomeados: `quadro` e `splash` (1 painel), `duplo-h` (2 na horizontal),
@@ -57,6 +58,13 @@ colunas), com máximo de 6 em cada eixo.
 A geometria é calculada em unidades relativas (0 a 1): margem nas bordas,
 sarjeta entre os painéis, células iguais. A ordem de leitura começa no topo;
 com `direcao rtl` as colunas são lidas da direita para a esquerda (manga).
+
+## Produção
+
+Desde a v0.12.0 o mesmo texto alimenta o docker **Produção** (checklist por
+página e painel, com três estados e meta semanal) e o personagem da fala
+aparece lá; o gerador de páginas ignora o personagem. O texto fica em
+`roteiro.txt` na pasta do projeto e o progresso em `producao.json`.
 
 O painel 1 fica no topo (à esquerda em `ltr`), e os painéis crescem por linha
 e coluna na ordem de leitura.

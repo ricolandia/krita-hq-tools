@@ -26,6 +26,7 @@ ROTULOS = {
     "viewer3d": "3D",
     "perspectiva": "Perspectiva",
     "moodboard": "Moodboard",
+    "producao": "Produção",
 }
 
 

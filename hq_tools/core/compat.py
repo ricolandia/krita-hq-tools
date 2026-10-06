@@ -49,6 +49,9 @@ if _USAR_PYQT6:  # Krita 6
     DIALOG_OK = QtWidgets.QMessageBox.StandardButton.Ok
     DIALOG_CANCEL = QtWidgets.QMessageBox.StandardButton.Cancel
     DIALOG_OPEN = QtWidgets.QFileDialog.Option.ShowDirsOnly
+    KEY_RETURN = QtCore.Qt.Key.Key_Return
+    KEY_ENTER = QtCore.Qt.Key.Key_Enter
+    CONTROL_MODIFIER = QtCore.Qt.KeyboardModifier.ControlModifier
 else:  # Krita 5.x
     from PyQt5 import QtCore, QtGui, QtWidgets
     from PyQt5.QtCore import pyqtSignal, pyqtSlot
@@ -80,6 +83,9 @@ else:  # Krita 5.x
     DIALOG_OK = QtWidgets.QMessageBox.Ok
     DIALOG_CANCEL = QtWidgets.QMessageBox.Cancel
     DIALOG_OPEN = QtWidgets.QFileDialog.ShowDirsOnly
+    KEY_RETURN = QtCore.Qt.Key_Return
+    KEY_ENTER = QtCore.Qt.Key_Enter
+    CONTROL_MODIFIER = QtCore.Qt.ControlModifier
 
 QImage = QtGui.QImage
 QIcon = QtGui.QIcon
@@ -194,4 +200,7 @@ __all__ = [
     "DIALOG_OK",
     "DIALOG_CANCEL",
     "DIALOG_OPEN",
+    "KEY_RETURN",
+    "KEY_ENTER",
+    "CONTROL_MODIFIER",
 ]

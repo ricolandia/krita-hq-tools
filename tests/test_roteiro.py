@@ -66,6 +66,33 @@ class TestRoteiro(unittest.TestCase):
         with self.assertRaises(roteiro.RoteiroError):
             roteiro.parse_script("pagina 1\ncomando estranho\n")
 
+    def test_personagem_na_fala(self):
+        pages = roteiro.parse_script(
+            "pagina 1\nlayout grade2x2\nfala p1 joao: Voce viu aquilo?\n"
+        )
+        balloon = pages[0]["balloons"][0]
+        self.assertEqual(balloon["character"], "joao")
+        self.assertEqual(balloon["text"], "Voce viu aquilo?")
+
+    def test_fala_sem_personagem_fica_vazia(self):
+        pages = roteiro.parse_script(SCRIPT)
+        self.assertEqual(pages[0]["balloons"][0]["character"], "")
+        self.assertEqual(pages[0]["balloons"][1]["character"], "")
+
+    def test_texto_com_dois_pontos_depois_do_personagem(self):
+        pages = roteiro.parse_script(
+            "pagina 1\nlayout quadro\nfala p1 joao: Ele disse: oi.\n"
+        )
+        balloon = pages[0]["balloons"][0]
+        self.assertEqual(balloon["character"], "joao")
+        self.assertEqual(balloon["text"], "Ele disse: oi.")
+
+    def test_narracao_sem_personagem(self):
+        pages = roteiro.parse_script(
+            "pagina 1\nlayout quadro\nnarracao p1: Era uma vez.\n"
+        )
+        self.assertEqual(pages[0]["balloons"][0]["character"], "")
+
     def test_page_pixels(self):
         page = roteiro.new_page()
         width, height = roteiro.page_pixels(page, "A4", 300)

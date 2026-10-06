@@ -1,5 +1,23 @@
 # Changelog
 
+## [Não publicado]
+
+### Produção (módulo novo)
+
+- Checklist do roteiro: cole o texto (a mesma sintaxe das páginas) e use
+  Ctrl+Enter; cada página vira um nó com os painéis do layout e cada painel
+  tem três estados (esboço, arte e final), com as falas e os personagens à
+  vista. Clique na coluna Estado para ciclar; o botão direito define direto.
+- A sintaxe do roteiro ganhou o personagem opcional na fala
+  (`fala p1 joao: texto`); o gerador de páginas continua igual.
+- Meta de painéis por semana com projeção de entrega, progresso, duplo
+  clique abre a `pagina_NNN.kra` e "Exportar .md" salva o checklist em
+  Markdown; o `roteiro.txt` e o `producao.json` ficam na pasta do projeto.
+- Aviso da sintaxe na própria doca (dica, placeholder e o botão "Sintaxe..."
+  com o formato completo), em PT e EN.
+- Validação: smoke `scripts/validar-producao.py` no Krita 5.3.4 isolado
+  (montar, ciclar estados, meta, export e abrir a página).
+
 ## [0.11.0] — 2026-10-06
 
 Módulo novo: **moodboard**, o quadro de referências do projeto. As imagens

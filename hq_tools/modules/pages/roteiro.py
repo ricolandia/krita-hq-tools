@@ -11,6 +11,7 @@ Sintaxe (uma página por bloco, palavras-chave sem acento e sem maiúsculas):
     margem 5%
     sarjeta 2%
     fala p1: primeira fala do painel 1
+    fala p1 joao: fala do painel 1 dita pelo Joao (personagem opcional)
     narracao p1: texto de narração do painel 1
 
 Layouts aceitos: ``quadro``, ``splash``, ``duplo-h``, ``duplo-v``,
@@ -50,7 +51,7 @@ DEFAULT_GUTTER = 0.02
 DEFAULT_DIRECTION = "ltr"
 
 BALLOON_PATTERN = re.compile(
-    r"^(fala|narracao|narração|legenda)\s+p?(\d+)\s*:\s*(.*)$",
+    r"^(fala|narracao|narração|legenda)\s+p?(\d+)\s*(?:([^:]+?)\s*)?:\s*(.*)$",
     re.IGNORECASE,
 )
 LAYOUT_PATTERN = re.compile(r"^(\d+)\s*[x×]\s*(\d+)$")
@@ -162,7 +163,8 @@ def parse_script(text):
                     {
                         "kind": kind,
                         "panel": int(match.group(2)),
-                        "text": match.group(3).strip(),
+                        "character": (match.group(3) or "").strip(),
+                        "text": match.group(4).strip(),
                     }
                 )
             else:
@@ -194,7 +196,12 @@ def finalize_page(page):
                 )
             )
         balloons.append(
-            {"kind": entry["kind"], "panel": index, "text": entry["text"]}
+            {
+                "kind": entry["kind"],
+                "panel": index,
+                "character": entry.get("character", ""),
+                "text": entry["text"],
+            }
         )
     page["balloons"] = balloons
     return page
