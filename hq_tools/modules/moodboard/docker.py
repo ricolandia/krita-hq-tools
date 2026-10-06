@@ -204,17 +204,32 @@ class MoodboardDocker(DockWidget):
     # ---------------------------------------------------------------- quadro
 
     def _quadro_aberto(self):
-        caminho = os.path.abspath(self.board_path())
+        """Documento do quadro aberto (compara caminhos reais: symlink/caixa)."""
+        caminho = os.path.realpath(self.board_path())
         try:
             documentos = Krita.instance().documents()
         except (AttributeError, RuntimeError):
             return None
         for documento in documentos:
             try:
-                if os.path.abspath(documento.fileName()) == caminho:
+                if os.path.realpath(documento.fileName()) == caminho:
                     return documento
             except (AttributeError, RuntimeError):
                 continue
+        return None
+
+    def _quadro_para_atualizar(self):
+        """Quadro aberto ou, se o arquivo existe, aberto agora.
+
+        Apagar/renomear uma referência que está no quadro precisa da camada
+        para atualizar; em vez de bloquear com um aviso, o quadro é aberto
+        (o arquivo já existe, pois a referência está no layout).
+        """
+        documento = self._quadro_aberto()
+        if documento is not None:
+            return documento
+        if os.path.exists(self.board_path()):
+            return self._garantir_quadro()
         return None
 
     def _garantir_quadro(self):
@@ -499,13 +514,7 @@ class MoodboardDocker(DockWidget):
         indice, item = self._item_do_arquivo(itens, caminho)
         documento = None
         if item is not None:
-            documento = self._quadro_aberto()
-            if documento is None:
-                helpers.show_info(
-                    i18n.t('Moodboard'),
-                    i18n.t('Abra o quadro antes de renomear uma referência que está nele (o link da camada precisa ser refeito).'),
-                )
-                return
+            documento = self._quadro_para_atualizar()
         try:
             novo_caminho = renomear_recurso(caminho, novo.strip())
         except OSError as erro:
@@ -548,13 +557,7 @@ class MoodboardDocker(DockWidget):
         indice, item = self._item_do_arquivo(itens, caminho)
         documento = None
         if item is not None:
-            documento = self._quadro_aberto()
-            if documento is None:
-                helpers.show_info(
-                    i18n.t('Moodboard'),
-                    i18n.t('Abra o quadro antes de apagar uma referência que está nele (a camada de arquivo ficaria sem link).'),
-                )
-                return
+            documento = self._quadro_para_atualizar()
         try:
             mb.apagar_referencia(caminho)
         except (OSError, ValueError) as erro:

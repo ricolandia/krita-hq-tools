@@ -26,7 +26,8 @@ except ImportError:  # Krita 6
 from krita import Krita
 
 BASE = "/tmp/moodboard-smoke"
-PASTA = os.path.join(BASE, "moodboard")
+LINK = "/tmp/moodboard-link"
+PASTA = os.path.join(LINK, "moodboard")
 LOG_PATH = "/tmp/moodboard-smoke.log"
 
 
@@ -58,6 +59,10 @@ def _exportar(documento, caminho):
 def executar_smoke():
     if os.path.exists(LOG_PATH):
         os.remove(LOG_PATH)
+    if os.path.islink(LINK):
+        os.remove(LINK)
+    os.makedirs(BASE, exist_ok=True)
+    os.symlink(BASE, LINK)
     os.makedirs(PASTA, exist_ok=True)
     aplicacao = Krita.instance()
     log("Krita {0}".format(aplicacao.version()))
@@ -112,10 +117,46 @@ def executar_smoke():
     docker._crescer_quadro(documento, len(itens))
     documento.refreshProjection()
     docker._salvar_quadro(documento)
+
+    # 3) guarda de apagar/renomear: o quadro é achado com o caminho por symlink?
+    caminho_ref = os.path.join(PASTA, itens[0]["arquivo"])
+    _, item = docker._item_do_arquivo(itens, caminho_ref)
+    log("guarda: item encontrado={0}".format(item is not None))
+    log("guarda: board_path={0!r}".format(docker.board_path()))
+    for aberto in aplicacao.documents():
+        try:
+            nome_arquivo = aberto.fileName()
+            log(
+                "guarda: doc aberto name={0!r} fileName={1!r} abspath-igual={2} realpath-igual={3}".format(
+                    aberto.name(),
+                    nome_arquivo,
+                    os.path.abspath(nome_arquivo) == os.path.abspath(docker.board_path()),
+                    os.path.realpath(nome_arquivo) == os.path.realpath(docker.board_path()),
+                )
+            )
+        except (AttributeError, RuntimeError) as erro:
+            log("guarda: doc aberto erro {0}".format(erro))
+    achado = docker._quadro_aberto()
+    log("guarda: quadro aberto={0}".format(achado.name() if achado is not None else None))
     log("exportacao inicial: {0}".format(_exportar(documento, "/tmp/moodboard-smoke.png")))
     log("tamanho do quadro: {0}x{1}".format(documento.width(), documento.height()))
     caminho_kra = docker.board_path()
     log("tamanho do kra: {0} bytes".format(os.path.getsize(caminho_kra)))
+
+    quadro = docker._quadro_para_atualizar()
+    log("guarda: quadro para atualizar={0}".format(quadro.name() if quadro is not None else None))
+    if quadro is not None and item is not None:
+        removida = docker._remover_camada(quadro, item)
+        itens.remove(item)
+        mb.salvar_layout(PASTA, itens)
+        quadro.refreshProjection()
+        docker._salvar_quadro(quadro)
+        log(
+            "guarda: camada removida={0}; camadas agora={1}".format(
+                removida, [no.name() for no in quadro.rootNode().findChildNodes(recursive=False)]
+            )
+        )
+        log("exportacao apagada: {0}".format(_exportar(quadro, "/tmp/moodboard-smoke-apagada.png")))
 
     documento.setModified(False)
     documento.close()

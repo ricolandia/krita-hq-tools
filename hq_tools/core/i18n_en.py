@@ -21,8 +21,6 @@ TRADUCOES = {
     "Abra e feche os módulos do HQ Tools por aqui. O botão fica marcado enquanto a doca está aberta; clicar de novo fecha.": "Open and close the HQ Tools modules from here. The button stays checked while the dock is open; click again to close.",
     "Abra e salve a página antes de criar o projeto.": "Open and save the page before creating the project.",
     "Abra o documento do recurso desenhado.": "Open the drawn resource document.",
-    "Abra o quadro antes de apagar uma referência que está nele (a camada de arquivo ficaria sem link).": "Open the board before deleting a reference that is on it (the file layer would lose its link).",
-    "Abra o quadro antes de renomear uma referência que está nele (o link da camada precisa ser refeito).": "Open the board before renaming a reference that is on it (the layer link must be rebuilt).",
     "Abra um documento para aplicar a cor.": "Open a document to apply the color.",
     "Abra um documento para aplicar a retícula.": "Open a document to apply the screentone.",
     "Abra um documento para aplicar o meio-tom.": "Open a document to apply the halftone.",

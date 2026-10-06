@@ -11,8 +11,9 @@
   escaladas por máscaras de transformação numa grade que cresce.
 - "Inserir na seleção" (ou duplo clique) traz a referência para o painel
   como camada travada, na medida da seleção, para desenhar por cima;
-  Renomear e Apagar cuidam da pasta e, com o quadro aberto, atualizam a
-  camada correspondente.
+  Renomear e Apagar cuidam da pasta e, se a referência está no quadro, a
+  camada é atualizada junto (o quadro abre sozinho, se estiver fechado;
+  caminhos são comparados resolvidos, tolerando symlink).
 - Ferramentas de validação: `scripts/poc-filelayer-transform.py` (PoC da
   máscara de transformação, validado no Krita 5.3.4) e
   `scripts/validar-moodboard.py` (smoke de ponta a ponta, com o quadro
