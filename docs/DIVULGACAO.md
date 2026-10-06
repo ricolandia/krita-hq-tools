@@ -158,8 +158,9 @@ Ricardo Graça
   1 arquivo, +1 linha na seção Plugins), aguardando a revisão do
   mantenedor. O passo a passo abaixo fica como referência de como foi
   feito.
-- **Tip para o LibreArts**: texto pronto (seção "Textos prontos"),
-  aguardando o envio pelo autor para alexandre.prokoudine@gmail.com.
+- **Tip para o LibreArts**: **enviado** em 06/10 para
+  alexandre.prokoudine@gmail.com (texto na seção "Textos prontos");
+  aguardando resposta (se publicarem, registrar no log).
 
 ### awesome-krita (PR pelo editor web, sem fork local)
 
@@ -217,6 +218,7 @@ fork e apontar o remoto).
 
 | Data | Canal | O que foi | Retorno |
 |---|---|---|---|
+| 06/10/2026 | LibreArts | Email de pauta enviado (assunto e corpo na seção "Textos prontos") | aguardando resposta |
 | 04/10/2026 | Fediverse (pubkit) | Post PT do blog (`hq-tools-krita`) no bolha.us e ursal.zone | publicado; o mastodon.social (EN) não recebeu |
 | 06/10/2026 | GitHub (topics) | 11 topics aplicados no repositório (via `gh`) | descoberta/SEO na busca do GitHub |
 | 06/10/2026 | awesome-krita | PR #2 (armstrongl/awesome-krita#2): uma linha na seção Plugins, formato validado com `awesome-lint` | aguardando revisão do mantenedor (só um bot de diff comentou) |
