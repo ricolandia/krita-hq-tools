@@ -31,7 +31,7 @@ Os quatro documentos originais de contexto do projeto estão em
 
 | Páginas | Biblioteca | Pincéis |
 |---|---|---|
-| ![Gerenciador de páginas](Screenshots/00-paginas.png) | ![Biblioteca do projeto](Screenshots/02-biblioteca.png) | ![Pincéis e slots](Screenshots/03-pinceis.png) |
+| ![Gerenciador de páginas](Screenshots/00-paginas.png) | ![Biblioteca do projeto](Screenshots/02-biblioteca.png) | ![Docker de pincéis com os cartões dos conjuntos, os 8 slots e o botão Limpar slots](Screenshots/03-pinceis.png) |
 
 | Retículas e linhas de ação | Onomatopeias | Paletas |
 |---|---|---|
@@ -39,11 +39,15 @@ Os quatro documentos originais de contexto do projeto estão em
 
 | Visualizador 3D | Hub |
 |---|---|
-| ![Docker 3D com abas Pose, Câmera e Inserir, manequim em corrida e os sliders das juntas](Screenshots/07-3d.png) | ![Docker Hub com os botões que abrem e fecham os módulos do plugin](Screenshots/10-hub.png) |
+| ![Docker 3D com abas Pose, Câmera e Inserir, manequim em corrida e os sliders das juntas](Screenshots/07-3d.png) | ![Docker Hub com os botões que abrem e fecham todos os dez módulos, incluindo o Moodboard](Screenshots/10-hub.png) |
 
 | Biblioteca de perspectivas | Hub e 3D no Krita |
 |---|---|
-| ![Docker de perspectiva com a galeria de malhas, a prévia ampliada e os botões de inserir na seleção](Screenshots/11-perspectiva.png) | ![Krita com o hub e o docker 3D abertos e o manequim já inserido em uma página](Screenshots/12-hub-e-3d.png) |
+| ![Docker de perspectiva com a galeria de malhas, a prévia ampliada e os botões de inserir na seleção](Screenshots/11-perspectiva.png) | ![Krita com o hub e o docker 3D abertos (câmera perspectiva de 14 mm, manequim azul) e o manequim já inserido em uma página](Screenshots/12-hub-e-3d.png) |
+
+| Moodboard |
+|---|
+| ![Docker Moodboard com a pasta de referências do projeto, a lista de referências linkadas e os botões de adicionar, inserir na seleção, renomear e apagar](Screenshots/13-Moodboard.png) |
 
 ## Módulos
 

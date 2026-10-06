@@ -32,7 +32,7 @@ The four original context documents of the project are in `docs/contexto/`
 
 | Pages | Library | Brushes |
 |---|---|---|
-| ![Page manager](Screenshots/00-paginas.png) | ![Project library](Screenshots/02-biblioteca.png) | ![Brushes and slots](Screenshots/03-pinceis.png) |
+| ![Page manager](Screenshots/00-paginas.png) | ![Project library](Screenshots/02-biblioteca.png) | ![Brushes docker with the set cards, the 8 slots and the Clear slots button](Screenshots/03-pinceis.png) |
 
 | Screentones and action lines | Onomatopoeia | Palettes |
 |---|---|---|
@@ -40,11 +40,15 @@ The four original context documents of the project are in `docs/contexto/`
 
 | 3D viewer | Hub |
 |---|---|
-| ![3D docker with the Pose, Camera and Insert tabs, a running mannequin and the joint sliders](Screenshots/07-3d.png) | ![Hub docker with the buttons that open and close the plugin modules](Screenshots/10-hub.png) |
+| ![3D docker with the Pose, Camera and Insert tabs, a running mannequin and the joint sliders](Screenshots/07-3d.png) | ![Hub docker with the buttons that open and close all ten modules, including Moodboard](Screenshots/10-hub.png) |
 
 | Perspective library | Hub and 3D in Krita |
 |---|---|
-| ![Perspective docker with the grid gallery, the enlarged preview and the insert-into-selection buttons](Screenshots/11-perspectiva.png) | ![Krita with the hub and the 3D docker open and the mannequin already inserted into a page](Screenshots/12-hub-e-3d.png) |
+| ![Perspective docker with the grid gallery, the enlarged preview and the insert-into-selection buttons](Screenshots/11-perspectiva.png) | ![Krita with the hub and the 3D docker open (14 mm perspective camera, blue mannequin) and the mannequin already inserted into a page](Screenshots/12-hub-e-3d.png) |
+
+| Moodboard |
+|---|
+| ![Moodboard docker with the project references folder, the list of linked references and the add, insert-into-selection, rename and delete buttons](Screenshots/13-Moodboard.png) |
 
 ## Modules
 
