@@ -33,15 +33,15 @@ a da nota do roadmap no Trilium.
 - **v0.11 (06/10, publicada):** moodboard (quadro de referências linkado à
   pasta do projeto), validado por PoC e smoke dentro do Krita 5.3.4 e pelo
   autor na interface.
-- **v0.12 (em preparo, 06/10):** produção (checklist do roteiro por
+- **v0.12 (06/10, publicada):** produção (checklist do roteiro por
   página/painel com três estados, meta semanal e export .md), com o
-  personagem opcional na sintaxe do roteiro.
+  personagem opcional na sintaxe do roteiro; validada pelo autor.
 - **Fora do roadmap original:** camada de UI compartilhada (52 botões), ícone
   e social preview, vídeos demo no YouTube com roteiros de captura, CI no
   Windows, automação de release (tag → ZIP + notas do CHANGELOG), duas
   auditorias (30/09 e 05/10) e a documentação espelhada no Trilium.
 
-### Produção (implementado em 06/10/2026, aguardando validação do autor)
+### Produção (implementado em 06/10/2026, v0.12.0 publicada)
 
 Pedido do autor: colar o texto do roteiro e receber um checklist por página e
 painel, com meta semanal. Decisões: sintaxe unificada com o roteiro (o parser

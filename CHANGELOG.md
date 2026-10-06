@@ -1,6 +1,21 @@
 # Changelog
 
-## [Não publicado]
+## [0.12.0] — 2026-10-06
+
+Módulo novo: **produção**, o checklist do roteiro. Cole o texto (a mesma
+sintaxe das páginas, com o personagem opcional na fala) e use Ctrl+Enter:
+cada página vira um nó com os painéis do layout, cada painel tem três estados
+(esboço, arte e final), a meta de painéis por semana projeta a entrega e o
+checklist sai em Markdown. Tudo fica na subpasta `producao/` do projeto (ou
+na pasta padrão do plugin, com aviso, quando não há projeto aberto).
+
+**English:** new module: **production**, the script checklist. Paste the text
+(the same syntax as the pages, with the optional character on the line) and
+use Ctrl+Enter: each page becomes a node with the layout panels, each panel
+has three states (sketch, art and final), the weekly panel goal projects the
+delivery and the checklist exports to Markdown. Everything lives in the
+project's `producao/` subfolder (or in the plugin default folder, with a
+notice, when no project is open).
 
 ### Produção (módulo novo)
 
