@@ -1,6 +1,14 @@
 # Changelog
 
-## [Não publicado]
+## [0.10.0] — 2026-10-05
+
+O docker do visualizador 3D ficou mais curto (abas Pose, Câmera e Inserir), a
+câmera ganhou perspectiva com lentes (14/28/35 mm) e a cor do manequim passou
+a ser escolhível (Bege, Azul, Gelo e Grafite).
+
+**English:** the 3D viewer docker is shorter now (Pose, Camera and Insert
+tabs), the camera has perspective with lenses (14/28/35 mm) and the mannequin
+color is selectable (Beige, Blue, Ice and Graphite).
 
 ### Visualizador 3D: abas e câmera com lentes
 
