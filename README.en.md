@@ -40,11 +40,11 @@ The four original context documents of the project are in `docs/contexto/`
 
 | 3D viewer | Hub |
 |---|---|
-| ![3D docker with the mannequin and body, pose, style and joint controls](Screenshots/07-3d.png) | ![Hub docker with the buttons that open and close the plugin modules](Screenshots/10-hub.png) |
+| ![3D docker with the Pose, Camera and Insert tabs, a running mannequin and the joint sliders](Screenshots/07-3d.png) | ![Hub docker with the buttons that open and close the plugin modules](Screenshots/10-hub.png) |
 
-| Perspective library |
-|---|
-| ![Perspective docker with the grid gallery, the enlarged preview and the insert-into-selection buttons](Screenshots/11-perspectiva.png) |
+| Perspective library | Hub and 3D in Krita |
+|---|---|
+| ![Perspective docker with the grid gallery, the enlarged preview and the insert-into-selection buttons](Screenshots/11-perspectiva.png) | ![Krita with the hub and the 3D docker open and the mannequin already inserted into a page](Screenshots/12-hub-e-3d.png) |
 
 ## Modules
 

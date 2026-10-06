@@ -39,11 +39,11 @@ Os quatro documentos originais de contexto do projeto estão em
 
 | Visualizador 3D | Hub |
 |---|---|
-| ![Docker 3D com o manequim e os controles de corpo, pose, estilo e juntas](Screenshots/07-3d.png) | ![Docker Hub com os botões que abrem e fecham os módulos do plugin](Screenshots/10-hub.png) |
+| ![Docker 3D com abas Pose, Câmera e Inserir, manequim em corrida e os sliders das juntas](Screenshots/07-3d.png) | ![Docker Hub com os botões que abrem e fecham os módulos do plugin](Screenshots/10-hub.png) |
 
-| Biblioteca de perspectivas |
-|---|
-| ![Docker de perspectiva com a galeria de malhas, a prévia ampliada e os botões de inserir na seleção](Screenshots/11-perspectiva.png) |
+| Biblioteca de perspectivas | Hub e 3D no Krita |
+|---|---|
+| ![Docker de perspectiva com a galeria de malhas, a prévia ampliada e os botões de inserir na seleção](Screenshots/11-perspectiva.png) | ![Krita com o hub e o docker 3D abertos e o manequim já inserido em uma página](Screenshots/12-hub-e-3d.png) |
 
 ## Módulos
 
