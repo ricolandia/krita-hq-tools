@@ -149,9 +149,9 @@ Ricardo Graça
 
 ## Pendências
 
-- **Topics do repositório** (na UI do GitHub: About > engrenagem > Topics):
-  `krita`, `krita-plugin`, `comics`, `comic-tools`, `webtoon`, `manga`,
-  `python`, `pyqt5`, `qt`, `art-tools`, `open-source`.
+- **Topics do repositório**: **feitos** em 06/10 (11 topics aplicados via
+  `gh`): `krita`, `krita-plugin`, `comics`, `comic-tools`, `webtoon`,
+  `manga`, `python`, `pyqt5`, `qt`, `art-tools`, `open-source`.
 - **awesome-krita**: PR **aberto** em 06/10 (armstrongl/awesome-krita#2,
   1 arquivo, +1 linha na seção Plugins), aguardando a revisão do
   mantenedor. O passo a passo abaixo fica como referência de como foi
@@ -215,4 +215,5 @@ fork e apontar o remoto).
 
 | Data | Canal | O que foi | Retorno |
 |---|---|---|---|
-| 06/10/2026 | awesome-krita | PR #2 (armstrongl/awesome-krita#2): uma linha na seção Plugins, formato validado com `awesome-lint` | aguardando revisão do mantenedor |
+| 06/10/2026 | GitHub (topics) | 11 topics aplicados no repositório (via `gh`) | descoberta/SEO na busca do GitHub |
+| 06/10/2026 | awesome-krita | PR #2 (armstrongl/awesome-krita#2): uma linha na seção Plugins, formato validado com `awesome-lint` | aguardando revisão do mantenedor (só um bot de diff comentou) |
