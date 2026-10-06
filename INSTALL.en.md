@@ -108,7 +108,7 @@ Inside it:
 - community brush packs (Deevad v8.2, CC-BY 4.0 and Krita Watercolor Set,
   CC-0), installable from the "Packs" tab of the brushes docker.
 
-Full credits and licenses in `CREDITS.md`. Everything installed into Krita's
+Full credits and licenses in `CREDITS.en.md`. Everything installed into Krita's
 resources (fonts, patterns, palettes, packs) requires restarting the program
 to show up.
 
@@ -149,6 +149,6 @@ to show up.
 ## License
 
 Code under MIT. Third-party resources (fonts, balloons, packs) have their own
-licenses documented in `CREDITS.md`. The plugin uses Krita's native features
+licenses documented in `CREDITS.en.md`. The plugin uses Krita's native features
 (the Screentone generator and Halftone filter by Deif Lou, and the Comics
 Project Management Tools by the Krita team) without redistributing them.

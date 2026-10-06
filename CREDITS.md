@@ -1,5 +1,7 @@
 # Créditos e licenças
 
+**Português** · [English](CREDITS.en.md)
+
 O código do plugin HQ Tools é MIT (ver `LICENSE`). O kit de HQ acompanha
 arquivos de terceiros, todos com licenças livres; as atribuições estão abaixo.
 Os arquivos de licença das fontes acompanham o pacote em

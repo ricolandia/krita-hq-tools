@@ -73,7 +73,7 @@ The four original context documents of the project are in `docs/contexto/`
 
 ## Comic kit (fonts and free balloons)
 
-The plugin ships a kit with licenses documented in `CREDITS.md`:
+The plugin ships a kit with licenses documented in `CREDITS.en.md`:
 
 - **Fonts** (SIL OFL 1.1): Bangers, Comic Relief (Regular/Bold), Patrick
   Hand, Comic Neue (Regular/Bold), the full Londrina family (Solid, Shadow,

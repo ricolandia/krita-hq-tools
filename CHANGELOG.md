@@ -1,5 +1,16 @@
 # Changelog
 
+## [Não publicado]
+
+### Documentação
+
+- `CREDITS.en.md`: créditos e licenças em inglês (o ZIP passa a levar os dois
+  arquivos, e as referências dos documentos em inglês apontam para ele).
+- Auditoria de i18n das docas: 81 strings que só existiam em PT foram
+  traduzidas (rótulos de dados do hub, catálogo de perspectiva, opções das
+  retículas, conjuntos de pincéis, formatos de página, biblioteca, o grupo
+  "Juntas" do 3D, diálogos e as mensagens do parser do roteiro e do gerador).
+
 ## [0.12.0] — 2026-10-06
 
 Módulo novo: **produção**, o checklist do roteiro. Cole o texto (a mesma

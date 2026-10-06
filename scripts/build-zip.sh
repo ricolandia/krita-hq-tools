@@ -26,6 +26,7 @@ itens = ["hq_tools", "hq_tools.desktop", "hq_tools.action"]
 documentos = [
     "LICENSE",
     "CREDITS.md",
+    "CREDITS.en.md",
     "README.md",
     "README.en.md",
     "CHANGELOG.md",
@@ -67,6 +68,7 @@ with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as arquivo:
         "hq_tools.action",
         "hq_tools/LICENSE",
         "hq_tools/CREDITS.md",
+        "hq_tools/CREDITS.en.md",
     }
     faltando = sorted(obrigatorios - contigo)
     if faltando:
