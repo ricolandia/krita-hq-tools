@@ -2,6 +2,14 @@
 
 ## [Não publicado]
 
+### Pincéis: slots em 8 e como limpar
+
+- Os slots caíram de 16 para 8 (duas fileiras), para a doca não ficar
+  comprida; os atalhos vão de "HQ Tools: pincel 1" a "pincel 8" e
+  configurações antigas com mais slots são truncadas na leitura.
+- Agora dá para limpar: botão direito num slot (limpar este ou todos) e o
+  botão "Limpar slots" esvazia tudo; os atalhos continuam existindo.
+
 ### Correções
 
 - Cores trocadas (vermelho e azul) na inserção do visualizador 3D e nos

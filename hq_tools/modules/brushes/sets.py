@@ -7,7 +7,10 @@ o primeiro preset instalado cujo nome, normalizado, contenha a pista.
 
 import re
 
-SLOT_COUNT = 16
+# Oito slots (2 fileiras de 4) para a doca não ficar comprida; o plugin cria um
+# atalho por slot em Configurar Krita > Atalhos. Configurações antigas com mais
+# slots são truncadas na leitura.
+SLOT_COUNT = 8
 PER_SET = 4
 
 BRUSH_SETS = (

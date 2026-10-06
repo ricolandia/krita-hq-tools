@@ -151,13 +151,13 @@ class TestRegistroDoPlugin(unittest.TestCase):
         self.assertEqual(len(ids), 9)
         self.assertNotIn("hq_tools_pages", ids)
 
-    def test_atalhos_criam_as_dezesseis_acoes(self):
+    def test_atalhos_criam_as_oito_acoes(self):
         modulo = self.carregar()
         janela = _Janela()
         self.instancia.extensoes[0].createActions(janela)
-        self.assertEqual(len(janela.acoes), 16)
+        self.assertEqual(len(janela.acoes), 8)
         self.assertEqual(janela.acoes[0][0], "hq_tools_brush_1")
-        self.assertEqual(janela.acoes[-1][0], "hq_tools_brush_16")
+        self.assertEqual(janela.acoes[-1][0], "hq_tools_brush_8")
 
     def test_atalhos_somem_quando_pinceis_desligado(self):
         self.carregar()

@@ -99,7 +99,14 @@ class BrushesDocker(DockWidget):
             button.setText(i18n.t('{0}:').format(index + 1))
             button.setToolButtonStyle(TOOL_BUTTON_TEXT_BESIDE_ICON)
             button.setSizePolicy(SIZE_EXPANDING, SIZE_FIXED)
+            button.setToolTip(
+                i18n.t('Clique para ativar o pincel do slot; botão direito abre as opções (limpar).')
+            )
             button.clicked.connect(lambda checked=False, slot=index: self.activate_slot(slot))
+            button.setContextMenuPolicy(CONTEXT_MENU)
+            button.customContextMenuRequested.connect(
+                lambda position, slot=index: self._slot_button_menu(slot, position)
+            )
             slots_layout.addWidget(button, index // 4, index % 4)
             self.slot_buttons.append(button)
         layout.addWidget(self.slots_box)
@@ -118,6 +125,12 @@ class BrushesDocker(DockWidget):
         )
         button_suggest.clicked.connect(self.apply_suggestions)
         buttons.addWidget(button_suggest)
+        button_clear = ui.botao(
+            i18n.t('Limpar slots'),
+            i18n.t('Esvazia todos os slots (os atalhos continuam, apontando para nada).'),
+        )
+        button_clear.clicked.connect(self.clear_slots)
+        buttons.addWidget(button_clear)
         layout.addLayout(buttons)
 
         hint = ui.rotulo(
@@ -395,6 +408,32 @@ class BrushesDocker(DockWidget):
 
     def _save_slots(self):
         self.config.set("brushes.slots", list(self.slot_names))
+
+    def _slot_button_menu(self, index, position):
+        """Menu do slot (botão direito): limpar este ou todos."""
+        button = self.slot_buttons[index]
+        menu = QtWidgets.QMenu(self)
+        limpar = menu.addAction(i18n.t('Limpar este slot'))
+        limpar.setEnabled(bool(self.slot_names[index]))
+        limpar_todos = menu.addAction(i18n.t('Limpar todos os slots'))
+        limpar_todos.setEnabled(any(self.slot_names))
+        escolhido = menu.exec(button.mapToGlobal(position))
+        if escolhido is None:
+            return
+        if escolhido == limpar:
+            self.slot_names[index] = ""
+            self._save_slots()
+            self._refresh_slots()
+            helpers.show_message(i18n.t('Slot {0} limpo.').format(index + 1))
+        elif escolhido == limpar_todos:
+            self.clear_slots()
+
+    def clear_slots(self):
+        """Esvazia todos os slots (os atalhos continuam, apontando para nada)."""
+        self.slot_names = [""] * SLOT_COUNT
+        self._save_slots()
+        self._refresh_slots()
+        helpers.show_message(i18n.t('Slots limpos.'))
 
     def apply_suggestions(self):
         suggested = slot_suggestions(sorted(self.resources.keys()))
