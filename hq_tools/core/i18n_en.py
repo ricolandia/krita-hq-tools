@@ -392,7 +392,7 @@ TRADUCOES = {
     "fala p1 joao: texto (fala do painel 1 dita pelo Joao; o personagem é opcional).": "fala p1 joao: texto (panel 1 line spoken by Joao; the character is optional).",
     "fala p1: texto (fala do painel 1).": "fala p1: texto (panel 1 line).",
     "formato A4: A4, A5, A3, tirinha, americano, tankobon ou quadrado (padrão A4).": "formato A4: A4, A5, A3, tirinha, americano, tankobon or quadrado (default A4).",
-    "layout grade2x2: quadro, splash, duplo-h, duplo-v, grade2x2, grade3x2, grade2x3, tira3, tira4 ou LxC (padrão grade2x2).": "layout grade2x2: quadro, splash, duplo-h, duplo-v, grade2x2, grade3x2, grade2x3, tira3, tira4 or LxC (default grade2x2).",
+    "layout grade2x2: quadro, splash, duplo-h, duplo-v, tira3, tira4, gradeRxC (ex.: grade3x3) ou LxC (ex.: 3x2), até 6 em cada eixo (padrão grade2x2).": "layout grade2x2: quadro, splash, duplo-h, duplo-v, tira3, tira4, gradeRxC (e.g. grade3x3) or LxC (e.g. 3x2), up to 6 per axis (default grade2x2).",
     "margem 5% e sarjeta 2%: fração ou porcentagem (padrões 5% e 2%).": "margem 5% and sarjeta 2%: fraction or percentage (defaults 5% and 2%).",
     "narracao p1: texto (narração do painel 1; 'legenda' também vale).": "narracao p1: texto (panel 1 narration; 'legenda' also works).",
     "pagina 1\nlayout grade2x2\nnarracao p1: Era uma vez...\nfala p1 joao: Voce viu aquilo?\nfala p4 maria: Ultima fala.": "pagina 1\nlayout grade2x2\nnarracao p1: Once upon a time...\nfala p1 joao: Did you see that?\nfala p4 maria: Last line.",

@@ -10,6 +10,8 @@
   vista. Clique na coluna Estado para ciclar; o botão direito define direto.
 - A sintaxe do roteiro ganhou o personagem opcional na fala
   (`fala p1 joao: texto`); o gerador de páginas continua igual.
+- O `layout` aceita qualquer `gradeRxC` (ex.: `grade3x3`), além dos nomes e
+  do `LxC`; a mensagem de erro orienta os formatos aceitos.
 - Meta de painéis por semana com projeção de entrega, progresso, duplo
   clique abre a `pagina_NNN.kra` e "Exportar .md" salva o checklist em
   Markdown; o `roteiro.txt` e o `producao.json` ficam na pasta do projeto.

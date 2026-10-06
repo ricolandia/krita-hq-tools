@@ -50,8 +50,8 @@ fala p3: Terceiro.
 
 Layouts nomeados: `quadro` e `splash` (1 painel), `duplo-h` (2 na horizontal),
 `duplo-v` (2 na vertical), `grade2x2`, `grade3x2`, `grade2x3`, `tira3` (3 na
-vertical), `tira4`. Também aceita `LxC`, ex.: `layout 3x2` (3 linhas, 2
-colunas), com máximo de 6 em cada eixo.
+vertical), `tira4`. Também aceita `gradeRxC` (ex.: `layout grade3x3`) e `LxC`
+(ex.: `layout 3x2`), com máximo de 6 em cada eixo.
 
 ## Painéis
 

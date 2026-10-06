@@ -58,6 +58,23 @@ class TestRoteiro(unittest.TestCase):
         self.assertEqual(page["cols"], 3)
         self.assertEqual(len(page["panels"]), 6)
 
+    def test_layout_grade_generico(self):
+        self.assertEqual(roteiro.parse_layout("grade3x3"), (3, 3))
+        self.assertEqual(roteiro.parse_layout("grade 4x2"), (4, 2))
+        self.assertEqual(roteiro.parse_layout("grade2x3"), (2, 3))
+        self.assertEqual(roteiro.parse_layout("5x2"), (5, 2))
+        self.assertEqual(roteiro.parse_layout("grade10x10"), (6, 6))
+
+    def test_script_com_grade_generica(self):
+        pages = roteiro.parse_script("pagina 1\nlayout grade3x3\nfala p9: Ultimo.\n")
+        self.assertEqual(len(pages[0]["panels"]), 9)
+        self.assertEqual(pages[0]["layout"], "3x3")
+
+    def test_layout_desconhecido_orienta(self):
+        with self.assertRaises(roteiro.RoteiroError) as contexto:
+            roteiro.parse_layout("grade")
+        self.assertIn("gradeRxC", str(contexto.exception))
+
     def test_painel_invalido(self):
         with self.assertRaises(roteiro.RoteiroError):
             roteiro.parse_script("pagina 1\nlayout quadro\nfala p2: fora do painel\n")

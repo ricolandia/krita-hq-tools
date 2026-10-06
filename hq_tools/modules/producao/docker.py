@@ -32,7 +32,7 @@ LINHAS_SINTAXE = (
     i18n.t("pagina 1: começa uma página (nova página é criada sozinha)."),
     i18n.t("formato A4: A4, A5, A3, tirinha, americano, tankobon ou quadrado (padrão A4)."),
     i18n.t("dpi 300: de 72 a 1200 (padrão 300)."),
-    i18n.t("layout grade2x2: quadro, splash, duplo-h, duplo-v, grade2x2, grade3x2, grade2x3, tira3, tira4 ou LxC (padrão grade2x2)."),
+    i18n.t("layout grade2x2: quadro, splash, duplo-h, duplo-v, tira3, tira4, gradeRxC (ex.: grade3x3) ou LxC (ex.: 3x2), até 6 em cada eixo (padrão grade2x2)."),
     i18n.t("direcao rtl: leitura ocidental (ltr, padrão) ou mangá (rtl)."),
     i18n.t("margem 5% e sarjeta 2%: fração ou porcentagem (padrões 5% e 2%)."),
     i18n.t("fala p1: texto (fala do painel 1)."),

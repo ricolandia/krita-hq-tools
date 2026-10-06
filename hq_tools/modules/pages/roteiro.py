@@ -15,8 +15,9 @@ Sintaxe (uma página por bloco, palavras-chave sem acento e sem maiúsculas):
     narracao p1: texto de narração do painel 1
 
 Layouts aceitos: ``quadro``, ``splash``, ``duplo-h``, ``duplo-v``,
-``grade2x2``, ``grade3x2``, ``grade2x3``, ``tira3``, ``tira4`` ou ``RxC``
-(linhas x colunas, ex.: ``2x3``).
+``grade2x2``, ``grade3x2``, ``grade2x3``, ``tira3``, ``tira4``,
+``gradeRxC`` (ex.: ``grade3x3``) ou ``RxC`` (ex.: ``3x2``), até 6 em cada
+eixo.
 """
 
 import re
@@ -86,12 +87,17 @@ def parse_layout(value):
     key = str(value).strip().lower()
     if key in LAYOUTS:
         return LAYOUTS[key]
-    match = LAYOUT_PATTERN.match(key)
+    # O prefixo "grade" é opcional: grade3x3, grade 4x2 e 3x2 valem igual.
+    sem_grade = key[5:].strip() if key.startswith("grade") else key
+    match = LAYOUT_PATTERN.match(sem_grade)
     if match:
         rows = max(1, min(6, int(match.group(1))))
         cols = max(1, min(6, int(match.group(2))))
         return (rows, cols)
-    raise RoteiroError("Layout desconhecido: {0}".format(value))
+    raise RoteiroError(
+        "Layout desconhecido: {0}. Use gradeRxC (ex.: grade3x3), LxC (ex.: 3x2) "
+        "ou um nome: quadro, splash, duplo-h, duplo-v, tira3, tira4.".format(value)
+    )
 
 
 def parse_direction(value):
