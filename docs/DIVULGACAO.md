@@ -156,6 +156,13 @@ garantia): abrir uma issue pedindo a inclusão, com o link e a linha pronta.
 O repositório não tem formulário de issue ativo (o template existe só na
 cópia `ci/`), então seria uma issue em texto simples.
 
+**Tom e conduta:** o repositório adota o Contributor Covenant 2.0
+(comportamento respeitoso, sem assédio nem ataques; o contato de denúncia
+ficou no placeholder do template). O PR deve ter tom neutro e objetivo, sem
+debate de IA e sem autopromoção exagerada; se o mantenedor recusar ou pedir
+ajustes, responder com tranquilidade, porque o próprio código dá a ele o
+direito de recusar contribuições.
+
 Se um dia o caminho pelo terminal voltar a interessar: o clone local está em
 `~/Documentos/32_APPS_GITHUB_contribuicoes/Krita_Awesome`, na branch
 `add-hq-tools`, com o commit "Add HQ Tools to Plugins" pronto (basta criar o
