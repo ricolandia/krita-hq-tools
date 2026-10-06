@@ -39,7 +39,7 @@ Os quatro documentos originais de contexto do projeto estão em
 
 | Visualizador 3D | Hub |
 |---|---|
-| ![Docker 3D com abas Pose, Câmera e Inserir, manequim em corrida e os sliders das juntas](Screenshots/07-3d.png) | ![Docker Hub com os botões que abrem e fecham todos os dez módulos, incluindo o Moodboard](Screenshots/10-hub.png) |
+| ![Docker 3D com abas Pose, Câmera e Inserir, manequim em corrida e os sliders das juntas](Screenshots/07-3d.png) | ![Docker Hub com os botões que abrem e fecham todos os onze módulos, incluindo o Moodboard e a Produção](Screenshots/10-hub.png) |
 
 | Biblioteca de perspectivas | Hub e 3D no Krita |
 |---|---|
@@ -48,6 +48,10 @@ Os quatro documentos originais de contexto do projeto estão em
 | Moodboard |
 |---|
 | ![Docker Moodboard com a pasta de referências do projeto, a lista de referências linkadas e os botões de adicionar, inserir na seleção, renomear e apagar](Screenshots/13-Moodboard.png) |
+
+| Produção |
+|---|
+| ![Docker Produção com o roteiro colado, o checklist por página e painel (estados Esboço, Arte e Final), as falas e a meta semanal com a projeção de entrega](Screenshots/14-Produc.png) |
 
 ## Módulos
 

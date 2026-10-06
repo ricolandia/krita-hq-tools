@@ -40,7 +40,7 @@ The four original context documents of the project are in `docs/contexto/`
 
 | 3D viewer | Hub |
 |---|---|
-| ![3D docker with the Pose, Camera and Insert tabs, a running mannequin and the joint sliders](Screenshots/07-3d.png) | ![Hub docker with the buttons that open and close all ten modules, including Moodboard](Screenshots/10-hub.png) |
+| ![3D docker with the Pose, Camera and Insert tabs, a running mannequin and the joint sliders](Screenshots/07-3d.png) | ![Hub docker with the buttons that open and close all eleven modules, including Moodboard and Production](Screenshots/10-hub.png) |
 
 | Perspective library | Hub and 3D in Krita |
 |---|---|
@@ -49,6 +49,10 @@ The four original context documents of the project are in `docs/contexto/`
 | Moodboard |
 |---|
 | ![Moodboard docker with the project references folder, the list of linked references and the add, insert-into-selection, rename and delete buttons](Screenshots/13-Moodboard.png) |
+
+| Production |
+|---|
+| ![Production docker with the pasted script, the checklist by page and panel (Sketch, Art and Final states), the lines and the weekly goal with the delivery projection](Screenshots/14-Produc.png) |
 
 ## Modules
 
