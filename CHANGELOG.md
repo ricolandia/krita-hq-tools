@@ -1,5 +1,18 @@
 # Changelog
 
+## [Não publicado]
+
+### Correções
+
+- Cores trocadas (vermelho e azul) na inserção do visualizador 3D e nos
+  recursos de pintura da biblioteca: o device RGBA 8 bits do Krita guarda os
+  canais em BGRA (documentação do libkis: "Integer RGBA: Blue, Green, Red,
+  Alpha"), e o código passava bytes RGBA8888 para o `setPixelData` e
+  interpretava a leitura da biblioteca em RGBA. A conversão agora usa o
+  `Format_ARGB32` do Qt (BGRA em memória) na inserção do 3D e nos dois
+  sentidos da biblioteca (salvar e inserir recurso de pintura). Camadas
+  inseridas antes da correção precisam ser reinseridas.
+
 ## [0.10.0] — 2026-10-05
 
 O docker do visualizador 3D ficou mais curto (abas Pose, Câmera e Inserir), a

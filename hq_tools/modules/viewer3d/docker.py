@@ -28,6 +28,7 @@ from ...core.compat import (
     CURSOR_ARROW,
     CURSOR_SIZE_ALL,
     CURSOR_SIZE_FDIAG,
+    IMAGE_FORMAT_ARGB32,
     IMAGE_FORMAT_RGBA8888,
     QImage,
     QSvgRenderer,
@@ -1201,7 +1202,11 @@ class Viewer3DDocker(DockWidget):
         nome_ativo = ativo.name() if ativo is not None else None
         svg = self._render_svg(largura, altura, com_fundo=False)
         imagem = self._rasterizar(svg, largura, altura)
-        rgba = imagem.convertToFormat(IMAGE_FORMAT_RGBA8888)
+        # O device RGBA 8 bits do Krita guarda os canais em BGRA (documentação
+        # do libkis: "Integer RGBA: Blue, Green, Red, Alpha"); o Format_ARGB32
+        # do Qt é BGRA em memória, então os bytes batem com o setPixelData.
+        # Com RGBA8888 o vermelho e o azul saíam trocados (azul virava bege).
+        rgba = imagem.convertToFormat(IMAGE_FORMAT_ARGB32)
         dados = bytes(rgba.constBits().asstring(rgba.sizeInBytes()))
         nome = helpers.unique_layer_name(documento, "3D")
         camada = documento.createNode(nome, "paintlayer")

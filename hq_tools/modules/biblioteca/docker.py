@@ -18,7 +18,6 @@ from ...core.compat import (
     DIALOG_YES,
     ICON_MODE,
     IMAGE_FORMAT_ARGB32,
-    IMAGE_FORMAT_RGBA8888,
     KEEP_ASPECT,
     LIST_ADJUST,
     LIST_STATIC,
@@ -358,8 +357,11 @@ class BibliotecaDocker(DockWidget):
             helpers.show_info(i18n.t('Biblioteca'), i18n.t('A camada de pintura está vazia.'))
             return
         data = layer.pixelData(bounds.x(), bounds.y(), bounds.width(), bounds.height())
+        # Os bytes do device RGBA 8 bits vêm em BGRA (documentação do libkis);
+        # o Format_ARGB32 do Qt interpreta nessa ordem, senão vermelho e azul
+        # saem trocados no PNG salvo.
         image = QImage(
-            bytes(data), bounds.width(), bounds.height(), IMAGE_FORMAT_RGBA8888
+            bytes(data), bounds.width(), bounds.height(), IMAGE_FORMAT_ARGB32
         )
         if image.isNull():
             helpers.show_info(i18n.t('Biblioteca'), i18n.t('Não foi possível montar a imagem.'))
@@ -490,7 +492,10 @@ class BibliotecaDocker(DockWidget):
         if image.isNull():
             helpers.show_message(i18n.t('Não foi possível ler o PNG.'))
             return
-        rgba = image.convertToFormat(IMAGE_FORMAT_RGBA8888)
+        # O setPixelData espera os canais em BGRA (documentação do libkis); o
+        # Format_ARGB32 do Qt é BGRA em memória. Com RGBA8888 o vermelho e o
+        # azul sairiam trocados.
+        rgba = image.convertToFormat(IMAGE_FORMAT_ARGB32)
         width = rgba.width()
         height = rgba.height()
         name = helpers.unique_layer_name(document, nome)
