@@ -30,14 +30,15 @@ a da nota do roadmap no Trilium.
 - **v0.9+ (05/10):** biblioteca de poses dividida em corpo e mãos, com o
   espelho da mão e as poses novas (Voa, Anda, Corre, Pose A, Fechada, Abertas
   e Segura).
-- **v0.11 (em preparo, 06/10):** moodboard (quadro de referências linkado à
-  pasta do projeto), validado por PoC e smoke dentro do Krita 5.3.4.
+- **v0.11 (06/10, publicada):** moodboard (quadro de referências linkado à
+  pasta do projeto), validado por PoC e smoke dentro do Krita 5.3.4 e pelo
+  autor na interface.
 - **Fora do roadmap original:** camada de UI compartilhada (52 botões), ícone
   e social preview, vídeos demo no YouTube com roteiros de captura, CI no
   Windows, automação de release (tag → ZIP + notas do CHANGELOG), duas
   auditorias (30/09 e 05/10) e a documentação espelhada no Trilium.
 
-### Moodboard (implementado em 06/10/2026, aguardando validação do autor)
+### Moodboard (implementado em 06/10/2026, v0.11.0 publicada)
 
 Pedido do autor: quadro horizontal de referências, leve, com as imagens
 comprimidas em JPG e "linkadas" como no HTML, e a referência podendo ser

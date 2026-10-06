@@ -1,6 +1,18 @@
 # Changelog
 
-## [Não publicado]
+## [0.11.0] — 2026-10-06
+
+Módulo novo: **moodboard**, o quadro de referências do projeto. As imagens
+escolhidas viram JPG comprimidos na pasta `moodboard/` e entram no
+`moodboard.kra` como camadas de arquivo linkadas (o quadro fica leve), numa
+grade que cresce; a referência selecionada pode ser inserida na seleção do
+painel, travada, para desenhar por cima.
+
+**English:** new module: **moodboard**, the project reference board. Chosen
+images become compressed JPGs in the `moodboard/` folder and enter
+`moodboard.kra` as linked file layers (the board stays light), on a grid that
+grows; the selected reference can be inserted into the panel selection,
+locked, for tracing over.
 
 ### Moodboard (módulo novo)
 
