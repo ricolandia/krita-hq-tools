@@ -1,6 +1,16 @@
 # Changelog
 
-## [Não publicado]
+## [0.12.1] — 2026-10-06
+
+Correções de idioma e documentação: 81 strings que só existiam em português
+foram traduzidas (rótulos de dados das docas, diálogos e as mensagens do
+roteiro e do gerador) e os créditos ganharam a versão em inglês
+(`CREDITS.en.md`), que também entra no ZIP.
+
+**English:** language and documentation fixes: 81 strings that existed only
+in Portuguese were translated (docker data labels, dialogs and the script
+and generator messages) and the credits got an English version
+(`CREDITS.en.md`), which also ships in the ZIP.
 
 ### Documentação
 
