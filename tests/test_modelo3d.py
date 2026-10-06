@@ -333,6 +333,60 @@ class TestEspelhoDePose(unittest.TestCase):
         )
 
 
+class TestLentes(unittest.TestCase):
+    """Câmera ortográfica (padrão) e perspectiva com lentes."""
+
+    def test_distancia_da_lente_cresce_com_a_lente(self):
+        perto = modelo3d.distancia_da_lente(300.0, 700, 14.0)
+        longe = modelo3d.distancia_da_lente(300.0, 700, 35.0)
+        self.assertGreater(longe, perto)
+        self.assertAlmostEqual(perto, 700 * 14.0 / (36.0 * 300.0), places=6)
+
+    def test_distancia_sem_escala_e_zero(self):
+        self.assertEqual(modelo3d.distancia_da_lente(0.0, 700, 35.0), 0.0)
+
+    def test_fator_perspectiva_no_plano_central_e_um(self):
+        self.assertEqual(modelo3d.fator_perspectiva(0.0, 2.0), 1.0)
+
+    def test_fator_maior_perto_e_menor_longe(self):
+        self.assertGreater(modelo3d.fator_perspectiva(-0.5, 2.0), 1.0)
+        self.assertLess(modelo3d.fator_perspectiva(0.5, 2.0), 1.0)
+
+    def test_fator_sem_distancia_e_ortografico(self):
+        self.assertEqual(modelo3d.fator_perspectiva(0.5, 0.0), 1.0)
+
+    def test_lente_curta_converge_mais(self):
+        # À mesma profundidade, a 14 mm (distância menor) deforma mais que a 35.
+        escala = 300.0
+        d14 = modelo3d.distancia_da_lente(escala, 700, 14.0)
+        d35 = modelo3d.distancia_da_lente(escala, 700, 35.0)
+        self.assertGreater(
+            modelo3d.fator_perspectiva(-0.3, d14),
+            modelo3d.fator_perspectiva(-0.3, d35),
+        )
+
+    def test_perspectiva_cabe_no_espaco_da_ortografica(self):
+        # O ajuste da lente garante que o conjunto projetado não estoure o
+        # quadro além do que a ortográfica ocupa (nada de pé cortado).
+        if not os.path.isfile(MODELO_REAL):
+            self.skipTest("homem.json não está no repositório")
+        modelo = modelo3d.Modelo.carregar(MODELO_REAL)
+        largura = altura = 700
+        base = modelo.vertices_em_tela(largura=largura, altura=altura)
+        max_orto_x = max(abs(ponto[0] - largura / 2.0) for ponto in base)
+        max_orto_y = max(abs(ponto[1] - altura / 2.0) for ponto in base)
+        self.assertGreater(max_orto_x, 1.0)
+        for lente in (14.0, 28.0, 35.0):
+            persp = modelo.vertices_em_tela(
+                largura=largura, altura=altura, lente=lente
+            )
+            self.assertEqual(len(persp), len(base))
+            max_x = max(abs(ponto[0] - largura / 2.0) for ponto in persp)
+            max_y = max(abs(ponto[1] - altura / 2.0) for ponto in persp)
+            self.assertLessEqual(max_x, max_orto_x + 1e-6, lente)
+            self.assertLessEqual(max_y, max_orto_y + 1e-6, lente)
+
+
 class TestEixosSemanticos(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

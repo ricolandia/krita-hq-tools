@@ -1,5 +1,18 @@
 # Changelog
 
+## [Não publicado]
+
+### Visualizador 3D: abas e câmera com lentes
+
+- Os controles do docker "HQ Tools: 3D" foram organizados em abas (**Pose**,
+  **Câmera** e **Inserir**), com o preview sempre à vista; a altura do docker
+  caiu bastante e cada etapa ficou no seu lugar.
+- A câmera ganhou **Ortográfica** (padrão, como era) e **Perspectiva** com
+  lentes **14 / 28 / 35 mm**: a lente mantém o enquadramento e muda só a
+  convergência (14 mm dramática, 35 mm suave), e um ajuste garante que o
+  conjunto continue cabendo no quadro como na ortográfica.
+- `scripts/preview-modelo3d.py` ganhou `--lente` para as prévias de QA.
+
 ## [0.9.1] — 2026-10-05
 
 Biblioteca de poses do 3D dividida em corpo e mãos (com espelho para a mão

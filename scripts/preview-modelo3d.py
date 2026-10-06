@@ -73,6 +73,10 @@ def main():
     parser.add_argument("--yaw", type=float, default=0.0)
     parser.add_argument("--pitch", type=float, default=-10.0)
     parser.add_argument("--zoom", type=float, default=1.0)
+    parser.add_argument(
+        "--lente", type=float, default=None,
+        help="lente em mm (14/28/35); sem ela, projeção ortográfica",
+    )
     parser.add_argument("--largura", type=int, default=700)
     parser.add_argument("--altura", type=int, default=700)
     parser.add_argument("--cor", default=None)
@@ -99,6 +103,7 @@ def main():
         cor=argumentos.cor,
         fundo=argumentos.fundo,
         estilo=argumentos.estilo,
+        lente=argumentos.lente,
     )
     with open(argumentos.saida, "w", encoding="utf-8") as arquivo:
         arquivo.write(svg)

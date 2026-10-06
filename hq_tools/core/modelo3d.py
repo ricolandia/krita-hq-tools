@@ -22,6 +22,35 @@ POSE_VERSAO = 1
 
 LUZ_PADRAO = (0.4, -0.8, 0.45)
 
+# Lentes oferecidas na perspectiva (mm, sensor cheio de 36 mm). Sem lente, a
+# projeção é ortográfica (o padrão do visualizador).
+SENSOR_MM = 36.0
+LENTES = (14.0, 28.0, 35.0)
+
+
+def distancia_da_lente(escala, largura, lente_mm, sensor_mm=SENSOR_MM):
+    """Distância da câmera (unidades do modelo) para a lente pedida.
+
+    A calibração deixa o plano central do modelo com a mesma escala da
+    projeção ortográfica: a lente muda só a convergência (14 mm dramática,
+    35 mm suave) e o zoom continua mandando no enquadramento.
+    """
+    if escala <= 0 or lente_mm <= 0 or largura <= 0:
+        return 0.0
+    return float(largura) * float(lente_mm) / (float(sensor_mm) * float(escala))
+
+
+def fator_perspectiva(profundidade, distancia):
+    """Escala de um ponto a ``profundidade`` relativa ao plano central.
+
+    ``1.0`` no plano central (coincide com a projeção ortográfica); maior que
+    um para o que está mais perto da câmera e menor para o que está mais
+    longe. Sem distância (ou ortográfica), devolve 1.
+    """
+    if distancia <= 0:
+        return 1.0
+    return distancia / (distancia + profundidade)
+
 
 def identidade():
     return [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0]
@@ -467,31 +496,74 @@ class Modelo:
             return [face]
         return [(face[0], face[indice], face[indice + 1]) for indice in range(1, len(face) - 1)]
 
-    def _camera(self, yaw, pitch, zoom, largura, altura, pan_x, pan_y):
+    def _camera(self, yaw, pitch, zoom, largura, altura, pan_x, pan_y, lente=None):
+        """(visão, centro, escala, distância): distância é None na ortográfica."""
         visao = multiplicar(rotacao_x(pitch), rotacao_z(yaw))
         centro = aplicar_ponto(visao, self.centro())
         escala = min(largura, altura) / max(self.diagonal(), 1e-6) * 0.85 * zoom
-        return visao, centro, escala
+        distancia = None
+        if lente:
+            distancia = distancia_da_lente(escala, largura, lente)
+        return visao, centro, escala, distancia
+
+    def _projetar(self, na_camera, centro, escala, distancia, largura, altura,
+                  pan_x, pan_y):
+        """Pontos de tela a partir das coordenadas de câmera.
+
+        Com lente, o fator de perspectiva cresce para o que está perto; para o
+        conjunto não estourar o quadro como na ortográfica (um pé que chega
+        perto da câmera, por exemplo), um ajuste único encolhe o resultado até
+        caber no mesmo espaço da projeção ortográfica.
+        """
+        fatores = [1.0] * len(na_camera)
+        ajuste = 1.0
+        if distancia:
+            fatores = [
+                fator_perspectiva(y - centro[1], distancia) for _, y, _ in na_camera
+            ]
+            ortogonal_x = max((abs(x - centro[0]) for x, _, _ in na_camera), default=0.0)
+            ortogonal_y = max((abs(z - centro[2]) for _, _, z in na_camera), default=0.0)
+            projetado_x = max(
+                (abs((x - centro[0]) * f) for (x, _, _), f in zip(na_camera, fatores)),
+                default=0.0,
+            )
+            projetado_y = max(
+                (abs((z - centro[2]) * f) for (_, _, z), f in zip(na_camera, fatores)),
+                default=0.0,
+            )
+            for ortogonal, projetado in (
+                (ortogonal_x, projetado_x),
+                (ortogonal_y, projetado_y),
+            ):
+                if projetado > ortogonal > 0:
+                    ajuste = min(ajuste, ortogonal / projetado)
+        return [
+            (
+                largura / 2.0 + (x - centro[0]) * escala * f * ajuste + pan_x,
+                altura / 2.0 - (z - centro[2]) * escala * f * ajuste + pan_y,
+                y,
+            )
+            for (x, y, z), f in zip(na_camera, fatores)
+        ]
 
     def vertices_em_tela(self, rotacoes=None, yaw=0.0, pitch=-10.0, zoom=1.0,
                          largura=700, altura=700, pan_x=0.0, pan_y=0.0,
-                         posados=None):
+                         posados=None, lente=None):
         """Projeta os vértices posados: (x, y na tela, profundidade)."""
-        visao, centro, escala = self._camera(yaw, pitch, zoom, largura, altura, pan_x, pan_y)
+        visao, centro, escala, distancia = self._camera(
+            yaw, pitch, zoom, largura, altura, pan_x, pan_y, lente=lente
+        )
         if posados is None:
             posados = self.vertices_em_pose(rotacoes)
-        resultado = []
-        for vertice in posados:
-            x, y, z = aplicar_ponto(visao, vertice)
-            tela_x = largura / 2.0 + (x - centro[0]) * escala + pan_x
-            tela_y = altura / 2.0 - (z - centro[2]) * escala + pan_y
-            resultado.append((tela_x, tela_y, y))
-        return resultado
+        na_camera = [aplicar_ponto(visao, vertice) for vertice in posados]
+        return self._projetar(
+            na_camera, centro, escala, distancia, largura, altura, pan_x, pan_y
+        )
 
     def renderizar(self, rotacoes=None, yaw=0.0, pitch=-10.0, zoom=1.0,
                    largura=700, altura=700, pan_x=0.0, pan_y=0.0,
                    cor=None, fundo=None, luz=LUZ_PADRAO, cull=False, posados=None,
-                   estilo="sombreado"):
+                   estilo="sombreado", lente=None):
         """Devolve o SVG do modelo posado.
 
         ``estilo="sombreado"`` (padrão) usa painter's algorithm e sombreamento
@@ -500,18 +572,15 @@ class Modelo:
         gerar e de rasterizar. ``estilo="contorno"`` desenha só a linha de
         silhueta (as arestas entre faces da frente e de trás).
         """
-        visao, centro, escala = self._camera(yaw, pitch, zoom, largura, altura, pan_x, pan_y)
+        visao, centro, escala, distancia = self._camera(
+            yaw, pitch, zoom, largura, altura, pan_x, pan_y, lente=lente
+        )
         if posados is None:
             posados = self.vertices_em_pose(rotacoes)
         na_camera = [aplicar_ponto(visao, vertice) for vertice in posados]
-        tela = [
-            (
-                largura / 2.0 + (x - centro[0]) * escala + pan_x,
-                altura / 2.0 - (z - centro[2]) * escala + pan_y,
-                y,
-            )
-            for x, y, z in na_camera
-        ]
+        tela = self._projetar(
+            na_camera, centro, escala, distancia, largura, altura, pan_x, pan_y
+        )
         luz_normalizada = _normalizar(luz)
         base = _hex_para_rgb(cor or self.cor_padrao)
 

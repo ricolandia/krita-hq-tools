@@ -348,6 +348,10 @@ class Viewer3DDocker(DockWidget):
             "pan_x": 0.0,
             "pan_y": 0.0,
         }
+        # Ortográfica por padrão (fluxo validado); a perspectiva mantém o
+        # enquadramento e muda só a convergência (ver modelo3d.LENTES).
+        self.perspectiva = False
+        self.lente = modelo3d.LENTES[-1]
         self._tela = []
         self._canvas = None
         self._flutuante = None
@@ -384,6 +388,19 @@ class Viewer3DDocker(DockWidget):
         self.lbl_regiao = ui.rotulo_info(i18n.t('Nenhuma região selecionada.'))
         layout.addWidget(self.lbl_regiao)
 
+        self.tabs = widgets.QTabWidget()
+        layout.addWidget(self.tabs, 1)
+        self.tabs.addTab(self._build_pose_tab(), i18n.t('Pose'))
+        self.tabs.addTab(self._build_camera_tab(), i18n.t('Câmera'))
+        self.tabs.addTab(self._build_insert_tab(), i18n.t('Inserir'))
+
+        self.setWidget(main)
+
+    def _build_pose_tab(self):
+        widgets = QtWidgets
+        tab = widgets.QWidget()
+        layout = ui.espacamento(widgets.QVBoxLayout(tab))
+
         modelo_row = widgets.QHBoxLayout()
         modelo_row.addWidget(ui.rotulo(i18n.t('Modelo:')))
         self.cmb_corpo = widgets.QComboBox()
@@ -417,6 +434,44 @@ class Viewer3DDocker(DockWidget):
         lado_row.addWidget(self.cmb_lado, 1)
         layout.addLayout(lado_row)
 
+        self.grupo_juntas = widgets.QGroupBox(i18n.t('Juntas'))
+        self.juntas_layout = ui.espacamento(
+            widgets.QVBoxLayout(self.grupo_juntas), margem=0, espaco=ui.GAP
+        )
+        layout.addWidget(self.grupo_juntas)
+
+        posse = widgets.QHBoxLayout()
+        button_reset = ui.botao(i18n.t('Limpar pose'), i18n.t('Zera todas as juntas.'))
+        button_reset.clicked.connect(self.limpar_pose)
+        posse.addWidget(button_reset)
+        layout.addLayout(posse)
+        layout.addStretch(1)
+        return tab
+
+    def _build_camera_tab(self):
+        widgets = QtWidgets
+        tab = widgets.QWidget()
+        layout = ui.espacamento(widgets.QVBoxLayout(tab))
+
+        camera_row = widgets.QHBoxLayout()
+        camera_row.addWidget(ui.rotulo(i18n.t('Câmera:')))
+        self.cmb_camera = widgets.QComboBox()
+        self.cmb_camera.addItem(i18n.t('Ortográfica'), "ortografica")
+        self.cmb_camera.addItem(i18n.t('Perspectiva'), "perspectiva")
+        self.cmb_camera.currentIndexChanged.connect(self._mudar_camera)
+        camera_row.addWidget(self.cmb_camera, 1)
+        layout.addLayout(camera_row)
+
+        lente_row = widgets.QHBoxLayout()
+        lente_row.addWidget(ui.rotulo(i18n.t('Lente:')))
+        self.cmb_lente = widgets.QComboBox()
+        for lente in modelo3d.LENTES:
+            self.cmb_lente.addItem(i18n.t('{0:.0f} mm').format(lente), lente)
+        self.cmb_lente.currentIndexChanged.connect(self._mudar_lente)
+        lente_row.addWidget(self.cmb_lente, 1)
+        layout.addLayout(lente_row)
+        self._atualizar_lente()
+
         estilo_row = widgets.QHBoxLayout()
         estilo_row.addWidget(ui.rotulo(i18n.t('Estilo:')))
         self.cmb_estilo = widgets.QComboBox()
@@ -426,12 +481,6 @@ class Viewer3DDocker(DockWidget):
         self.cmb_estilo.currentIndexChanged.connect(self.agendar_render)
         estilo_row.addWidget(self.cmb_estilo, 1)
         layout.addLayout(estilo_row)
-
-        self.grupo_juntas = widgets.QGroupBox(i18n.t('Juntas'))
-        self.juntas_layout = ui.espacamento(
-            widgets.QVBoxLayout(self.grupo_juntas), margem=0, espaco=ui.GAP
-        )
-        layout.addWidget(self.grupo_juntas)
 
         cameras = widgets.QHBoxLayout()
         button_front = ui.botao(
@@ -452,18 +501,24 @@ class Viewer3DDocker(DockWidget):
         cameras.addWidget(button_zoom_in)
         layout.addLayout(cameras)
 
-        posse = widgets.QHBoxLayout()
-        button_reset = ui.botao(i18n.t('Limpar pose'), i18n.t('Zera todas as juntas.'))
-        button_reset.clicked.connect(self.limpar_pose)
-        posse.addWidget(button_reset)
         self.button_move = ui.botao(
             i18n.t('Mover'),
             i18n.t('Ligado, arrastar desloca o enquadramento em vez de girar (ou use Shift/botão do meio).'),
         )
         self.button_move.setCheckable(True)
         self.button_move.toggled.connect(self._alternar_mover)
-        posse.addWidget(self.button_move)
-        layout.addLayout(posse)
+        layout.addWidget(self.button_move)
+
+        layout.addWidget(ui.rotulo(
+            i18n.t('Arraste no preview para orbitar; Shift+arraste desloca; roda ou +/− dão zoom.')
+        ))
+        layout.addStretch(1)
+        return tab
+
+    def _build_insert_tab(self):
+        widgets = QtWidgets
+        tab = widgets.QWidget()
+        layout = ui.espacamento(widgets.QVBoxLayout(tab))
 
         flutuante = widgets.QHBoxLayout()
         self.button_flutuar = ui.botao(
@@ -512,10 +567,10 @@ class Viewer3DDocker(DockWidget):
         layout.addLayout(acoes)
 
         layout.addWidget(ui.rotulo(
-            i18n.t("1) Desenhe uma seleção retangular sobre o painel. 2) Ajuste a pose e o zoom (o preview mostra exatamente o recorte que será inserido). 3) 'Inserir' coloca a camada abaixo da ativa e desfaz a seleção. Arraste para orbitar; Shift+arraste desloca; roda ou +/− dão zoom; clique numa região para abrir os sliders.")
+            i18n.t("1) Desenhe uma seleção retangular sobre o painel. 2) Ajuste a pose e o zoom (o preview mostra exatamente o recorte). 3) 'Inserir' coloca a camada abaixo da ativa e desfaz a seleção.")
         ))
-
-        self.setWidget(main)
+        layout.addStretch(1)
+        return tab
 
     def _caminho_do_corpo(self, chave):
         for chave_modelo, _, caminho in VIEWER3D_MODELOS:
@@ -606,6 +661,20 @@ class Viewer3DDocker(DockWidget):
         self.lado_mao = self.cmb_lado.itemData(indice) or modelo3d.LADO_DIREITA
         self._aplicar_poses()
 
+    def _mudar_camera(self, indice):
+        self.perspectiva = self.cmb_camera.itemData(indice) == "perspectiva"
+        self._atualizar_lente()
+        self.agendar_render()
+
+    def _mudar_lente(self, indice):
+        lente = self.cmb_lente.itemData(indice)
+        if lente:
+            self.lente = float(lente)
+        self.agendar_render()
+
+    def _atualizar_lente(self):
+        self.cmb_lente.setEnabled(self.perspectiva)
+
     def _aplicar_poses(self):
         """Combina corpo e mãos (as mãos por cima) e redesenha."""
         corpo = self._ler_pose(VIEWER3D_POSES_CORPO_DIR, self.pose_corpo)
@@ -658,6 +727,7 @@ class Viewer3DDocker(DockWidget):
             estilo=estilo,
             cor=cor,
             fundo=fundo,
+            lente=self.lente if self.perspectiva else None,
         )
 
     @staticmethod
@@ -706,6 +776,7 @@ class Viewer3DDocker(DockWidget):
             largura=largura,
             altura=altura,
             posados=posados,
+            lente=self.lente if self.perspectiva else None,
         )
         if QSvgRenderer is None:
             return
