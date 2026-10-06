@@ -16,15 +16,11 @@ The four original context documents of the project are in `docs/contexto/`
 
 ## Demo
 
-**3D viewer over the page:** pick the body and pose, draw a rectangular selection over the target panel (the preview adopts its aspect ratio and shows the exact crop, with up to 12x zoom for details), use "Float on page" to see it over the panel and "Insert as layer" or "as reference": the layer lands at the selection size, below the sketch, and the selection is cleared.
+**Plugin update:** the video shows HQ Tools in action, from the hub to the comics tools (screentones, balloons, pages, brushes, 3D, perspective, moodboard and production).
 
-[<img src="Screenshots/09-3d-na-pagina.png" width="720" alt="Click to watch the short video 'Krita tools - update 3Dfloat'">](https://youtu.be/0rfDIr2QTDE)
+[<img src="Screenshots/15-video-update.png" width="720" alt="Click to watch the video 'Krita HQ Tools - Update'">](https://youtu.be/qzLnXSGgufc)
 
-▶ **Short video:** [Krita tools - update 3Dfloat](https://youtu.be/0rfDIr2QTDE) (the 3D float flow in action).
-
-[<img src="Screenshots/08-demo.png" width="720" alt="Click to watch the short video 'All features' (first release)">](https://youtu.be/B9KYYyLdHF0)
-
-▶ **Short video:** [All features](https://youtu.be/B9KYYyLdHF0) (the first release demo).
+▶ **Video:** [Krita HQ Tools - Update](https://youtu.be/qzLnXSGgufc) (the plugin update in action).
 
 ## Screenshots
 

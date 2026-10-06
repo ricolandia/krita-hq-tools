@@ -15,15 +15,11 @@ Os quatro documentos originais de contexto do projeto estão em
 
 ## Demo
 
-**Visualizador 3D sobre a página:** escolha o corpo e a pose, desenhe uma seleção retangular sobre o painel de destino (o preview adota a proporção dela e mostra o recorte exato, com zoom de até 12x para detalhes), use "Flutuar na página" para ver sobre o painel e "Inserir como camada" ou "como referência": a camada sai no tamanho da seleção, abaixo do esboço, e a seleção é desfeita.
+**Atualização do plugin:** o vídeo mostra o HQ Tools em uso, do hub às ferramentas de quadrinhos (retículas, balões, páginas, pincéis, 3D, perspectiva, moodboard e produção).
 
-[<img src="Screenshots/09-3d-na-pagina.png" width="720" alt="Clique para assistir ao vídeo curto 'Krita tools - update 3Dfloat'">](https://youtu.be/0rfDIr2QTDE)
+[<img src="Screenshots/15-video-update.png" width="720" alt="Clique para assistir ao vídeo 'Krita HQ Tools - Update'">](https://youtu.be/qzLnXSGgufc)
 
-▶ **Vídeo curto:** [Krita tools - update 3Dfloat](https://youtu.be/0rfDIr2QTDE) (o fluxo do 3D float em uso).
-
-[<img src="Screenshots/08-demo.png" width="720" alt="Clique para assistir ao vídeo curto 'Todos os recursos' (primeiro release)">](https://youtu.be/B9KYYyLdHF0)
-
-▶ **Vídeo curto:** [Todos os recursos](https://youtu.be/B9KYYyLdHF0) (o demo do primeiro release).
+▶ **Vídeo:** [Krita HQ Tools - Update](https://youtu.be/qzLnXSGgufc) (a atualização do plugin em uso).
 
 ## Capturas
 
