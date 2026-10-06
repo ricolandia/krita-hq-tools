@@ -30,10 +30,34 @@ a da nota do roadmap no Trilium.
 - **v0.9+ (05/10):** biblioteca de poses dividida em corpo e mãos, com o
   espelho da mão e as poses novas (Voa, Anda, Corre, Pose A, Fechada, Abertas
   e Segura).
+- **v0.11 (em preparo, 06/10):** moodboard (quadro de referências linkado à
+  pasta do projeto), validado por PoC e smoke dentro do Krita 5.3.4.
 - **Fora do roadmap original:** camada de UI compartilhada (52 botões), ícone
   e social preview, vídeos demo no YouTube com roteiros de captura, CI no
   Windows, automação de release (tag → ZIP + notas do CHANGELOG), duas
   auditorias (30/09 e 05/10) e a documentação espelhada no Trilium.
+
+### Moodboard (implementado em 06/10/2026, aguardando validação do autor)
+
+Pedido do autor: quadro horizontal de referências, leve, com as imagens
+comprimidas em JPG e "linkadas" como no HTML, e a referência podendo ser
+inserida num painel dentro de uma seleção. Decisões e achados:
+
+- Referências em `<projeto>/moodboard/*.jpg` (lado máximo 1600 px, qualidade
+  85; aviso na primeira vez) e o `moodboard.kra` guarda **camadas de
+  arquivo** (só o caminho relativo): o quadro fica com centenas de KB mesmo
+  com dezenas de referências.
+- **Camada de arquivo não aceita transformação direta** (a ferramenta de
+  transformar não afeta; bug T4595 do KDE): posição/escala vão numa **máscara
+  de transformação** (`scaleX`/`scaleY` no centro original + deslocamento em
+  `transformedCenter`; a `flattenedPerspectiveTransform` sozinha é ignorada
+  no modo livre). Validado no PoC `scripts/poc-filelayer-transform.py`.
+- Grade de células de 640 px, 8 colunas (tela de 5552 px), que cresce em
+  altura (`resizeImage`) conforme as referências; `moodboard.json` guarda o
+  layout (para renomear/apagar atualizando a camada).
+- "Inserir na seleção" reusa o fluxo WYSIWYG da perspectiva, mas entra
+  **abaixo do ativo** e, com o fundo ativo, acima dele (senão some atrás do
+  fundo).
 
 ### Próximo (reavaliado)
 

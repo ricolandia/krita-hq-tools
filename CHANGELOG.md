@@ -1,5 +1,23 @@
 # Changelog
 
+## [Não publicado]
+
+### Moodboard (módulo novo)
+
+- Quadro de referências leve: as imagens escolhidas em "Adicionar
+  referências..." são redimensionadas (lado máximo 1600 px) e salvas em JPG
+  na pasta `moodboard/` do projeto (os originais não mudam); o
+  `moodboard.kra` guarda só camadas de arquivo linkadas, posicionadas e
+  escaladas por máscaras de transformação numa grade que cresce.
+- "Inserir na seleção" (ou duplo clique) traz a referência para o painel
+  como camada travada, na medida da seleção, para desenhar por cima;
+  Renomear e Apagar cuidam da pasta e, com o quadro aberto, atualizam a
+  camada correspondente.
+- Ferramentas de validação: `scripts/poc-filelayer-transform.py` (PoC da
+  máscara de transformação, validado no Krita 5.3.4) e
+  `scripts/validar-moodboard.py` (smoke de ponta a ponta, com o quadro
+  salvo/reaberto e a inserção conferida pixel a pixel).
+
 ## [0.10.1] — 2026-10-05
 
 Duas correções: as cores inseridas pelo visualizador 3D (e os recursos de

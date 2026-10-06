@@ -71,6 +71,7 @@ CACHE_DIR = _pasta_de_cache()
 BALLOONS_DIR = os.path.join(USER_DIR, "balloons")
 ONOMATOPEIAS_DIR = os.path.join(USER_DIR, "onomatopeias")
 BIBLIOTECA_DIR = os.path.join(USER_DIR, "biblioteca")
+MOODBOARD_DIR = os.path.join(USER_DIR, "moodboard")
 MODELOS_DIR = os.path.join(USER_DIR, "modelos")
 VIEWER3D_DIR = os.path.join(MODULES_DIR, "viewer3d")
 VIEWER3D_MODELOS = (

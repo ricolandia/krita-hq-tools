@@ -1,8 +1,8 @@
 """Registro do plugin HQ Tools no Krita.
 
 Cada módulo (retículas, balões, onomatopeias, paletas, páginas, biblioteca,
-pincéis, 3D, perspectiva e o hub) registra o seu docker aqui, conforme a
-configuração salva em ``~/.local/share/krita/hq_tools``.
+pincéis, 3D, perspectiva, moodboard e o hub) registra o seu docker aqui,
+conforme a configuração salva em ``~/.local/share/krita/hq_tools``.
 """
 
 from krita import DockWidgetFactory, DockWidgetFactoryBase, Extension, Krita
@@ -54,6 +54,12 @@ MODULOS = (
         "hq_tools_perspectiva",
         "PerspectivaDocker",
         "modules.perspectiva.docker",
+    ),
+    (
+        "moodboard",
+        "hq_tools_moodboard",
+        "MoodboardDocker",
+        "modules.moodboard.docker",
     ),
 )
 

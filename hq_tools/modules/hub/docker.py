@@ -25,6 +25,7 @@ ROTULOS = {
     "brushes": "Pincéis",
     "viewer3d": "3D",
     "perspectiva": "Perspectiva",
+    "moodboard": "Moodboard",
 }
 
 

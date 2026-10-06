@@ -111,9 +111,9 @@ class TestRegistroDoPlugin(unittest.TestCase):
         return modulo
 
 
-    def test_registra_os_dez_modulos(self):
+    def test_registra_os_modulos(self):
         modulo = self.carregar()
-        self.assertEqual(len(self.instancia.fabricas), 10)
+        self.assertEqual(len(self.instancia.fabricas), 11)
         self.assertEqual(len(self.instancia.extensoes), 1)
         self.assertEqual(modulo.HQTools.__name__, "HQTools")
 
@@ -128,7 +128,7 @@ class TestRegistroDoPlugin(unittest.TestCase):
         extension = self.instancia.extensoes[0]
         extension.setup()
         ids = [fabrica[0] for fabrica in self.instancia.fabricas]
-        self.assertEqual(len(ids), 9)
+        self.assertEqual(len(ids), 10)
         self.assertNotIn("hq_tools_screentone", ids)
         self.assertIn("hq_tools_pages", ids)
         self.assertIn("hq_tools_brushes", ids)
@@ -148,7 +148,7 @@ class TestRegistroDoPlugin(unittest.TestCase):
         self.instancia.fabricas = []
         extension.setup()
         ids = [fabrica[0] for fabrica in self.instancia.fabricas]
-        self.assertEqual(len(ids), 9)
+        self.assertEqual(len(ids), 10)
         self.assertNotIn("hq_tools_pages", ids)
 
     def test_atalhos_criam_as_oito_acoes(self):
