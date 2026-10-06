@@ -37,8 +37,10 @@ remoção, não poste (e não esconda).
    for Krita (open source)"; público técnico, IA como assistente é normal.
 4. **Lobsters** (post "Show", requer conta).
 5. **r/opensource** (ler as regras de autopromoção; showcase com capturas).
-6. **Mastodon/Fediverse** (pubkit): vídeos demo com #Krita #FOSS #Comics;
-   **Lemmy** (c/opensource, c/krita).
+6. **Mastodon/Fediverse** (pubkit): **PT publicado** em 04/10 (bolha.us +
+   ursal.zone, com o post do blog); o **mastodon.social (EN) ainda não
+   recebeu** (texto pronto em `scripts/microposts/hq-tools-krita.txt` do
+   projeto do site); **Lemmy** (c/opensource, c/krita) idem.
 7. **Discord da comunidade Krita** (o servidor do Rakurri, citado no
    próprio fórum como o lugar alternativo para plugins "com IA"): pedir
    convite e postar no canal de plugins.
@@ -215,5 +217,6 @@ fork e apontar o remoto).
 
 | Data | Canal | O que foi | Retorno |
 |---|---|---|---|
+| 04/10/2026 | Fediverse (pubkit) | Post PT do blog (`hq-tools-krita`) no bolha.us e ursal.zone | publicado; o mastodon.social (EN) não recebeu |
 | 06/10/2026 | GitHub (topics) | 11 topics aplicados no repositório (via `gh`) | descoberta/SEO na busca do GitHub |
 | 06/10/2026 | awesome-krita | PR #2 (armstrongl/awesome-krita#2): uma linha na seção Plugins, formato validado com `awesome-lint` | aguardando revisão do mantenedor (só um bot de diff comentou) |
