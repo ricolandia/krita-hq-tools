@@ -122,10 +122,12 @@ Comics pack e InkP/Expressive Inks.
   Auto-Rig Pro (addon de terceiros) e exportado pelo autor. Os JSON são
   redistribuídos para o visualizador 3D do plugin; os FBX originais ficam
   fora do repositório.
-- `hq_tools/modules/viewer3d/poses/`: poses extraídas dos FBX animados do
-  autor (valores semânticos por osso), separadas em `corpo/` (Idle, Voa, Anda,
-  Corre e Pose A) e `maos/` (Fechada, Abertas e Segura, autorais para a mão
-  direita; o docker espelha para a esquerda).
+- `hq_tools/modules/viewer3d/poses/`: poses extraídas dos **FBX exportados
+  pelo autor** (valores semânticos por osso; o `.blend` é só reserva, porque
+  pode sair incompleto: no Salto, o blend deu 20 ossos contra 27 do FBX),
+  separadas em `corpo/` (Idle, Voa, Anda, Corre, Salto e Pose A) e `maos/`
+  (Fechada, Abertas e Segura, autorais para a mão direita; o docker espelha
+  para a esquerda).
 
 ## Pastas fora do repositório
 

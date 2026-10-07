@@ -34,6 +34,8 @@ from hq_tools.core.paths import (  # noqa: E402
 
 
 def _ler(pasta, nome):
+    if not nome.endswith(".json"):
+        nome += ".json"
     with open(os.path.join(pasta, nome), encoding="utf-8") as arquivo:
         return json.load(arquivo).get("ossos", {})
 

@@ -414,6 +414,7 @@ TRADUCOES = {
     "Reutilizar retícula idêntica já existente": "Reuse identical existing screentone",
     "Roteiro": "Script",
     "Roteiro: {0}": "Script: {0}",
+    "Salto": "Jump",
     "Salva o checklist em checklist.md na pasta do projeto (para espelhar onde quiser).": "Saves the checklist as checklist.md in the project folder (to mirror wherever you like).",
     "Salva o preset atual na pasta de presets do usuário.": "Saves the current preset into the user presets folder.",
     "Salvar a página (pasta do projeto)": "Save the page (project folder)",

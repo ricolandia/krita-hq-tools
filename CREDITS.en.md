@@ -122,10 +122,12 @@ pencils), Lilly_Mist Comics pack and InkP/Expressive Inks.
   with Auto-Rig Pro (third-party addon) and exported by the author. The JSON
   files are redistributed for the plugin's 3D viewer; the original FBX files
   stay outside the repository.
-- `hq_tools/modules/viewer3d/poses/`: poses extracted from the author's
-  animated FBX files (semantic values per bone), split into `corpo/` (Idle,
-  Voa, Anda, Corre and Pose A) and `maos/` (Fechada, Abertas and Segura,
-  authored for the right hand; the docker mirrors to the left).
+- `hq_tools/modules/viewer3d/poses/`: poses extracted from the **FBX files
+  exported by the author** (semantic values per bone; the `.blend` is only a
+  fallback, because it can come out incomplete: for Salto, the blend gave 20
+  bones against 27 from the FBX), split into `corpo/` (Idle, Voa, Anda, Corre,
+  Salto and Pose A) and `maos/` (Fechada, Abertas and Segura, authored for the
+  right hand; the docker mirrors to the left).
 
 ## Folders outside the repository
 

@@ -2,7 +2,10 @@
 
 O FBX precisa carregar a pose numa ação (keyframes); um FBX só com a pose
 "no viewport" sai igual ao repouso, como já aconteceu. O ``.blend`` é aceito
-como entrada para o caso de a pose só existir no arquivo do Blender. O script
+como entrada para o caso de a pose só existir no arquivo do Blender, mas
+**prefira o FBX exportado pelo autor**: o ``.blend`` pode sair incompleto
+(no Salto, o blend deu 20 ossos contra 27 do FBX, sem tronco, cabeça e
+ombros). O script
 roda dentro do Blender, lê a pose avaliada no frame pedido, calcula a rotação
 local de cada osso em relação ao repouso e converte para os valores semânticos
 do docker (Dobrar/Abrir/Girar), usando o mesmo mapa do núcleo (``modelo3d``).
