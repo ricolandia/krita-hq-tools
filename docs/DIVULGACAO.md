@@ -171,6 +171,15 @@ bilíngues.
 
 ## Pendências
 
+- **Discussions — 2 itens só na interface** (a API do GitHub não tem
+  mutation para pin nem para categoria, conferido em 07/10): fixar o post
+  de boas-vindas ("Pin discussion") e colar a descrição PT no **Polls**
+  ("Enquetes · Polls"), que ficou com a padrão ("Take a vote from the
+  community").
+- **Próximos canais da fila** (ordem sugerida): **Show HN** (A3) →
+  **Mastodon EN** (A6, conta no mastodon.social) → **r/opensource** (A5) →
+  comunidades de quadrinhos (B10-B12). Os textos prontos entram aqui quando
+  o canal for preparado.
 - **Topics do repositório**: **feitos** em 06/10 (11 topics aplicados via
   `gh`): `krita`, `krita-plugin`, `comics`, `comic-tools`, `webtoon`,
   `manga`, `python`, `pyqt5`, `qt`, `art-tools`, `open-source`.
