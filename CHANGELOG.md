@@ -2,6 +2,16 @@
 
 ## [Não publicado]
 
+### Correções
+
+- Inserção posicionada (v0.13.0): em páginas de 300 dpi a arte caía muito
+  fora da seleção. A conta usava pixels da imagem sobre o espaço dos shapes
+  do Krita, que é em **pontos** (``72/dpi`` de diferença). O
+  ``posicionar_vetor`` agora converte a seleção e o centro da vista para
+  pontos e usa a caixa dos próprios shapes; validado no smoke
+  (``validar-insercao.py``, agora com documento a 300 dpi) com balão e
+  onomatopeia dentro da seleção e o PNG da biblioteca exato.
+
 ### Visualizador 3D
 
 - Pose **Joinha** (`poses/maos/joinha.json`, EN "Thumbs up"), exportada do

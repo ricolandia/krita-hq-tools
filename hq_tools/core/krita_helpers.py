@@ -457,28 +457,13 @@ def destino_de_insercao(documento, largura, altura):
 def posicionar_vetor(documento, camada):
     """Posiciona a camada vetorial (seleção ou centro da vista).
 
-    Devolve True quando conseguiu posicionar; sem seleção e sem vista (ou
-    com um documento sem conteúdo), devolve False e a arte fica onde o SVG
-    a colocou (como antes).
-    """
-    try:
-        limites = camada.bounds()
-    except (AttributeError, RuntimeError):
-        return False
-    if limites is None or limites.isEmpty():
-        return False
-    destino_x, destino_y, escala = destino_de_insercao(
-        documento, limites.width(), limites.height()
-    )
-    return _transformar_vetor(camada, limites, escala, destino_x, destino_y)
-
-
-def _transformar_vetor(camada, limites, escala, destino_x, destino_y):
-    """Aplica escala e translação nos shapes do topo da camada vetorial.
-
-    A matriz global entra DEPOIS da transformação de cada shape
-    (``atual * global``: no Qt, ``X * Y`` aplica X primeiro), então a arte
-    inteira (inclusive grupos do SVG) anda e escala junto.
+    A conta roda em **pontos**, o espaço dos shapes do Krita (o
+    ``boundingBox`` é em pontos): a seleção e o centro da vista, que vêm em
+    pixels da imagem, são convertidos por ``72/dpi``. Sem essa conversão, em
+    páginas de 300 dpi a arte caía muito fora da seleção (relato do autor em
+    07/10). Com seleção, a arte cabe nela reduzindo (nunca amplia) e fica
+    centralizada; sem seleção, mantém o tamanho natural e vai para o centro
+    da vista.
     """
     try:
         shapes = camada.shapes()
@@ -486,10 +471,53 @@ def _transformar_vetor(camada, limites, escala, destino_x, destino_y):
         return False
     if not shapes:
         return False
+    caixa = None
+    for shape in shapes:
+        try:
+            limite = shape.boundingBox()
+        except (AttributeError, RuntimeError):
+            return False
+        caixa = limite if caixa is None else caixa.united(limite)
+    if caixa is None or caixa.isEmpty():
+        return False
+    fator = 72.0 / max(1.0, document_dpi(documento))
+    largura = caixa.width()
+    altura = caixa.height()
+    selecao = selection_bounds(documento)
+    if selecao is not None:
+        destino_x, destino_y, escala = mapeamento.encaixe_central(
+            (
+                selecao[0] * fator,
+                selecao[1] * fator,
+                selecao[2] * fator,
+                selecao[3] * fator,
+            ),
+            largura,
+            altura,
+        )
+    else:
+        centro = centro_da_vista(documento)
+        if centro is None:
+            return False
+        escala = 1.0
+        destino_x = centro[0] * fator - largura / 2.0
+        destino_y = centro[1] * fator - altura / 2.0
+    return _transformar_shapes(shapes, caixa, escala, destino_x, destino_y)
+
+
+def _transformar_shapes(shapes, caixa, escala, destino_x, destino_y):
+    """Aplica escala e translação (em pontos) nos shapes do topo da camada.
+
+    A matriz global entra DEPOIS da transformação de cada shape
+    (``atual * global``: no Qt, ``X * Y`` aplica X primeiro), então a arte
+    inteira (inclusive grupos do SVG) anda e escala junto. O
+    ``updateAbsolute`` repinta a união da área antiga com a nova; sem isso a
+    arte fica "fantasma" na posição original.
+    """
     global_transform = QtGui.QTransform()
     global_transform.translate(destino_x, destino_y)
     global_transform.scale(escala, escala)
-    global_transform.translate(-limites.x(), -limites.y())
+    global_transform.translate(-caixa.x(), -caixa.y())
     for shape in shapes:
         try:
             antigo = shape.boundingBox()
@@ -498,9 +526,6 @@ def _transformar_vetor(camada, limites, escala, destino_x, destino_y):
         except (AttributeError, RuntimeError, TypeError):
             return False
         try:
-            # Ao mover/escalar, o Krita precisa repintar a UNIÃO da área
-            # antiga com a nova; sem isso a arte fica "fantasma" na posição
-            # original (visto no smoke de 07/10).
             shape.updateAbsolute(antigo.united(shape.boundingBox()))
         except (AttributeError, RuntimeError, TypeError):
             try:

@@ -118,7 +118,7 @@ def executar():
     from hq_tools.core import krita_helpers as helpers
 
     documento = aplicacao.createDocument(
-        1600, 1000, "pagina-teste", "RGBA", "U8", "sRGB built-in", 72.0
+        1600, 1000, "pagina-teste", "RGBA", "U8", "sRGB built-in", 300.0
     )
     janela = aplicacao.activeWindow()
     if janela is not None:
@@ -129,7 +129,9 @@ def executar():
             # real a vista ativa é a do documento que o autor está olhando.
             view = views[-1]
             helpers.active_view = lambda: view
-    log("centro da vista: {0}".format(helpers.centro_da_vista(documento)))
+    log("dpi: {0} | centro da vista: {1}".format(
+        documento.resolution(), helpers.centro_da_vista(documento)
+    ))
 
     _selecionar(documento, 200, 300, 600, 400)
     camada, ok = _inserir_vetor(documento, helpers, BALAO, "balao-selecao")
