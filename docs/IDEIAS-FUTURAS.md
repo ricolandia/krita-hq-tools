@@ -79,7 +79,8 @@ inserida num painel dentro de uma seleção. Decisões e achados:
 ### Próximo (reavaliado)
 
 1. **Biblioteca de poses, o que falta:** "Salvar pose atual" (biblioteca do
-   usuário), miniatura no seletor e o joinha (o autor vai refazer a pose).
+   usuário), miniatura no seletor e o joinha (feito em 07/10 a partir do
+   `Mao_joinha_v2_.fbx`).
 2. **Validação no Krita da v0.9.0:** hub (abrir/fechar), malha de perspectiva
    (Ctrl+Z único), flutuante com dois documentos e a interface em inglês.
 3. **Krita 6:** validar o plugin no PyQt6 (pré-requisito do balão
@@ -100,6 +101,11 @@ inserida num painel dentro de uma seleção. Decisões e achados:
 9. **Exportação de páginas (amadurecer, adiada em 05/10):** diálogo com cor
    (RGB/CMYK + perfil), resolução (72/96/150/300), saída (pasta de imagens ou
    PDF único) e presets web/impressão; especificação abaixo.
+10. **Pose de mãos por lado:** hoje há uma única pose de mão, com o seletor
+    direita/esquerda/ambas; com ele num lado, mudar a pose do corpo devolve a
+    outra mão ao repouso e não dá para manter poses diferentes por mão.
+    Plano aprovado: duas caixas independentes (mão direita e mão esquerda),
+    aplicadas por cima da pose do corpo, com o padrão fechada nas duas.
 
 **Fora de escopo (mantido):** exportação webtoon (Batch Exporter cobre),
 preflight de impressão (Scribus), rotas B/C do 3D (Blender Layer e pose
