@@ -243,6 +243,7 @@ TRADUCOES = {
     "Instalar padrões e texturas (kit)": "Install patterns and textures (kit)",
     "Intensidade (preto e branco)": "Intensity (black and white)",
     "Inverter (pontos brancos)": "Invert (white dots)",
+    "Joinha": "Thumbs up",
     "Juntas": "Joints",
     "Juntas: {0}": "Joints: {0}",
     "L:": "W:",

@@ -126,7 +126,7 @@ Comics pack e InkP/Expressive Inks.
   pelo autor** (valores semânticos por osso; o `.blend` é só reserva, porque
   pode sair incompleto: no Salto, o blend deu 20 ossos contra 27 do FBX),
   separadas em `corpo/` (Idle, Voa, Anda, Corre, Salto e Pose A) e `maos/`
-  (Fechada, Abertas e Segura, autorais para a mão direita; o docker espelha
+  (Fechada, Abertas, Segura e Joinha, autorais para a mão direita; o docker espelha
   para a esquerda).
 
 ## Pastas fora do repositório

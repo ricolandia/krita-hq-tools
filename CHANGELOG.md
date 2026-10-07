@@ -1,5 +1,12 @@
 # Changelog
 
+## [Não publicado]
+
+### Visualizador 3D
+
+- Pose **Joinha** (`poses/maos/joinha.json`, EN "Thumbs up"), exportada do
+  `Mao_joinha_v2_.fbx` (o v1 sai vazio, sem keyframes).
+
 ## [0.13.0] — 2026-10-07
 
 A inserção de balões, onomatopeias e recursos da biblioteca passou a levar em
