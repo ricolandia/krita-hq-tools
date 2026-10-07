@@ -1,6 +1,17 @@
 # Changelog
 
-## [Não publicado]
+## [0.13.1] — 2026-10-07
+
+Correção da inserção posicionada: em páginas de 300 dpi a arte caía muito
+fora da seleção (a conta misturava pixels com os pontos dos shapes do Krita);
+agora balões, onomatopeias e recursos da biblioteca entram dentro da seleção,
+como os outros módulos. Também entrou a pose Joinha no visualizador 3D.
+
+**English:** fix for the positioned insertion: on 300 dpi pages the artwork
+landed far outside the selection (the math mixed pixels with Krita's shape
+points); balloons, sound effects and library resources now land inside the
+selection, like the other modules. The Joinha (thumbs up) pose also joined
+the 3D viewer.
 
 ### Correções
 
