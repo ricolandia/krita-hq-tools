@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.12.3] — 2026-10-06
+
+O ZIP de instalação voltou a funcionar no importador do Krita: o pacote agora
+inclui a entrada de diretório do módulo (`hq_tools/`), que o importador exige
+para encontrar o plugin. Até a 0.12.2, todo ZIP falhava com "Nenhum arquivo
+encontrado no arquivo morto" ("No plugins found in archive").
+
+**English:** the install ZIP works again in Krita's plugin importer: the
+package now includes the module directory entry (`hq_tools/`), which the
+importer requires to find the plugin. Up to 0.12.2, every ZIP failed with
+"No plugins found in archive".
+
+### Correções
+
+- `build-zip.sh`: grava as entradas de diretório no ZIP (a `hq_tools/` é a
+  que o importador procura) e passa a validar o contrato do importador
+  (`.desktop` > `X-KDE-Library` > `<nome>/` com `<nome>/__init__.py`),
+  quebrando o build se não bater. Validado com o próprio
+  `plugin_importer.py` do Krita (importa e extrai o plugin).
+- INSTALL (PT/EN): contagem de dockers corrigida (12, com moodboard e
+  produção), o `.action` agora é colocado pelo importador e há nota de
+  solução de problemas para o erro em ZIPs antigos.
+
 ## [0.12.2] — 2026-10-06
 
 O hub ganhou divisores: os botões ficam agrupados por fluxo

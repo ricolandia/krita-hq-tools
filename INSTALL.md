@@ -22,9 +22,9 @@ já tem o repositório e quer desenvolver, veja `scripts/install-dev.sh` e o
    e escolha o ZIP.
 3. Em Configurar Krita > **Gerenciador de plugins Python**, marque **HQ Tools**.
 4. Feche e reabra o Krita.
-5. Os 10 dockers aparecem em Configurações > Dockers com o prefixo "HQ Tools":
-   retículas, balões, onomatopeias, paletas, páginas, pincéis, biblioteca, 3D,
-   perspectiva e hub.
+5. Os 12 dockers aparecem em Configurações > Dockers com o prefixo "HQ Tools":
+   retículas, balões, onomatopeias, paletas, páginas, pincéis, biblioteca,
+   3D, perspectiva, moodboard, produção e hub.
    Para agrupá-los como abas de um mesmo painel, arraste um docker sobre o
    outro (o Krita junta automaticamente; desagrupar é só arrastar de volta).
 6. Atalhos de pincel (opcional): descompacte o ZIP, copie o arquivo
@@ -127,8 +127,12 @@ programa para aparecer.
 - **Docker não aparece na listagem**: confira se HQ Tools está marcado no
   Gerenciador de plugins Python e reinicie o Krita. Erros de importação na
   inicialização aparecem em Ferramentas > Scripts > Scripter (aba Python).
-- **Atalhos de pincel não aparecem**: quem instalou pelo ZIP precisa copiar
-  o `hq_tools.action` para a pasta `actions` (passo 6 da instalação rápida).
+- **Atalhos de pincel não aparecem**: o importador do Krita (ZIP de 0.12.3 em
+  diante) já coloca o `hq_tools.action` na pasta `actions`; em ZIPs antigos,
+  copie o arquivo manualmente.
+- **"Nenhum arquivo encontrado no arquivo morto" ao importar o ZIP**: é um
+  defeito dos ZIPs até a 0.12.2 (faltava a entrada de diretório do módulo);
+  baixe a release 0.12.3 ou mais nova.
 - **Fontes/padrões/paletas novas não aparecem**: o Krita lê os recursos na
   inicialização; reinicie depois de instalar qualquer item do kit.
 - **Pincel dos packs não aparece**: confira se a aba "Packs" marca

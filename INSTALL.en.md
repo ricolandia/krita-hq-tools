@@ -22,9 +22,9 @@ have the repository and want to develop, see `scripts/install-dev.sh` and
    the ZIP.
 3. In Configure Krita > **Python Plugin Manager**, check **HQ Tools**.
 4. Close and reopen Krita.
-5. The 10 dockers show up in Settings > Dockers with the "HQ Tools" prefix:
+5. The 12 dockers show up in Settings > Dockers with the "HQ Tools" prefix:
    screentones, balloons, sound effects, palettes, pages, brushes, library,
-   3D, perspective and hub.
+   3D, perspective, moodboard, production and hub.
    To group them as tabs in a single panel, drag one docker over another
    (Krita groups them automatically; drag back to ungroup).
 6. Brush shortcuts (optional): unpack the ZIP, copy the `hq_tools.action`
@@ -128,8 +128,12 @@ to show up.
 - **Docker does not show up in the list**: check that HQ Tools is enabled in
   the Python Plugin Manager and restart Krita. Import errors on startup show
   up in Tools > Scripts > Scripter (Python tab).
-- **Brush shortcuts do not show up**: if you installed from the ZIP, copy
-  `hq_tools.action` into the `actions` folder (step 6 of the quick install).
+- **Brush shortcuts do not show up**: Krita's importer (ZIP from 0.12.3 on)
+  already places `hq_tools.action` in the `actions` folder; with older ZIPs,
+  copy the file manually.
+- **"No plugins found in archive" when importing the ZIP**: this is a defect
+  of the ZIPs up to 0.12.2 (the module directory entry was missing); download
+  release 0.12.3 or newer.
 - **New fonts/patterns/palettes do not show up**: Krita reads resources on
   startup; restart after installing any kit item.
 - **Pack brush does not show up**: check that the "Packs" tab marks
