@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """Renderiza prévias das poses do 3D para QA (corpo + mãos combinados).
 
-Monta a mesma combinação do docker (corpo + mãos por lado) e chama o
-``preview-modelo3d.py`` para gerar o SVG; com o cairosvg instalado, converte
-para PNG (o QA de visão lê PNG).
+Monta a mesma combinação do docker (corpo + as duas mãos, cada uma com a
+própria pose) e chama o ``preview-modelo3d.py`` para gerar o SVG; com o
+cairosvg instalado, converte para PNG (o QA de visão lê PNG).
 
 Sem argumentos, renderiza o conjunto todo: cada pose de corpo e cada pose de
 mão combinada com o Idle (na direita e nas duas mãos). Para um caso só:
 
-    python3 scripts/preview-poses3d.py --corpo voa --maos segura --lado ambas
+    python3 scripts/preview-poses3d.py --corpo voa --mao-direita segura --mao-esquerda fechada
 
 Uso:
     python3 scripts/preview-poses3d.py [--saida-dir DIR] [--corpo NOME]
-        [--maos NOME] [--lado direita|esquerda|ambas] [--zoom N] [--yaw GRAUS]
+        [--mao-direita NOME] [--mao-esquerda NOME] [--zoom N] [--yaw GRAUS]
         [--so-svg]
 """
 
@@ -49,32 +49,30 @@ def _listar(pasta):
         return []
 
 
-def _montar(corpo, maos, lado):
-    ossos = {}
+def _montar(corpo, mao_direita, mao_esquerda):
+    return modelo3d.combinar_poses(
+        _ler(VIEWER3D_POSES_CORPO_DIR, corpo) if corpo else {},
+        _ler(VIEWER3D_POSES_MAOS_DIR, mao_direita) if mao_direita else {},
+        _ler(VIEWER3D_POSES_MAOS_DIR, mao_esquerda) if mao_esquerda else {},
+    )
+
+
+def _renderizar(corpo, mao_direita, mao_esquerda, saida_dir, zoom, yaw, pitch, so_svg):
+    partes = []
     if corpo:
-        ossos.update(_ler(VIEWER3D_POSES_CORPO_DIR, corpo))
-    if maos:
-        ossos.update(modelo3d.pose_maos_por_lado(_ler(VIEWER3D_POSES_MAOS_DIR, maos), lado))
-    return ossos
-
-
-def _renderizar(corpo, maos, lado, saida_dir, zoom, yaw, pitch, so_svg):
-    nome = "-".join(
-        parte
-        for parte in (
-            os.path.splitext(corpo)[0] if corpo else None,
-            os.path.splitext(maos)[0] if maos else None,
-            lado if maos else None,
-        )
-        if parte
-    ) or "repouso"
+        partes.append(os.path.splitext(corpo)[0])
+    if mao_direita:
+        partes.append(os.path.splitext(mao_direita)[0] + "-direita")
+    if mao_esquerda:
+        partes.append(os.path.splitext(mao_esquerda)[0] + "-esquerda")
+    nome = "-".join(partes) or "repouso"
     json_saida = os.path.join(saida_dir, nome + ".json")
     svg_saida = os.path.join(saida_dir, nome + ".svg")
     documento = {
         "formato": "hq_tools.pose3d",
         "versao": 1,
         "nome": nome,
-        "ossos": _montar(corpo, maos, lado),
+        "ossos": _montar(corpo, mao_direita, mao_esquerda),
     }
     with open(json_saida, "w", encoding="utf-8") as arquivo:
         json.dump(documento, arquivo, ensure_ascii=False)
@@ -108,9 +106,8 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--saida-dir", default="/tmp/poses-preview")
     parser.add_argument("--corpo", default=None)
-    parser.add_argument("--maos", default=None)
-    parser.add_argument("--lado", default=modelo3d.LADO_DIREITA,
-                        choices=modelo3d.LADOS)
+    parser.add_argument("--mao-direita", default=None)
+    parser.add_argument("--mao-esquerda", default=None)
     parser.add_argument("--zoom", type=float, default=1.0)
     parser.add_argument("--yaw", type=float, default=0.0)
     parser.add_argument("--pitch", type=float, default=-10.0)
@@ -118,18 +115,20 @@ def main(argv=None):
     opcoes = parser.parse_args(argv)
 
     os.makedirs(opcoes.saida_dir, exist_ok=True)
-    if opcoes.corpo or opcoes.maos:
-        _renderizar(opcoes.corpo, opcoes.maos, opcoes.lado, opcoes.saida_dir,
-                    opcoes.zoom, opcoes.yaw, opcoes.pitch, opcoes.so_svg)
+    if opcoes.corpo or opcoes.mao_direita or opcoes.mao_esquerda:
+        _renderizar(opcoes.corpo, opcoes.mao_direita, opcoes.mao_esquerda,
+                    opcoes.saida_dir, opcoes.zoom, opcoes.yaw, opcoes.pitch,
+                    opcoes.so_svg)
         return 0
 
     for corpo in _listar(VIEWER3D_POSES_CORPO_DIR):
-        _renderizar(corpo, None, opcoes.lado, opcoes.saida_dir, opcoes.zoom,
+        _renderizar(corpo, None, None, opcoes.saida_dir, opcoes.zoom,
                     opcoes.yaw, opcoes.pitch, opcoes.so_svg)
     for maos in _listar(VIEWER3D_POSES_MAOS_DIR):
-        for lado in (modelo3d.LADO_DIREITA, modelo3d.LADO_AMBAS):
-            _renderizar("idle.json", maos, lado, opcoes.saida_dir, opcoes.zoom,
-                        opcoes.yaw, opcoes.pitch, opcoes.so_svg)
+        _renderizar("idle.json", maos, None, opcoes.saida_dir, opcoes.zoom,
+                    opcoes.yaw, opcoes.pitch, opcoes.so_svg)
+        _renderizar("idle.json", maos, maos, opcoes.saida_dir, opcoes.zoom,
+                    opcoes.yaw, opcoes.pitch, opcoes.so_svg)
     return 0
 
 

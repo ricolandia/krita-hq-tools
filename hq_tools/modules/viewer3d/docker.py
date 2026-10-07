@@ -336,10 +336,10 @@ class Viewer3DDocker(DockWidget):
         self.regiao = None
         self.semantica = {}
         self.pose_corpo = VIEWER3D_POSE_CORPO_PADRAO
-        self.pose_maos = VIEWER3D_POSE_MAOS_PADRAO
-        # Padrão "ambas": o Idle de trabalho fica com as duas mãos fechadas,
-        # como antes da separação; o seletor troca para um lado só.
-        self.lado_mao = modelo3d.LADO_AMBAS
+        # Padrão: as duas mãos fechadas, como antes da separação; cada mão
+        # tem a própria caixa de pose.
+        self.pose_mao_direita = VIEWER3D_POSE_MAOS_PADRAO
+        self.pose_mao_esquerda = VIEWER3D_POSE_MAOS_PADRAO
         self.modo_mover = False
         self.modo_fixado = False
         self.camera = {
@@ -421,22 +421,19 @@ class Viewer3DDocker(DockWidget):
         corpo_row.addWidget(self.cmb_pose_corpo, 1)
         layout.addLayout(corpo_row)
 
-        maos_row = widgets.QHBoxLayout()
-        maos_row.addWidget(ui.rotulo(i18n.t('Mãos:')))
-        self.cmb_pose_maos = widgets.QComboBox()
-        self.cmb_pose_maos.currentIndexChanged.connect(self._mudar_pose_maos)
-        maos_row.addWidget(self.cmb_pose_maos, 1)
-        layout.addLayout(maos_row)
+        mao_direita_row = widgets.QHBoxLayout()
+        mao_direita_row.addWidget(ui.rotulo(i18n.t('Mão direita:')))
+        self.cmb_mao_direita = widgets.QComboBox()
+        self.cmb_mao_direita.currentIndexChanged.connect(self._mudar_mao_direita)
+        mao_direita_row.addWidget(self.cmb_mao_direita, 1)
+        layout.addLayout(mao_direita_row)
 
-        lado_row = widgets.QHBoxLayout()
-        lado_row.addWidget(ui.rotulo(i18n.t('Mão:')))
-        self.cmb_lado = widgets.QComboBox()
-        self.cmb_lado.addItem(i18n.t('Direita'), modelo3d.LADO_DIREITA)
-        self.cmb_lado.addItem(i18n.t('Esquerda'), modelo3d.LADO_ESQUERDA)
-        self.cmb_lado.addItem(i18n.t('Ambas'), modelo3d.LADO_AMBAS)
-        self.cmb_lado.currentIndexChanged.connect(self._mudar_lado_mao)
-        lado_row.addWidget(self.cmb_lado, 1)
-        layout.addLayout(lado_row)
+        mao_esquerda_row = widgets.QHBoxLayout()
+        mao_esquerda_row.addWidget(ui.rotulo(i18n.t('Mão esquerda:')))
+        self.cmb_mao_esquerda = widgets.QComboBox()
+        self.cmb_mao_esquerda.currentIndexChanged.connect(self._mudar_mao_esquerda)
+        mao_esquerda_row.addWidget(self.cmb_mao_esquerda, 1)
+        layout.addLayout(mao_esquerda_row)
 
         self.grupo_juntas = widgets.QGroupBox(i18n.t('Juntas'))
         self.juntas_layout = ui.espacamento(
@@ -613,7 +610,10 @@ class Viewer3DDocker(DockWidget):
             self.cmb_pose_corpo, VIEWER3D_POSES_CORPO_DIR, self.pose_corpo
         )
         self._popular_combo(
-            self.cmb_pose_maos, VIEWER3D_POSES_MAOS_DIR, self.pose_maos
+            self.cmb_mao_direita, VIEWER3D_POSES_MAOS_DIR, self.pose_mao_direita
+        )
+        self._popular_combo(
+            self.cmb_mao_esquerda, VIEWER3D_POSES_MAOS_DIR, self.pose_mao_esquerda
         )
 
     def _popular_combo(self, combo, pasta, atual):
@@ -640,8 +640,8 @@ class Viewer3DDocker(DockWidget):
     def _sincronizar_combos(self):
         for combo, atual in (
             (self.cmb_pose_corpo, self.pose_corpo),
-            (self.cmb_pose_maos, self.pose_maos),
-            (self.cmb_lado, self.lado_mao),
+            (self.cmb_mao_direita, self.pose_mao_direita),
+            (self.cmb_mao_esquerda, self.pose_mao_esquerda),
         ):
             indice = combo.findData(atual)
             combo.blockSignals(True)
@@ -668,12 +668,12 @@ class Viewer3DDocker(DockWidget):
         self.pose_corpo = self.cmb_pose_corpo.itemData(indice)
         self._aplicar_poses()
 
-    def _mudar_pose_maos(self, indice):
-        self.pose_maos = self.cmb_pose_maos.itemData(indice)
+    def _mudar_mao_direita(self, indice):
+        self.pose_mao_direita = self.cmb_mao_direita.itemData(indice)
         self._aplicar_poses()
 
-    def _mudar_lado_mao(self, indice):
-        self.lado_mao = self.cmb_lado.itemData(indice) or modelo3d.LADO_DIREITA
+    def _mudar_mao_esquerda(self, indice):
+        self.pose_mao_esquerda = self.cmb_mao_esquerda.itemData(indice)
         self._aplicar_poses()
 
     def _mudar_camera(self, indice):
@@ -695,14 +695,11 @@ class Viewer3DDocker(DockWidget):
         self.cmb_lente.setEnabled(self.perspectiva)
 
     def _aplicar_poses(self):
-        """Combina corpo e mãos (as mãos por cima) e redesenha."""
+        """Combina corpo e mãos (cada mão por cima) e redesenha."""
         corpo = self._ler_pose(VIEWER3D_POSES_CORPO_DIR, self.pose_corpo)
-        maos = modelo3d.pose_maos_por_lado(
-            self._ler_pose(VIEWER3D_POSES_MAOS_DIR, self.pose_maos), self.lado_mao
-        )
-        self.semantica = {osso: dict(valores) for osso, valores in corpo.items()}
-        for osso, valores in maos.items():
-            self.semantica[osso] = dict(valores)
+        direita = self._ler_pose(VIEWER3D_POSES_MAOS_DIR, self.pose_mao_direita)
+        esquerda = self._ler_pose(VIEWER3D_POSES_MAOS_DIR, self.pose_mao_esquerda)
+        self.semantica = modelo3d.combinar_poses(corpo, direita, esquerda)
         self._montar_sliders()
         self.agendar_render()
 
@@ -996,8 +993,8 @@ class Viewer3DDocker(DockWidget):
     def limpar_pose(self):
         """Volta ao padrão: Idle + Fechadas, nas duas mãos."""
         self.pose_corpo = VIEWER3D_POSE_CORPO_PADRAO
-        self.pose_maos = VIEWER3D_POSE_MAOS_PADRAO
-        self.lado_mao = modelo3d.LADO_AMBAS
+        self.pose_mao_direita = VIEWER3D_POSE_MAOS_PADRAO
+        self.pose_mao_esquerda = VIEWER3D_POSE_MAOS_PADRAO
         self._sincronizar_combos()
         self._aplicar_poses()
 

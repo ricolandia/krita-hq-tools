@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.14.0] — 2026-10-07
+
+Pose de mãos por lado no visualizador 3D: cada mão ganhou a própria caixa de
+pose. Antes havia uma pose só com o seletor direita/esquerda/ambas, que
+devolvia a outra mão ao repouso quando a pose do corpo mudava e não deixava
+manter poses diferentes por mão.
+
+**English:** per-hand poses in the 3D viewer: each hand now has its own pose
+box. Before there was a single pose with a right/left/both selector, which
+sent the other hand back to rest whenever the body pose changed and made it
+impossible to keep different poses per hand.
+
+### Visualizador 3D
+
+- "Mão direita" e "Mão esquerda" com caixas independentes, aplicadas por cima
+  da pose do corpo; o padrão segue fechada nas duas (como antes).
+- `modelo3d.combinar_poses` centraliza a combinação (corpo + as duas mãos, a
+  esquerda espelhada) e ganhou testes.
+
 ## [0.13.1] — 2026-10-07
 
 Correção da inserção posicionada: em páginas de 300 dpi a arte caía muito

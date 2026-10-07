@@ -217,6 +217,23 @@ def pose_maos_por_lado(valores, lado):
     return direita
 
 
+def combinar_poses(corpo, mao_direita, mao_esquerda):
+    """Corpo + mãos (cada mão por cima, a esquerda espelhada).
+
+    As poses de corpo não têm ossos de mão: sem esta combinação os dedos
+    ficam no repouso. Cada mão é independente (uma pode vir vazia) e a
+    esquerda recebe a versão espelhada da pose autoral da direita.
+    """
+    resultado = {osso: dict(valores) for osso, valores in (corpo or {}).items()}
+    for valores, lado in (
+        (mao_direita, LADO_DIREITA),
+        (mao_esquerda, LADO_ESQUERDA),
+    ):
+        for osso, junta in pose_maos_por_lado(valores, lado).items():
+            resultado[osso] = dict(junta)
+    return resultado
+
+
 EIXOS = {"x": 0, "y": 1, "z": 2}
 
 

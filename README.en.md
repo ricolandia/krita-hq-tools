@@ -37,7 +37,7 @@ overview.
 
 | Perspective library | Hub and 3D in Krita |
 |---|---|
-| ![Perspective docker with the grid gallery, the enlarged preview and the insert-into-selection buttons](Screenshots/11-perspectiva.png) | ![Krita with the hub (modules grouped by dividers) and the 3D docker open, with the pose selectors (Body: Run, Hands: Closed, Hand: Right) and the mannequin already inserted into a page](Screenshots/12-hub-e-3d.png) |
+| ![Perspective docker with the grid gallery, the enlarged preview and the insert-into-selection buttons](Screenshots/11-perspectiva.png) | ![Krita with the hub (modules grouped by dividers) and the 3D docker open, with the pose selectors (Body: Run, Right hand: Closed, Left hand: Closed) and the mannequin already inserted into a page](Screenshots/12-hub-e-3d.png) |
 
 | Moodboard |
 |---|

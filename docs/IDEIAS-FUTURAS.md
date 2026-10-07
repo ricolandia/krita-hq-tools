@@ -39,6 +39,10 @@ a da nota do roadmap no Trilium.
 - **v0.12.2 (06/10, publicada):** hub com divisores (agrupamento por fluxo:
   Páginas/Produção, Moodboard/Biblioteca, Perspectiva/3D, Paletas/Pincéis,
   Retículas/Balões e Onomatopeias), sem strings novas.
+- **v0.14 (07/10):** pose de mãos por lado (caixas independentes "Mão
+  direita" e "Mão esquerda", aplicadas por cima da pose do corpo, padrão
+  fechada nas duas), com `modelo3d.combinar_poses` e validação dentro do
+  Krita.
 - **Fora do roadmap original:** camada de UI compartilhada (52 botões), ícone
   e social preview, vídeos demo no YouTube com roteiros de captura, CI no
   Windows, automação de release (tag → ZIP + notas do CHANGELOG), duas
@@ -101,11 +105,6 @@ inserida num painel dentro de uma seleção. Decisões e achados:
 9. **Exportação de páginas (amadurecer, adiada em 05/10):** diálogo com cor
    (RGB/CMYK + perfil), resolução (72/96/150/300), saída (pasta de imagens ou
    PDF único) e presets web/impressão; especificação abaixo.
-10. **Pose de mãos por lado:** hoje há uma única pose de mão, com o seletor
-    direita/esquerda/ambas; com ele num lado, mudar a pose do corpo devolve a
-    outra mão ao repouso e não dá para manter poses diferentes por mão.
-    Plano aprovado: duas caixas independentes (mão direita e mão esquerda),
-    aplicadas por cima da pose do corpo, com o padrão fechada nas duas.
 
 **Fora de escopo (mantido):** exportação webtoon (Batch Exporter cobre),
 preflight de impressão (Scribus), rotas B/C do 3D (Blender Layer e pose

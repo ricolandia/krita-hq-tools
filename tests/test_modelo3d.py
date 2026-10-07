@@ -303,6 +303,48 @@ class TestEspelhoDePose(unittest.TestCase):
             {"hand.r": {"girar": 10.0}, "hand.l": {"girar": -10.0}},
         )
 
+    def test_combinar_poses_corpo_com_as_duas_maos(self):
+        corpo = {"spine_01.x": {"dobrar": 5.0}, "arm_stretch.r": {"dobrar": 10.0}}
+        direita = {"hand.r": {"dobrar": 20.0}, "index1.r": {"dobrar": 30.0}}
+        esquerda = {"hand.r": {"girar": 15.0}}
+        combinado = modelo3d.combinar_poses(corpo, direita, esquerda)
+        self.assertEqual(combinado["spine_01.x"], {"dobrar": 5.0})
+        self.assertEqual(combinado["arm_stretch.r"], {"dobrar": 10.0})
+        self.assertEqual(combinado["hand.r"], {"dobrar": 20.0})
+        self.assertEqual(combinado["index1.r"], {"dobrar": 30.0})
+        self.assertEqual(combinado["hand.l"], {"girar": -15.0})
+
+    def test_combinar_poses_mao_vazia_nao_mexe_na_outra(self):
+        # Regressão: mudar a pose do corpo não pode devolver a mão ao repouso
+        # (as poses de corpo não têm ossos de mão).
+        corpo = {"arm_stretch.l": {"dobrar": 7.0}}
+        direita = {"hand.r": {"dobrar": 20.0}}
+        combinado = modelo3d.combinar_poses(corpo, direita, None)
+        self.assertEqual(combinado["hand.r"], {"dobrar": 20.0})
+        self.assertNotIn("hand.l", combinado)
+        self.assertEqual(combinado["arm_stretch.l"], {"dobrar": 7.0})
+        self.assertEqual(
+            modelo3d.combinar_poses(corpo, direita, None),
+            modelo3d.combinar_poses(corpo, direita, {}),
+        )
+
+    def test_combinar_poses_com_arquivos_do_repositorio(self):
+        pasta = os.path.join(
+            RAIZ, "hq_tools", "modules", "viewer3d", "poses", "maos"
+        )
+        direita = modelo3d.carregar_pose(os.path.join(pasta, "joinha.json"))["ossos"]
+        esquerda = modelo3d.carregar_pose(os.path.join(pasta, "fechada.json"))["ossos"]
+        combinado = modelo3d.combinar_poses({}, direita, esquerda)
+        self.assertIn("index1.r", combinado)
+        self.assertIn("hand.l", combinado)
+        self.assertNotIn("hand.r", combinado)
+        self.assertEqual(
+            combinado["hand.l"],
+            modelo3d.pose_maos_por_lado(
+                esquerda, modelo3d.LADO_ESQUERDA
+            )["hand.l"],
+        )
+
     def test_poses_de_mao_do_repositorio_sao_da_direita(self):
         pasta = os.path.join(
             RAIZ, "hq_tools", "modules", "viewer3d", "poses", "maos"
