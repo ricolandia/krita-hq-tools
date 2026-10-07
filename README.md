@@ -184,6 +184,11 @@ resto usa inglês; a variável de ambiente `HQ_TOOLS_IDIOMA=pt|en` força um
 idioma. O manual e o guia de instalação têm versões em inglês
 (`hq_tools_manual.en.html`, `INSTALL.en.md`).
 
+## Comunidade
+
+- **Discussões** (dúvidas, ideias e mostras do que você faz): https://github.com/ricolandia/krita-hq-tools/discussions
+- **Issues** (bugs e pedidos): https://github.com/ricolandia/krita-hq-tools/issues
+
 ## Licença
 
 MIT. Usa recursos nativos do Krita: gerador Screentone e filtro Halftone

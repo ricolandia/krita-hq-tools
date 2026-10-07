@@ -44,7 +44,10 @@ remoção, não poste (e não esconda).
 7. **Discord da comunidade Krita** (o servidor do Rakurri, citado no
    próprio fórum como o lugar alternativo para plugins "com IA"): pedir
    convite e postar no canal de plugins.
-8. **GitHub**: topics do repositório (ver "Pendências") e a descrição.
+8. **GitHub**: topics do repositório (ver "Pendências"), a descrição e o
+   **Discussions** (aberto em 07/10: Q&A, Ideas, Show and tell e General,
+   com post de boas-vindas bilíngue, descrições bilíngues das categorias e
+   dois tópicos iniciais; linkado nos READMEs PT/EN).
 9. **YouTube**: descrição dos demos com links e capítulos.
 
 ### B. Comunidades de quadrinhos
@@ -148,6 +151,24 @@ Thanks for your time,
 Ricardo Graça
 ```
 
+### GitHub Discussions (post de boas-vindas e tópicos)
+
+Publicados em 07/10 (textos bilíngues, PT em cima e EN embaixo, como nos
+READMEs):
+
+- **Boas-vindas** (Announcements, fixado):
+  https://github.com/ricolandia/krita-hq-tools/discussions/1 — o que vai em
+  cada categoria (Q&A, Ideas, Show and tell, Announcements; bug é Issue),
+  links úteis, regras rápidas e o convite para se apresentar nos comentários.
+- **Mostre sua página / Show your page** (Show and tell):
+  https://github.com/ricolandia/krita-hq-tools/discussions/2
+- **Qual seu fluxo no Krita? / What's your Krita workflow?** (General):
+  https://github.com/ricolandia/krita-hq-tools/discussions/3
+
+Convenção: cada um escreve no seu idioma e o autor responde no idioma da
+pergunta; as categorias ficam com os nomes padrão do GitHub e descrições
+bilíngues.
+
 ## Pendências
 
 - **Topics do repositório**: **feitos** em 06/10 (11 topics aplicados via
@@ -217,6 +238,7 @@ fork e apontar o remoto).
 
 | Data | Canal | O que foi | Retorno |
 |---|---|---|---|
+| 07/10/2026 | GitHub Discussions | Post de boas-vindas bilíngue (fixado), descrições bilíngues das categorias e 2 tópicos iniciais (#2 Mostre sua página, #3 Fluxo no Krita); link nos READMEs | aberto, sem respostas ainda |
 | 06/10/2026 | LibreArts | Email de pauta enviado (assunto e corpo na seção "Textos prontos") | aguardando resposta |
 | 04/10/2026 | Fediverse (pubkit) | Post PT do blog (`hq-tools-krita`) no bolha.us e ursal.zone | publicado; o mastodon.social (EN) não recebeu |
 | 06/10/2026 | GitHub (topics) | 11 topics aplicados no repositório (via `gh`) | descoberta/SEO na busca do GitHub |
