@@ -39,8 +39,8 @@ a da nota do roadmap no Trilium.
 - **v0.12.2 (06/10, publicada):** hub com divisores (agrupamento por fluxo:
   Páginas/Produção, Moodboard/Biblioteca, Perspectiva/3D, Paletas/Pincéis,
   Retículas/Balões e Onomatopeias), sem strings novas.
-- **v0.14 (07/10):** pose de mãos por lado (caixas independentes "Mão
-  direita" e "Mão esquerda", aplicadas por cima da pose do corpo, padrão
+- **v0.14 (07/10, publicada):** pose de mãos por lado (caixas independentes
+  "Mão direita" e "Mão esquerda", aplicadas por cima da pose do corpo, padrão
   fechada nas duas), com `modelo3d.combinar_poses` e validação dentro do
   Krita.
 - **Fora do roadmap original:** camada de UI compartilhada (52 botões), ícone
