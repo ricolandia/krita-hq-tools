@@ -406,9 +406,13 @@ class BibliotecaDocker(DockWidget):
             return
         path = item.data(USER_ROLE)
         if path.lower().endswith(".png"):
-            self._insert_paint(document, path, item.text())
+            helpers.run_in_macro(
+                document, lambda: self._insert_paint(document, path, item.text())
+            )
         else:
-            self._insert_vector(document, path, item.text())
+            helpers.run_in_macro(
+                document, lambda: self._insert_vector(document, path, item.text())
+            )
 
     def _recurso_selecionado(self):
         item = self.list_items.currentItem()

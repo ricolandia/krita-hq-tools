@@ -23,7 +23,6 @@ import argparse
 import ast
 import os
 import pathlib
-import sys
 
 RAIZ_PADRAO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 

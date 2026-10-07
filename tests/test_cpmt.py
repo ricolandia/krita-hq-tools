@@ -70,15 +70,13 @@ class TestCPMTProject(unittest.TestCase):
     def test_create_project_recusa_pasta_que_ja_e_projeto(self):
         # Sobrescrever o comicConfig.json apagava a lista de páginas, a ordem
         # e o UUID do projeto, sem perguntar nada.
-        antes = open(
-            os.path.join(self.root, "comicConfig.json"), "rb"
-        ).read()
+        with open(os.path.join(self.root, "comicConfig.json"), "rb") as arquivo:
+            antes = arquivo.read()
         with self.assertRaises(CPMTError) as contexto:
             create_project_with_page(self.root, "pagina_999.kra", "outro")
         self.assertIn("já tem um projeto", str(contexto.exception))
-        depois = open(
-            os.path.join(self.root, "comicConfig.json"), "rb"
-        ).read()
+        with open(os.path.join(self.root, "comicConfig.json"), "rb") as arquivo:
+            depois = arquivo.read()
         self.assertEqual(antes, depois)
         self.assertEqual(CPMTProject(self.root).page_relatives(), [])
 

@@ -1197,32 +1197,36 @@ class Viewer3DDocker(DockWidget):
         x, y, largura, altura = selecao
         ativo = documento.activeNode()
         nome_ativo = ativo.name() if ativo is not None else None
-        svg = self._render_svg(largura, altura, com_fundo=False)
-        imagem = self._rasterizar(svg, largura, altura)
-        # O device RGBA 8 bits do Krita guarda os canais em BGRA (documentação
-        # do libkis: "Integer RGBA: Blue, Green, Red, Alpha"); o Format_ARGB32
-        # do Qt é BGRA em memória, então os bytes batem com o setPixelData.
-        # Com RGBA8888 o vermelho e o azul saíam trocados (azul virava bege).
-        rgba = imagem.convertToFormat(IMAGE_FORMAT_ARGB32)
-        dados = bytes(rgba.constBits().asstring(rgba.sizeInBytes()))
-        nome = helpers.unique_layer_name(documento, "3D")
-        camada = documento.createNode(nome, "paintlayer")
-        if camada is None or not camada.setPixelData(dados, x, y, largura, altura):
-            helpers.show_info(i18n.t('3D'), i18n.t('Não foi possível criar a camada.'))
-            return
-        helpers.attach_below_active(documento, camada)
-        if referencia:
-            camada.setColorLabel(1)
-            camada.setLocked(True)
-            camada.setOpacity(150)
-        documento.setActiveNode(camada)
-        helpers.deselect(documento)
-        documento.refreshProjection()
-        self._sincronizar_flutuante()
-        helpers.show_message(
-            i18n.t("Camada '{0}' inserida abaixo de '{1}'{2}; seleção desfeita.").format(
-                nome,
-                nome_ativo or "camada ativa",
-                " como referência" if referencia else "",
+
+        def _inserir_agora():
+            svg = self._render_svg(largura, altura, com_fundo=False)
+            imagem = self._rasterizar(svg, largura, altura)
+            # O device RGBA 8 bits do Krita guarda os canais em BGRA (documentação
+            # do libkis: "Integer RGBA: Blue, Green, Red, Alpha"); o Format_ARGB32
+            # do Qt é BGRA em memória, então os bytes batem com o setPixelData.
+            # Com RGBA8888 o vermelho e o azul saíam trocados (azul virava bege).
+            rgba = imagem.convertToFormat(IMAGE_FORMAT_ARGB32)
+            dados = bytes(rgba.constBits().asstring(rgba.sizeInBytes()))
+            nome = helpers.unique_layer_name(documento, "3D")
+            camada = documento.createNode(nome, "paintlayer")
+            if camada is None or not camada.setPixelData(dados, x, y, largura, altura):
+                helpers.show_info(i18n.t('3D'), i18n.t('Não foi possível criar a camada.'))
+                return
+            helpers.attach_below_active(documento, camada)
+            if referencia:
+                camada.setColorLabel(1)
+                camada.setLocked(True)
+                camada.setOpacity(150)
+            documento.setActiveNode(camada)
+            helpers.deselect(documento)
+            documento.refreshProjection()
+            self._sincronizar_flutuante()
+            helpers.show_message(
+                i18n.t("Camada '{0}' inserida abaixo de '{1}'{2}; seleção desfeita.").format(
+                    nome,
+                    nome_ativo or "camada ativa",
+                    " como referência" if referencia else "",
+                )
             )
-        )
+
+        helpers.run_in_macro(documento, _inserir_agora)

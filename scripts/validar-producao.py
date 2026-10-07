@@ -110,7 +110,8 @@ def executar_smoke():
     caminho_md = os.path.join(BASE, "producao", "checklist.md")
     log("checklist.md existe: {0}".format(os.path.exists(caminho_md)))
     if os.path.exists(caminho_md):
-        linhas = open(caminho_md, encoding="utf-8").read().splitlines()
+        with open(caminho_md, encoding="utf-8") as arquivo:
+            linhas = arquivo.read().splitlines()
         log("md: {0!r}".format(linhas[2]))
         log("md: {0!r}".format(linhas[4]))
         log("md: {0!r}".format(linhas[6]))

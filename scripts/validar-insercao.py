@@ -166,6 +166,45 @@ def executar():
         _exportar(documento, "/tmp/insercao-e-png-centro.png")
     ))
 
+    # F) perspectiva com seleção a 300 dpi: a malha tem que cair na seleção.
+    # O SVG sem unidade é interpretado em pixels do documento pelo Krita
+    # (medido no harness em 07/10), então a seleção entra em pixels e a caixa
+    # dos shapes (em pontos) bate com a seleção convertida por 72/dpi.
+    from hq_tools.modules.perspectiva import linhas
+
+    _selecionar(documento, 200, 100, 900, 700)
+    svg = linhas.gerar("02-dois-pontos.svg", 900, 700, deslocamento=(200, 100))
+    camada_f = documento.createVectorLayer("perspectiva-selecao")
+    formas = camada_f.addShapesFromSvg(svg)
+    helpers.attach(documento, camada_f)
+    caixa = None
+    for forma in formas:
+        limite = forma.boundingBox()
+        caixa = limite if caixa is None else caixa.united(limite)
+    fator = 72.0 / 300.0
+    dentro = (
+        caixa is not None
+        and caixa.x() >= 200 * fator - 2.0
+        and caixa.y() >= 100 * fator - 2.0
+        and caixa.x() + caixa.width() <= (200 + 900) * fator + 2.0
+        and caixa.y() + caixa.height() <= (100 + 700) * fator + 2.0
+    )
+    preenche = caixa is not None and caixa.width() >= 900 * fator * 0.5
+    log(
+        "F) perspectiva 300dpi: shapes={0} caixa={1} esperado=({2:.1f},{3:.1f} "
+        "{4:.1f}x{5:.1f}) dentro={6} preenche={7}".format(
+            len(formas),
+            caixa,
+            200 * fator,
+            100 * fator,
+            900 * fator,
+            700 * fator,
+            dentro,
+            preenche,
+        )
+    )
+    helpers.deselect(documento)
+
     camadas = [no.name() for no in documento.rootNode().findChildNodes(recursive=False)]
     log("camadas: {0}".format(camadas))
 

@@ -3,8 +3,9 @@
 set -euo pipefail
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
-PYKRITA="${HOME}/.local/share/krita/pykrita"
-ACTIONS="${HOME}/.local/share/krita/actions"
+DATA="${XDG_DATA_HOME:-$HOME/.local/share}"
+PYKRITA="${DATA}/krita/pykrita"
+ACTIONS="${DATA}/krita/actions"
 
 mkdir -p "$PYKRITA" "$ACTIONS"
 

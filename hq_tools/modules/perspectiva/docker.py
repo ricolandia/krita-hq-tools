@@ -402,6 +402,9 @@ class PerspectivaDocker(DockWidget):
         x, y, largura, altura = selecao
         ativo = documento.activeNode()
         nome_ativo = ativo.name() if ativo is not None else None
+        # O SVG sem unidade é interpretado em pixels do documento pelo Krita
+        # (medido no harness em 07/10: 100 unidades = 24 pt a 300 dpi), então a
+        # seleção entra em pixels mesmo, sem conversão para pontos.
         svg = linhas.gerar(arquivo, largura, altura, deslocamento=(x, y))
         nome = helpers.unique_layer_name(documento, "Perspectiva")
 

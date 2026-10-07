@@ -247,15 +247,6 @@ def full_selection(document):
     return selection
 
 
-def selection_for_apply(document, use_active_selection=True):
-    """Devolve a seleção ativa quando pedida, ou uma seleção total."""
-    if use_active_selection:
-        selection = document.selection()
-        if selection is not None:
-            return selection
-    return full_selection(document)
-
-
 def target_container(document):
     """Resolve onde inserir uma camada nova a partir do nó ativo.
 

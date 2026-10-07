@@ -1,5 +1,19 @@
 # Changelog
 
+## [Não publicado]
+
+Auditoria de 2026-10-07 (3ª): correções de borda, sem mudança de interface. A
+inserção da biblioteca e do 3D entra em macro de desfazer (um Ctrl+Z desfaz a
+inserção inteira, como nos outros módulos); código morto e imports não usados
+saem; `install-dev.sh` respeita `XDG_DATA_HOME`; o smoke de inserção ganha o
+caso da perspectiva a 300 dpi.
+
+**English:** audit of 2026-10-07 (3rd): edge fixes with no UI change. Library
+and 3D insertion now run inside an undo macro (one Ctrl+Z undoes the whole
+insertion, like the other modules); dead code and unused imports removed;
+`install-dev.sh` respects `XDG_DATA_HOME`; the insertion smoke gains the 300
+dpi perspective case.
+
 ## [0.14.0] — 2026-10-07
 
 Pose de mãos por lado no visualizador 3D: cada mão ganhou a própria caixa de

@@ -13,7 +13,6 @@ PRESETS_REMOVIDOS, que serve de documentação do motivo.
 """
 
 import importlib.util
-import os
 import pathlib
 import struct
 import tempfile
