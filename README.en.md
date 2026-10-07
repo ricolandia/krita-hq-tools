@@ -193,3 +193,9 @@ have English versions (`hq_tools_manual.en.html`, `INSTALL.en.md`).
 MIT. Uses native Krita resources: the Screentone generator and the Halftone
 filter (Deif Lou) and the Comics Project Management Tools (Krita team). See
 `LICENSE`.
+
+## ☕ Support this project
+
+**🇧🇷 Pix:** `ricardograca@ricolandia.com`  
+**💳 PayPal:** [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ricolandia%40gmail.com&currency_code=BRL)  
+**🧡 GitHub Sponsors:** [github.com/sponsors/ricolandia](https://github.com/sponsors/ricolandia)

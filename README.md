@@ -190,3 +190,9 @@ idioma. O manual e o guia de instalação têm versões em inglês
 
 MIT. Usa recursos nativos do Krita: gerador Screentone e filtro Halftone
 (Deif Lou) e o Comics Project Management Tools (time do Krita). Ver `LICENSE`.
+
+## ☕ Apoie o projeto
+
+**🇧🇷 Pix:** `ricardograca@ricolandia.com`  
+**💳 PayPal:** [Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ricolandia%40gmail.com&currency_code=BRL)  
+**🧡 GitHub Sponsors:** [github.com/sponsors/ricolandia](https://github.com/sponsors/ricolandia)
