@@ -11,9 +11,6 @@ Krita 5.3.4 (AppImage, PyQt5) with preparation for Krita 6 (PyQt6). The
 project documentation is written in Portuguese; this file is the English
 overview.
 
-The four original context documents of the project are in `docs/contexto/`
-(Portuguese).
-
 ## Demo
 
 **Plugin update:** the video shows HQ Tools in action, from the hub to the comics tools (screentones, balloons, pages, brushes, 3D, perspective, moodboard and production).

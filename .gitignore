@@ -14,3 +14,7 @@ Novas_ideias/
 User_error/
 # Notas locais do projeto (a versão navegável é o espelho no Trilium)
 SESSION.md
+
+# Estrategia e notas de origem (nao versionar; espelho no Trilium quando houver)
+docs/DIVULGACAO.md
+docs/contexto/

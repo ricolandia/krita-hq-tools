@@ -10,9 +10,6 @@ visualizador 3D, biblioteca de perspectivas e um hub para abrir e fechar os
 módulos. Feito para o Krita 5.3.4 (AppImage, PyQt5) com preparação para o
 Krita 6 (PyQt6).
 
-Os quatro documentos originais de contexto do projeto estão em
-`docs/contexto/`.
-
 ## Demo
 
 **Atualização do plugin:** o vídeo mostra o HQ Tools em uso, do hub às ferramentas de quadrinhos (retículas, balões, páginas, pincéis, 3D, perspectiva, moodboard e produção).
