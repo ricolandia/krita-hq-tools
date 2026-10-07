@@ -252,8 +252,13 @@ class BalloonsDocker(DockWidget):
                 i18n.t('O SVG não gerou formas. Verifique o arquivo (use formas e texto).')
             )
             return
+        tinha_selecao = helpers.has_selection(document)
         helpers.attach(document, layer)
         document.setActiveNode(layer)
+        helpers.posicionar_vetor(document, layer)
+        document.refreshProjection()
+        if tinha_selecao:
+            helpers.deselect(document)
         self.config.set(
             "balloons.insert_as_text_layer", self.chk_text_layer.isChecked()
         )

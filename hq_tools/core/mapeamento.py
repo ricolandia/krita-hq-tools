@@ -101,6 +101,38 @@ def retangulo_para_imagem(retangulo, centro_widget, centro_imagem, zoom,
     return x0, y0, max(1, x1 - x0), max(1, y1 - y0)
 
 
+def centro_da_vista(centro_widget, centro_imagem, zoom,
+                    rotacao=0.0, pan=(0.0, 0.0), espelhado=False):
+    """Ponto da imagem que está no centro do widget (o que está na tela).
+
+    Serve para a inserção "onde você está olhando": o ponto devolvido é o
+    centro da vista atual, com pan, zoom, rotação e espelho aplicados.
+    """
+    return widget_para_imagem(
+        centro_widget, centro_widget, centro_imagem, zoom, rotacao, pan, espelhado
+    )
+
+
+def encaixe_central(caixa, largura, altura, ampliar=False):
+    """(x, y, escala) para a imagem caber centrada na caixa.
+
+    ``caixa`` é ``(x, y, largura, altura)``; sem ``ampliar``, a escala nunca
+    passa de 1 (a imagem só reduz), como pedido na inserção de balões,
+    onomatopeias e recursos da biblioteca.
+    """
+    x, y, largura_caixa, altura_caixa = caixa
+    if largura <= 0 or altura <= 0 or largura_caixa <= 0 or altura_caixa <= 0:
+        return (x, y, 1.0)
+    escala = min(float(largura_caixa) / largura, float(altura_caixa) / altura)
+    if not ampliar:
+        escala = min(1.0, escala)
+    return (
+        x + (largura_caixa - largura * escala) / 2.0,
+        y + (altura_caixa - altura * escala) / 2.0,
+        escala,
+    )
+
+
 def intersecao_com_documento(retangulo, largura, altura):
     """Parte visível do retângulo dentro do documento (pode ser vazia)."""
     x, y, w, h = retangulo

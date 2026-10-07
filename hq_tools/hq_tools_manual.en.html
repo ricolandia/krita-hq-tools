@@ -43,7 +43,10 @@ center (focus) instead of the percentage fields.</p>
 <p>Shows the SVG models from a folder (by default,
 <code>~/.local/share/krita/hq_tools/balloons</code>, with samples and public
 domain balloons on first run). Double-click to insert the balloon into the
-active group as a vector layer. You can draw your own balloons and save them
+active group as a vector layer. With an active selection, the balloon lands
+shrunk (never enlarged) and centered in it, and the selection is cleared;
+without a selection, it lands at the center of the current view instead of
+the document corner. You can draw your own balloons and save them
 into that folder. The "Krita symbols" button opens Krita's native docker for
 the installed libraries, and "Install comic fonts" installs the included fonts
 (12 OFL families: Bangers, Comic Relief, Patrick Hand, Comic Neue, Londrina
@@ -53,7 +56,9 @@ credits in CREDITS.en.md).</p>
 <h2>Sound effects</h2>
 <p>Catalog of sound effects (8 samples) in
 <code>~/.local/share/krita/hq_tools/onomatopeias</code>. Double-click to
-insert as a vector layer into the active group; draw your own models in
+insert as a vector layer into the active group (with a selection, it lands
+shrunk and centered in it, clearing the selection; without one, at the center
+of the view); draw your own models in
 Inkscape and save them as SVG in the folder.</p>
 
 <h2>Project library</h2>
@@ -62,7 +67,9 @@ layer type (Vector or Paint) and "Create new resource" opens a 15 x 15 cm
 square document at 300 dpi. Vector: draw with shapes and text and save as SVG.
 Paint: draw with a brush and save as a transparent PNG, trimmed by the active
 layer. The resource shows up in the list and is inserted into the active group
-with a double-click (PNG becomes a paint layer). The library folder can be
+with a double-click (PNG becomes a paint layer, also shrunk and positioned:
+in the active selection or at the center of the view, clearing the selection).
+The library folder can be
 changed; when you create a project through the manager, the library lives in
 the <code>biblioteca</code> subfolder of the project folder. Rename, Duplicate
 and Delete act on the selected resource; delete asks for confirmation.</p>

@@ -138,5 +138,49 @@ class TestRetanguloParaImagem(unittest.TestCase):
         )
 
 
+class TestCentroDaVista(unittest.TestCase):
+    def test_sem_deslocamento_e_o_centro_da_imagem(self):
+        centro = mapeamento.centro_da_vista((100.0, 100.0), (500.0, 400.0), 2.0)
+        self.assertAlmostEqual(centro[0], 500.0, places=6)
+        self.assertAlmostEqual(centro[1], 400.0, places=6)
+
+    def test_pan_desloca_o_centro(self):
+        centro = mapeamento.centro_da_vista(
+            (100.0, 100.0), (500.0, 400.0), 2.0, pan=(20.0, -10.0)
+        )
+        self.assertAlmostEqual(centro[0], 490.0, places=6)
+        self.assertAlmostEqual(centro[1], 405.0, places=6)
+
+    def test_rotacao_90(self):
+        centro = mapeamento.centro_da_vista(
+            (100.0, 100.0), (0.0, 0.0), 1.0, rotacao=90.0, pan=(10.0, 0.0)
+        )
+        self.assertAlmostEqual(centro[0], 0.0, places=6)
+        self.assertAlmostEqual(centro[1], 10.0, places=6)
+
+
+class TestEncaixeCentral(unittest.TestCase):
+    def test_centraliza_e_reduz(self):
+        x, y, escala = mapeamento.encaixe_central((100, 200, 400, 400), 800, 400)
+        self.assertAlmostEqual(escala, 0.5)
+        self.assertAlmostEqual(x, 100.0)
+        self.assertAlmostEqual(y, 200.0 + (400 - 200) / 2.0)
+
+    def test_sem_ampliar_por_padrao(self):
+        _, _, escala = mapeamento.encaixe_central((0, 0, 1000, 1000), 100, 100)
+        self.assertAlmostEqual(escala, 1.0)
+
+    def test_ampliar_quando_pedido(self):
+        _, _, escala = mapeamento.encaixe_central(
+            (0, 0, 1000, 1000), 100, 100, ampliar=True
+        )
+        self.assertAlmostEqual(escala, 10.0)
+
+    def test_caixa_invalida(self):
+        self.assertEqual(
+            mapeamento.encaixe_central((10, 20, 0, 100), 50, 50), (10, 20, 1.0)
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

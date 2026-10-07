@@ -483,8 +483,13 @@ class BibliotecaDocker(DockWidget):
         if not shapes:
             helpers.show_message(i18n.t('O SVG não gerou formas.'))
             return
+        tinha_selecao = helpers.has_selection(document)
         helpers.attach(document, layer)
         document.setActiveNode(layer)
+        helpers.posicionar_vetor(document, layer)
+        document.refreshProjection()
+        if tinha_selecao:
+            helpers.deselect(document)
         helpers.show_message(i18n.t('Recurso inserido: {0}').format(nome))
 
     def _insert_paint(self, document, path, nome):
@@ -498,13 +503,28 @@ class BibliotecaDocker(DockWidget):
         rgba = image.convertToFormat(IMAGE_FORMAT_ARGB32)
         width = rgba.width()
         height = rgba.height()
+        tinha_selecao = helpers.has_selection(document)
+        posicao_x, posicao_y, escala = helpers.destino_de_insercao(
+            document, width, height
+        )
+        if escala != 1.0:
+            rgba = rgba.scaled(
+                max(1, int(round(width * escala))),
+                max(1, int(round(height * escala))),
+                KEEP_ASPECT,
+                SMOOTH_TRANSFORMATION,
+            )
+            width = rgba.width()
+            height = rgba.height()
         name = helpers.unique_layer_name(document, nome)
         layer = document.createNode(name, "paintlayer")
         if layer is None:
             helpers.show_message(i18n.t('Não foi possível criar a camada de pintura.'))
             return
         data = _qimage_bytes(rgba)
-        if not layer.setPixelData(data, 0, 0, width, height):
+        if not layer.setPixelData(
+            data, int(round(posicao_x)), int(round(posicao_y)), width, height
+        ):
             file_layer = document.createFileLayer(
                 name, path, "ToImageSize", "Bilinear"
             )
@@ -516,4 +536,6 @@ class BibliotecaDocker(DockWidget):
         else:
             helpers.attach(document, layer)
             document.setActiveNode(layer)
+        if tinha_selecao:
+            helpers.deselect(document)
         helpers.show_message(i18n.t('Recurso inserido: {0}').format(nome))

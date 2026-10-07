@@ -1,5 +1,41 @@
 # Changelog
 
+## [0.13.0] — 2026-10-07
+
+A inserção de balões, onomatopeias e recursos da biblioteca passou a levar em
+conta onde você está: com uma seleção ativa, a arte entra reduzida (nunca
+ampliada) e centralizada nela, desfazendo a seleção; sem seleção, nasce no
+centro da vista atual, em vez do canto do documento. Também entrou a pose
+**Salto** no visualizador 3D.
+
+**English:** the insertion of balloons, sound effects and library resources
+now takes where you are into account: with an active selection the artwork
+lands shrunk (never enlarged) and centered in it, clearing the selection;
+without one, it lands at the center of the current view instead of the
+document corner. The **Salto** (jump) pose also joined the 3D viewer.
+
+### Inserção posicionada
+
+- Balões, onomatopeias e a biblioteca (SVG e PNG) usam `posicionar_vetor` e
+  `destino_de_insercao` (`core/krita_helpers.py`): seleção ou centro da vista
+  (a conta do centro reusa `parametros_do_canvas` e o mapeamento do
+  visualizador 3D), com o encaixe central em `core/mapeamento.py`
+  (`encaixe_central`, sem ampliar por padrão) e o moodboard passando a
+  delegar para ele.
+- O PNG da biblioteca é reduzido no próprio pixel data antes de entrar, então
+  o encaixe vale para pintura também.
+- Correção de "fantasma": a transformação dos shapes vetoriais agora repinta
+  a **união** da área antiga com a nova (`updateAbsolute`); sem isso a arte
+  ficava duplicada na posição original (achado no smoke `validar-insercao.py`,
+  que valida os cinco casos com conferência de pixels).
+
+### Visualizador 3D
+
+- Pose **Salto** (`poses/corpo/salto.json`, EN "Jump"), exportada do
+  `Pose_Pula_.fbx`; o `.blend` deu uma pose incompleta (20 ossos contra 27),
+  então a convenção ficou registrada: poses sempre do **FBX exportado pelo
+  autor**.
+
 ## [0.12.3] — 2026-10-06
 
 O ZIP de instalação voltou a funcionar no importador do Krita: o pacote agora

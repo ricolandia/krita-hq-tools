@@ -201,6 +201,11 @@ class OnomatopoeiasDocker(DockWidget):
                 i18n.t('O SVG não gerou formas. Verifique o arquivo (use texto e formas).')
             )
             return
+        tinha_selecao = helpers.has_selection(document)
         helpers.attach(document, layer)
         document.setActiveNode(layer)
+        helpers.posicionar_vetor(document, layer)
+        document.refreshProjection()
+        if tinha_selecao:
+            helpers.deselect(document)
         helpers.show_message(i18n.t('Onomatopeia inserida: {0}').format(item.text()))

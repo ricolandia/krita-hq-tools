@@ -14,6 +14,7 @@ ignorada no modo livre.
 import json
 import os
 
+from ...core import mapeamento
 from ..biblioteca.core import caminho_livre, slugify
 
 CELULA = 640
@@ -69,13 +70,8 @@ def altura_necessaria(total):
 
 def encaixe_em(x, y, largura_caixa, altura_caixa, largura, altura):
     """Posição e escala para a imagem caber centrada numa caixa (a seleção)."""
-    if largura <= 0 or altura <= 0 or largura_caixa <= 0 or altura_caixa <= 0:
-        return (x, y, 1.0)
-    escala = min(float(largura_caixa) / largura, float(altura_caixa) / altura)
-    return (
-        x + (largura_caixa - largura * escala) / 2.0,
-        y + (altura_caixa - altura * escala) / 2.0,
-        escala,
+    return mapeamento.encaixe_central(
+        (x, y, largura_caixa, altura_caixa), largura, altura, ampliar=True
     )
 
 

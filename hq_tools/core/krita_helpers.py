@@ -6,7 +6,7 @@ from krita import InfoObject, Krita, Selection
 
 from . import mapeamento
 from .camadas import ordem_com_no_abaixo
-from .compat import WAIT_CURSOR, QIcon, QtCore, QtWidgets
+from .compat import WAIT_CURSOR, QIcon, QtCore, QtGui, QtWidgets
 from .erros import escrever_erro
 
 
@@ -416,3 +416,95 @@ def parametros_do_canvas(documento, viewport):
     pan = pan_do_viewport(viewport)
     centro_widget = (viewport.width() / 2.0, viewport.height() / 2.0)
     return centro_widget, centro_imagem, zoom, rotacao, pan, espelhado
+
+
+def centro_da_vista(documento):
+    """Ponto (x, y) da imagem no centro da vista atual, ou None.
+
+    É o "onde você está olhando": a inserção de balões, onomatopeias e
+    recursos usa este ponto (em vez do canto do documento) quando não há
+    seleção, para a arte nascer no meio da tela mesmo com zoom.
+    """
+    if documento is None:
+        return None
+    view = active_view()
+    if view is None:
+        return None
+    viewport = viewport_da_view(view)
+    if viewport is None:
+        return None
+    parametros = parametros_do_canvas(documento, viewport)
+    if parametros is None:
+        return None
+    return mapeamento.centro_da_vista(*parametros)
+
+
+def destino_de_insercao(documento, largura, altura):
+    """(x, y, escala) de onde inserir uma arte de ``largura`` x ``altura``.
+
+    Com seleção, cabe nela reduzindo (nunca amplia) e fica centralizada;
+    sem seleção, mantém o tamanho natural e vai para o centro da vista.
+    """
+    caixa = selection_bounds(documento)
+    if caixa is not None:
+        return mapeamento.encaixe_central(caixa, largura, altura)
+    centro = centro_da_vista(documento)
+    if centro is None:
+        return (0.0, 0.0, 1.0)
+    return (centro[0] - largura / 2.0, centro[1] - altura / 2.0, 1.0)
+
+
+def posicionar_vetor(documento, camada):
+    """Posiciona a camada vetorial (seleção ou centro da vista).
+
+    Devolve True quando conseguiu posicionar; sem seleção e sem vista (ou
+    com um documento sem conteúdo), devolve False e a arte fica onde o SVG
+    a colocou (como antes).
+    """
+    try:
+        limites = camada.bounds()
+    except (AttributeError, RuntimeError):
+        return False
+    if limites is None or limites.isEmpty():
+        return False
+    destino_x, destino_y, escala = destino_de_insercao(
+        documento, limites.width(), limites.height()
+    )
+    return _transformar_vetor(camada, limites, escala, destino_x, destino_y)
+
+
+def _transformar_vetor(camada, limites, escala, destino_x, destino_y):
+    """Aplica escala e translação nos shapes do topo da camada vetorial.
+
+    A matriz global entra DEPOIS da transformação de cada shape
+    (``atual * global``: no Qt, ``X * Y`` aplica X primeiro), então a arte
+    inteira (inclusive grupos do SVG) anda e escala junto.
+    """
+    try:
+        shapes = camada.shapes()
+    except (AttributeError, RuntimeError):
+        return False
+    if not shapes:
+        return False
+    global_transform = QtGui.QTransform()
+    global_transform.translate(destino_x, destino_y)
+    global_transform.scale(escala, escala)
+    global_transform.translate(-limites.x(), -limites.y())
+    for shape in shapes:
+        try:
+            antigo = shape.boundingBox()
+            atual = shape.transformation()
+            shape.setTransformation(atual * global_transform)
+        except (AttributeError, RuntimeError, TypeError):
+            return False
+        try:
+            # Ao mover/escalar, o Krita precisa repintar a UNIÃO da área
+            # antiga com a nova; sem isso a arte fica "fantasma" na posição
+            # original (visto no smoke de 07/10).
+            shape.updateAbsolute(antigo.united(shape.boundingBox()))
+        except (AttributeError, RuntimeError, TypeError):
+            try:
+                shape.update()
+            except (AttributeError, RuntimeError):
+                pass
+    return True

@@ -45,7 +45,10 @@ como camada vetorial. Com uma seleção ativa, as linhas usam a área dela
 <p>Mostra os modelos SVG de uma pasta (por padrão,
 <code>~/.local/share/krita/hq_tools/balloons</code>, com amostras e balões de
 domínio público na primeira execução). Clique duas vezes para inserir o balão
-no grupo ativo como camada vetorial. Você pode desenhar seus próprios balões e
+no grupo ativo como camada vetorial. Com uma seleção ativa, o balão entra
+reduzido (nunca ampliado) e centralizado nela, e a seleção é desfeita; sem
+seleção, ele nasce no centro da vista atual, em vez do canto do documento.
+Você pode desenhar seus próprios balões e
 salvá-los nessa pasta. O botão "Símbolos do Krita" abre o docker nativo do
 Krita para as bibliotecas instaladas, e "Instalar fontes de HQ" instala as fontes inclusas (12 famílias OFL: Bangers,
 Comic Relief, Patrick Hand, Comic Neue, Londrina Solid/Shadow/Outline/Sketch,
@@ -54,7 +57,9 @@ Nanum Pen Script, Gaegu e Boogaloo, com créditos no CREDITS.md).</p>
 <h2>Onomatopeias</h2>
 <p>Catálogo de efeitos sonoros (8 amostras) em
 <code>~/.local/share/krita/hq_tools/onomatopeias</code>. Clique duas vezes para
-inserir como camada vetorial no grupo ativo; crie os seus modelos no Inkscape
+inserir como camada vetorial no grupo ativo (com seleção, entra reduzida e
+centralizada nela, desfazendo a seleção; sem seleção, no centro da vista);
+crie os seus modelos no Inkscape
 e salve como SVG na pasta.</p>
 
 <h2>Biblioteca do projeto</h2>
@@ -63,7 +68,9 @@ de camada (Vetorial ou Pintura) e "Criar novo recurso" abre um documento
 quadrado de 15 x 15 cm a 300 dpi. Vetorial: desenhe com formas e texto e
 salve como SVG. Pintura: desenhe com pincel e salve como PNG transparente,
 recortado pela camada ativa. O recurso aparece na lista e é inserido no grupo
-ativo com um duplo clique (PNG vira camada de pintura). A pasta da biblioteca
+ativo com um duplo clique (PNG vira camada de pintura, também reduzido e
+posicionado: na seleção ativa ou no centro da vista, desfazendo a seleção).
+A pasta da biblioteca
 pode ser trocada; ao criar um projeto pelo gerenciador, a biblioteca fica na
 subpasta <code>biblioteca</code> da pasta do projeto. Renomear, Duplicar e
 Apagar agem sobre o recurso selecionado; apagar pede confirmação.</p>
