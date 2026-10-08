@@ -1,6 +1,6 @@
 # Changelog
 
-## [Não publicado]
+## [0.17.1] — 2026-10-08
 
 Visualizador 3D: trocar a pose de uma mão não mexe mais no corpo (e vice-versa):
 cada seletor altera só a sua parte, preservando os ajustes feitos nos sliders;
