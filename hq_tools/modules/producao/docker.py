@@ -8,6 +8,7 @@ projeto; duplo clique abre a ``pagina_NNN.kra`` e o checklist sai em Markdown.
 """
 
 import os
+import time
 
 from krita import DockWidget, Krita
 
@@ -15,6 +16,7 @@ from ...core import i18n
 from ...core import krita_helpers as helpers
 from ...core import registro, ui
 from ...core.compat import (
+    ANTIALIASING,
     CONTEXT_MENU,
     CONTROL_MODIFIER,
     KEY_ENTER,
@@ -70,6 +72,50 @@ class _CaixaRoteiro(QtWidgets.QPlainTextEdit):
         super().keyPressEvent(evento)
 
 
+class _BarraEstados(QtWidgets.QWidget):
+    """Barra de progresso em três segmentos: final, arte e esboço."""
+
+    def __init__(self, pai=None):
+        super().__init__(pai)
+        self._contagem = {"final": 0, "arte": 0, "esboco": 0, "total": 0}
+        self.setMinimumHeight(16)
+
+    def set_contagem(self, contagem):
+        self._contagem = dict(contagem)
+        self.update()
+
+    def paintEvent(self, evento):
+        pintor = QtGui.QPainter(self)
+        pintor.setRenderHint(ANTIALIASING, True)
+        largura = float(self.width())
+        altura = float(self.height())
+        raio = 4.0
+        caminho = QtGui.QPainterPath()
+        caminho.addRoundedRect(QtCore.QRectF(0, 0, largura, altura), raio, raio)
+        pintor.setClipPath(caminho)
+        # fundo neutro: legível no tema claro e no escuro
+        pintor.setPen(QtGui.QColor(0, 0, 0, 0))
+        pintor.setBrush(QtGui.QColor(128, 128, 128, 60))
+        pintor.drawRect(QtCore.QRectF(0, 0, largura, altura))
+        total = max(0, int(self._contagem.get("total", 0)))
+        if total > 0:
+            x = 0.0
+            for estado in ("final", "arte", "esboco"):
+                fatia = largura * self._contagem.get(estado, 0) / float(total)
+                if fatia <= 0:
+                    continue
+                pintor.setBrush(QtGui.QColor(CORES[estado]))
+                pintor.drawRect(QtCore.QRectF(x, 0, fatia, altura))
+                x += fatia
+        pintor.setClipping(False)
+        pintor.setBrush(QtGui.QColor(0, 0, 0, 0))
+        pintor.setPen(QtGui.QPen(QtGui.QColor(128, 128, 128, 120), 1))
+        pintor.drawRoundedRect(
+            QtCore.QRectF(0.5, 0.5, largura - 1.0, altura - 1.0), raio, raio
+        )
+        pintor.end()
+
+
 class ProducaoDocker(DockWidget):
     def __init__(self):
         super().__init__()
@@ -78,7 +124,29 @@ class ProducaoDocker(DockWidget):
         self.config = Config()
         self.checklist = []
         self._carregando = False
+        self._pagina_pendente = None
+        self._icones_estado = {}
+        # Auto-save do roteiro: grava sozinho depois da última tecla e no
+        # fechamento da doca (o "Montar checklist" continua salvando também).
+        self._timer_roteiro = QtCore.QTimer(self)
+        self._timer_roteiro.setSingleShot(True)
+        self._timer_roteiro.setInterval(1500)
+        self._timer_roteiro.timeout.connect(self._salvar_roteiro_automatico)
+        # Timetracking manual: a sessão vive em memória (monotonic) e o
+        # acumulado vai para tempos.json na pausa e a cada minuto rodando.
+        self.tempos = {"total": 0, "por_pagina": {}}
+        self._sessao_inicio = None
+        self._sessao_pagina = None
+        self._sessao_pasta = None
+        self._ultimo_save = None
+        self._timer_tempo = QtCore.QTimer(self)
+        self._timer_tempo.setInterval(1000)
+        self._timer_tempo.timeout.connect(self._tick_tempo)
         self._build_ui()
+        try:
+            self.widget().destroyed.connect(self._salvar_ao_fechar)
+        except (AttributeError, TypeError):
+            pass
         self.recarregar()
 
     def canvasChanged(self, canvas):
@@ -175,6 +243,7 @@ class ProducaoDocker(DockWidget):
             i18n.t("Cole o roteiro aqui. Ctrl+Enter monta o checklist; 'Sintaxe...' mostra o formato.")
         )
         self.caixa.setMinimumHeight(140)
+        self.caixa.textChanged.connect(self._roteiro_editado)
         roteiro_layout.addWidget(self.caixa, 1)
         linha_botoes = widgets.QHBoxLayout()
         botao_montar = ui.botao(
@@ -196,6 +265,8 @@ class ProducaoDocker(DockWidget):
         botao_exportar.clicked.connect(self.exportar_markdown)
         linha_botoes.addWidget(botao_exportar)
         roteiro_layout.addLayout(linha_botoes)
+        self.lbl_roteiro_salvo = ui.rotulo_info("")
+        roteiro_layout.addWidget(self.lbl_roteiro_salvo)
         layout.addWidget(group_roteiro)
         layout.addWidget(ui.separador())
 
@@ -210,11 +281,37 @@ class ProducaoDocker(DockWidget):
         )
         self.arvore.setColumnWidth(0, 150)
         self.arvore.setColumnWidth(1, 90)
+        self.arvore.setIconSize(QtCore.QSize(12, 12))
         self.arvore.itemClicked.connect(self._item_clicado)
         self.arvore.itemDoubleClicked.connect(self._item_duplo_clique)
         self.arvore.setContextMenuPolicy(CONTEXT_MENU)
         self.arvore.customContextMenuRequested.connect(self._menu_contexto)
         checklist_layout.addWidget(self.arvore, 1)
+
+        linha_barra = widgets.QHBoxLayout()
+        self.barra = _BarraEstados()
+        linha_barra.addWidget(self.barra, 1)
+        checklist_layout.addLayout(linha_barra)
+        self.lbl_legenda = ui.rotulo("")
+        self.lbl_legenda.setText(" &nbsp; ".join(
+            '<span style="color:{0}">●</span> {1}'.format(
+                CORES[estado], self._rotulo_estado(estado)
+            )
+            for estado in ("final", "arte", "esboco")
+        ))
+        checklist_layout.addWidget(self.lbl_legenda)
+
+        linha_pendente = widgets.QHBoxLayout()
+        self.lbl_pendente = ui.rotulo_info("")
+        linha_pendente.addWidget(self.lbl_pendente, 1)
+        botao_pendente = ui.botao(
+            i18n.t('Abrir próxima pendente'),
+            i18n.t('Abre a primeira página com painel não final e a seleciona na lista.'),
+            icone_chave="abrir",
+        )
+        botao_pendente.clicked.connect(self.abrir_proxima_pendente)
+        linha_pendente.addWidget(botao_pendente)
+        checklist_layout.addLayout(linha_pendente)
 
         linha_meta = widgets.QHBoxLayout()
         linha_meta.addWidget(ui.rotulo(i18n.t('Meta semanal:')))
@@ -229,6 +326,17 @@ class ProducaoDocker(DockWidget):
 
         self.lbl_progresso = ui.rotulo_info("")
         checklist_layout.addWidget(self.lbl_progresso)
+
+        linha_tempo = widgets.QHBoxLayout()
+        self.btn_tempo = ui.botao(
+            i18n.t('Iniciar'),
+            i18n.t('Conta o tempo da produção (manual): inicia ou pausa a sessão.'),
+        )
+        self.btn_tempo.clicked.connect(self.alternar_tempo)
+        linha_tempo.addWidget(self.btn_tempo)
+        self.lbl_tempo = ui.rotulo_info("")
+        linha_tempo.addWidget(self.lbl_tempo, 1)
+        checklist_layout.addLayout(linha_tempo)
         layout.addWidget(group_checklist, 1)
 
         dica = ui.rotulo(
@@ -240,8 +348,43 @@ class ProducaoDocker(DockWidget):
 
     # ----------------------------------------------------------------- fluxo
 
+    def _roteiro_editado(self):
+        """Reinicia o relógio do auto-save e avisa que há texto novo."""
+        if self._carregando:
+            return
+        self.lbl_roteiro_salvo.setText(i18n.t('salvando…'))
+        self._timer_roteiro.start()
+
+    def _salvar_roteiro_automatico(self):
+        """Grava o roteiro.txt sem passar pelo "Montar checklist"."""
+        if self._carregando:
+            return
+        pasta = self.pasta_dados()
+        try:
+            os.makedirs(pasta, exist_ok=True)
+            prod.salvar_roteiro(pasta, self.caixa.toPlainText())
+        except OSError:
+            self.lbl_roteiro_salvo.setText(i18n.t('falha ao salvar'))
+            return
+        self.lbl_roteiro_salvo.setText(
+            i18n.t('salvo {0}').format(
+                QtCore.QTime.currentTime().toString("HH:mm")
+            )
+        )
+
+    def _salvar_ao_fechar(self):
+        """Última gravação ao fechar a doca (o widget pode já estar morto)."""
+        try:
+            self._timer_roteiro.stop()
+            self._parar_tempo()
+            self._salvar_roteiro_automatico()
+        except (AttributeError, RuntimeError):
+            pass
+
     def recarregar(self):
         """Relê o roteiro e o progresso da pasta e remonta a árvore."""
+        if self._sessao_inicio is not None:
+            self._parar_tempo()
         pasta = self.pasta_dados()
         try:
             os.makedirs(pasta, exist_ok=True)
@@ -257,6 +400,7 @@ class ProducaoDocker(DockWidget):
         self._carregando = True
         texto = prod.carregar_roteiro(pasta)
         estados, meta = prod.carregar(pasta)
+        self.tempos = prod.carregar_tempos(pasta)
         self.caixa.setPlainText(texto)
         self.meta.setValue(meta)
         self._carregando = False
@@ -266,6 +410,7 @@ class ProducaoDocker(DockWidget):
             self.checklist = []
             self._montar_arvore()
             self._atualizar_resumo()
+        self._atualizar_tempo()
 
     def montar(self):
         """Lê o texto, monta o checklist e salva o roteiro e os estados."""
@@ -283,6 +428,11 @@ class ProducaoDocker(DockWidget):
         except OSError as erro:
             helpers.show_info(i18n.t('Produção'), i18n.t('Falha ao salvar: {0}').format(erro))
             return
+        self.lbl_roteiro_salvo.setText(
+            i18n.t('salvo {0}').format(
+                QtCore.QTime.currentTime().toString("HH:mm")
+            )
+        )
         contagem = prod.progresso(self.checklist)
         helpers.show_message(
             i18n.t('Checklist montado: {0} página(s), {1} painel(éis).').format(
@@ -347,6 +497,25 @@ class ProducaoDocker(DockWidget):
 
     def _pintar_estado(self, item, estado):
         item.setForeground(1, QtGui.QBrush(QtGui.QColor(CORES.get(estado, "#8a8a8a"))))
+        item.setIcon(1, self._icone_estado(estado))
+
+    def _icone_estado(self, estado):
+        """Bolinha colorida do estado (cacheada por estado)."""
+        chave = estado if estado in CORES else "esboco"
+        if chave in self._icones_estado:
+            return self._icones_estado[chave]
+        tamanho = 12
+        pixmap = QtGui.QPixmap(tamanho, tamanho)
+        pixmap.fill(QtGui.QColor(0, 0, 0, 0))
+        pintor = QtGui.QPainter(pixmap)
+        pintor.setRenderHint(ANTIALIASING, True)
+        pintor.setPen(QtGui.QPen(QtGui.QColor(0, 0, 0, 70), 1))
+        pintor.setBrush(QtGui.QColor(CORES[chave]))
+        pintor.drawEllipse(QtCore.QRectF(1.5, 1.5, tamanho - 3.0, tamanho - 3.0))
+        pintor.end()
+        icone = QtGui.QIcon(pixmap)
+        self._icones_estado[chave] = icone
+        return icone
 
     def _achar_pagina(self, numero):
         for pagina in self.checklist:
@@ -448,6 +617,8 @@ class ProducaoDocker(DockWidget):
         contagem = prod.progresso(self.checklist)
         total = contagem["total"]
         restantes = total - contagem["finais"]
+        self.barra.set_contagem(contagem)
+        self._atualizar_pendente()
         if total:
             porcentagem = int(round(100.0 * contagem["finais"] / total))
             self.lbl_progresso.setText(
@@ -475,6 +646,146 @@ class ProducaoDocker(DockWidget):
             self.lbl_meta.setText(
                 i18n.t('Defina a meta semanal para ver a projeção.')
             )
+
+    def _atualizar_pendente(self):
+        """Acha a primeira página com painel não final e marca na árvore."""
+        self._pagina_pendente = None
+        for pagina in self.checklist:
+            finais, total = prod.progresso_da_pagina(pagina)
+            if finais < total:
+                self._pagina_pendente = pagina["pagina"]
+                break
+        for indice in range(self.arvore.topLevelItemCount()):
+            item = self.arvore.topLevelItem(indice)
+            dados = item.data(0, USER_ROLE)
+            numero = dados[1] if dados else None
+            rotulo = i18n.t('Página {0}').format(numero)
+            if numero == self._pagina_pendente:
+                item.setText(0, "▶ " + rotulo)
+            else:
+                item.setText(0, rotulo)
+        if not self.checklist:
+            self.lbl_pendente.setText("")
+        elif self._pagina_pendente is None:
+            self.lbl_pendente.setText(i18n.t('Tudo finalizado!'))
+        else:
+            self.lbl_pendente.setText(
+                i18n.t('Próxima pendente: Página {0}').format(self._pagina_pendente)
+            )
+
+    def abrir_proxima_pendente(self):
+        """Abre a primeira página com painel não final (selecionando na lista)."""
+        if not self.checklist:
+            helpers.show_message(i18n.t('Monte o checklist antes de abrir.'))
+            return
+        if self._pagina_pendente is None:
+            helpers.show_message(i18n.t('Tudo finalizado!'))
+            return
+        self._selecionar_pagina(self._pagina_pendente)
+        self.abrir_pagina(self._pagina_pendente)
+
+    def _selecionar_pagina(self, numero):
+        for indice in range(self.arvore.topLevelItemCount()):
+            item = self.arvore.topLevelItem(indice)
+            dados = item.data(0, USER_ROLE)
+            if dados and dados[0] == "pagina" and dados[1] == numero:
+                self.arvore.setCurrentItem(item)
+                self.arvore.scrollToItem(item)
+                return
+
+    # ------------------------------------------------------------------ tempo
+
+    def alternar_tempo(self):
+        """Inicia ou pausa a sessão de trabalho (timetracking manual)."""
+        if self._sessao_inicio is None:
+            self._iniciar_tempo()
+        else:
+            self._parar_tempo()
+
+    def _iniciar_tempo(self):
+        self._sessao_pagina = self._pagina_selecionada()
+        self._sessao_pasta = self.pasta_dados()
+        self._sessao_inicio = time.monotonic()
+        self._ultimo_save = self._sessao_inicio
+        self._timer_tempo.start()
+        self.btn_tempo.setText(i18n.t('Pausar'))
+        self._atualizar_tempo()
+
+    def _parar_tempo(self):
+        if self._sessao_inicio is None:
+            return
+        self._persistir_tempo()
+        self._sessao_inicio = None
+        self._sessao_pagina = None
+        self._sessao_pasta = None
+        self._ultimo_save = None
+        self._timer_tempo.stop()
+        try:
+            self.btn_tempo.setText(i18n.t('Iniciar'))
+        except (AttributeError, RuntimeError):
+            pass
+        self._atualizar_tempo()
+
+    def _persistir_tempo(self):
+        """Soma o trecho desde o último save (parcial a cada minuto rodando)."""
+        if self._sessao_inicio is None or self._ultimo_save is None:
+            return
+        agora = time.monotonic()
+        segundos = int(agora - self._ultimo_save)
+        self._ultimo_save = agora
+        if segundos <= 0:
+            return
+        self.tempos = prod.acumular_tempo(
+            self.tempos, self._sessao_pagina, segundos
+        )
+        try:
+            prod.salvar_tempos(self._sessao_pasta or self.pasta_dados(), self.tempos)
+        except OSError:
+            pass
+
+    def _tick_tempo(self):
+        if self._sessao_inicio is None:
+            return
+        self._atualizar_tempo()
+        if self._ultimo_save is not None and time.monotonic() - self._ultimo_save >= 60:
+            self._persistir_tempo()
+
+    def _atualizar_tempo(self):
+        if self._sessao_inicio is None:
+            if self.tempos.get("total"):
+                self.lbl_tempo.setText(
+                    i18n.t('Tempo total: {0}').format(
+                        prod.formatar_duracao(self.tempos["total"])
+                    )
+                )
+            else:
+                self.lbl_tempo.setText(i18n.t('Sem tempo registrado.'))
+            return
+        cronometro = prod.formatar_cronometro(time.monotonic() - self._sessao_inicio)
+        if self._sessao_pagina:
+            self.lbl_tempo.setText(
+                i18n.t('Tempo: {0} · Página {1} · total {2}').format(
+                    cronometro,
+                    self._sessao_pagina,
+                    prod.formatar_duracao(self.tempos["total"]),
+                )
+            )
+        else:
+            self.lbl_tempo.setText(
+                i18n.t('Tempo: {0} · total {1}').format(
+                    cronometro, prod.formatar_duracao(self.tempos["total"])
+                )
+            )
+
+    def _pagina_selecionada(self):
+        """Número da página do item selecionado na árvore (ou None)."""
+        item = self.arvore.currentItem()
+        if item is None:
+            return None
+        dados = item.data(0, USER_ROLE)
+        if not dados:
+            return None
+        return dados[1]
 
     # --------------------------------------------------------------- páginas
 
@@ -511,6 +822,7 @@ class ProducaoDocker(DockWidget):
             self.meta.value(),
             rotulos=rotulos,
             titulo=i18n.t('Checklist de produção'),
+            tempos=self.tempos,
         )
         caminho = os.path.join(pasta, prod.ARQUIVO_CHECKLIST)
         try:

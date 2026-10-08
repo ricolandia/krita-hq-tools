@@ -11,7 +11,9 @@ Saídas: ``/tmp/producao-smoke.log`` e os arquivos na pasta ``/tmp/producao-smok
 """
 
 import os
+import shutil
 import sys
+import time
 
 REPO = "/home/ricardo/Documentos/31_APPS_GITHUB/Krita-Comics-Plugin"
 if REPO not in sys.path:
@@ -52,6 +54,8 @@ def executar_smoke():
     if os.path.exists(LOG_PATH):
         os.remove(LOG_PATH)
     os.makedirs(BASE, exist_ok=True)
+    # Execução determinística: limpa o estado da rodada anterior.
+    shutil.rmtree(os.path.join(BASE, "producao"), ignore_errors=True)
     aplicacao = Krita.instance()
     log("Krita {0}".format(aplicacao.version()))
 
@@ -115,6 +119,46 @@ def executar_smoke():
         log("md: {0!r}".format(linhas[2]))
         log("md: {0!r}".format(linhas[4]))
         log("md: {0!r}".format(linhas[6]))
+
+    # 4) auto-save do roteiro (sem passar pelo "Montar")
+    docker.caixa.setPlainText(ROTEIRO + "fala p2: extra do auto-save\n")
+    docker._salvar_roteiro_automatico()
+    with open(os.path.join(BASE, "producao", "roteiro.txt"), encoding="utf-8") as arquivo:
+        texto_salvo = arquivo.read()
+    log("auto-save: contem extra={0} | indicador={1!r}".format(
+        "extra do auto-save" in texto_salvo, docker.lbl_roteiro_salvo.text()))
+
+    # 5) timetracking manual (simula 90 s de trabalho na pagina 1)
+    docker._selecionar_pagina(1)
+    docker._iniciar_tempo()
+    docker._ultimo_save = time.monotonic() - 90
+    docker._persistir_tempo()
+    docker._parar_tempo()
+    log("tempo: total={0}s pagina1={1}s | indicador={2!r} | botao={3!r}".format(
+        docker.tempos["total"],
+        docker.tempos["por_pagina"].get("1", 0),
+        docker.lbl_tempo.text(),
+        docker.btn_tempo.text(),
+    ))
+    log("tempos.json existe: {0}".format(
+        os.path.exists(prod.caminho_tempos(docker.pasta_dados()))
+    ))
+    docker.exportar_markdown()
+    with open(caminho_md, encoding="utf-8") as arquivo:
+        texto_md = arquivo.read()
+    log("md com tempo: {0}".format(
+        [linha for linha in texto_md.splitlines() if "Tempo" in linha or "⏱" in linha]
+    ))
+
+    # 6) visual: barra de estados, pendente e captura da doca
+    log("barra: {0}".format(docker.barra._contagem))
+    log("pendente: pagina={0} rotulo={1!r}".format(
+        docker._pagina_pendente, docker.lbl_pendente.text()
+    ))
+    docker.widget().resize(380, 760)
+    captura = docker.widget().grab()
+    caminho_captura = "/tmp/producao-smoke-docker.png"
+    log("captura: {0} -> {1}".format(bool(captura.save(caminho_captura)), caminho_captura))
 
     # abrir_pagina() usa openDocument + addView + setActiveDocument (o mesmo
     # fluxo do gerenciador de páginas); no headless sem foco de janela o

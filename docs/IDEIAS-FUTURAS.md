@@ -43,6 +43,13 @@ a da nota do roadmap no Trilium.
   "Mão direita" e "Mão esquerda", aplicadas por cima da pose do corpo, padrão
   fechada nas duas), com `modelo3d.combinar_poses` e validação dentro do
   Krita.
+- **v0.14.1 (07/10, publicada):** auditoria de 07/10 (macro de desfazer na
+  inserção da biblioteca e do 3D, bordas) e desempenho do 3D (culling de
+  costas + caches; render puro 34 → 9,8 ms).
+- **v0.15 (08/10, pronta, sem release):** produção com auto-save do roteiro,
+  barra de progresso em três cores, bolinha de estado na árvore, "Abrir
+  próxima pendente", timetracking manual (total e por página, `tempos.json`)
+  e `checklist.md` com checkboxes, emojis e tempo por página.
 - **Fora do roadmap original:** camada de UI compartilhada (52 botões), ícone
   e social preview, vídeos demo no YouTube com roteiros de captura, CI no
   Windows, automação de release (tag → ZIP + notas do CHANGELOG), duas
@@ -105,6 +112,14 @@ inserida num painel dentro de uma seleção. Decisões e achados:
 9. **Exportação de páginas (amadurecer, adiada em 05/10):** diálogo com cor
    (RGB/CMYK + perfil), resolução (72/96/150/300), saída (pasta de imagens ou
    PDF único) e presets web/impressão; especificação abaixo.
+10. **Compartilhar o projeto (pacote):** "Exportar pacote..." em `.zip` com
+    opções (páginas, produção, moodboard com/sem as imagens) + `LEIA-ME.txt`,
+    e o "abrir pacote" depois. Avaliado em 08/10; adiado a pedido do autor.
+11. **Timetracking automático (v2):** contar por atividade (event filter no
+    canvas, o mesmo caminho do clique direto) em cima do manual que entrou na
+    v0.15; avaliar junto com o clique direto.
+12. **Duplo clique no painel com zoom:** abrir a `pagina_NNN.kra` já focando o
+    painel (depende do clique direto no canvas).
 
 **Fora de escopo (mantido):** exportação webtoon (Batch Exporter cobre),
 preflight de impressão (Scribus), rotas B/C do 3D (Blender Layer e pose
@@ -270,6 +285,9 @@ paramétrico.
 
 ### Anotadas, ainda fora
 
+- **Miniatura na produção** (na coluna do arquivo): não é prioridade e talvez
+  nem precise entrar (autor, 08/10); o cache de miniaturas já existe para
+  quando fizer sentido.
 - **Lettering nas páginas geradas**: o gerador desenha as falas como `<text>`
   sans-serif simples; usar os balões e as fontes do kit deixaria o storyboard
   mais perto da arte final. Parente do item "Atualizar textos das páginas

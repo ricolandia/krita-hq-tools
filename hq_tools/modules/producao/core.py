@@ -21,6 +21,7 @@ PASTA = "producao"
 ARQUIVO_ESTADOS = "producao.json"
 ARQUIVO_ROTEIRO = "roteiro.txt"
 ARQUIVO_CHECKLIST = "checklist.md"
+ARQUIVO_TEMPOS = "tempos.json"
 PADRAO_PAGINA = re.compile(r"^pagina_(\d+)\.kra$", re.IGNORECASE)
 
 ROTULOS_PT = {
@@ -30,7 +31,7 @@ ROTULOS_PT = {
     "narracao": "Narração",
 }
 
-MARCAS = {"final": "[x]", "arte": "[-]", "esboco": "[ ]"}
+EMOJIS = {"final": "🟩", "arte": "🟧", "esboco": "⬜"}
 
 
 def proximo_estado(estado):
@@ -104,6 +105,26 @@ def projecao(restantes, meta_semanal, hoje=None):
     return (semanas, base + timedelta(days=7 * semanas))
 
 
+def formatar_cronometro(segundos):
+    """``HH:MM:SS`` para o cronômetro da sessão."""
+    segundos = max(0, int(segundos))
+    horas, resto = divmod(segundos, 3600)
+    minutos, segs = divmod(resto, 60)
+    return "{0:02d}:{1:02d}:{2:02d}".format(horas, minutos, segs)
+
+
+def formatar_duracao(segundos):
+    """Duração curta para relatórios: ``3h20min``, ``45min`` ou ``30s``."""
+    segundos = max(0, int(segundos))
+    if segundos < 60:
+        return "{0}s".format(segundos)
+    minutos = segundos // 60
+    if minutos < 60:
+        return "{0}min".format(minutos)
+    horas, minutos = divmod(minutos, 60)
+    return "{0}h{1:02d}min".format(horas, minutos)
+
+
 def falas_resumo(painel, rotulo_narracao="Narração"):
     """Prévia das falas do painel: ``JOAO: oi · Narração: era uma vez``."""
     partes = []
@@ -117,14 +138,17 @@ def falas_resumo(painel, rotulo_narracao="Narração"):
     return " · ".join(partes)
 
 
-def para_markdown(checklist, meta_semanal=0, hoje=None, rotulos=None, titulo=None):
-    """Checklist em Markdown (para espelhar no Trilium, se quiser)."""
+def para_markdown(checklist, meta_semanal=0, hoje=None, rotulos=None, titulo=None, tempos=None):
+    """Checklist em Markdown (checkboxes e emojis de estado; tempo opcional)."""
     rotulos = dict(ROTULOS_PT, **(rotulos or {}))
     contagem = progresso(checklist)
     linhas = ["# {0}".format(titulo or "Checklist de produção"), ""]
     linhas.append(
-        "- Painéis: {total} · finais: {finais} · em arte: {arte} · em esboço: {esboco}".format(
-            **contagem
+        "- Painéis: {total} · {0} finais · {1} em arte · {2} em esboço".format(
+            "{0} {1}".format(EMOJIS["final"], contagem["finais"]),
+            "{0} {1}".format(EMOJIS["arte"], contagem["arte"]),
+            "{0} {1}".format(EMOJIS["esboco"], contagem["esboco"]),
+            total=contagem["total"],
         )
     )
     if meta_semanal:
@@ -137,20 +161,46 @@ def para_markdown(checklist, meta_semanal=0, hoje=None, rotulos=None, titulo=Non
                     int(meta_semanal), semanas, previsao.strftime("%d/%m")
                 )
             )
+    tempos = tempos or {}
+    if _segundos_int(tempos.get("total")):
+        por_pagina = [
+            _segundos_int(valor)
+            for valor in (tempos.get("por_pagina") or {}).values()
+            if _segundos_int(valor) > 0
+        ]
+        media = ""
+        if por_pagina:
+            media = " · média {0} por página".format(
+                formatar_duracao(sum(por_pagina) // len(por_pagina))
+            )
+        linhas.append(
+            "- Tempo: {0} no total{1}".format(
+                formatar_duracao(tempos["total"]), media
+            )
+        )
     linhas.append("")
     for pagina in checklist:
         finais, total = progresso_da_pagina(pagina)
-        linhas.append(
-            "## Página {0}: {1}/{2} finais".format(pagina["pagina"], finais, total)
+        titulo_pagina = "## Página {0} · {1}/{2} finais".format(
+            pagina["pagina"], finais, total
         )
+        segundos = _segundos_int(
+            (tempos.get("por_pagina") or {}).get(str(pagina["pagina"]))
+        )
+        if segundos > 0:
+            titulo_pagina += " · ⏱ {0}".format(formatar_duracao(segundos))
+        linhas.append(titulo_pagina)
         for painel in pagina["paineis"]:
+            estado = painel["estado"]
+            caixa = "[x]" if estado == "final" else "[ ]"
             resumo = falas_resumo(painel, rotulos.get("narracao", "Narração"))
             sufixo = " · {0}".format(resumo) if resumo else ""
             linhas.append(
-                "- {0} Painel {1} ({2}){3}".format(
-                    MARCAS.get(painel["estado"], "[ ]"),
+                "- {0} {1} Painel {2} ({3}){4}".format(
+                    caixa,
+                    EMOJIS.get(estado, EMOJIS["esboco"]),
                     painel["painel"],
-                    rotulos.get(painel["estado"], painel["estado"]),
+                    rotulos.get(estado, estado),
                     sufixo,
                 )
             )
@@ -213,6 +263,68 @@ def salvar(pasta, estados, meta_semanal):
             indent=2,
         )
     os.replace(temporario, caminho)
+
+
+def _segundos_int(valor):
+    """Segundos como inteiro >= 0 (tolerante a valor vindo do JSON)."""
+    try:
+        return max(0, int(valor or 0))
+    except (TypeError, ValueError):
+        return 0
+
+
+def caminho_tempos(pasta):
+    return os.path.join(pasta, ARQUIVO_TEMPOS)
+
+
+def carregar_tempos(pasta):
+    """Tempos acumulados (total e por página); tolerante a arquivo quebrado."""
+    try:
+        with open(caminho_tempos(pasta), encoding="utf-8") as arquivo:
+            dados = json.load(arquivo)
+    except (OSError, ValueError):
+        return {"total": 0, "por_pagina": {}}
+    if not isinstance(dados, dict):
+        return {"total": 0, "por_pagina": {}}
+    por_pagina = {}
+    for pagina, segundos in (dados.get("por_pagina") or {}).items():
+        por_pagina[str(pagina)] = _segundos_int(segundos)
+    return {"total": _segundos_int(dados.get("total")), "por_pagina": por_pagina}
+
+
+def salvar_tempos(pasta, dados):
+    """Grava o tempos.json de forma atômica."""
+    dados = dados or {}
+    caminho = caminho_tempos(pasta)
+    temporario = caminho + ".tmp"
+    with open(temporario, "w", encoding="utf-8") as arquivo:
+        json.dump(
+            {
+                "total": _segundos_int(dados.get("total")),
+                "por_pagina": {
+                    str(pagina): _segundos_int(segundos)
+                    for pagina, segundos in (dados.get("por_pagina") or {}).items()
+                },
+            },
+            arquivo,
+            ensure_ascii=False,
+            indent=2,
+        )
+    os.replace(temporario, caminho)
+
+
+def acumular_tempo(dados, pagina, segundos):
+    """Tempos com a sessão somada (total e, quando houver, a página)."""
+    dados = dados or {}
+    segundos = _segundos_int(segundos)
+    por_pagina = dict(dados.get("por_pagina") or {})
+    if pagina is not None and segundos:
+        chave = str(pagina)
+        por_pagina[chave] = _segundos_int(por_pagina.get(chave)) + segundos
+    return {
+        "total": _segundos_int(dados.get("total")) + segundos,
+        "por_pagina": por_pagina,
+    }
 
 
 def carregar_roteiro(pasta):

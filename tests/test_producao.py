@@ -109,10 +109,20 @@ class TestMarkdown(unittest.TestCase):
             rotulos={"narracao": "Narration"}, titulo="Production checklist",
         )
         self.assertIn("# Production checklist", texto)
-        self.assertIn("## Página 1: 1/4 finais", texto)
-        self.assertIn("- [x] Painel 1 (Final) · Narration: Era uma vez... · joao: Voce viu aquilo?", texto)
-        self.assertIn("- [-] Painel 2 (Arte)", texto)
+        self.assertIn("## Página 1 · 1/4 finais", texto)
+        self.assertIn("- [x] 🟩 Painel 1 (Final) · Narration: Era uma vez... · joao: Voce viu aquilo?", texto)
+        self.assertIn("- [ ] 🟧 Painel 2 (Arte)", texto)
+        self.assertIn("- [ ] ⬜ Painel 3 (Esboço)", texto)
         self.assertIn("~1 semana(s) · entrega ~13/10", texto)
+
+    def test_exportacao_com_tempo(self):
+        checklist = producao.montar(ROTEIRO, {"1-1": "final"})
+        texto = producao.para_markdown(
+            checklist,
+            tempos={"total": 12000, "por_pagina": {"1": 2700}},
+        )
+        self.assertIn("- Tempo: 3h20min no total · média 45min por página", texto)
+        self.assertIn("## Página 1 · 1/4 finais · ⏱ 45min", texto)
 
     def test_resumo_de_falas(self):
         checklist = producao.montar(ROTEIRO)
@@ -168,6 +178,44 @@ class TestArquivos(unittest.TestCase):
         self.assertTrue(producao.pagina_do_arquivo(self.pasta, 1).endswith("pagina_001.kra"))
         self.assertIsNone(producao.pagina_do_arquivo(self.pasta, 3))
         self.assertIsNone(producao.pagina_do_arquivo(os.path.join(self.pasta, "nada"), 1))
+
+
+class TestTempos(unittest.TestCase):
+    def test_formatar_cronometro(self):
+        self.assertEqual(producao.formatar_cronometro(0), "00:00:00")
+        self.assertEqual(producao.formatar_cronometro(3725), "01:02:05")
+        self.assertEqual(producao.formatar_cronometro(-5), "00:00:00")
+
+    def test_formatar_duracao(self):
+        self.assertEqual(producao.formatar_duracao(30), "30s")
+        self.assertEqual(producao.formatar_duracao(45 * 60), "45min")
+        self.assertEqual(producao.formatar_duracao(3 * 3600 + 20 * 60), "3h20min")
+
+    def test_salvar_e_carregar_tempos(self):
+        with tempfile.TemporaryDirectory() as pasta:
+            producao.salvar_tempos(
+                pasta, {"total": 3600, "por_pagina": {1: 1800, "2": 600}}
+            )
+            dados = producao.carregar_tempos(pasta)
+        self.assertEqual(dados["total"], 3600)
+        self.assertEqual(dados["por_pagina"], {"1": 1800, "2": 600})
+
+    def test_carregar_tempos_tolerante(self):
+        with tempfile.TemporaryDirectory() as pasta:
+            with open(producao.caminho_tempos(pasta), "w", encoding="utf-8") as arquivo:
+                arquivo.write("{quebrado")
+            dados = producao.carregar_tempos(pasta)
+        self.assertEqual(dados, {"total": 0, "por_pagina": {}})
+
+    def test_acumular_tempo(self):
+        dados = producao.acumular_tempo(
+            {"total": 100, "por_pagina": {"1": 100}}, 1, 50
+        )
+        self.assertEqual(dados["total"], 150)
+        self.assertEqual(dados["por_pagina"], {"1": 150})
+        sem_pagina = producao.acumular_tempo(dados, None, 25)
+        self.assertEqual(sem_pagina["total"], 175)
+        self.assertEqual(sem_pagina["por_pagina"], {"1": 150})
 
 
 if __name__ == "__main__":

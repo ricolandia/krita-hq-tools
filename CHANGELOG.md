@@ -1,5 +1,22 @@
 # Changelog
 
+## [Não publicado]
+
+Produção (v0.15): o roteiro ganha auto-save (grava sozinho depois da última
+tecla e no fechamento, com indicador "salvo HH:MM"); o checklist ganha barra de
+progresso em três cores, bolinha de estado na árvore, marcador "▶" na página
+pendente e botão "Abrir próxima pendente"; entra o timetracking manual
+(play/pause, total e por página, salvo a cada minuto em `producao/tempos.json`)
+e o `checklist.md` sai com checkboxes, emojis de estado e tempo por página.
+
+**English:** production (v0.15): the script gets auto-save (writes on its own
+after the last keystroke and on close, with a "saved HH:MM" hint); the
+checklist gains a three-color progress bar, state dots in the tree, a "▶"
+marker on the pending page and an "Open next pending" button; manual time
+tracking lands (play/pause, total and per page, saved every minute to
+`producao/tempos.json`) and `checklist.md` now has checkboxes, state emojis and
+per-page time.
+
 ## [0.14.1] — 2026-10-07
 
 Auditoria de 2026-10-07 (3ª): correções de borda, sem mudança de interface. A
