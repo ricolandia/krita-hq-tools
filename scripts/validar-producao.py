@@ -27,6 +27,8 @@ LOG_PATH = "/tmp/producao-smoke.log"
 ROTEIRO = (
     "pagina 1\n"
     "layout grade2x2\n"
+    "plano p1: geral\n"
+    "plano p2: close\n"
     "narracao p1: Era uma vez...\n"
     "fala p1 joao: Voce viu aquilo?\n"
     "fala p4 maria: Ultima fala.\n"
@@ -89,7 +91,9 @@ def executar_smoke():
         log("pagina: {0!r} | {1!r} | {2!r}".format(item.text(0), item.text(1), item.text(2)))
         for posicao in range(item.childCount()):
             filho = item.child(posicao)
-            log("  painel: {0!r} | {1!r} | {2!r}".format(filho.text(0), filho.text(1), filho.text(2)))
+            log("  painel: {0!r} | {1!r} | {2!r} | {3!r}".format(
+                filho.text(0), filho.text(1), filho.text(2), filho.text(3)
+            ))
     log("progresso: {0!r}".format(docker.lbl_progresso.text()))
     log("meta (sem valor): {0!r}".format(docker.lbl_meta.text()))
 
@@ -159,6 +163,15 @@ def executar_smoke():
     captura = docker.widget().grab()
     caminho_captura = "/tmp/producao-smoke-docker.png"
     log("captura: {0} -> {1}".format(bool(captura.save(caminho_captura)), caminho_captura))
+
+    # 7) storyboard: o rótulo de plano entra no SVG de texto do gerador
+    from hq_tools.modules.pages import generator, roteiro as roteiro_mod
+
+    pagina = roteiro_mod.parse_script(ROTEIRO)[0]
+    svg = generator._text_svg(pagina, 1000, 1400, 300)
+    log("storyboard: contem 'geral'={0} e 'close'={1}".format(
+        "geral" in svg, "close" in svg
+    ))
 
     # abrir_pagina() usa openDocument + addView + setActiveDocument (o mesmo
     # fluxo do gerenciador de páginas); no headless sem foco de janela o

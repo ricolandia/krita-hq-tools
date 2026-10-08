@@ -129,17 +129,22 @@ Krita.</p>
 
 <h2>Production</h2>
 <p>Script checklist: paste the text (the same syntax as the pages, with the
-optional character on the line) and use Ctrl+Enter (or "Build checklist");
-each page becomes a node with the layout panels and each panel has three
-states (sketch, art and final): click the State column to cycle, and
-right-click sets it directly. The lines and characters are in view on each
-panel. The weekly panel goal shows what is left and the expected delivery
-date, and double-clicking a page opens its <code>pagina_NNN.kra</code>. The
-"Syntax..." button shows the full format; <code>roteiro.txt</code> and
-<code>producao.json</code> live in the project's <code>producao/</code> subfolder
+optional character on the line and the shot type per panel, e.g.
+<code>plano p1: wide</code>) and use Ctrl+Enter (or "Build checklist"); the
+script auto-saves (with a "saved HH:MM" hint). Each page becomes a node with
+the layout panels and each panel has three states (sketch, art and final):
+click the State column to cycle, and right-click sets it directly. The panel
+shot appears in the Shot column and in the generated storyboard (label in the
+panel corner); the lines and characters are in view. The bar on top shows the
+progress in three colors and "Open next pending" jumps to the first unfinished
+page. The Start/Pause button counts production time (total and per page); the
+weekly panel goal shows what is left and the expected delivery date, and
+double-clicking a page opens its <code>pagina_NNN.kra</code>. The "Syntax..."
+button shows the full format; <code>roteiro.txt</code>, <code>producao.json</code>
+and <code>tempos.json</code> live in the project's <code>producao/</code> subfolder
 (created with the project in Pages; without a project open, it saves in the
 plugin default folder and warns to choose the folder), and "Export .md" saves
-the checklist as Markdown.</p>
+the checklist with checkboxes, emojis and per-page time.</p>
 
 <h2>Palettes</h2>
 <p>Comic and artistic templates (tones, ink, skin, sky, vegetation, flat

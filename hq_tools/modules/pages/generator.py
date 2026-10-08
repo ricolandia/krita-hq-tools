@@ -49,7 +49,8 @@ def _panels_svg(page, width_px, height_px, dpi):
 
 
 def _text_svg(page, width_px, height_px, dpi):
-    if not page["balloons"]:
+    planos = page.get("planos") or {}
+    if not page["balloons"] and not planos:
         return ""
     scale = 72.0 / float(dpi)
     width_pt = width_px * scale
@@ -66,6 +67,21 @@ def _text_svg(page, width_px, height_px, dpi):
             width_pt, height_pt
         )
     ]
+
+    # Rótulos de plano: canto superior esquerdo do painel, em cinza discreto.
+    for indice, plano in sorted(planos.items()):
+        index = indice - 1
+        if index < 0 or index >= len(page["panels"]):
+            continue
+        x, y, w, h = page["panels"][index]
+        rotulo_x = (x * width_px + w * width_px * 0.04) * scale
+        rotulo_y = (y * height_px + h * height_px * 0.10) * scale
+        parts.append(
+            '<text x="{0:.4f}" y="{1:.4f}" font-family="sans-serif" '
+            'font-size="{2:.4f}" fill="#666666">{3}</text>'.format(
+                rotulo_x, rotulo_y, max(6.0, font_pt * 0.8), _escape(str(plano))
+            )
+        )
 
     for balloon in page["balloons"]:
         index = balloon["panel"] - 1

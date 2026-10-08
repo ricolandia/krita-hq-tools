@@ -285,6 +285,13 @@ paramétrico.
 
 ### Anotadas, ainda fora
 
+- **Textura no vetor ("lápis tremido")**: avaliado em 08/10. O Krita aceita
+  preenchimento e traço com **pattern** no vetor (nativo), mas **não** traço com
+  pincel (é recurso pedido no tracker do KDE, "brush vector lines"); o libkis
+  também não expõe setters de estilo, então o padrão teria de nascer no SVG
+  gerado. O tremido é geometria: opção de jitter nos geradores (linhas de
+  efeito, perspectiva) + textura de lápis do kit no traço. Adiado a pedido do
+  autor.
 - **Miniatura na produção** (na coluna do arquivo): não é prioridade e talvez
   nem precise entrar (autor, 08/10); o cache de miniaturas já existe para
   quando fizer sentido.

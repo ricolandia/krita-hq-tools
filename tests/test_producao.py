@@ -124,6 +124,14 @@ class TestMarkdown(unittest.TestCase):
         self.assertIn("- Tempo: 3h20min no total · média 45min por página", texto)
         self.assertIn("## Página 1 · 1/4 finais · ⏱ 45min", texto)
 
+    def test_plano_no_checklist_e_no_md(self):
+        texto_plano = "pagina 1\nlayout grade2x2\nplano p2: close\nfala p1: Oi\n"
+        checklist = producao.montar(texto_plano)
+        self.assertEqual(checklist[0]["paineis"][1]["plano"], "close")
+        self.assertEqual(checklist[0]["paineis"][0]["plano"], "")
+        md = producao.para_markdown(checklist, rotulos={"plano": "Shot"})
+        self.assertIn("· Shot: close", md)
+
     def test_resumo_de_falas(self):
         checklist = producao.montar(ROTEIRO)
         painel = checklist[1]["paineis"][0]

@@ -83,6 +83,28 @@ class TestRoteiro(unittest.TestCase):
         with self.assertRaises(roteiro.RoteiroError):
             roteiro.parse_script("pagina 1\ncomando estranho\n")
 
+    def test_plano_com_e_sem_dois_pontos(self):
+        pages = roteiro.parse_script(
+            "pagina 1\nlayout grade2x2\nplano p1: geral\nplano p2 close\nnarracao p1: cena\n"
+        )
+        self.assertEqual(pages[0]["planos"], {1: "geral", 2: "close"})
+
+    def test_plano_valor_livre(self):
+        pages = roteiro.parse_script("pagina 1\nplano p1: plano médio com grua baixa\n")
+        self.assertEqual(pages[0]["planos"][1], "plano médio com grua baixa")
+
+    def test_plano_sem_valor(self):
+        with self.assertRaises(roteiro.RoteiroError):
+            roteiro.parse_script("pagina 1\nplano p1:\n")
+
+    def test_plano_sem_painel(self):
+        with self.assertRaises(roteiro.RoteiroError):
+            roteiro.parse_script("pagina 1\nplano geral\n")
+
+    def test_plano_painel_invalido(self):
+        with self.assertRaises(roteiro.RoteiroError):
+            roteiro.parse_script("pagina 1\nlayout quadro\nplano p9: close\n")
+
     def test_personagem_na_fala(self):
         pages = roteiro.parse_script(
             "pagina 1\nlayout grade2x2\nfala p1 joao: Voce viu aquilo?\n"

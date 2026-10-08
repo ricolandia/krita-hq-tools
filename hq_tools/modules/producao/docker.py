@@ -41,12 +41,14 @@ LINHAS_SINTAXE = (
     i18n.t("fala p1: texto (fala do painel 1)."),
     i18n.t("fala p1 joao: texto (fala do painel 1 dita pelo Joao; o personagem é opcional)."),
     i18n.t("narracao p1: texto (narração do painel 1; 'legenda' também vale)."),
+    i18n.t("plano p1: close (tipo de plano do painel; texto livre, ex.: geral, médio, close)."),
     i18n.t("A fala aponta para o painel N do layout (a grade define quantos painéis a página tem)."),
 )
 
 EXEMPLO = i18n.t(
     "pagina 1\n"
     "layout grade2x2\n"
+    "plano p1: geral\n"
     "narracao p1: Era uma vez...\n"
     "fala p1 joao: Voce viu aquilo?\n"
     "fala p4 maria: Ultima fala."
@@ -275,12 +277,18 @@ class ProducaoDocker(DockWidget):
             widgets.QVBoxLayout(group_checklist), margem=0, espaco=ui.GAP
         )
         self.arvore = widgets.QTreeWidget()
-        self.arvore.setColumnCount(3)
+        self.arvore.setColumnCount(4)
         self.arvore.setHeaderLabels(
-            [i18n.t('Página / Painel'), i18n.t('Estado'), i18n.t('Falas')]
+            [
+                i18n.t('Página / Painel'),
+                i18n.t('Estado'),
+                i18n.t('Plano'),
+                i18n.t('Falas'),
+            ]
         )
-        self.arvore.setColumnWidth(0, 150)
-        self.arvore.setColumnWidth(1, 90)
+        self.arvore.setColumnWidth(0, 130)
+        self.arvore.setColumnWidth(1, 80)
+        self.arvore.setColumnWidth(2, 80)
         self.arvore.setIconSize(QtCore.QSize(12, 12))
         self.arvore.itemClicked.connect(self._item_clicado)
         self.arvore.itemDoubleClicked.connect(self._item_duplo_clique)
@@ -459,6 +467,7 @@ class ProducaoDocker(DockWidget):
                     i18n.t('Página {0}').format(pagina["pagina"]),
                     i18n.t('{0}/{1} finais').format(finais, total),
                     "",
+                    "",
                 ]
             )
             item.setData(0, USER_ROLE, ("pagina", pagina["pagina"]))
@@ -478,6 +487,7 @@ class ProducaoDocker(DockWidget):
                     [
                         i18n.t('Painel {0}').format(painel["painel"]),
                         self._rotulo_estado(painel["estado"]),
+                        painel.get("plano", ""),
                         prod.falas_resumo(painel, i18n.t('Narração')),
                     ]
                 )
@@ -816,6 +826,7 @@ class ProducaoDocker(DockWidget):
             "arte": i18n.t('Arte'),
             "final": i18n.t('Final'),
             "narracao": i18n.t('Narração'),
+            "plano": i18n.t('Plano'),
         }
         texto = prod.para_markdown(
             self.checklist,

@@ -1,5 +1,15 @@
 # Changelog
 
+## [Não publicado]
+
+Roteiro: o comando `plano pN: valor` (texto livre) define o tipo de plano do
+painel; ele aparece na nova coluna "Plano" da Produção, como rótulo no canto do
+painel no storyboard gerado e no checklist.md.
+
+**English:** script: the `plano pN: value` command (free text) sets the panel
+shot type; it shows up in the new "Shot" column in Production, as a label in the
+panel corner of the generated storyboard and in checklist.md.
+
 ## [0.15.0] — 2026-10-08
 
 Produção (v0.15): o roteiro ganha auto-save (grava sozinho depois da última

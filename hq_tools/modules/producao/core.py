@@ -29,6 +29,7 @@ ROTULOS_PT = {
     "arte": "Arte",
     "final": "Final",
     "narracao": "Narração",
+    "plano": "Plano",
 }
 
 EMOJIS = {"final": "🟩", "arte": "🟧", "esboco": "⬜"}
@@ -51,6 +52,7 @@ def montar(texto, estados=None):
     marcados = estados or {}
     checklist = []
     for pagina in roteiro.parse_script(texto):
+        planos = pagina.get("planos") or {}
         paineis = []
         for indice in range(1, len(pagina["panels"]) + 1):
             falas = [fala for fala in pagina["balloons"] if fala["panel"] == indice]
@@ -60,6 +62,7 @@ def montar(texto, estados=None):
                     "estado": marcados.get(
                         chave(pagina["index"], indice), ESTADO_PADRAO
                     ),
+                    "plano": planos.get(indice, ""),
                     "falas": falas,
                 }
             )
@@ -193,14 +196,21 @@ def para_markdown(checklist, meta_semanal=0, hoje=None, rotulos=None, titulo=Non
         for painel in pagina["paineis"]:
             estado = painel["estado"]
             caixa = "[x]" if estado == "final" else "[ ]"
+            plano = (painel.get("plano") or "").strip()
+            trecho_plano = (
+                " · {0}: {1}".format(rotulos.get("plano", "Plano"), plano)
+                if plano
+                else ""
+            )
             resumo = falas_resumo(painel, rotulos.get("narracao", "Narração"))
             sufixo = " · {0}".format(resumo) if resumo else ""
             linhas.append(
-                "- {0} {1} Painel {2} ({3}){4}".format(
+                "- {0} {1} Painel {2} ({3}){4}{5}".format(
                     caixa,
                     EMOJIS.get(estado, EMOJIS["esboco"]),
                     painel["painel"],
                     rotulos.get(estado, estado),
+                    trecho_plano,
                     sufixo,
                 )
             )

@@ -57,6 +57,7 @@ BALLOON_PATTERN = re.compile(
     r"^(fala|narracao|narração|legenda)\s+p?(\d+)\s*(?:([^:]+?)\s*)?:\s*(.*)$",
     re.IGNORECASE,
 )
+PLANO_PATTERN = re.compile(r"^plano\s+p?(\d+)\s*:?\s*(.*)$", re.IGNORECASE)
 LAYOUT_PATTERN = re.compile(r"^(\d+)\s*[x×]\s*(\d+)$")
 
 
@@ -74,6 +75,7 @@ def new_page():
         "margin": DEFAULT_MARGIN,
         "gutter": DEFAULT_GUTTER,
         "balloon_lines": [],
+        "planos": {},
     }
 
 
@@ -163,6 +165,20 @@ def parse_script(text):
         elif lower.startswith("sarjeta"):
             value = line.split(":", 1)[-1].strip() if ":" in line else line[7:].strip()
             current["gutter"] = parse_fraction(value)
+        elif lower.startswith("plano"):
+            match = PLANO_PATTERN.match(line)
+            if match is None:
+                raise RoteiroError(
+                    i18n.t("Linha {0}: plano sem o número do painel: {1}.").format(
+                        line_number, line
+                    )
+                )
+            valor = match.group(2).strip()
+            if not valor:
+                raise RoteiroError(
+                    i18n.t("Linha {0}: plano sem valor: {1}.").format(line_number, line)
+                )
+            current["planos"][int(match.group(1))] = valor
         else:
             match = BALLOON_PATTERN.match(line)
             if match:
@@ -214,6 +230,16 @@ def finalize_page(page):
             }
         )
     page["balloons"] = balloons
+    planos = {}
+    for index, valor in page["planos"].items():
+        if index < 1 or index > total:
+            raise RoteiroError(
+                i18n.t("Página {0}: plano aponta para o painel {1}, mas há {2} painéis.").format(
+                    page["index"], index, total
+                )
+            )
+        planos[index] = valor
+    page["planos"] = planos
     return page
 
 

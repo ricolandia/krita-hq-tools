@@ -19,6 +19,7 @@ dpi 300
 layout grade2x2
 margem 5%
 sarjeta 2%
+plano p1: geral
 narracao p1: Era uma vez, numa cidade pequena...
 fala p1: Voce viu aquilo?
 fala p2: Nao vi nada.
@@ -47,6 +48,7 @@ fala p3: Terceiro.
 | `fala pN: texto` | fala de balão do painel N | |
 | `fala pN personagem: texto` | fala do painel N com o personagem (opcional) | |
 | `narracao pN: texto` | narração (caixa) do painel N | |
+| `plano pN: texto` | tipo de plano do painel N (texto livre: geral, médio, close, plongée...) | |
 
 Layouts nomeados: `quadro` e `splash` (1 painel), `duplo-h` (2 na horizontal),
 `duplo-v` (2 na vertical), `grade2x2`, `grade3x2`, `grade2x3`, `tira3` (3 na
@@ -64,7 +66,9 @@ com `direcao rtl` as colunas são lidas da direita para a esquerda (manga).
 Desde a v0.12.0 o mesmo texto alimenta o docker **Produção** (checklist por
 página e painel, com três estados e meta semanal) e o personagem da fala
 aparece lá; o gerador de páginas ignora o personagem. O texto fica em
-`roteiro.txt` na pasta do projeto e o progresso em `producao.json`.
+`roteiro.txt` na pasta do projeto e o progresso em `producao.json`. O tipo de
+plano (`plano pN:`) entra na coluna Plano da Produção e como rótulo no canto do
+painel no storyboard gerado.
 
 O painel 1 fica no topo (à esquerda em `ltr`), e os painéis crescem por linha
 e coluna na ordem de leitura.
