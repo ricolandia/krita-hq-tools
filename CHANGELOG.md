@@ -1,6 +1,6 @@
 # Changelog
 
-## [Não publicado]
+## [0.14.1] — 2026-10-07
 
 Auditoria de 2026-10-07 (3ª): correções de borda, sem mudança de interface. A
 inserção da biblioteca e do 3D entra em macro de desfazer (um Ctrl+Z desfaz a
