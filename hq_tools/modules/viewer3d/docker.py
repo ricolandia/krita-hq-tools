@@ -671,15 +671,15 @@ class Viewer3DDocker(DockWidget):
 
     def _mudar_pose_corpo(self, indice):
         self.pose_corpo = self.cmb_pose_corpo.itemData(indice)
-        self._aplicar_poses()
+        self._aplicar_corpo()
 
     def _mudar_mao_direita(self, indice):
         self.pose_mao_direita = self.cmb_mao_direita.itemData(indice)
-        self._aplicar_poses()
+        self._aplicar_mao(modelo3d.LADO_DIREITA)
 
     def _mudar_mao_esquerda(self, indice):
         self.pose_mao_esquerda = self.cmb_mao_esquerda.itemData(indice)
-        self._aplicar_poses()
+        self._aplicar_mao(modelo3d.LADO_ESQUERDA)
 
     def _mudar_camera(self, indice):
         self.perspectiva = self.cmb_camera.itemData(indice) == "perspectiva"
@@ -700,11 +700,36 @@ class Viewer3DDocker(DockWidget):
         self.cmb_lente.setEnabled(self.perspectiva)
 
     def _aplicar_poses(self):
-        """Combina corpo e mãos (cada mão por cima) e redesenha."""
+        """Combina corpo e mãos (cada mão por cima) e redesenha.
+
+        Reconstrução completa: usada na carga do modelo e no "limpar pose".
+        As trocas de seletor usam :meth:`_aplicar_corpo` e :meth:`_aplicar_mao`
+        para não descartar os ajustes feitos nos sliders.
+        """
         corpo = self._ler_pose(VIEWER3D_POSES_CORPO_DIR, self.pose_corpo)
         direita = self._ler_pose(VIEWER3D_POSES_MAOS_DIR, self.pose_mao_direita)
         esquerda = self._ler_pose(VIEWER3D_POSES_MAOS_DIR, self.pose_mao_esquerda)
         self.semantica = modelo3d.combinar_poses(corpo, direita, esquerda)
+        self._pose_mudou()
+        self._montar_sliders()
+        self.agendar_render()
+
+    def _aplicar_corpo(self):
+        """Troca só a pose do corpo, preservando as mãos (e seus ajustes)."""
+        corpo = self._ler_pose(VIEWER3D_POSES_CORPO_DIR, self.pose_corpo)
+        self.semantica = modelo3d.substituir_corpo(self.semantica, corpo)
+        self._pose_mudou()
+        self._montar_sliders()
+        self.agendar_render()
+
+    def _aplicar_mao(self, lado):
+        """Troca só a mão pedida, preservando corpo e a outra mão."""
+        if lado == modelo3d.LADO_DIREITA:
+            arquivo = self.pose_mao_direita
+        else:
+            arquivo = self.pose_mao_esquerda
+        valores = self._ler_pose(VIEWER3D_POSES_MAOS_DIR, arquivo)
+        self.semantica = modelo3d.substituir_mao(self.semantica, valores, lado)
         self._pose_mudou()
         self._montar_sliders()
         self.agendar_render()

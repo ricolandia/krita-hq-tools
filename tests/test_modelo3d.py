@@ -365,6 +365,61 @@ class TestEspelhoDePose(unittest.TestCase):
             faltando = sorted(osso for osso in usados if osso not in modelo.osso_por_nome)
             self.assertEqual(faltando, [], "%s sem os ossos: %s" % (caminho, faltando))
 
+    def test_substituir_mao_preserva_o_resto(self):
+        semantica = {
+            "spine_01.x": {"dobrar": 5.0},
+            "arm_stretch.r": {"dobrar": 10.0},
+            "hand.r": {"dobrar": 20.0},
+            "hand.l": {"girar": -15.0},
+            "index1.l": {"dobrar": 30.0},
+        }
+        nova = modelo3d.substituir_mao(
+            semantica, {"hand.r": {"girar": 40.0}}, modelo3d.LADO_DIREITA
+        )
+        self.assertEqual(nova["spine_01.x"], {"dobrar": 5.0})
+        self.assertEqual(nova["arm_stretch.r"], {"dobrar": 10.0})
+        self.assertEqual(nova["hand.r"], {"girar": 40.0})
+        self.assertEqual(nova["hand.l"], {"girar": -15.0})
+        self.assertEqual(nova["index1.l"], {"dobrar": 30.0})
+
+    def test_substituir_mao_remove_o_que_a_nova_nao_tem(self):
+        semantica = {
+            "hand.r": {"dobrar": 20.0},
+            "index1.r": {"dobrar": 30.0},
+            "hand.l": {"girar": 1.0},
+        }
+        nova = modelo3d.substituir_mao(
+            semantica, {"thumb1.r": {"abrir": 5.0}}, modelo3d.LADO_DIREITA
+        )
+        self.assertNotIn("hand.r", nova)
+        self.assertNotIn("index1.r", nova)
+        self.assertEqual(nova["thumb1.r"], {"abrir": 5.0})
+        self.assertEqual(nova["hand.l"], {"girar": 1.0})
+
+    def test_substituir_mao_esquerda_espelha(self):
+        nova = modelo3d.substituir_mao(
+            {}, {"hand.r": {"girar": 10.0}}, modelo3d.LADO_ESQUERDA
+        )
+        self.assertEqual(nova, {"hand.l": {"girar": -10.0}})
+
+    def test_substituir_corpo_preserva_as_maos(self):
+        semantica = {
+            "spine_01.x": {"dobrar": 5.0},
+            "arm_stretch.r": {"dobrar": 10.0},
+            "hand.r": {"dobrar": 20.0},
+        }
+        nova = modelo3d.substituir_corpo(semantica, {"head.x": {"girar": 30.0}})
+        self.assertEqual(nova["head.x"], {"girar": 30.0})
+        self.assertEqual(nova["hand.r"], {"dobrar": 20.0})
+        self.assertNotIn("spine_01.x", nova)
+        self.assertNotIn("arm_stretch.r", nova)
+
+    def test_osso_de_mao(self):
+        self.assertTrue(modelo3d.osso_de_mao("hand.r"))
+        self.assertTrue(modelo3d.osso_de_mao("index1.l"))
+        self.assertFalse(modelo3d.osso_de_mao("arm_stretch.r"))
+        self.assertFalse(modelo3d.osso_de_mao("head.x"))
+
     def test_poses_de_mao_do_repositorio_sao_da_direita(self):
         pasta = os.path.join(
             RAIZ, "hq_tools", "modules", "viewer3d", "poses", "maos"

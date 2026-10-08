@@ -237,6 +237,47 @@ def combinar_poses(corpo, mao_direita, mao_esquerda):
 
 EIXOS = {"x": 0, "y": 1, "z": 2}
 
+PREFIXOS_MAO = ("hand", "index", "middle", "pinky", "ring", "thumb")
+
+
+def osso_de_mao(nome):
+    """True para os ossos de mão (pulso e dedos), com ou sem lado."""
+    return str(nome).split(".")[0].startswith(PREFIXOS_MAO)
+
+
+def substituir_corpo(semantica, corpo):
+    """Troca só a parte do corpo, preservando as mãos (e seus ajustes).
+
+    Diferente do :func:`combinar_poses`, que remonta tudo: aqui os ossos de
+    mão que já estavam na semântica ficam como estão (inclusive valores
+    ajustados nos sliders) e só a parte do corpo é substituída.
+    """
+    resultado = {
+        osso: dict(valores)
+        for osso, valores in (semantica or {}).items()
+        if osso_de_mao(osso)
+    }
+    for osso, valores in (corpo or {}).items():
+        resultado[osso] = dict(valores)
+    return resultado
+
+
+def substituir_mao(semantica, mao, lado):
+    """Troca só a mão pedida, preservando corpo e a outra mão.
+
+    Remove os ossos de mão daquele lado (o que a pose nova não trouxer volta
+    ao repouso) e aplica a pose espelhada quando o lado é a esquerda.
+    """
+    sufixo = ".r" if lado == LADO_DIREITA else ".l"
+    resultado = {
+        osso: dict(valores)
+        for osso, valores in (semantica or {}).items()
+        if not (osso_de_mao(osso) and osso.endswith(sufixo))
+    }
+    for osso, valores in pose_maos_por_lado(mao, lado).items():
+        resultado[osso] = dict(valores)
+    return resultado
+
 
 def eixos_semanticos(osso):
     """Mapeia os eixos locais do osso para nomes de junta.

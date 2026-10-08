@@ -1,5 +1,15 @@
 # Changelog
 
+## [Não publicado]
+
+Visualizador 3D: trocar a pose de uma mão não mexe mais no corpo (e vice-versa):
+cada seletor altera só a sua parte, preservando os ajustes feitos nos sliders;
+"Limpar pose" continua voltando tudo ao padrão.
+
+**English:** 3D viewer: changing one hand's pose no longer resets the body (and
+vice-versa): each selector only changes its own part, preserving the slider
+adjustments; "Reset pose" still returns everything to the default.
+
 ## [0.17.0] — 2026-10-08
 
 Visualizador 3D: os manequins **Homem** e **Mulher** foram substituídos pelos
