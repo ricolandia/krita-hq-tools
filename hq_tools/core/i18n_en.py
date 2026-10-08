@@ -578,7 +578,6 @@ TRADUCOES = {
     "Modelo:": "Model:",
     "Homem": "Man",
     "Mulher": "Woman",
-    "Mínimo": "Minimal",
     "Mão direita:": "Right hand:",
     "Mão esquerda:": "Left hand:",
     "Idle": "Idle",

@@ -78,7 +78,6 @@ VIEWER3D_DIR = os.path.join(MODULES_DIR, "viewer3d")
 VIEWER3D_MODELOS = (
     ("homem", "Homem", os.path.join(VIEWER3D_DIR, "modelos", "homem.json")),
     ("mulher", "Mulher", os.path.join(VIEWER3D_DIR, "modelos", "mulher.json")),
-    ("minimo", "Mínimo", os.path.join(VIEWER3D_DIR, "modelos", "minimo.json")),
 )
 VIEWER3D_POSES_DIR = os.path.join(VIEWER3D_DIR, "poses")
 VIEWER3D_POSES_CORPO_DIR = os.path.join(VIEWER3D_POSES_DIR, "corpo")

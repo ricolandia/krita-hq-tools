@@ -6,7 +6,7 @@ JSON que o plugin consome em tempo de execução. O Blender entra só na convers
 
 Uso:
     blender -b --factory-startup --python scripts/exportar-modelo3d.py -- \
-        entrada.fbx saida.json
+        entrada.fbx saida.json [--decimar 0.35] [--girar-180]
 
 O JSON tem o formato ``hq_tools.modelo3d`` versão 1:
 - ``ossos``: nome, pai e matriz de repouso no espaço do mundo (16 floats,
@@ -17,9 +17,11 @@ O JSON tem o formato ``hq_tools.modelo3d`` versão 1:
 """
 
 import json
+import math
 import sys
 
 import bpy
+from mathutils import Matrix
 
 
 def _argumentos():
@@ -36,12 +38,16 @@ def _argumentos():
         except (IndexError, ValueError):
             raise SystemExit("--decimar espera uma fração entre 0 e 1 (ex.: 0.35)")
         del argv[posicao:posicao + 2]
+    girar_180 = False
+    if "--girar-180" in argv:
+        girar_180 = True
+        argv.remove("--girar-180")
     if len(argv) < 2:
         raise SystemExit(
             "uso: blender -b --factory-startup --python scripts/exportar-modelo3d.py "
-            "-- entrada.fbx saida.json [--decimar 0.35]"
+            "-- entrada.fbx saida.json [--decimar 0.35] [--girar-180]"
         )
-    return argv[0], argv[1], decimar
+    return argv[0], argv[1], decimar, girar_180
 
 
 def _matriz_lista(matriz):
@@ -67,7 +73,7 @@ def _ossos_em_ordem(armadura):
 
 
 def main():
-    entrada, saida, decimar = _argumentos()
+    entrada, saida, decimar, girar_180 = _argumentos()
 
     bpy.ops.wm.read_factory_settings(use_empty=True)
     bpy.ops.import_scene.fbx(filepath=entrada)
@@ -98,6 +104,11 @@ def main():
     ossos = _ossos_em_ordem(armadura)
     indice_do_osso = {osso.name: indice for indice, osso in enumerate(ossos)}
     matriz_da_armadura = armadura.matrix_world
+    # A convenção do visualizador é a frente em +Y; o --girar-180 atende os
+    # FBX exportados de frente para -Y (gira malha e armadura juntas no Z).
+    if girar_180:
+        rotacao = Matrix.Rotation(math.radians(180.0), 4, "Z")
+        matriz_da_armadura = rotacao @ matriz_da_armadura
     dados_ossos = []
     for osso in ossos:
         pai = indice_do_osso.get(osso.parent.name) if osso.parent is not None else None
@@ -115,6 +126,8 @@ def main():
             grupo_para_osso[grupo.index] = indice_do_osso[grupo.name]
 
     matriz_da_malha = malha.matrix_world
+    if girar_180:
+        matriz_da_malha = rotacao @ matriz_da_malha
     dados_vertices = []
     dados_pesos = []
     for vertice in malha.data.vertices:

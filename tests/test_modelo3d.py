@@ -528,9 +528,9 @@ class TestModeloMulher(unittest.TestCase):
         cls.modelo = modelo3d.Modelo.carregar(MODELO_MULHER)
 
     def test_estrutura(self):
-        self.assertEqual(len(self.modelo.ossos), 68)
-        self.assertEqual(len(self.modelo.vertices), 1605)
-        self.assertEqual(len(self.modelo.faces), 1584)
+        self.assertEqual(len(self.modelo.ossos), 146)
+        self.assertEqual(len(self.modelo.vertices), 1144)
+        self.assertEqual(len(self.modelo.faces), 1166)
 
     def test_mesmos_ossos_do_homem(self):
         if not os.path.isfile(MODELO_REAL):
@@ -563,9 +563,9 @@ class TestModeloReal(unittest.TestCase):
         cls.modelo = modelo3d.Modelo.carregar(MODELO_REAL)
 
     def test_estrutura(self):
-        self.assertEqual(len(self.modelo.ossos), 68)
-        self.assertEqual(len(self.modelo.vertices), 1591)
-        self.assertEqual(len(self.modelo.faces), 1570)
+        self.assertEqual(len(self.modelo.ossos), 146)
+        self.assertEqual(len(self.modelo.vertices), 1144)
+        self.assertEqual(len(self.modelo.faces), 1166)
         for pares in self.modelo.pesos:
             self.assertTrue(pares)
             self.assertLessEqual(len(pares), 4)
