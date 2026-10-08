@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.17.0] — 2026-10-08
+
+Visualizador 3D: os manequins **Homem** e **Mulher** foram substituídos pelos
+modelos low-poly novos do autor (cerca de 28% menos triângulos: 3.140 →
+2.269), com as poses de **Idle** e **Voo** re-exportadas e as mãos refeitas. O
+desenho ficou cerca de 25% mais rápido no tick e o render puro caiu de ~16
+para ~6,5 ms; o seletor de modelo traduz os rótulos no inglês e o exportador
+ganhou `--girar-180` (para FBX com a frente invertida).
+
+**English:** 3D viewer: the **Man** and **Woman** mannequins were replaced by
+the author's new low-poly models (about 28% fewer triangles: 3,140 → 2,269),
+with the **Idle** and **Fly** poses re-exported and the hands redone. Drawing
+is about 25% faster (tick) and the pure render dropped from ~16 to ~6.5 ms;
+the model selector translates its labels in English and the exporter gained
+`--girar-180` (for flipped FBX files).
+
 ## [0.16.0] — 2026-10-08
 
 Roteiro: o comando `plano pN: valor` (texto livre) define o tipo de plano do
