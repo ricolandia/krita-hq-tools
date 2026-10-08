@@ -413,7 +413,7 @@ class Viewer3DDocker(DockWidget):
         modelo_row.addWidget(ui.rotulo(i18n.t('Modelo:')))
         self.cmb_corpo = widgets.QComboBox()
         for chave, rotulo, _ in VIEWER3D_MODELOS:
-            self.cmb_corpo.addItem(rotulo, chave)
+            self.cmb_corpo.addItem(i18n.t(rotulo), chave)
         self.cmb_corpo.currentIndexChanged.connect(self._mudar_corpo)
         modelo_row.addWidget(self.cmb_corpo, 1)
         layout.addLayout(modelo_row)

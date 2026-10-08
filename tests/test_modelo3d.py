@@ -345,6 +345,26 @@ class TestEspelhoDePose(unittest.TestCase):
             )["hand.l"],
         )
 
+    def test_modelos_do_repositorio_cobrem_as_poses(self):
+        from hq_tools.core.paths import VIEWER3D_MODELOS
+
+        usados = set()
+        pasta = os.path.join(RAIZ, "hq_tools", "modules", "viewer3d", "poses")
+        for parte in ("corpo", "maos"):
+            for nome in sorted(os.listdir(os.path.join(pasta, parte))):
+                if nome.endswith(".json"):
+                    usados |= set(
+                        modelo3d.carregar_pose(os.path.join(pasta, parte, nome))["ossos"].keys()
+                    )
+        self.assertTrue(usados)
+        for _, _, caminho in VIEWER3D_MODELOS:
+            modelo = modelo3d.Modelo.carregar(caminho)
+            self.assertTrue(modelo.vertices, caminho)
+            self.assertTrue(modelo.faces, caminho)
+            self.assertTrue(all(pesos for pesos in modelo.pesos), "vértice sem peso em " + caminho)
+            faltando = sorted(osso for osso in usados if osso not in modelo.osso_por_nome)
+            self.assertEqual(faltando, [], "%s sem os ossos: %s" % (caminho, faltando))
+
     def test_poses_de_mao_do_repositorio_sao_da_direita(self):
         pasta = os.path.join(
             RAIZ, "hq_tools", "modules", "viewer3d", "poses", "maos"

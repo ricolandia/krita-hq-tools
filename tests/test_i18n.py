@@ -33,6 +33,15 @@ def _rotulos_do_ast(caminho, nome, indice=None):
         try:
             dados = ast.literal_eval(no.value)
         except ValueError:
+            # Sequências montadas com chamadas (ex.: os.path.join): extrai os
+            # literais na coluna pedida (VIEWER3D_MODELOS usa o rótulo no
+            # índice 1, com o caminho no 2).
+            if isinstance(no.value, (ast.Tuple, ast.List)):
+                for item in no.value.elts:
+                    if isinstance(item, (ast.Tuple, ast.List)) and len(item.elts) > (indice or 0):
+                        alvo = item.elts[indice or 0]
+                        if isinstance(alvo, ast.Constant) and isinstance(alvo.value, str):
+                            valores.add(alvo.value)
             continue
         if isinstance(dados, dict):
             for valor in dados.values():
@@ -82,6 +91,7 @@ def strings_usadas():
     # biblioteca, opções das retículas, conjuntos de pincéis e o catálogo de
     # perspectiva.
     usadas |= _rotulos_do_ast(PACOTE / "modules/hub/docker.py", "ROTULOS")
+    usadas |= _rotulos_do_ast(PACOTE / "core/paths.py", "VIEWER3D_MODELOS", 1)
     usadas |= _rotulos_do_ast(
         PACOTE / "modules/pages/manager_docker.py", "FORMATO_ITENS", 1
     )
