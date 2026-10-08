@@ -1,6 +1,6 @@
 # Changelog
 
-## [Não publicado]
+## [0.15.0] — 2026-10-08
 
 Produção (v0.15): o roteiro ganha auto-save (grava sozinho depois da última
 tecla e no fechamento, com indicador "salvo HH:MM"); o checklist ganha barra de

@@ -60,7 +60,7 @@ Krita 6 (PyQt6).
 | Visualizador 3D | Manequim low-poly posável (MakeHuman + Auto-Rig Pro) como referência, com escolha de modelo (Homem/Mulher) e biblioteca de poses separada em corpo (Idle, Voa, Anda, Corre, Salto e Pose A) e mãos (Fechada, Abertas, Segura e Joinha, autorais para a mão direita, com o seletor Mão: para direita, esquerda espelhada ou ambas): arraste para orbitar; a roda do mouse ou os botões −/+ dão zoom; Shift+arraste, o botão do meio ou o botão Mover deslocam o enquadramento, e "Enquadrar" centraliza; um clique numa região (cabeça, tronco, braço, perna) abre os sliders Dobrar/Abrir/Girar daquela junta. Os controles ficam em abas (Pose, Câmera e Inserir), com o preview sempre à vista; a câmera pode ser ortográfica (padrão) ou perspectiva com lentes 14/28/35 mm (a lente muda só a convergência, sem estourar o quadro), e a cor do manequim é escolhível (bege, azul, gelo ou grafite). Desenhe uma seleção sobre o painel e o preview adota a proporção dela (WYSIWYG, com zoom e deslocamento da câmera); "Flutuar na página" só abre com seleção e aparece sobre ela (arraste/redimensione, opacidade e modo fixar), e a inserção sai no tamanho exato da seleção, abaixo do esboço, desfazendo a seleção. |
 | Perspectiva | Biblioteca de 9 malhas de perspectiva (frontal, dois e três pontos, pássaro e verme em dois níveis, curvilíneas de 4 e 5 pontos) com miniatura e prévia que adota a proporção da seleção: "Flutuar na página" mostra a malha sobre a seleção (arraste e roda); a inserção sai como camada vetorial editável (cada linha com dois nós) no tamanho exato da seleção, abaixo do esboço, como camada ou referência travada, dentro de macro (um Ctrl+Z desfaz) e desfazendo a seleção. |
 | Moodboard | Quadro de referências do projeto, leve porque guarda só links: "Adicionar referências..." redimensiona (lado máximo 1600 px) e salva as imagens em JPG na pasta `moodboard/` do projeto (os originais não mudam) e as insere no `moodboard.kra` como camadas de arquivo numa grade que cresce; duplo clique (ou "Inserir na seleção") traz a referência para o painel selecionado, travada e na medida da seleção, para desenhar por cima; Renomear e Apagar cuidam da pasta (com o quadro aberto, a camada é atualizada junto). |
-| Produção | Checklist do roteiro: cole o texto (a mesma sintaxe das páginas, com o personagem opcional na fala, ex.: `fala p1 joao: ...`) e use Ctrl+Enter; cada página vira um nó com os painéis do layout e cada painel tem três estados (esboço, arte e final; clique na coluna Estado para ciclar, botão direito define direto), com as falas e personagens à vista; a meta de painéis por semana mostra o que falta e a data prevista, o progresso aparece no topo, o duplo clique abre a `pagina_NNN.kra` e "Exportar .md" salva o checklist em Markdown; o `roteiro.txt` e o `producao.json` ficam na subpasta `producao/` do projeto (criada com o projeto; sem projeto aberto, salva na pasta padrão do plugin e avisa para escolher a pasta), e o botão "Sintaxe..." mostra o formato completo. |
+| Produção | Checklist do roteiro: cole o texto (a mesma sintaxe das páginas, com o personagem opcional na fala, ex.: `fala p1 joao: ...`) e use Ctrl+Enter; o roteiro salva sozinho (com o aviso "salvo HH:MM") e cada página vira um nó com os painéis do layout; cada painel tem três estados com bolinha colorida na árvore (esboço, arte e final; clique na coluna Estado para ciclar, botão direito define direto), com as falas e personagens à vista; a barra no topo mostra o progresso em três cores e o botão "Abrir próxima pendente" leva à primeira página não finalizada; o tempo de produção é contado pelo botão Iniciar/Pausar (total e por página, em `tempos.json`); a meta de painéis por semana mostra o que falta e a data prevista, o duplo clique abre a `pagina_NNN.kra` e "Exportar .md" salva o checklist com checkboxes, emojis de estado e tempo por página; o `roteiro.txt`, o `producao.json` e o `tempos.json` ficam na subpasta `producao/` do projeto (criada com o projeto; sem projeto aberto, salva na pasta padrão do plugin e avisa para escolher a pasta), e o botão "Sintaxe..." mostra o formato completo. |
 | Hub | Central para abrir e fechar os módulos: um botão por docker, marcado enquanto a doca está aberta (clicar de novo fecha), agrupados por divisores (Páginas/Produção, Moodboard/Biblioteca, Perspectiva/3D, Paletas/Pincéis, Retículas/Balões e Onomatopeias); a opção "Fechar o atual ao abrir outro" alterna entre um módulo por vez e as dockas convivendo; módulo desligado nas configurações fica com o botão desabilitado e aviso. |
 
 ## Kit de HQ (fontes e balões livres)
@@ -145,14 +145,20 @@ automaticamente; você pode desagrupar quando quiser).
    documento" e insira com duplo clique. A pintura sai como PNG transparente
    recortado pela camada ativa. Renomear, Duplicar e Apagar organizam a lista.
 8. **Visualizador 3D**: no docker "HQ Tools: 3D", escolha o corpo (Homem ou
-   Mulher) e a pose do corpo e a das mãos (padrão: Idle + Fechadas; o seletor
-   Mão: espelha para a esquerda ou aplica nas duas); arraste para orbitar,
+   Mulher) e a pose do corpo e a das mãos (padrão: Idle + Fechadas; cada mão
+   tem a própria caixa e a esquerda recebe a versão espelhada); arraste para orbitar,
    use Shift+arraste (ou o botão Mover) para deslocar, a roda ou os botões −/+
    para o zoom e "Enquadrar" para centralizar; clique numa região do corpo para
    posar. Desenhe uma seleção retangular sobre o painel: o preview mostra
    exatamente o recorte (use o zoom para detalhes, como uma mão) e "Flutuar na
-   página" aparece sobre a seleção. "Inserir como camada" ou "como referência"
+   página" aparece sobre a seleção.    "Inserir como camada" ou "como referência"
    coloca no tamanho da seleção, abaixo do esboço, e desfaz a seleção.
+9. **Produção**: cole o roteiro no docker "HQ Tools: produção" e use Ctrl+Enter
+   (o texto salva sozinho, com o aviso "salvo HH:MM"); clique na coluna Estado
+   para ciclar esboço → arte → final (a bolinha mostra a cor), acompanhe a
+   barra de progresso e use "Abrir próxima pendente" para ir direto à página
+   que falta; o botão Iniciar/Pausar conta o tempo da produção (total e por
+   página) e "Exportar .md" gera o checklist com checkboxes, emojis e tempo.
 
 ## Desenvolvimento
 

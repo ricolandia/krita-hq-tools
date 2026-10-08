@@ -61,7 +61,7 @@ overview.
 | 3D viewer | Posable low-poly mannequin (MakeHuman + Auto-Rig Pro) as reference, with model choice (Man/Woman) and a pose library split into body (Idle, Fly, Walk, Run, Jump and Pose A) and hands (Closed, Open, Holding and Thumbs up, authored for the right hand, with the Hand: selector for right, mirrored left or both): drag to orbit; the mouse wheel or the −/+ buttons zoom; Shift+drag, the middle mouse button or the Move button pan the framing, and "Fit" recenters; click a region (head, torso, arm, leg) to open Bend/Open/Twist sliders for that joint. The controls live in tabs (Pose, Camera and Insert), with the preview always visible; the camera can be orthographic (default) or perspective with 14/28/35 mm lenses (the lens changes only the convergence, without spilling out of the frame), and the mannequin color is selectable (beige, blue, ice or graphite). Draw a selection over the panel and the preview adopts its aspect ratio (WYSIWYG, camera zoom and pan included); "Float on page" only opens with a selection and appears over it (drag/resize, opacity and lock mode), and the insertion lands at the exact selection size, below the sketch, clearing the selection. |
 | Perspective | Library of 9 perspective grids (one-point, two-point, three-point, bird's and worm's eye in two levels, 4- and 5-point curvilinear) with thumbnails and a preview that adopts the selection aspect ratio: "Float on page" shows the grid over the selection (drag and wheel); the insertion lands as an editable vector layer (each line with two nodes) at the exact selection size, below the sketch, as a layer or a locked reference, inside a macro (one Ctrl+Z undoes it) and clearing the selection. |
 | Moodboard | Project reference board, light because it stores only links: "Add references..." resizes (max side 1600 px) and saves the images as JPG in the project's `moodboard/` folder (the originals stay untouched) and inserts them into `moodboard.kra` as file layers on a grid that grows; double-click (or "Insert into selection") brings the reference to the selected panel, locked and fitted to the selection, for tracing over; Rename and Delete manage the folder (with the board open, the layer is updated along). |
-| Production | Script checklist: paste the text (the same syntax as the pages, with the optional character on the line, e.g. `fala p1 joao: ...`) and use Ctrl+Enter; each page becomes a node with the layout panels and each panel has three states (sketch, art and final; click the State column to cycle, right-click sets it directly), with the lines and characters in view; the weekly panel goal shows what is left and the expected date, the progress sits on top, double-click opens the `pagina_NNN.kra` and "Export .md" saves the checklist as Markdown; `roteiro.txt` and `producao.json` live in the project's `producao/` subfolder (created with the project; without a project open, it saves in the plugin default folder and warns to choose the folder), and the "Syntax..." button shows the full format. |
+| Production | Script checklist: paste the text (the same syntax as the pages, with the optional character on the line, e.g. `fala p1 joao: ...`) and use Ctrl+Enter; the script auto-saves (with a "saved HH:MM" hint) and each page becomes a node with the layout panels; each panel has three states with a colored dot in the tree (sketch, art and final; click the State column to cycle, right-click sets it directly), with the lines and characters in view; the bar on top shows the progress in three colors and the "Open next pending" button jumps to the first unfinished page; production time is counted with the Start/Pause button (total and per page, in `tempos.json`); the weekly panel goal shows what is left and the expected date, double-click opens the `pagina_NNN.kra` and "Export .md" saves the checklist with checkboxes, state emojis and per-page time; `roteiro.txt`, `producao.json` and `tempos.json` live in the project's `producao/` subfolder (created with the project; without a project open, it saves in the plugin default folder and warns to choose the folder), and the "Syntax..." button shows the full format. |
 | Hub | Control center to open and close the modules: one button per docker, checked while the dock is open (click again to close), grouped by dividers (Pages/Production, Moodboard/Library, Perspective/3D, Palettes/Brushes, Screentones/Balloons and Sound effects); the "Close the current one when opening another" option toggles between one module at a time and docks living together; a module disabled in the settings gets a disabled button with a warning. |
 
 ## Comic kit (fonts and free balloons)
@@ -147,14 +147,20 @@ automatically, and you can ungroup whenever you want).
    PNG trimmed by the active layer. Rename, Duplicate and Delete organize the
    list.
 8. **3D viewer**: in the "HQ Tools: 3D" docker, choose the model (Man or
-   Woman) and the body and hand poses (default: Idle + Closed; the Hand:
-   selector mirrors to the left or applies to both); drag to orbit, use
+   Woman) and the body and hand poses (default: Idle + Closed; each hand has
+   its own box and the left one receives the mirrored version); drag to orbit, use
    Shift+drag (or the Move button) to pan, the wheel or the −/+ buttons to
    zoom and "Fit" to recenter; click a body region to pose. Draw a rectangular
    selection over the panel: the preview shows exactly the crop (use zoom for
    details, like a hand) and "Float on page" appears over the selection.
    "Insert as layer" or "as reference" places it at the selection size, below
    the sketch, and clears the selection.
+9. **Production**: paste the script in the "HQ Tools: production" docker and
+   use Ctrl+Enter (the text auto-saves, with a "saved HH:MM" hint); click the
+   State column to cycle sketch → art → final (the dot shows the color), follow
+   the progress bar and use "Open next pending" to jump straight to the missing
+   page; the Start/Pause button counts production time (total and per page) and
+   "Export .md" writes the checklist with checkboxes, emojis and time.
 
 ## Development
 
