@@ -335,6 +335,10 @@ class Viewer3DDocker(DockWidget):
         self.corpo = "homem"
         self.regiao = None
         self.semantica = {}
+        # A pose só muda em _aplicar_poses e nos sliders; a revisão evita
+        # recalcular vertices_em_pose a cada tick de câmera (arrasto/zoom).
+        self._pose_revisao = 0
+        self._posados_cache = None
         self.pose_corpo = VIEWER3D_POSE_CORPO_PADRAO
         # Padrão: as duas mãos fechadas, como antes da separação; cada mão
         # tem a própria caixa de pose.
@@ -596,6 +600,7 @@ class Viewer3DDocker(DockWidget):
         except (OSError, ValueError) as error:
             self.lbl_regiao.setText(i18n.t('Modelo 3D indisponível: {0}').format(error))
             return
+        self._posados_cache = None
         self._popular_poses()
         if aplicar_padrao:
             self._aplicar_poses()
@@ -700,8 +705,25 @@ class Viewer3DDocker(DockWidget):
         direita = self._ler_pose(VIEWER3D_POSES_MAOS_DIR, self.pose_mao_direita)
         esquerda = self._ler_pose(VIEWER3D_POSES_MAOS_DIR, self.pose_mao_esquerda)
         self.semantica = modelo3d.combinar_poses(corpo, direita, esquerda)
+        self._pose_mudou()
         self._montar_sliders()
         self.agendar_render()
+
+    def _pose_mudou(self):
+        """Invalida o cache dos vértices posados (a pose mudou)."""
+        self._pose_revisao += 1
+
+    def _posados(self):
+        """Vértices na pose atual, recalculados só quando a pose muda."""
+        if (
+            self._posados_cache is None
+            or self._posados_cache[0] != self._pose_revisao
+        ):
+            self._posados_cache = (
+                self._pose_revisao,
+                self.modelo.vertices_em_pose(self._rotacoes()),
+            )
+        return self._posados_cache[1]
 
     def _rotacoes(self):
         if self.modelo is None:
@@ -730,7 +752,7 @@ class Viewer3DDocker(DockWidget):
         if not com_fundo:
             fundo = None
         if posados is None:
-            posados = self.modelo.vertices_em_pose(self._rotacoes())
+            posados = self._posados()
         pan_x, pan_y = self._pan_em_pixels(largura, altura)
         return self.modelo.renderizar(
             yaw=self.camera["yaw"],
@@ -745,6 +767,7 @@ class Viewer3DDocker(DockWidget):
             cor=cor,
             fundo=fundo,
             lente=self.lente if self.perspectiva else None,
+            cull=True,
         )
 
     @staticmethod
@@ -783,7 +806,7 @@ class Viewer3DDocker(DockWidget):
             return
         largura, altura = self._tamanho_do_preview()
         pan_x, pan_y = self._pan_em_pixels(largura, altura)
-        posados = self.modelo.vertices_em_pose(self._rotacoes())
+        posados = self._posados()
         self._tela = self.modelo.vertices_em_tela(
             yaw=self.camera["yaw"],
             pitch=self.camera["pitch"],
@@ -1072,6 +1095,7 @@ class Viewer3DDocker(DockWidget):
 
     def _mudar_junta(self, osso, chave, valor, etiqueta):
         self.semantica.setdefault(osso, {})[chave] = float(valor)
+        self._pose_mudou()
         etiqueta.setText(i18n.t('{0}°').format(valor))
         self.agendar_render()
 
@@ -1103,6 +1127,7 @@ class Viewer3DDocker(DockWidget):
     def _mudar_dedos(self, ossos, valor, etiqueta):
         for osso in ossos:
             self.semantica.setdefault(osso, {})["dobrar"] = float(valor)
+        self._pose_mudou()
         etiqueta.setText(i18n.t('{0}°').format(valor))
         self.agendar_render()
 

@@ -14,6 +14,26 @@ insertion, like the other modules); dead code and unused imports removed;
 `install-dev.sh` respects `XDG_DATA_HOME`; the insertion smoke gains the 300
 dpi perspective case.
 
+### Visualizador 3D — desempenho
+
+O desenho do manequim ficou cerca de **3× mais rápido** no núcleo e o tick do
+preview caiu de ~53–68 ms para ~31–41 ms (medido no harness, preview
+240×240):
+
+- Culling de costas no preview e na inserção (1.818 dos 3.140 triângulos;
+  aprovado em QA de visão e conferência por pixel: silhueta idêntica, com
+  diferença só de antialiasing nas bordas, média 0,25/255).
+- Triangulação das faces pré-computada no modelo; `vertices_em_pose`
+  recalculado só quando a pose muda (câmera livre para arrastar); cache das
+  cores em hexadecimal; montagem do SVG com f-strings.
+
+**English:** the mannequin drawing is about 3× faster in the core and the
+preview tick dropped from ~53–68 ms to ~31–41 ms (measured in the harness,
+240×240 preview): backface culling in the preview and insertion (1,818 of the
+3,140 triangles; approved by vision QA and per-pixel comparison: identical
+silhouette); precomputed face triangulation; `vertices_em_pose` recomputed
+only when the pose changes; cached hex colors; SVG built with f-strings.
+
 ## [0.14.0] — 2026-10-07
 
 Pose de mãos por lado no visualizador 3D: cada mão ganhou a própria caixa de

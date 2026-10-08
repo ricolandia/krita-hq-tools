@@ -12,6 +12,7 @@ rotações das juntas são locais, em graus, aplicadas na ordem X, depois Y,
 depois Z.
 """
 
+import functools
 import json
 import math
 
@@ -291,6 +292,7 @@ def _hex_para_rgb(cor):
     return (int(cor[0:2], 16), int(cor[2:4], 16), int(cor[4:6], 16))
 
 
+@functools.lru_cache(maxsize=4096)
 def _rgb_para_hex(rgb):
     return "#{0:02x}{1:02x}{2:02x}".format(
         max(0, min(255, int(round(rgb[0])))),
@@ -319,6 +321,10 @@ class Modelo:
         self.vertices = [tuple(vertice) for vertice in dados["vertices"]]
         self.pesos = [list(pares) for pares in dados["pesos"]]
         self.faces = [tuple(face) for face in dados["faces"]]
+        # A triangulação (leque) não muda com a pose nem com a câmera; fica
+        # pronta para os quatro consumidores (máscara, contorno, chapado e
+        # sombreado), em vez de refeita a cada quadro.
+        self.triangulos = [self._triangular(face) for face in self.faces]
         self.osso_por_nome = {osso["nome"]: osso for osso in self.ossos}
         self.caixa = self._calcular_caixa()
 
@@ -416,8 +422,8 @@ class Modelo:
         """
         tamanho = max(largura, altura) / float(celulas)
         mascara = set()
-        for face in self.faces:
-            for triangulo in self._triangular(face):
+        for triangulos in self.triangulos:
+            for triangulo in triangulos:
                 pontos = [tela[indice] for indice in triangulo]
                 ys = [ponto[1] for ponto in pontos]
                 iy0 = int(min(ys) / tamanho)
@@ -485,8 +491,8 @@ class Modelo:
         face). É o que desenha a linha do contorno do modelo projetado.
         """
         vizinhanca = {}
-        for face in self.faces:
-            for triangulo in self._triangular(face):
+        for triangulos in self.triangulos:
+            for triangulo in triangulos:
                 p0, p1, p2 = (na_camera[indice] for indice in triangulo)
                 aresta1 = (p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2])
                 aresta2 = (p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2])
@@ -614,16 +620,15 @@ class Modelo:
             cor_solida = _rgb_para_hex(_hex_para_rgb(cor or self.cor_padrao))
             if estilo == "chapado":
                 caminho = []
-                for face in self.faces:
-                    for triangulo in self._triangular(face):
+                for triangulos in self.triangulos:
+                    for triangulo in triangulos:
                         a, b, c = (tela[indice] for indice in triangulo)
                         area = (b[0] - a[0]) * (c[1] - a[1]) - (c[0] - a[0]) * (b[1] - a[1])
                         if area < 0:
                             b, c = c, b
                         caminho.append(
-                            "M{0:.1f} {1:.1f}L{2:.1f} {3:.1f}L{4:.1f} {5:.1f}Z".format(
-                                a[0], a[1], b[0], b[1], c[0], c[1],
-                            )
+                            f"M{a[0]:.1f} {a[1]:.1f}L{b[0]:.1f} {b[1]:.1f}"
+                            f"L{c[0]:.1f} {c[1]:.1f}Z"
                         )
                 partes.append(
                     '<path d="{0}" fill="{1}"/>'.format("".join(caminho), cor_solida)
@@ -644,9 +649,7 @@ class Modelo:
                     if not visivel:
                         continue
                     caminho.append(
-                        "M{0:.1f} {1:.1f}L{2:.1f} {3:.1f}".format(
-                            a[0], a[1], b[0], b[1],
-                        )
+                        f"M{a[0]:.1f} {a[1]:.1f}L{b[0]:.1f} {b[1]:.1f}"
                     )
                 partes.append(
                     '<path d="{0}" fill="none" stroke="{1}" stroke-width="1.5" '
@@ -656,8 +659,8 @@ class Modelo:
             return "".join(partes)
 
         desenhaveis = []
-        for face in self.faces:
-            for triangulo in self._triangular(face):
+        for triangulos in self.triangulos:
+            for triangulo in triangulos:
                 p0, p1, p2 = (
                     na_camera[triangulo[0]],
                     na_camera[triangulo[1]],
@@ -687,14 +690,13 @@ class Modelo:
         for _, face, brilho in desenhaveis:
             rgb = tuple(canal * brilho for canal in base)
             pontos_svg = " ".join(
-                "{0:.1f},{1:.1f}".format(tela[indice][0], tela[indice][1])
+                f"{tela[indice][0]:.1f},{tela[indice][1]:.1f}"
                 for indice in face
             )
             cor_face = _rgb_para_hex(rgb)
             partes.append(
-                '<polygon points="{0}" fill="{1}" stroke="{1}" stroke-width="0.4"/>'.format(
-                    pontos_svg, cor_face
-                )
+                f'<polygon points="{pontos_svg}" fill="{cor_face}" '
+                f'stroke="{cor_face}" stroke-width="0.4"/>'
             )
         partes.append("</svg>")
         return "".join(partes)
