@@ -1,6 +1,6 @@
 # Changelog
 
-## [Não publicado]
+## [0.16.0] — 2026-10-08
 
 Roteiro: o comando `plano pN: valor` (texto livre) define o tipo de plano do
 painel; ele aparece na nova coluna "Plano" da Produção, como rótulo no canto do

@@ -45,7 +45,7 @@ overview.
 
 | Production |
 |---|
-| ![Production docker with the pasted script, the checklist by page and panel (Sketch, Art and Final states), the lines and the weekly goal with the delivery projection](Screenshots/14-Produc.png) |
+| ![Production docker with the script (auto-save), the checklist by page and panel with the Shot column, the three-color progress bar with legend, the production time and the weekly goal](Screenshots/14-Produc.png) |
 
 ## Modules
 

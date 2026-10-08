@@ -44,7 +44,7 @@ Krita 6 (PyQt6).
 
 | Produção |
 |---|
-| ![Docker Produção com o roteiro colado, o checklist por página e painel (estados Esboço, Arte e Final), as falas e a meta semanal com a projeção de entrega](Screenshots/14-Produc.png) |
+| ![Docker Produção com o roteiro (auto-save), o checklist por página e painel com a coluna Plano, a barra de progresso em três cores com legenda, o tempo de produção e a meta semanal](Screenshots/14-Produc.png) |
 
 ## Módulos
 
