@@ -591,7 +591,7 @@ TRADUCOES = {
     "Abertas": "Open",
     "Segura": "Holding",
     "Fechada boxing": "Boxing fist",
-    "Relaxada": "Relaxed",
+    "Pega": "Catch",
     "1) Desenhe uma seleção retangular sobre o painel. 2) Ajuste a pose e o zoom (o preview mostra exatamente o recorte). 3) 'Inserir' coloca a camada abaixo da ativa e desfaz a seleção.": "1) Draw a rectangular selection over the panel. 2) Adjust the pose and zoom (the preview shows exactly the crop). 3) 'Insert' places the layer below the active one and clears the selection.",
     "Arraste no preview para orbitar; Shift+arraste desloca; roda ou +/− dão zoom.": "Drag on the preview to orbit; Shift+drag pans; wheel or +/− zoom.",
     "Câmera": "Camera",
