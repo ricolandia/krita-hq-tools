@@ -585,6 +585,8 @@ TRADUCOES = {
     "Anda": "Walk",
     "Corre": "Run",
     "Pose A": "Pose A",
+    "Boxing": "Boxing",
+    "Sentado": "Sitting",
     "Fechada": "Closed",
     "Abertas": "Open",
     "Segura": "Holding",
