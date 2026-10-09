@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.18.0] — 2026-10-09
+
+Visualizador 3D: duas poses de corpo novas do autor, **Sentado** e **Boxing**,
+e duas poses de mão aproveitadas delas, **Fechada boxing** e **Pega** (16 ossos
+cada, autorais para a mão direita como as demais). Ajustes nas docs: as listas
+de poses, a descrição do manequim (malha do autor com rig Auto-Rig Pro) e a
+legenda da captura do hub com o 3D.
+
+**English:** 3D viewer: two new body poses by the author, **Sitting** and
+**Boxing**, and two hand poses taken from them, **Boxing fist** and **Catch**
+(16 bones each, authored for the right hand like the others). Documentation
+fixes: the pose lists, the mannequin description (author's mesh with the
+Auto-Rig Pro rig) and the hub with the 3D screenshot caption.
+
 ## [0.17.1] — 2026-10-08
 
 Visualizador 3D: trocar a pose de uma mão não mexe mais no corpo (e vice-versa):
