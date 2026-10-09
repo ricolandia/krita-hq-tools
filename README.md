@@ -36,7 +36,7 @@ Krita 6 (PyQt6).
 
 | Biblioteca de perspectivas | Hub e 3D no Krita |
 |---|---|
-| ![Docker de perspectiva com a galeria de malhas, a prévia ampliada e os botões de inserir na seleção](Screenshots/11-perspectiva.png) | ![Krita com o hub (módulos agrupados por divisores) e o docker 3D abertos, com os seletores de pose (Corpo: Corre, Mão direita: Fechada, Mão esquerda: Fechada) e o manequim já inserido numa página](Screenshots/12-hub-e-3d.png) |
+| ![Docker de perspectiva com a galeria de malhas, a prévia ampliada e os botões de inserir na seleção](Screenshots/11-perspectiva.png) | ![Krita com o hub do HQ Tools na coluna da direita (módulos agrupados por divisores), o docker 3D na aba Câmera (ortográfica, lente 14 mm), o manequim inserido na página e o docker de produção flutuando à esquerda](Screenshots/12-hub-e-3d.png) |
 
 | Moodboard |
 |---|
