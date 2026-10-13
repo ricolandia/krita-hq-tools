@@ -47,6 +47,8 @@ from ...core.paths import (
     VIEWER3D_POSE_MAOS_PADRAO,
     VIEWER3D_POSES_CORPO_DIR,
     VIEWER3D_POSES_MAOS_DIR,
+    VIEWER3D_POSES_USUARIO_CORPO_DIR,
+    VIEWER3D_POSES_USUARIO_MAOS_DIR,
 )
 
 LIMITE_SLIDER = 120
@@ -424,6 +426,12 @@ class Viewer3DDocker(DockWidget):
         self.cmb_pose_corpo = widgets.QComboBox()
         self.cmb_pose_corpo.currentIndexChanged.connect(self._mudar_pose_corpo)
         corpo_row.addWidget(self.cmb_pose_corpo, 1)
+        corpo_row.addWidget(ui.botao(
+            i18n.t('Salvar pose...'),
+            i18n.t('Salva a pose do corpo atual na sua biblioteca. As mãos não entram.'),
+            self._salvar_pose_corpo,
+            icone_chave="salvar",
+        ))
         layout.addLayout(corpo_row)
 
         mao_direita_row = widgets.QHBoxLayout()
@@ -612,43 +620,75 @@ class Viewer3DDocker(DockWidget):
         self.atualizar_preview()
 
     def _popular_poses(self):
-        self._popular_combo(
-            self.cmb_pose_corpo, VIEWER3D_POSES_CORPO_DIR, self.pose_corpo
+        self.pose_corpo = self._popular_combo(
+            self.cmb_pose_corpo,
+            (VIEWER3D_POSES_CORPO_DIR, VIEWER3D_POSES_USUARIO_CORPO_DIR),
+            "corpo",
+            self.pose_corpo,
         )
-        self._popular_combo(
-            self.cmb_mao_direita, VIEWER3D_POSES_MAOS_DIR, self.pose_mao_direita
+        self.pose_mao_direita = self._popular_combo(
+            self.cmb_mao_direita,
+            (VIEWER3D_POSES_MAOS_DIR, VIEWER3D_POSES_USUARIO_MAOS_DIR),
+            "maos",
+            self.pose_mao_direita,
         )
-        self._popular_combo(
-            self.cmb_mao_esquerda, VIEWER3D_POSES_MAOS_DIR, self.pose_mao_esquerda
+        self.pose_mao_esquerda = self._popular_combo(
+            self.cmb_mao_esquerda,
+            (VIEWER3D_POSES_MAOS_DIR, VIEWER3D_POSES_USUARIO_MAOS_DIR),
+            "maos",
+            self.pose_mao_esquerda,
         )
 
-    def _popular_combo(self, combo, pasta, atual):
+    def _popular_combo(self, combo, pastas, parte, atual):
         combo.blockSignals(True)
         combo.clear()
         combo.addItem(i18n.t('—'), None)
         combo.setIconSize(QtCore.QSize(28, 40))
-        try:
-            arquivos = sorted(os.listdir(pasta))
-        except OSError:
-            arquivos = []
-        parte = os.path.basename(pasta)
-        for arquivo in arquivos:
-            if not arquivo.endswith(".json"):
-                continue
+        for pasta in pastas:
             try:
-                dados = modelo3d.carregar_pose(os.path.join(pasta, arquivo))
-                rotulo = i18n.t(dados.get("nome") or arquivo[:-5])
-            except (OSError, ValueError):
-                rotulo = arquivo[:-5]
-            combo.addItem(rotulo, arquivo)
-            previa = os.path.join(
-                RESOURCES_DIR, "poses-preview", parte, arquivo[:-5] + ".png"
-            )
-            if os.path.isfile(previa):
-                combo.setItemIcon(combo.count() - 1, QtGui.QIcon(previa))
-        indice = combo.findData(atual)
+                arquivos = sorted(os.listdir(pasta))
+            except OSError:
+                continue
+            for arquivo in arquivos:
+                if not arquivo.endswith(".json"):
+                    continue
+                caminho = os.path.join(pasta, arquivo)
+                try:
+                    dados = modelo3d.carregar_pose(caminho)
+                    rotulo = i18n.t(dados.get("nome") or arquivo[:-5])
+                except (OSError, ValueError):
+                    rotulo = arquivo[:-5]
+                combo.addItem(rotulo, caminho)
+                # Miniatura: a do lado do arquivo (pose do usuário gera a sua)
+                # ou a galeria do repositório, por nome de arquivo.
+                previa = os.path.splitext(caminho)[0] + ".png"
+                if not os.path.isfile(previa):
+                    previa = os.path.join(
+                        RESOURCES_DIR, "poses-preview", parte, arquivo[:-5] + ".png"
+                    )
+                if os.path.isfile(previa):
+                    combo.setItemIcon(combo.count() - 1, QtGui.QIcon(previa))
+        indice = self._indice_da_pose(combo, atual)
         combo.setCurrentIndex(indice if indice >= 0 else 0)
         combo.blockSignals(False)
+        return combo.itemData(combo.currentIndex())
+
+    @staticmethod
+    def _indice_da_pose(combo, atual):
+        """Índice do item para ``atual`` (caminho completo ou nome de arquivo).
+
+        O nome puro cobre o valor inicial e o do "limpar pose" em versões
+        anteriores, quando os itens guardavam só o nome do arquivo.
+        """
+        indice = combo.findData(atual)
+        if indice >= 0 or not atual:
+            return indice
+        alvo = os.path.basename(atual)
+        for indice in range(combo.count()):
+            dado = combo.itemData(indice)
+            if dado and os.path.basename(dado) == alvo:
+                return indice
+        return -1
 
     def _sincronizar_combos(self):
         for combo, atual in (
@@ -656,16 +696,16 @@ class Viewer3DDocker(DockWidget):
             (self.cmb_mao_direita, self.pose_mao_direita),
             (self.cmb_mao_esquerda, self.pose_mao_esquerda),
         ):
-            indice = combo.findData(atual)
+            indice = self._indice_da_pose(combo, atual)
             combo.blockSignals(True)
             combo.setCurrentIndex(indice if indice >= 0 else 0)
             combo.blockSignals(False)
 
-    def _ler_pose(self, pasta, arquivo):
-        if not arquivo:
+    def _ler_pose(self, caminho):
+        if not caminho:
             return {}
         try:
-            dados = modelo3d.carregar_pose(os.path.join(pasta, arquivo))
+            dados = modelo3d.carregar_pose(caminho)
         except (OSError, ValueError) as error:
             helpers.show_info(i18n.t('3D'), i18n.t('Não foi possível ler a pose: {0}').format(error))
             return {}
@@ -714,9 +754,9 @@ class Viewer3DDocker(DockWidget):
         As trocas de seletor usam :meth:`_aplicar_corpo` e :meth:`_aplicar_mao`
         para não descartar os ajustes feitos nos sliders.
         """
-        corpo = self._ler_pose(VIEWER3D_POSES_CORPO_DIR, self.pose_corpo)
-        direita = self._ler_pose(VIEWER3D_POSES_MAOS_DIR, self.pose_mao_direita)
-        esquerda = self._ler_pose(VIEWER3D_POSES_MAOS_DIR, self.pose_mao_esquerda)
+        corpo = self._ler_pose(self.pose_corpo)
+        direita = self._ler_pose(self.pose_mao_direita)
+        esquerda = self._ler_pose(self.pose_mao_esquerda)
         self.semantica = modelo3d.combinar_poses(corpo, direita, esquerda)
         self._pose_mudou()
         self._montar_sliders()
@@ -724,7 +764,7 @@ class Viewer3DDocker(DockWidget):
 
     def _aplicar_corpo(self):
         """Troca só a pose do corpo, preservando as mãos (e seus ajustes)."""
-        corpo = self._ler_pose(VIEWER3D_POSES_CORPO_DIR, self.pose_corpo)
+        corpo = self._ler_pose(self.pose_corpo)
         self.semantica = modelo3d.substituir_corpo(self.semantica, corpo)
         self._pose_mudou()
         self._montar_sliders()
@@ -736,7 +776,7 @@ class Viewer3DDocker(DockWidget):
             arquivo = self.pose_mao_direita
         else:
             arquivo = self.pose_mao_esquerda
-        valores = self._ler_pose(VIEWER3D_POSES_MAOS_DIR, arquivo)
+        valores = self._ler_pose(arquivo)
         self.semantica = modelo3d.substituir_mao(self.semantica, valores, lado)
         self._pose_mudou()
         self._montar_sliders()
@@ -1048,11 +1088,77 @@ class Viewer3DDocker(DockWidget):
 
     def limpar_pose(self):
         """Volta ao padrão: Idle + Fechadas, nas duas mãos."""
-        self.pose_corpo = VIEWER3D_POSE_CORPO_PADRAO
-        self.pose_mao_direita = VIEWER3D_POSE_MAOS_PADRAO
-        self.pose_mao_esquerda = VIEWER3D_POSE_MAOS_PADRAO
+        self.pose_corpo = os.path.join(
+            VIEWER3D_POSES_CORPO_DIR, VIEWER3D_POSE_CORPO_PADRAO
+        )
+        self.pose_mao_direita = os.path.join(
+            VIEWER3D_POSES_MAOS_DIR, VIEWER3D_POSE_MAOS_PADRAO
+        )
+        self.pose_mao_esquerda = os.path.join(
+            VIEWER3D_POSES_MAOS_DIR, VIEWER3D_POSE_MAOS_PADRAO
+        )
         self._sincronizar_combos()
         self._aplicar_poses()
+
+    def _salvar_pose_corpo(self):
+        """Salva a pose atual do corpo na biblioteca do usuário (só o corpo)."""
+        if self.modelo is None:
+            helpers.show_info(i18n.t('3D'), i18n.t('O modelo não está disponível.'))
+            return
+        nome, ok = QtWidgets.QInputDialog.getText(
+            self.widget(),
+            i18n.t('Salvar pose do corpo'),
+            i18n.t('Nome da pose do corpo (somente o corpo será salvo):'),
+        )
+        if not ok or not nome.strip():
+            return
+        nome = nome.strip()
+        destino = os.path.join(
+            VIEWER3D_POSES_USUARIO_CORPO_DIR, modelo3d.slug_de_pose(nome) + ".json"
+        )
+        if os.path.exists(destino):
+            helpers.show_info(
+                i18n.t('3D'),
+                i18n.t('Já existe uma pose com esse nome na sua biblioteca.'),
+            )
+            return
+        try:
+            os.makedirs(VIEWER3D_POSES_USUARIO_CORPO_DIR, exist_ok=True)
+            valores = modelo3d.semantica_do_corpo(self.semantica)
+            modelo3d.salvar_pose(destino, nome, valores)
+            self._salvar_previa_da_pose(destino, valores)
+        except OSError as error:
+            helpers.show_info(
+                i18n.t('3D'),
+                i18n.t('Não foi possível salvar a pose: {0}').format(error),
+            )
+            return
+        self.pose_corpo = destino
+        self._popular_poses()
+        helpers.show_info(
+            i18n.t('3D'), i18n.t('Pose do corpo salva na sua biblioteca.')
+        )
+
+    def _salvar_previa_da_pose(self, caminho_json, valores):
+        """Miniatura ao lado da pose do usuário, na câmera da galeria.
+
+        Falha de miniatura não derruba o salvamento: a pose já está gravada e
+        a lista mostra o item sem ícone.
+        """
+        if QSvgRenderer is None:
+            return
+        try:
+            fechada = self._ler_pose(
+                os.path.join(VIEWER3D_POSES_MAOS_DIR, VIEWER3D_POSE_MAOS_PADRAO)
+            )
+            semantica = modelo3d.combinar_poses(valores, fechada, fechada)
+            svg = modelo3d.render_previa(self.modelo, semantica, "corpo")
+            imagem = self._rasterizar(
+                svg, modelo3d.PREVIA_LARGURA, modelo3d.PREVIA_ALTURA
+            )
+            imagem.save(os.path.splitext(caminho_json)[0] + ".png", "PNG")
+        except (OSError, ValueError) as erro:
+            helpers.log("prévia da pose não gerada: {0}".format(erro))
 
     def selecionar_em(self, x, y):
         if self.modelo is None or not self._tela:

@@ -4,8 +4,9 @@
 Calcula, a partir do rig e das poses do repositório, o enquadramento que
 fecha o quadro com ~6 px de margem em cada grupo: corpo = todas as poses de
 corpo (mãos fechadas); mãos = todas as poses de mão (com o braço levantado ao
-lado, para a mão sair da silhueta do corpo). Imprime os dicionários prontos
-para colar em ``preview-poses3d.py``; rodar quando o rig ou as poses mudarem.
+lado, para a mão sair da silhueta do corpo). Imprime os dicionários para colar
+em ``modelo3d.PREVIA_CAMERA_CORPO/MAOS``; rodar quando o rig ou as poses
+mudarem.
 
 Uso:
     python3 scripts/calibrar-galeria-poses3d.py
@@ -26,10 +27,10 @@ from hq_tools.core.paths import (  # noqa: E402
     VIEWER3D_POSES_MAOS_DIR,
 )
 
-LARGURA, ALTURA = 120, 160
+LARGURA, ALTURA = modelo3d.PREVIA_LARGURA, modelo3d.PREVIA_ALTURA
 YAW_CORPO, YAW_MAOS, PITCH = 0.0, -15.0, -10.0
 MARGEM = 6.0
-ABRIR_MAO = 70.0
+ABRIR_MAO = modelo3d.PREVIA_ABRIR_MAO
 
 
 def _ler(pasta, nome):

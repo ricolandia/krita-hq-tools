@@ -467,6 +467,52 @@ class TestEspelhoDePose(unittest.TestCase):
         )
 
 
+class TestPosesUsuario(unittest.TestCase):
+    """O que o "Salvar pose do corpo..." grava (núcleo, sem Krita)."""
+
+    def test_serializar_pose_arredonda_e_ordena(self):
+        dados = modelo3d.serializar_pose(
+            "Minha Pose", {"b.x": {"girar": 1.239}, "a.l": {"dobrar": -2.0}}
+        )
+        self.assertEqual("hq_tools.pose3d", dados["formato"])
+        self.assertEqual(1, dados["versao"])
+        self.assertEqual("Minha Pose", dados["nome"])
+        self.assertEqual(["a.l", "b.x"], list(dados["ossos"]))
+        self.assertEqual({"dobrar": -2.0}, dados["ossos"]["a.l"])
+        self.assertEqual(1.24, dados["ossos"]["b.x"]["girar"])
+
+    def test_salvar_pose_round_trip(self):
+        with tempfile.TemporaryDirectory() as pasta:
+            caminho = os.path.join(pasta, "minha-pose.json")
+            modelo3d.salvar_pose(
+                caminho, "Minha Pose", {"spine_01.x": {"dobrar": 3.456}}
+            )
+            self.assertFalse(os.path.exists(caminho + ".tmp"))
+            dados = modelo3d.carregar_pose(caminho)
+            self.assertEqual("Minha Pose", dados["nome"])
+            self.assertEqual({"dobrar": 3.46}, dados["ossos"]["spine_01.x"])
+
+    def test_slug_de_pose(self):
+        self.assertEqual(
+            "braco-erguido-pose-2", modelo3d.slug_de_pose("Braço Erguido (pose 2)")
+        )
+        self.assertEqual("pose", modelo3d.slug_de_pose("///"))
+        self.assertEqual("a-b", modelo3d.slug_de_pose("  a b  "))
+
+    def test_semantica_do_corpo_tira_maos_e_dedos(self):
+        semantica = {
+            "spine_01.x": {"dobrar": 5.0},
+            "arm_stretch.r": {"abrir": 10.0},
+            "hand.r": {"dobrar": 20.0},
+            "index1.l": {"abrir": -30.0},
+        }
+        corpo = modelo3d.semantica_do_corpo(semantica)
+        self.assertEqual({"spine_01.x", "arm_stretch.r"}, set(corpo))
+        # Cópia: mexer no resultado não pode alterar a pose em uso.
+        corpo["spine_01.x"]["dobrar"] = 99.0
+        self.assertEqual(5.0, semantica["spine_01.x"]["dobrar"])
+
+
 class TestCorDoRender(unittest.TestCase):
     def test_cor_escolhida_aparece_no_svg(self):
         if not os.path.isfile(MODELO_REAL):

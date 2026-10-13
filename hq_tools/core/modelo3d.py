@@ -15,6 +15,9 @@ depois Z.
 import functools
 import json
 import math
+import os
+import re
+import unicodedata
 
 FORMATO = "hq_tools.modelo3d"
 VERSAO = 1
@@ -167,6 +170,44 @@ def carregar_pose(caminho):
     return dados
 
 
+def serializar_pose(nome, ossos):
+    """Monta o documento de uma pose (formato ``hq_tools.pose3d``).
+
+    Arredonda os valores para duas casas (como os exportadores) e ordena os
+    ossos: o arquivo do usuário fica no mesmo formato do kit.
+    """
+    return {
+        "formato": POSE_FORMATO,
+        "versao": POSE_VERSAO,
+        "nome": str(nome),
+        "ossos": {
+            nome_osso: {
+                chave: round(float(valor), 2)
+                for chave, valor in sorted(valores.items())
+            }
+            for nome_osso, valores in sorted(ossos.items())
+        },
+    }
+
+
+def salvar_pose(caminho, nome, ossos):
+    """Grava a pose em JSON, atômico (temporário + replace)."""
+    dados = serializar_pose(nome, ossos)
+    temporario = "{0}.tmp".format(caminho)
+    with open(temporario, "w", encoding="utf-8") as arquivo:
+        json.dump(dados, arquivo, ensure_ascii=False, indent=1, sort_keys=True)
+    os.replace(temporario, caminho)
+    return dados
+
+
+def slug_de_pose(nome):
+    """Nome de arquivo seguro para a pose (sem acento, minúsculo, com hifens)."""
+    texto = unicodedata.normalize("NFKD", str(nome))
+    texto = "".join(letra for letra in texto if not unicodedata.combining(letra))
+    texto = re.sub(r"[^A-Za-z0-9]+", "-", texto).strip("-").lower()
+    return texto or "pose"
+
+
 LADO_DIREITA = "direita"
 LADO_ESQUERDA = "esquerda"
 LADO_AMBAS = "ambas"
@@ -279,6 +320,15 @@ def substituir_mao(semantica, mao, lado):
     return resultado
 
 
+def semantica_do_corpo(semantica):
+    """Só os ossos do corpo (fora mãos e dedos), para a pose do usuário."""
+    return {
+        osso: dict(valores)
+        for osso, valores in semantica.items()
+        if not osso_de_mao(osso)
+    }
+
+
 def eixos_semanticos(osso):
     """Mapeia os eixos locais do osso para nomes de junta.
 
@@ -326,6 +376,41 @@ def eixos_semanticos(osso):
         "abrir": (abrir[0], sinal(abrir, lado)),
         "girar": ("y", 1),
     }
+
+
+# Prévias de pose (ícones do seletor do docker e miniatura da pose do
+# usuário), num lugar só porque o script da galeria e o docker desenham a
+# mesma imagem. Calibradas por ``scripts/calibrar-galeria-poses3d.py``: o
+# corpo fecha o quadro na vista padrão; as mãos usam um close na direita (o
+# docker espelha para a esquerda) com o braço levantado ao lado, para a mão
+# sair da silhueta do corpo e o fundo ficar limpo.
+PREVIA_LARGURA, PREVIA_ALTURA = 120, 160
+PREVIA_CAMERA_CORPO = {"yaw": 0.0, "pitch": -10.0, "zoom": 1.708, "pan_x": 1.8, "pan_y": -0.3}
+PREVIA_CAMERA_MAOS = {"yaw": -15.0, "pitch": -10.0, "zoom": 11.142, "pan_x": 356.7, "pan_y": 362.5}
+PREVIA_ABRIR_MAO = 70.0
+
+
+def render_previa(modelo, semantica, parte, largura=PREVIA_LARGURA, altura=PREVIA_ALTURA):
+    """SVG da prévia de pose (``parte`` = "corpo" ou "maos").
+
+    Nas mãos, o braço direito sai para o lado antes de renderizar (a mão fica
+    fora da silhueta do corpo). Devolve o SVG, como :meth:`Modelo.renderizar`.
+    """
+    camera = PREVIA_CAMERA_CORPO if parte == "corpo" else PREVIA_CAMERA_MAOS
+    if parte == "maos":
+        semantica = {osso: dict(valores) for osso, valores in semantica.items()}
+        semantica.setdefault("arm_stretch.r", {})["abrir"] = PREVIA_ABRIR_MAO
+    posados = modelo.vertices_em_pose(modelo.aplicar_semantica(semantica))
+    return modelo.renderizar(
+        yaw=camera["yaw"],
+        pitch=camera["pitch"],
+        zoom=camera["zoom"],
+        pan_x=camera["pan_x"],
+        pan_y=camera["pan_y"],
+        largura=largura,
+        altura=altura,
+        posados=posados,
+    )
 
 
 def _hex_para_rgb(cor):

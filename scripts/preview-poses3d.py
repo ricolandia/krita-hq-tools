@@ -39,16 +39,10 @@ from hq_tools.core.paths import (  # noqa: E402
     VIEWER3D_POSES_MAOS_DIR,
 )
 
-# Galeria dos ícones do seletor: o corpo usa o enquadramento padrão da vista
-# (yaw 0, pitch -10) fechando o quadro com ~6 px de margem; as mãos usam um
-# close na mão direita (a autoral; o docker espelha na aplicação) com o braço
-# levantado ao lado, para a mão sair da silhueta do corpo e o fundo ficar
-# limpo (o antebraço entra pela borda, natural). Calibrar/recalibrar com
-# ``scripts/calibrar-galeria-poses3d.py`` (mudou o rig ou as poses).
-TAMANHO_GALERIA = (120, 160)
-CAMERA_GALERIA_CORPO = {"yaw": 0.0, "pitch": -10.0, "zoom": 1.708, "pan_x": 1.8, "pan_y": -0.3}
-CAMERA_GALERIA_MAOS = {"yaw": -15.0, "pitch": -10.0, "zoom": 11.142, "pan_x": 356.7, "pan_y": 362.5}
-ABRIR_MAO_GALERIA = 70.0
+# Galeria dos ícones do seletor: câmeras e tamanho vêm do núcleo
+# (``modelo3d.render_previa``), num lugar só com o docker; recalibrar com
+# ``scripts/calibrar-galeria-poses3d.py`` quando o rig ou as poses mudarem.
+TAMANHO_GALERIA = (modelo3d.PREVIA_LARGURA, modelo3d.PREVIA_ALTURA)
 
 
 def _ler(pasta, nome):
@@ -130,10 +124,7 @@ def _galeria():
     modelo = modelo3d.Modelo.carregar(VIEWER3D_MODELOS[0][2])
     largura, altura = TAMANHO_GALERIA
     destino = os.path.join(RESOURCES_DIR, "poses-preview")
-    for parte, camera in (
-        ("corpo", CAMERA_GALERIA_CORPO),
-        ("maos", CAMERA_GALERIA_MAOS),
-    ):
+    for parte in ("corpo", "maos"):
         fonte = VIEWER3D_POSES_CORPO_DIR if parte == "corpo" else VIEWER3D_POSES_MAOS_DIR
         saida = os.path.join(destino, parte)
         os.makedirs(saida, exist_ok=True)
@@ -150,20 +141,7 @@ def _galeria():
                     _ler(fonte, arquivo),
                     {},
                 )
-                # Braço levantado ao lado: a mão sai da silhueta do corpo (que
-                # ficaria atrás dela na ortográfica) e o close fica limpo.
-                semantica.setdefault("arm_stretch.r", {})["abrir"] = ABRIR_MAO_GALERIA
-            posados = modelo.vertices_em_pose(modelo.aplicar_semantica(semantica))
-            svg = modelo.renderizar(
-                yaw=camera["yaw"],
-                pitch=camera["pitch"],
-                zoom=camera["zoom"],
-                pan_x=camera["pan_x"],
-                pan_y=camera["pan_y"],
-                largura=largura,
-                altura=altura,
-                posados=posados,
-            )
+            svg = modelo3d.render_previa(modelo, semantica, parte)
             png = os.path.join(saida, arquivo[:-5] + ".png")
             cairosvg.svg2png(
                 bytestring=svg.encode("utf-8"),

@@ -84,6 +84,11 @@ VIEWER3D_POSES_CORPO_DIR = os.path.join(VIEWER3D_POSES_DIR, "corpo")
 VIEWER3D_POSES_MAOS_DIR = os.path.join(VIEWER3D_POSES_DIR, "maos")
 VIEWER3D_POSE_CORPO_PADRAO = "idle.json"
 VIEWER3D_POSE_MAOS_PADRAO = "fechada.json"
+# Poses criadas pelo usuário ("Salvar pose do corpo..."), separadas do kit do
+# repositório; a pasta entra na lista de diretórios de dados do usuário.
+VIEWER3D_POSES_USUARIO_DIR = os.path.join(USER_DIR, "poses")
+VIEWER3D_POSES_USUARIO_CORPO_DIR = os.path.join(VIEWER3D_POSES_USUARIO_DIR, "corpo")
+VIEWER3D_POSES_USUARIO_MAOS_DIR = os.path.join(VIEWER3D_POSES_USUARIO_DIR, "maos")
 ICONE_PATH = os.path.join(RESOURCES_DIR, "icon.png")
 KRITA_PALETTES_DIR = os.path.join(KRITA_HOME, "palettes")
 CONFIG_PATH = os.path.join(USER_DIR, "config.json")
@@ -98,6 +103,8 @@ def ensure_user_dirs():
         ONOMATOPEIAS_DIR,
         BIBLIOTECA_DIR,
         MODELOS_DIR,
+        VIEWER3D_POSES_USUARIO_CORPO_DIR,
+        VIEWER3D_POSES_USUARIO_MAOS_DIR,
     ):
         os.makedirs(path, exist_ok=True)
 
