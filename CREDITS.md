@@ -46,8 +46,9 @@ Mais balões livres podem ser baixados em:
 
 ## Amostras do plugin
 
-As 19 amostras de balão em `modules/balloons/samples/` e as 3 onomatopeias em
-`modules/onomatopeias/samples/` (WHOOSH!, POW! e CRASH!) são o kit handdrawn do
+As 19 amostras de balão em `modules/balloons/samples/` e as 6 onomatopeias em
+`modules/onomatopeias/samples/` (WHOOSH!, POW!, CRASH!, BAM!, CLANK! e KRAK)
+são o kit handdrawn do
 autor (Ricardo Graça), desenhado no Inkscape em outubro de 2026 sob a licença
 MIT do plugin. As paletas `.gpl`, os presets de retícula e os ícones gerados
 foram criados para o projeto e seguem a mesma licença.
@@ -107,9 +108,9 @@ Comics pack e InkP/Expressive Inks.
   3x3), criados para o projeto.
 - Paletas, presets de retícula e ícones: criados para o projeto.
 - Kit handdrawn de balões e onomatopeias (19 amostras em
-  `modules/balloons/samples/` e 3 em `modules/onomatopeias/samples/`; fonte
+  `modules/balloons/samples/` e 6 em `modules/onomatopeias/samples/`; fonte
   local do autor fora do repositório): desenhado à mão por Ricardo Graça no
-  Inkscape em 02 e 03/10/2026 (MIT).
+  Inkscape em 02, 03 e 13/10/2026 (MIT).
 - Ícone do plugin (`assets/`; cópia em `hq_tools/resources/`): grade de
   retícula em papel `#F4EFE6` e tinta `#141414`, desenhado no Penpot para o
   projeto (MIT).

@@ -1,12 +1,12 @@
 """Docker de onomatopeias: efeitos sonoros em SVG, inseridos como vetor.
 
-A pasta padrão recebe as amostras do plugin na primeira execução; você pode
-criar os seus modelos no Inkscape e salvá-los lá (SVG comum, com texto e
-formas). Duplo clique insere no grupo ativo.
+A pasta padrão recebe as amostras do plugin (todas na primeira execução e as
+novas nas atualizações, via ``core.amostras``; amostra que você alterar é
+preservada); crie os seus modelos no Inkscape e salve-os lá (SVG comum, com
+texto e formas). Duplo clique insere no grupo ativo.
 """
 
 import os
-import shutil
 
 from krita import DockWidget
 
@@ -26,7 +26,7 @@ from ...core.compat import (
     QtWidgets,
 )
 from ...core.config import Config
-from ...core import registro, ui
+from ...core import amostras, registro, ui
 from ...core import i18n
 from ...core.paths import ONOMATOPEIAS_DIR
 
@@ -39,12 +39,13 @@ def ensure_default_folder(config):
     try:
         os.makedirs(folder, exist_ok=True)
         if os.path.abspath(folder) == os.path.abspath(ONOMATOPEIAS_DIR):
-            if not any(name.lower().endswith(".svg") for name in os.listdir(folder)):
-                for name in sorted(os.listdir(SAMPLES_DIR)):
-                    if name.lower().endswith(".svg"):
-                        shutil.copy2(
-                            os.path.join(SAMPLES_DIR, name), os.path.join(folder, name)
-                        )
+            resultado = amostras.sincronizar(folder, [SAMPLES_DIR])
+            if resultado["copiadas"] or resultado["atualizadas"]:
+                helpers.log(
+                    "onomatopeias: amostras sincronizadas ({0} novas, {1} atualizadas)".format(
+                        len(resultado["copiadas"]), len(resultado["atualizadas"])
+                    )
+                )
     except OSError as erro:
         helpers.log("pasta de onomatopeias inacessível ({0}): {1}".format(folder, erro))
         if os.path.abspath(folder) != os.path.abspath(ONOMATOPEIAS_DIR):

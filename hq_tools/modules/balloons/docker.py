@@ -29,7 +29,7 @@ from ...core.compat import (
     QtWidgets,
 )
 from ...core.config import Config
-from ...core import registro, ui
+from ...core import amostras, registro, ui
 from ...core import i18n
 from ...core.paths import BALLOONS_DIR, FONTS_TARGET, mesma_copia
 
@@ -45,29 +45,26 @@ KIT_FONTS_DIR = os.path.join(
 
 
 def ensure_default_folder(config):
-    """Define a pasta padrão de balões e copia as amostras na primeira execução.
+    """Define a pasta padrão de balões e sincroniza as amostras do plugin.
 
-    Tolera pasta inacessível: uma pasta configurada que não existe mais (HD
-    externo desmontado, pasta renomeada) levantava ``OSError`` dentro do
-    ``__init__`` e o docker não abria. Agora há aviso e a pasta padrão assume.
+    As amostras ausentes são copiadas a cada abertura (novas chegam nas
+    atualizações, via ``core.amostras``), sem sobrescrever arquivo alterado
+    pelo usuário. Tolera pasta inacessível: uma pasta configurada que não
+    existe mais (HD externo desmontado, pasta renomeada) levantava ``OSError``
+    dentro do ``__init__`` e o docker não abria. Agora há aviso e a pasta
+    padrão assume.
     """
     folder = config.get("balloons.folder") or BALLOONS_DIR
     try:
         os.makedirs(folder, exist_ok=True)
         if os.path.abspath(folder) == os.path.abspath(BALLOONS_DIR):
-            if not any(name.lower().endswith(".svg") for name in os.listdir(folder)):
-                for name in sorted(os.listdir(SAMPLES_DIR)):
-                    if name.lower().endswith(".svg"):
-                        shutil.copy2(
-                            os.path.join(SAMPLES_DIR, name), os.path.join(folder, name)
-                        )
-                if os.path.isdir(KIT_CC0_DIR):
-                    for name in sorted(os.listdir(KIT_CC0_DIR)):
-                        if name.lower().endswith(".svg"):
-                            shutil.copy2(
-                                os.path.join(KIT_CC0_DIR, name),
-                                os.path.join(folder, name),
-                            )
+            resultado = amostras.sincronizar(folder, [SAMPLES_DIR, KIT_CC0_DIR])
+            if resultado["copiadas"] or resultado["atualizadas"]:
+                helpers.log(
+                    "balões: amostras sincronizadas ({0} novas, {1} atualizadas)".format(
+                        len(resultado["copiadas"]), len(resultado["atualizadas"])
+                    )
+                )
     except OSError as erro:
         helpers.log("pasta de balões inacessível ({0}): {1}".format(folder, erro))
         if os.path.abspath(folder) != os.path.abspath(BALLOONS_DIR):
