@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.19.0] — 2026-10-13
+
+Visualizador 3D: o seletor de poses agora mostra **miniaturas** de cada pose
+(corpo na câmera padrão; mãos em close) e a pose atual do corpo pode ser
+**salva na sua biblioteca** pelo botão "Salvar pose...", com o aviso de que as
+mãos não entram no arquivo; o kit do repositório e as suas poses aparecem na
+mesma lista. Na biblioteca de perspectiva, a miniatura do conjunto ganhou
+respiro antes do rótulo (o texto encostava nas linhas azuis). Por dentro: a
+miniatura de SVG dos dockers ficou num lugar só e o CI ganhou lint (ruff:
+erros de sintaxe e nomes/importes sem uso).
+
+**English:** 3D viewer: the pose selector now shows **thumbnails** for every
+pose (body in the default camera; hands in close-up), and the current body
+pose can be **saved into your library** with the "Save pose..." button, with a
+notice that the hands are not included in the file; the repository kit and
+your own poses show up in the same list. In the perspective library, the set
+thumbnail got breathing room before its label (the text used to touch the blue
+lines). Under the hood: the dockers' SVG thumbnail now lives in a single place
+and CI gained linting (ruff: syntax errors and unused names/imports).
+
 ## [0.18.0] — 2026-10-09
 
 Visualizador 3D: duas poses de corpo novas do autor, **Sentado** e **Boxing**,
