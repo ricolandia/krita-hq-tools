@@ -191,15 +191,13 @@ class TestManequim(unittest.TestCase):
         self.assertTrue(areas)
         self.assertTrue(all(area >= 0 for area in areas))
 
-    def test_svg_contorno_sem_preenchimento(self):
+    def test_svg_toon_usa_poligono_chapado(self):
         modelo = modelo3d.Modelo(triangulo_visivel())
-        svg = modelo.renderizar(largura=400, altura=400, estilo="contorno")
+        svg = modelo.renderizar(largura=400, altura=400, estilo="toon")
         raiz = ET.fromstring(svg)
-        caminhos = raiz.findall("{http://www.w3.org/2000/svg}path")
-        self.assertEqual(len(caminhos), 1)
-        self.assertEqual(caminhos[0].get("fill"), "none")
-        self.assertIn("stroke", caminhos[0].attrib)
-        self.assertEqual(caminhos[0].get("d").count("M"), 3)
+        poligonos = raiz.findall("{http://www.w3.org/2000/svg}polygon")
+        self.assertEqual(len(poligonos), 1)
+        self.assertIsNotNone(poligonos[0].get("fill"))
 
     def test_formato_desconhecido(self):
         dados = manequim()
@@ -531,6 +529,43 @@ class TestCorDoRender(unittest.TestCase):
         self.assertIn(modelo.cor_padrao, svg)
 
 
+class TestLuz(unittest.TestCase):
+    """A luz do render (azimute e altura em graus, espaço da câmera)."""
+
+    def test_angulos_base(self):
+        self.assertEqual((0.0, -1.0, 0.0), modelo3d.luz_de_angulos(0, 0))
+        x, y, z = modelo3d.luz_de_angulos(90, 0)
+        self.assertAlmostEqual(1.0, x)
+        self.assertAlmostEqual(0.0, y, places=6)
+        self.assertAlmostEqual(0.0, z, places=6)
+        x, y, z = modelo3d.luz_de_angulos(0, 90)
+        self.assertAlmostEqual(0.0, x, places=6)
+        self.assertAlmostEqual(0.0, y, places=6)
+        self.assertAlmostEqual(1.0, z)
+
+    def test_padrao_reproduz_a_luz_do_nucleo(self):
+        # Os padrões do docker (26,6° / 26,7°) têm que dar a LUZ_PADRAO.
+        x, y, z = modelo3d.luz_de_angulos(26.6, 26.7)
+        padrao = modelo3d._normalizar(modelo3d.LUZ_PADRAO)
+        self.assertAlmostEqual(padrao[0], x, places=2)
+        self.assertAlmostEqual(padrao[1], y, places=2)
+        self.assertAlmostEqual(padrao[2], z, places=2)
+
+    def test_luz_esquerda_e_direita_sombreiam_diferente(self):
+        if not os.path.isfile(MODELO_REAL):
+            self.skipTest("homem.json não está no repositório")
+        modelo = modelo3d.Modelo.carregar(MODELO_REAL)
+        esquerda = modelo.renderizar(
+            largura=200, altura=200, estilo="toon",
+            luz=modelo3d.luz_de_angulos(-60, 25),
+        )
+        direita = modelo.renderizar(
+            largura=200, altura=200, estilo="toon",
+            luz=modelo3d.luz_de_angulos(60, 25),
+        )
+        self.assertNotEqual(esquerda, direita)
+
+
 class TestLentes(unittest.TestCase):
     """Câmera ortográfica (padrão) e perspectiva com lentes."""
 
@@ -696,12 +731,13 @@ class TestModeloReal(unittest.TestCase):
         self.assertGreater(len(poligonos), 500)
         self.assertLessEqual(len(poligonos), 2 * len(self.modelo.faces))
 
-    def test_contorno_tem_muitos_segmentos(self):
-        svg = self.modelo.renderizar(largura=500, altura=500, estilo="contorno")
+    def test_toon_tem_exatamente_dois_tons(self):
+        svg = self.modelo.renderizar(largura=500, altura=500, estilo="toon")
         raiz = ET.fromstring(svg)
-        caminho = raiz.find("{http://www.w3.org/2000/svg}path")
-        self.assertIsNotNone(caminho)
-        self.assertGreater(caminho.get("d").count("M"), 50)
+        poligonos = raiz.findall("{http://www.w3.org/2000/svg}polygon")
+        self.assertGreater(len(poligonos), 500)
+        cores = {poligono.get("fill") for poligono in poligonos}
+        self.assertEqual(2, len(cores), "toon: um tom de luz e um de sombra")
 
     def test_pose_move_vertices(self):
         repouso = self.modelo.vertices_em_pose()

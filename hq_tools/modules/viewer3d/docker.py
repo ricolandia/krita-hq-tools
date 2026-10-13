@@ -363,6 +363,10 @@ class Viewer3DDocker(DockWidget):
         # None = cor padrão do modelo; qualquer outra vale no render, no
         # flutuante e na inserção (a camada inserida é raster).
         self.cor = None
+        # Luz do render (azimute e altura em graus, no espaço da câmera): os
+        # padrões reproduzem a LUZ_PADRAO do núcleo.
+        self.luz_azimute = 26.6
+        self.luz_altura = 26.7
         self._tela = []
         self._canvas = None
         self._flutuante = None
@@ -491,7 +495,7 @@ class Viewer3DDocker(DockWidget):
         self.cmb_estilo = widgets.QComboBox()
         self.cmb_estilo.addItem(i18n.t('Sombreado'), "sombreado")
         self.cmb_estilo.addItem(i18n.t('Silhueta'), "silhueta")
-        self.cmb_estilo.addItem(i18n.t('Contorno'), "contorno")
+        self.cmb_estilo.addItem(i18n.t('Toon'), "toon")
         self.cmb_estilo.currentIndexChanged.connect(self.agendar_render)
         estilo_row.addWidget(self.cmb_estilo, 1)
         layout.addLayout(estilo_row)
@@ -506,6 +510,36 @@ class Viewer3DDocker(DockWidget):
         self.cmb_cor.currentIndexChanged.connect(self._mudar_cor)
         cor_row.addWidget(self.cmb_cor, 1)
         layout.addLayout(cor_row)
+
+        luz_azimute_row = widgets.QHBoxLayout()
+        luz_azimute_row.addWidget(ui.rotulo(i18n.t('Luz · Azimute')))
+        self.sld_luz_azimute = widgets.QSlider(ORIENTACAO_HORIZONTAL)
+        self.sld_luz_azimute.setRange(-180, 180)
+        self.sld_luz_azimute.setValue(int(self.luz_azimute))
+        etiqueta_azimute = ui.rotulo_info(i18n.t('{0}°').format(int(self.luz_azimute)))
+        self.sld_luz_azimute.valueChanged.connect(
+            lambda novo, etiqueta=etiqueta_azimute: self._mudar_luz(
+                "azimute", novo, etiqueta
+            )
+        )
+        luz_azimute_row.addWidget(self.sld_luz_azimute, 1)
+        luz_azimute_row.addWidget(etiqueta_azimute)
+        layout.addLayout(luz_azimute_row)
+
+        luz_altura_row = widgets.QHBoxLayout()
+        luz_altura_row.addWidget(ui.rotulo(i18n.t('Luz · Altura')))
+        self.sld_luz_altura = widgets.QSlider(ORIENTACAO_HORIZONTAL)
+        self.sld_luz_altura.setRange(-80, 80)
+        self.sld_luz_altura.setValue(int(self.luz_altura))
+        etiqueta_altura = ui.rotulo_info(i18n.t('{0}°').format(int(self.luz_altura)))
+        self.sld_luz_altura.valueChanged.connect(
+            lambda novo, etiqueta=etiqueta_altura: self._mudar_luz(
+                "altura", novo, etiqueta
+            )
+        )
+        luz_altura_row.addWidget(self.sld_luz_altura, 1)
+        luz_altura_row.addWidget(etiqueta_altura)
+        layout.addLayout(luz_altura_row)
 
         cameras = widgets.QHBoxLayout()
         button_front = ui.botao(
@@ -744,6 +778,14 @@ class Viewer3DDocker(DockWidget):
         self.cor = self.cmb_cor.itemData(indice)
         self.agendar_render()
 
+    def _mudar_luz(self, eixo, valor, etiqueta):
+        if eixo == "azimute":
+            self.luz_azimute = float(valor)
+        else:
+            self.luz_altura = float(valor)
+        etiqueta.setText(i18n.t('{0}°').format(valor))
+        self.agendar_render()
+
     def _atualizar_lente(self):
         self.cmb_lente.setEnabled(self.perspectiva)
 
@@ -811,8 +853,8 @@ class Viewer3DDocker(DockWidget):
         cor = self.cor
         if dados == "silhueta":
             return "chapado", cor or "#141414", "#ffffff"
-        if dados == "contorno":
-            return "contorno", cor or "#141414", "#ffffff"
+        if dados == "toon":
+            return "toon", cor, None
         return "sombreado", cor, None
 
     def _pan_em_pixels(self, largura, altura):
@@ -839,6 +881,7 @@ class Viewer3DDocker(DockWidget):
             estilo=estilo,
             cor=cor,
             fundo=fundo,
+            luz=modelo3d.luz_de_angulos(self.luz_azimute, self.luz_altura),
             lente=self.lente if self.perspectiva else None,
             cull=True,
         )

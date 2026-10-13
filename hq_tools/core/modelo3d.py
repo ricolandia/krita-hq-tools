@@ -26,6 +26,26 @@ POSE_VERSAO = 1
 
 LUZ_PADRAO = (0.4, -0.8, 0.45)
 
+# Limite do estilo "toon": acima dele a face fica no tom de luz; abaixo, no de
+# sombra (dois tons chapados de alto contraste).
+LIMITE_TOON = 0.20
+
+
+def luz_de_angulos(azimute, altura):
+    """Vetor de luz (espaço da câmera) a partir do azimute e da altura (graus).
+
+    Azimute 0 = luz vindo de frente para o modelo; o negativo traz a luz da
+    esquerda da imagem e o positivo da direita; a altura positiva sobe. Os
+    padrões do docker (26,6° e 26,7°) reproduzem a ``LUZ_PADRAO``.
+    """
+    az = math.radians(azimute)
+    al = math.radians(altura)
+    return (
+        math.sin(az) * math.cos(al),
+        -math.cos(az) * math.cos(al),
+        math.sin(al),
+    )
+
 # Lentes oferecidas na perspectiva (mm, sensor cheio de 36 mm). Sem lente, a
 # projeção é ortográfica (o padrão do visualizador).
 SENSOR_MM = 36.0
@@ -448,8 +468,8 @@ class Modelo:
         self.pesos = [list(pares) for pares in dados["pesos"]]
         self.faces = [tuple(face) for face in dados["faces"]]
         # A triangulação (leque) não muda com a pose nem com a câmera; fica
-        # pronta para os quatro consumidores (máscara, contorno, chapado e
-        # sombreado), em vez de refeita a cada quadro.
+        # pronta para os três consumidores (chapado, toon e sombreado), em vez
+        # de refeita a cada quadro.
         self.triangulos = [self._triangular(face) for face in self.faces]
         self.osso_por_nome = {osso["nome"]: osso for osso in self.ossos}
         self.caixa = self._calcular_caixa()
@@ -539,104 +559,6 @@ class Modelo:
             resultado.append((x, y, z))
         return resultado
 
-    def _mascara_projetada(self, tela, largura, altura, celulas=140):
-        """Grade booleana da área coberta pela projeção de todas as faces.
-
-        Serve para esconder as linhas de contorno que estão no interior da
-        silhueta (membro atrás do tronco, olhos, boca): elas parecem
-        transparência num desenho de contorno.
-        """
-        tamanho = max(largura, altura) / float(celulas)
-        mascara = set()
-        for triangulos in self.triangulos:
-            for triangulo in triangulos:
-                pontos = [tela[indice] for indice in triangulo]
-                ys = [ponto[1] for ponto in pontos]
-                iy0 = int(min(ys) / tamanho)
-                iy1 = int(max(ys) / tamanho)
-                for iy in range(iy0, iy1 + 1):
-                    y = (iy + 0.5) * tamanho
-                    xs = []
-                    for posicao in range(3):
-                        a = pontos[posicao]
-                        b = pontos[(posicao + 1) % 3]
-                        if (a[1] <= y < b[1]) or (b[1] <= y < a[1]):
-                            fator = (y - a[1]) / (b[1] - a[1])
-                            xs.append(a[0] + fator * (b[0] - a[0]))
-                    if len(xs) < 2:
-                        continue
-                    ix0 = int(min(xs) / tamanho)
-                    ix1 = int(max(xs) / tamanho)
-                    for ix in range(ix0, ix1 + 1):
-                        mascara.add((ix, iy))
-        return mascara, tamanho
-
-    @staticmethod
-    def _fechar_mascara(mascara, iteracoes=2):
-        """Fechamento morfológico: preenche vãos estreitos (axila, virilha).
-
-        Dilata e erode de volta; canais vazios mais finos que o raio somem, e
-        as linhas de contorno que passavam por eles deixam de ser desenhadas.
-        Vãos largos (pernas afastadas) continuam abertos.
-        """
-        vizinhos = ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1))
-        for _ in range(iteracoes):
-            dilatada = set()
-            for ix, iy in mascara:
-                for dx, dy in vizinhos:
-                    dilatada.add((ix + dx, iy + dy))
-            erodida = set()
-            for ix, iy in dilatada:
-                if all((ix + dx, iy + dy) in dilatada for dx, dy in vizinhos):
-                    erodida.add((ix, iy))
-            mascara = erodida
-        return mascara
-
-    @staticmethod
-    def _na_borda_da_mascara(x, y, mascara, tamanho):
-        """Diz se o ponto está na borda da máscara (célula vazia ou vizinha).
-
-        Sem a dilatação diagonal: uma linha no interior sólido tem os quatro
-        vizinhos diretos preenchidos e é descartada; linhas a uma célula de um
-        buraco real continuam.
-        """
-        ix = int(x / tamanho)
-        iy = int(y / tamanho)
-        if (ix, iy) not in mascara:
-            return True
-        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-            if (ix + dx, iy + dy) not in mascara:
-                return True
-        return False
-
-    def _contorno(self, na_camera):
-        """Arestas de silhueta: as que separam face da frente de face de trás.
-
-        Percorre os triângulos, marca a orientação de cada um e devolve os
-        pares de vértices cujas faces vizinhas discordam (ou que só têm uma
-        face). É o que desenha a linha do contorno do modelo projetado.
-        """
-        vizinhanca = {}
-        for triangulos in self.triangulos:
-            for triangulo in triangulos:
-                p0, p1, p2 = (na_camera[indice] for indice in triangulo)
-                aresta1 = (p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2])
-                aresta2 = (p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2])
-                normal_y = aresta1[2] * aresta2[0] - aresta1[0] * aresta2[2]
-                frente = normal_y < -1e-9
-                for a, b in ((0, 1), (1, 2), (2, 0)):
-                    chave = (
-                        min(triangulo[a], triangulo[b]),
-                        max(triangulo[a], triangulo[b]),
-                    )
-                    registro = vizinhanca.setdefault(chave, [0, 0])
-                    registro[0 if frente else 1] += 1
-        return [
-            chave
-            for chave, (frente, tras) in vizinhanca.items()
-            if (frente > 0 and tras > 0) or (frente + tras) == 1
-        ]
-
     @staticmethod
     def _triangular(face):
         """Leque de triângulos: o culling e o painter ficam estáveis com quads
@@ -718,8 +640,9 @@ class Modelo:
         ``estilo="sombreado"`` (padrão) usa painter's algorithm e sombreamento
         por face. ``estilo="chapado"`` desenha a silhueta: todas as faces numa
         cor só, num único ``path``, sem ordenar nem sombrear; é mais barato de
-        gerar e de rasterizar. ``estilo="contorno"`` desenha só a linha de
-        silhueta (as arestas entre faces da frente e de trás).
+        gerar e de rasterizar. ``estilo="toon"`` usa dois tons chapados de
+        alto contraste: as faces viradas para a luz num tom, as em sombra num
+        tom escuro do mesmo matiz (``luz`` decide a divisão).
         """
         visao, centro, escala, distancia = self._camera(
             yaw, pitch, zoom, largura, altura, pan_x, pan_y, lente=lente
@@ -742,45 +665,22 @@ class Modelo:
                 '<rect width="{0}" height="{1}" fill="{2}"/>'.format(largura, altura, fundo)
             )
 
-        if estilo in ("chapado", "contorno"):
+        if estilo == "chapado":
             cor_solida = _rgb_para_hex(_hex_para_rgb(cor or self.cor_padrao))
-            if estilo == "chapado":
-                caminho = []
-                for triangulos in self.triangulos:
-                    for triangulo in triangulos:
-                        a, b, c = (tela[indice] for indice in triangulo)
-                        area = (b[0] - a[0]) * (c[1] - a[1]) - (c[0] - a[0]) * (b[1] - a[1])
-                        if area < 0:
-                            b, c = c, b
-                        caminho.append(
-                            f"M{a[0]:.1f} {a[1]:.1f}L{b[0]:.1f} {b[1]:.1f}"
-                            f"L{c[0]:.1f} {c[1]:.1f}Z"
-                        )
-                partes.append(
-                    '<path d="{0}" fill="{1}"/>'.format("".join(caminho), cor_solida)
-                )
-            else:
-                mascara, tamanho = self._mascara_projetada(tela, largura, altura)
-                mascara = self._fechar_mascara(mascara)
-                caminho = []
-                for inicio, fim in self._contorno(na_camera):
-                    a, b = tela[inicio], tela[fim]
-                    visivel = False
-                    for fator in (0.15, 0.35, 0.5, 0.65, 0.85):
-                        x = a[0] + (b[0] - a[0]) * fator
-                        y = a[1] + (b[1] - a[1]) * fator
-                        if self._na_borda_da_mascara(x, y, mascara, tamanho):
-                            visivel = True
-                            break
-                    if not visivel:
-                        continue
+            caminho = []
+            for triangulos in self.triangulos:
+                for triangulo in triangulos:
+                    a, b, c = (tela[indice] for indice in triangulo)
+                    area = (b[0] - a[0]) * (c[1] - a[1]) - (c[0] - a[0]) * (b[1] - a[1])
+                    if area < 0:
+                        b, c = c, b
                     caminho.append(
                         f"M{a[0]:.1f} {a[1]:.1f}L{b[0]:.1f} {b[1]:.1f}"
+                        f"L{c[0]:.1f} {c[1]:.1f}Z"
                     )
-                partes.append(
-                    '<path d="{0}" fill="none" stroke="{1}" stroke-width="1.5" '
-                    'stroke-linejoin="round"/>'.format("".join(caminho), cor_solida)
-                )
+            partes.append(
+                '<path d="{0}" fill="{1}"/>'.format("".join(caminho), cor_solida)
+            )
             partes.append("</svg>")
             return "".join(partes)
 
@@ -801,12 +701,18 @@ class Modelo:
                 ))
                 if cull and normal[1] >= -1e-9:
                     continue
-                difusa = abs(
+                produto = (
                     normal[0] * luz_normalizada[0]
                     + normal[1] * luz_normalizada[1]
                     + normal[2] * luz_normalizada[2]
                 )
-                brilho = 0.35 + 0.65 * difusa
+                if estilo == "toon":
+                    # Dois tons de alto contraste: o lado virado para a luz
+                    # fica claro e o resto escurece (sem ``abs``: a divisão
+                    # depende do lado da face).
+                    brilho = 1.0 if produto >= LIMITE_TOON else 0.30
+                else:
+                    brilho = 0.35 + 0.65 * abs(produto)
                 profundidade = (
                     p0[1] + p1[1] + p2[1]
                 ) / 3.0
