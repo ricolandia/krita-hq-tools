@@ -91,11 +91,11 @@ inserida num painel dentro de uma seleção. Decisões e achados:
 
 1. **Biblioteca de poses:** ✅ "Salvar pose atual" do corpo (13/10, botão
    "Salvar pose..." com aviso de que só o corpo entra) e ✅ miniatura no
-   seletor (13/10, galeria em `resources/poses-preview/`). **Próximo:** aba
-   "Mãos" — regiões Mão esquerda/direita com um "Dobrar" por dedo, além do
-   slider único atual (que fica na região do braço), e "Salvar pose de mão"
-   com espelho da esquerda para a convenção da direita; desenho aprovado pelo
-   autor em 13/10. O joinha foi feito em 07/10 (`Mao_joinha_v2_.fbx`).
+   seletor (13/10, galeria em `resources/poses-preview/`). **Próximo update
+   (pedido do autor, 13/10):** aba "Mãos" — regiões Mão esquerda/direita com
+   um "Dobrar" por dedo, além do slider único atual (que fica na região do
+   braço), e "Salvar pose de mão" com espelho da esquerda para a convenção da
+   direita. O joinha foi feito em 07/10 (`Mao_joinha_v2_.fbx`).
 2. **Validação no Krita da v0.9.0:** hub (abrir/fechar), malha de perspectiva
    (Ctrl+Z único), flutuante com dois documentos e a interface em inglês.
 3. **Krita 6:** validar o plugin no PyQt6 (pré-requisito do balão
