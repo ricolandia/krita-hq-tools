@@ -10,10 +10,15 @@ mão combinada com o Idle (na direita e nas duas mãos). Para um caso só:
 
     python3 scripts/preview-poses3d.py --corpo voa --mao-direita segura --mao-esquerda fechada
 
+Com ``--galeria``, gera os ícones do seletor de poses do docker:
+``hq_tools/resources/poses-preview/{corpo,maos}/<pose>.png`` (corpo na
+câmera padrão; mãos em close na mão direita, a autoral). Rodar quando uma
+pose entrar ou mudar; o teste da galeria acusa se ficar fora de sincronia.
+
 Uso:
     python3 scripts/preview-poses3d.py [--saida-dir DIR] [--corpo NOME]
         [--mao-direita NOME] [--mao-esquerda NOME] [--zoom N] [--yaw GRAUS]
-        [--so-svg]
+        [--so-svg] [--galeria]
 """
 
 import argparse
@@ -28,9 +33,22 @@ if RAIZ not in sys.path:
 
 from hq_tools.core import modelo3d  # noqa: E402
 from hq_tools.core.paths import (  # noqa: E402
+    RESOURCES_DIR,
+    VIEWER3D_MODELOS,
     VIEWER3D_POSES_CORPO_DIR,
     VIEWER3D_POSES_MAOS_DIR,
 )
+
+# Galeria dos ícones do seletor: o corpo usa o enquadramento padrão da vista
+# (yaw 0, pitch -10) fechando o quadro com ~6 px de margem; as mãos usam um
+# close na mão direita (a autoral; o docker espelha na aplicação) com o braço
+# levantado ao lado, para a mão sair da silhueta do corpo e o fundo ficar
+# limpo (o antebraço entra pela borda, natural). Calibrar/recalibrar com
+# ``scripts/calibrar-galeria-poses3d.py`` (mudou o rig ou as poses).
+TAMANHO_GALERIA = (120, 160)
+CAMERA_GALERIA_CORPO = {"yaw": 0.0, "pitch": -10.0, "zoom": 1.708, "pan_x": 1.8, "pan_y": -0.3}
+CAMERA_GALERIA_MAOS = {"yaw": -15.0, "pitch": -10.0, "zoom": 11.142, "pan_x": 356.7, "pan_y": 362.5}
+ABRIR_MAO_GALERIA = 70.0
 
 
 def _ler(pasta, nome):
@@ -102,6 +120,61 @@ def _renderizar(corpo, mao_direita, mao_esquerda, saida_dir, zoom, yaw, pitch, s
     print(png_saida)
 
 
+def _galeria():
+    """Gera os ícones do seletor de poses em ``resources/poses-preview``."""
+    try:
+        import cairosvg
+    except ImportError:
+        print("cairosvg é necessário para a galeria (pip install cairosvg)")
+        return 1
+    modelo = modelo3d.Modelo.carregar(VIEWER3D_MODELOS[0][2])
+    largura, altura = TAMANHO_GALERIA
+    destino = os.path.join(RESOURCES_DIR, "poses-preview")
+    for parte, camera in (
+        ("corpo", CAMERA_GALERIA_CORPO),
+        ("maos", CAMERA_GALERIA_MAOS),
+    ):
+        fonte = VIEWER3D_POSES_CORPO_DIR if parte == "corpo" else VIEWER3D_POSES_MAOS_DIR
+        saida = os.path.join(destino, parte)
+        os.makedirs(saida, exist_ok=True)
+        for arquivo in _listar(fonte):
+            if parte == "corpo":
+                semantica = modelo3d.combinar_poses(
+                    _ler(fonte, arquivo),
+                    _ler(VIEWER3D_POSES_MAOS_DIR, "fechada.json"),
+                    _ler(VIEWER3D_POSES_MAOS_DIR, "fechada.json"),
+                )
+            else:
+                semantica = modelo3d.combinar_poses(
+                    _ler(VIEWER3D_POSES_CORPO_DIR, "idle.json"),
+                    _ler(fonte, arquivo),
+                    {},
+                )
+                # Braço levantado ao lado: a mão sai da silhueta do corpo (que
+                # ficaria atrás dela na ortográfica) e o close fica limpo.
+                semantica.setdefault("arm_stretch.r", {})["abrir"] = ABRIR_MAO_GALERIA
+            posados = modelo.vertices_em_pose(modelo.aplicar_semantica(semantica))
+            svg = modelo.renderizar(
+                yaw=camera["yaw"],
+                pitch=camera["pitch"],
+                zoom=camera["zoom"],
+                pan_x=camera["pan_x"],
+                pan_y=camera["pan_y"],
+                largura=largura,
+                altura=altura,
+                posados=posados,
+            )
+            png = os.path.join(saida, arquivo[:-5] + ".png")
+            cairosvg.svg2png(
+                bytestring=svg.encode("utf-8"),
+                write_to=png,
+                output_width=largura,
+                output_height=altura,
+            )
+            print(png)
+    return 0
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--saida-dir", default="/tmp/poses-preview")
@@ -112,8 +185,14 @@ def main(argv=None):
     parser.add_argument("--yaw", type=float, default=0.0)
     parser.add_argument("--pitch", type=float, default=-10.0)
     parser.add_argument("--so-svg", action="store_true")
+    parser.add_argument(
+        "--galeria", action="store_true",
+        help="gera os ícones do seletor em resources/poses-preview",
+    )
     opcoes = parser.parse_args(argv)
 
+    if opcoes.galeria:
+        return _galeria()
     os.makedirs(opcoes.saida_dir, exist_ok=True)
     if opcoes.corpo or opcoes.mao_direita or opcoes.mao_esquerda:
         _renderizar(opcoes.corpo, opcoes.mao_direita, opcoes.mao_esquerda,

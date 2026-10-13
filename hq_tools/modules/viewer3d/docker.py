@@ -41,6 +41,7 @@ from ...core.compat import (
     QtWidgets,
 )
 from ...core.paths import (
+    RESOURCES_DIR,
     VIEWER3D_MODELOS,
     VIEWER3D_POSE_CORPO_PADRAO,
     VIEWER3D_POSE_MAOS_PADRAO,
@@ -625,10 +626,12 @@ class Viewer3DDocker(DockWidget):
         combo.blockSignals(True)
         combo.clear()
         combo.addItem(i18n.t('—'), None)
+        combo.setIconSize(QtCore.QSize(28, 40))
         try:
             arquivos = sorted(os.listdir(pasta))
         except OSError:
             arquivos = []
+        parte = os.path.basename(pasta)
         for arquivo in arquivos:
             if not arquivo.endswith(".json"):
                 continue
@@ -638,6 +641,11 @@ class Viewer3DDocker(DockWidget):
             except (OSError, ValueError):
                 rotulo = arquivo[:-5]
             combo.addItem(rotulo, arquivo)
+            previa = os.path.join(
+                RESOURCES_DIR, "poses-preview", parte, arquivo[:-5] + ".png"
+            )
+            if os.path.isfile(previa):
+                combo.setItemIcon(combo.count() - 1, QtGui.QIcon(previa))
         indice = combo.findData(atual)
         combo.setCurrentIndex(indice if indice >= 0 else 0)
         combo.blockSignals(False)

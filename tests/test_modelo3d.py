@@ -365,6 +365,23 @@ class TestEspelhoDePose(unittest.TestCase):
             faltando = sorted(osso for osso in usados if osso not in modelo.osso_por_nome)
             self.assertEqual(faltando, [], "%s sem os ossos: %s" % (caminho, faltando))
 
+    def test_galeria_de_icones_cobre_as_poses(self):
+        # A galeria (resources/poses-preview) alimenta os ícones do seletor de
+        # poses; pose nova sem prévia gerada deixaria o item sem ícone em
+        # silêncio (scripts/preview-poses3d.py --galeria regenera).
+        from hq_tools.core.paths import RESOURCES_DIR, VIEWER3D_POSES_DIR
+
+        for parte in ("corpo", "maos"):
+            fonte = os.path.join(VIEWER3D_POSES_DIR, parte)
+            galeria = os.path.join(RESOURCES_DIR, "poses-preview", parte)
+            poses = sorted(
+                nome[:-5] for nome in os.listdir(fonte) if nome.endswith(".json")
+            )
+            previas = sorted(
+                nome[:-4] for nome in os.listdir(galeria) if nome.endswith(".png")
+            )
+            self.assertEqual(poses, previas, "galeria fora de sincronia: " + parte)
+
     def test_substituir_mao_preserva_o_resto(self):
         semantica = {
             "spine_01.x": {"dobrar": 5.0},
