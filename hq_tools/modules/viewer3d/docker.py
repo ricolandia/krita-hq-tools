@@ -23,6 +23,7 @@ from ...core import krita_helpers as helpers
 from ...core import mapeamento
 from ...core import modelo3d
 from ...core import registro, ui
+from ...core.config import Config
 from ...core import i18n
 from ...core.compat import (
     ALIGN_CENTER,
@@ -57,7 +58,6 @@ LIMITE_SLIDER = 120
 # valores saem da interpolação da pose de referência "fechada" (medida em QA:
 # o fechar do dedo mora no eixo "abrir" negativo; "dobrar"/"girar" deformam).
 LIMITE_FECHAR_DEDO = 90
-REFERENCIA_FECHADA_GRAUS = 82.0
 
 ORIENTACAO_HORIZONTAL = getattr(
     getattr(QtCore.Qt, "Orientation", QtCore.Qt), "Horizontal"
@@ -338,6 +338,7 @@ class Viewer3DDocker(DockWidget):
         super().__init__()
         self.setWindowTitle(i18n.t("HQ Tools: 3D"))
         registro.registrar("viewer3d", self)
+        self.config = Config()
         self.modelo = None
         self.corpo = "homem"
         self.regiao = None
@@ -375,6 +376,9 @@ class Viewer3DDocker(DockWidget):
         # direita; a esquerda é espelhada ao gravar).
         self.mao_ajuste = modelo3d.LADO_DIREITA
         self._ref_fechada = None
+        # Estado salvo: o estilo vem por atributo porque o combo só existe
+        # depois de _build_ui.
+        self._estilo_salvo = None
         self._tela = []
         self._canvas = None
         self._flutuante = None
@@ -385,7 +389,15 @@ class Viewer3DDocker(DockWidget):
         self._timer.setSingleShot(True)
         self._timer.setInterval(30)
         self._timer.timeout.connect(self.atualizar_preview)
+        # Autosave do estado (config.json): grava com um respiro depois da
+        # última mudança; o agendar_render agenda as duas coisas.
+        self._salvar_timer = QtCore.QTimer(self)
+        self._salvar_timer.setSingleShot(True)
+        self._salvar_timer.setInterval(800)
+        self._salvar_timer.timeout.connect(self._salvar_estado)
+        self._restaurar_estado()
         self._build_ui()
+        self._aplicar_estado_nos_combos()
         try:
             self.widget().destroyed.connect(self._fechar_flutuante)
         except (AttributeError, TypeError):
@@ -486,7 +498,7 @@ class Viewer3DDocker(DockWidget):
         layout.addWidget(
             ui.rotulo(
                 i18n.t(
-                    "Escolha a mão, ajuste os dedos e salve na sua biblioteca: a esquerda é espelhada ao salvar, como as poses do kit."
+                    "Escolha a mão, ajuste os dedos (0° = mão aberta, 90° = punho) e salve na sua biblioteca: a esquerda é espelhada ao salvar, como as poses do kit."
                 )
             )
         )
@@ -746,7 +758,7 @@ class Viewer3DDocker(DockWidget):
         combo.blockSignals(True)
         combo.clear()
         combo.addItem(i18n.t("—"), None)
-        combo.setIconSize(QtCore.QSize(28, 40))
+        combo.setIconSize(QtCore.QSize(34, 46))
         for pasta in pastas:
             try:
                 arquivos = sorted(os.listdir(pasta))
@@ -821,6 +833,7 @@ class Viewer3DDocker(DockWidget):
         if chave:
             self.corpo = chave
             self._carregar_modelo()
+            self._agendar_salvar_estado()
 
     def _mudar_pose_corpo(self, indice):
         self.pose_corpo = self.cmb_pose_corpo.itemData(indice)
@@ -915,6 +928,96 @@ class Viewer3DDocker(DockWidget):
 
     def agendar_render(self):
         self._timer.start()
+        self._salvar_timer.start()
+
+    def _restaurar_estado(self):
+        """Lê o estado da sessão anterior do config.json (tolerante a lixo)."""
+
+        def ler(chave, padrao, tipos):
+            valor = self.config.get(chave)
+            if valor is None or not isinstance(valor, tipos):
+                return padrao
+            return valor
+
+        self.corpo = ler("viewer3d.modelo", self.corpo, str) or self.corpo
+        self.pose_corpo = ler("viewer3d.pose_corpo", self.pose_corpo, str)
+        self.pose_mao_direita = ler(
+            "viewer3d.pose_mao_direita", self.pose_mao_direita, str
+        )
+        self.pose_mao_esquerda = ler(
+            "viewer3d.pose_mao_esquerda", self.pose_mao_esquerda, str
+        )
+        camera = ler("viewer3d.camera", {}, dict)
+        for chave in ("yaw", "pitch", "zoom", "pan_x", "pan_y"):
+            valor = camera.get(chave)
+            if isinstance(valor, (int, float)):
+                self.camera[chave] = float(valor)
+        self.cor = ler("viewer3d.cor", self.cor, str)
+        self.luz_azimute = float(
+            ler("viewer3d.luz_azimute", self.luz_azimute, (int, float))
+        )
+        self.luz_altura = float(
+            ler("viewer3d.luz_altura", self.luz_altura, (int, float))
+        )
+        self.perspectiva = bool(ler("viewer3d.perspectiva", self.perspectiva, bool))
+        self.lente = float(ler("viewer3d.lente", self.lente, (int, float)))
+        self._estilo_salvo = ler("viewer3d.estilo", None, str)
+
+    @staticmethod
+    def _indice_por_dado(combo, dado):
+        """Índice do item com este dado (o ``findData`` não lida bem com None)."""
+        for indice in range(combo.count()):
+            if combo.itemData(indice) == dado:
+                return indice
+        return -1
+
+    def _aplicar_estado_nos_combos(self):
+        """Mostra nos combos o estado restaurado, sem disparar os handlers.
+
+        O estado já está nos atributos; os sinais ficam bloqueados para o
+        modelo não carregar duas vezes (a carga acontece uma vez no __init__).
+        """
+        alvos = []
+        if self._estilo_salvo:
+            indice = self._indice_por_dado(self.cmb_estilo, self._estilo_salvo)
+            if indice >= 0:
+                alvos.append((self.cmb_estilo, indice))
+        for combo, dado in (
+            (self.cmb_cor, self.cor),
+            (
+                self.cmb_camera,
+                "perspectiva" if self.perspectiva else "ortografica",
+            ),
+            (self.cmb_lente, self.lente),
+            (self.cmb_corpo, self.corpo),
+        ):
+            indice = self._indice_por_dado(combo, dado)
+            if indice >= 0:
+                alvos.append((combo, indice))
+        for combo, indice in alvos:
+            combo.blockSignals(True)
+            combo.setCurrentIndex(indice)
+            combo.blockSignals(False)
+
+    def _agendar_salvar_estado(self):
+        self._salvar_timer.start()
+
+    def _salvar_estado(self):
+        """Grava o estado da sessão no config.json (agendado com respiro)."""
+        try:
+            self.config.set("viewer3d.modelo", self.corpo)
+            self.config.set("viewer3d.pose_corpo", self.pose_corpo)
+            self.config.set("viewer3d.pose_mao_direita", self.pose_mao_direita)
+            self.config.set("viewer3d.pose_mao_esquerda", self.pose_mao_esquerda)
+            self.config.set("viewer3d.estilo", self.cmb_estilo.currentData())
+            self.config.set("viewer3d.cor", self.cor)
+            self.config.set("viewer3d.luz_azimute", self.luz_azimute)
+            self.config.set("viewer3d.luz_altura", self.luz_altura)
+            self.config.set("viewer3d.perspectiva", self.perspectiva)
+            self.config.set("viewer3d.lente", self.lente)
+            self.config.set("viewer3d.camera", dict(self.camera))
+        except OSError as erro:
+            helpers.log("estado do 3D não salvo: {0}".format(erro))
 
     def _estilo(self):
         dados = self.cmb_estilo.currentData()
@@ -1251,6 +1354,7 @@ class Viewer3DDocker(DockWidget):
             return
         self.pose_corpo = destino
         self._popular_poses()
+        self._agendar_salvar_estado()
         helpers.show_info(
             i18n.t("3D"), i18n.t("Pose do corpo salva na sua biblioteca.")
         )
@@ -1335,6 +1439,7 @@ class Viewer3DDocker(DockWidget):
         else:
             self.pose_mao_esquerda = destino
         self._popular_poses()
+        self._agendar_salvar_estado()
         helpers.show_info(i18n.t("3D"), i18n.t("Pose de mão salva na sua biblioteca."))
 
     def selecionar_em(self, x, y):
@@ -1393,6 +1498,11 @@ class Viewer3DDocker(DockWidget):
         linha.addWidget(ui.rotulo(rotulo))
         slider = widgets.QSlider(ORIENTACAO_HORIZONTAL)
         slider.setRange(-LIMITE_SLIDER, LIMITE_SLIDER)
+        slider.setToolTip(
+            i18n.t(
+                "Ajusta a junta em graus; Dobrar/Abrir/Girar seguem os eixos do rig."
+            )
+        )
         slider.setValue(int(self.semantica.get(osso, {}).get(chave, 0)))
         valor = ui.rotulo_info(i18n.t("0°"))
         slider.valueChanged.connect(
@@ -1431,42 +1541,28 @@ class Viewer3DDocker(DockWidget):
         return self._ref_fechada
 
     def _valor_do_dedo(self, ossos):
-        """Valor do slider (0 = aberta, 90 = fechada) a partir da semântica.
-
-        É a razão contra o valor da referência "fechada" da família (o
-        polegar tem valores compostos, então a razão resolve os três ossos).
-        """
-        referencia = self._referencia_fechada()
-        if ossos and ossos[0].endswith(".l"):
-            referencia = modelo3d.espelhar(referencia)
-        for osso in ossos:
-            if osso in referencia and "abrir" in referencia[osso]:
-                base = referencia[osso]["abrir"]
-                if abs(base) > 1e-6:
-                    atual = self.semantica.get(osso, {}).get("abrir", 0.0)
-                    return max(
-                        0,
-                        min(
-                            LIMITE_FECHAR_DEDO,
-                            int(round(atual * REFERENCIA_FECHADA_GRAUS / base)),
-                        ),
-                    )
-                return 0
-        return 0
+        """Valor do slider (0 = aberta, 90 = fechada) a partir da semântica."""
+        return max(
+            0,
+            min(
+                LIMITE_FECHAR_DEDO,
+                modelo3d.graus_dos_dedos(
+                    self._referencia_fechada(), ossos, self.semantica
+                ),
+            ),
+        )
 
     def _mudar_dedos(self, ossos, valor, etiqueta):
         """Interpola os valores da pose "fechada" na proporção do slider."""
-        referencia = self._referencia_fechada()
-        if ossos and ossos[0].endswith(".l"):
-            referencia = modelo3d.espelhar(referencia)
-        fator = float(valor) / REFERENCIA_FECHADA_GRAUS
+        lado = (
+            modelo3d.LADO_ESQUERDA
+            if ossos and ossos[0].endswith(".l")
+            else modelo3d.LADO_DIREITA
+        )
+        valores = modelo3d.dedos_por_graus(self._referencia_fechada(), lado, valor)
         for osso in ossos:
-            if osso not in referencia:
-                continue
-            self.semantica[osso] = {
-                chave: round(base * fator, 2)
-                for chave, base in referencia[osso].items()
-            }
+            if osso in valores:
+                self.semantica[osso] = valores[osso]
         self._pose_mudou()
         etiqueta.setText(i18n.t("{0}°").format(valor))
         self.agendar_render()
@@ -1480,6 +1576,7 @@ class Viewer3DDocker(DockWidget):
         linha.addWidget(ui.rotulo(rotulo))
         slider = widgets.QSlider(ORIENTACAO_HORIZONTAL)
         slider.setRange(0, LIMITE_FECHAR_DEDO)
+        slider.setToolTip(i18n.t("0° = mão aberta; 90° = punho."))
         slider.setValue(self._valor_do_dedo(ossos))
         valor = ui.rotulo_info(i18n.t("{0}°").format(slider.value()))
         slider.valueChanged.connect(
@@ -1507,6 +1604,11 @@ class Viewer3DDocker(DockWidget):
         if self.modelo is None:
             return
         lado = "l" if self.mao_ajuste == modelo3d.LADO_ESQUERDA else "r"
+        self.grupo_dedos.setTitle(
+            i18n.t("Dedos · {0}").format(
+                i18n.t("Esquerda" if lado == "l" else "Direita")
+            )
+        )
         for familia, rotulo in (
             ("thumb", i18n.t("Polegar")),
             ("index", i18n.t("Indicador")),
@@ -1556,15 +1658,17 @@ class Viewer3DDocker(DockWidget):
                 break
         else:
             return
-        self.grupo_juntas.setTitle(i18n.t("Juntas: {0}").format(nome))
-        self.lbl_regiao.setText(i18n.t("Região: {0}").format(nome))
+        self.grupo_juntas.setTitle(i18n.t("Juntas: {0}").format(i18n.t(nome)))
+        self.lbl_regiao.setText(i18n.t("Região: {0}").format(i18n.t(nome)))
         for osso in ossos:
             for eixo in EIXOS_POR_BASE.get(_base(osso), ("dobrar",)):
                 self.juntas_layout.addLayout(
                     self._linha_slider(
                         osso,
                         eixo,
-                        "{0} · {1}".format(nome_amigavel(osso), ROTULOS[eixo]),
+                        "{0} · {1}".format(
+                            i18n.t(nome_amigavel(osso)), i18n.t(ROTULOS[eixo])
+                        ),
                     )
                 )
         # As regiões do braço mostram também o slider de todos os dedos

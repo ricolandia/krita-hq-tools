@@ -13,6 +13,7 @@ pinta fundo, borda ou fonte, porque estilo próprio briga com o tema que o autor
 escolheu, com o alto dpi e com os ícones do programa.
 """
 
+import collections
 import os
 
 from .compat import (
@@ -99,16 +100,43 @@ def rotulo_info(texto="", dica=None, pai=None):
     return widget
 
 
+# Cache das miniaturas de SVG: as listas redesenham a cada refresh e o mesmo
+# arquivo era rasterizado de novo. A chave inclui mtime e tamanho, então
+# editar o SVG invalida sozinho (mesmo padrão do cache de .kra do thumbs.py).
+_LIMITE_MINIATURAS = 256
+_miniaturas = collections.OrderedDict()
+
+
+def limpar_cache_miniaturas():
+    """Esvazia o cache das miniaturas de SVG (testes e quem quiser)."""
+    _miniaturas.clear()
+
+
+def _chave_miniatura(path, size, proporcao):
+    try:
+        info = os.stat(path)
+    except OSError:
+        return None
+    return (os.path.abspath(path), info.st_mtime_ns, info.st_size, size, proporcao)
+
+
 def render_svg_thumbnail(path, size=120, proporcao=0.75):
     """Miniatura rasterizada de um SVG, para as listas dos dockers.
 
     Estava copiada em três (balões, onomatopeias e biblioteca) com alturas
     diferentes; aqui a proporção vira parâmetro para cada lista manter o que
-    já usava. Devolve ``None`` quando o Qt do SVG não está disponível ou o
-    arquivo não é um SVG legível: a lista cai no item sem ícone, sem quebrar.
+    já usava. Com cache por arquivo (mtime/tamanho na chave). Devolve ``None``
+    quando o Qt do SVG não está disponível ou o arquivo não é um SVG legível:
+    a lista cai no item sem ícone, sem quebrar.
     """
     if QSvgRenderer is None:
         return None
+    chave = _chave_miniatura(path, size, proporcao)
+    if chave is not None:
+        pixmap = _miniaturas.get(chave)
+        if pixmap is not None:
+            _miniaturas.move_to_end(chave)
+            return pixmap
     renderer = QSvgRenderer(path)
     if not renderer.isValid():
         return None
@@ -117,7 +145,13 @@ def render_svg_thumbnail(path, size=120, proporcao=0.75):
     painter = QtGui.QPainter(image)
     renderer.render(painter)
     painter.end()
-    return QPixmap.fromImage(image)
+    pixmap = QPixmap.fromImage(image)
+    if chave is not None:
+        _miniaturas[chave] = pixmap
+        _miniaturas.move_to_end(chave)
+        while len(_miniaturas) > _LIMITE_MINIATURAS:
+            _miniaturas.popitem(last=False)
+    return pixmap
 
 
 def separador(pai=None):

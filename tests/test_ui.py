@@ -15,7 +15,10 @@ Duas coisas diferentes são verificadas aqui:
 """
 
 import ast
+import os
 import pathlib
+import tempfile
+import types
 import unittest
 
 from hq_tools.core import ui
@@ -101,7 +104,9 @@ class TestContrato(unittest.TestCase):
 
     def test_botao_conecta_o_slot_e_mantem_o_rotulo(self):
         alvo = lambda: None  # noqa: E731 - só para ver se foi conectado
-        widget = ui.botao("Atualizar", "Relê os presets.", slot=alvo, icone_chave="atualizar")
+        widget = ui.botao(
+            "Atualizar", "Relê os presets.", slot=alvo, icone_chave="atualizar"
+        )
         self.assertEqual("Atualizar", widget.argumentos[0])
         self.assertEqual((alvo,), self.qt.chamadas("connect")[0][1])
         self.assertEqual(1, len(self.qt.chamadas("setIcon")))
@@ -129,7 +134,9 @@ class TestContrato(unittest.TestCase):
     def test_rotulo_info_quebra_linha_e_nao_reserva_largura(self):
         # Rótulo de estado: sem o wrap e sem zerar a largura mínima, um aviso de
         # 90 caracteres estufa o docker em vez de quebrar a linha.
-        ui.rotulo_info("Célula: 4.32 px a 300 dpi (máx. 85.7 lpi) — reduzida ao aplicar")
+        ui.rotulo_info(
+            "Célula: 4.32 px a 300 dpi (máx. 85.7 lpi) — reduzida ao aplicar"
+        )
         self.assertEqual((True,), self.qt.chamadas("setWordWrap")[0][1])
         larguras = self.qt.chamadas("setMinimumWidth")
         self.assertEqual(1, len(larguras), "a largura mínima precisa ser zerada")
@@ -144,13 +151,19 @@ class TestContrato(unittest.TestCase):
         devolvido = ui.espacamento(layout)
         self.assertIs(layout, devolvido, "o layout tem que voltar, para encadear")
         self.assertEqual(
-            [(ui.MARGEM,) * 4], [chamada[1] for chamada in self.qt.chamadas("setContentsMargins")]
+            [(ui.MARGEM,) * 4],
+            [chamada[1] for chamada in self.qt.chamadas("setContentsMargins")],
         )
-        self.assertEqual([(ui.GAP,)], [chamada[1] for chamada in self.qt.chamadas("setSpacing")])
+        self.assertEqual(
+            [(ui.GAP,)], [chamada[1] for chamada in self.qt.chamadas("setSpacing")]
+        )
 
     def test_painel_devolve_widget_e_layout(self):
         widget, layout = ui.painel()
-        self.assertEqual(["QWidget", "QVBoxLayout"], [c[1] for c in self.qt.criados("QWidget") + self.qt.criados("QVBoxLayout")])
+        self.assertEqual(
+            ["QWidget", "QVBoxLayout"],
+            [c[1] for c in self.qt.criados("QWidget") + self.qt.criados("QVBoxLayout")],
+        )
 
 
 class TestIcones(unittest.TestCase):
@@ -174,8 +187,12 @@ class TestIcones(unittest.TestCase):
     def test_nomes_sao_padronizaveis(self):
         for chave, nome in ui.ICONES.items():
             self.assertTrue(chave.islower(), "chave de ícone em minúsculas: " + chave)
-            self.assertEqual(chave, chave.strip(), "chave sem espaço nas bordas: " + chave)
-            self.assertTrue(nome.startswith("SP_"), nome + " não é um QStyle.StandardPixmap")
+            self.assertEqual(
+                chave, chave.strip(), "chave sem espaço nas bordas: " + chave
+            )
+            self.assertTrue(
+                nome.startswith("SP_"), nome + " não é um QStyle.StandardPixmap"
+            )
 
 
 class TestMiniaturas(unittest.TestCase):
@@ -186,17 +203,120 @@ class TestMiniaturas(unittest.TestCase):
             self.skipTest("ambiente com QSvgRenderer real")
         self.assertIsNone(ui.render_svg_thumbnail("/nao/existe.svg"))
 
+    def test_miniatura_usa_cache_e_invalida_por_mtime(self):
+        anteriores = {
+            "QSvgRenderer": ui.QSvgRenderer,
+            "QImage": ui.QImage,
+            "QPixmap": ui.QPixmap,
+            "QtGui": ui.QtGui,
+            "IMAGE_FORMAT_ARGB32": ui.IMAGE_FORMAT_ARGB32,
+            "TRANSPARENT": ui.TRANSPARENT,
+        }
+
+        class RenderizadorFalso:
+            def __init__(self, path):
+                self.path = path
+
+            def isValid(self):
+                return True
+
+            def render(self, painter):
+                pass
+
+        class ImagemFalsa:
+            def fill(self, *args):
+                pass
+
+        class PixmapFalso:
+            def __init__(self, imagem=None):
+                self.imagem = imagem
+
+            @classmethod
+            def fromImage(cls, imagem):
+                return cls(imagem)
+
+        class PainterFalso:
+            def __init__(self, imagem):
+                pass
+
+            def end(self):
+                pass
+
+        try:
+            ui.QSvgRenderer = RenderizadorFalso
+            ui.QImage = ImagemFalsa
+            ui.QPixmap = PixmapFalso
+            ui.QtGui = types.SimpleNamespace(QPainter=PainterFalso)
+            ui.IMAGE_FORMAT_ARGB32 = 1
+            ui.TRANSPARENT = 0
+            ui.limpar_cache_miniaturas()
+            with tempfile.TemporaryDirectory() as pasta:
+                caminho = os.path.join(pasta, "amostra.svg")
+                with open(caminho, "w", encoding="utf-8") as arquivo:
+                    arquivo.write("<svg/>")
+                primeira = ui.render_svg_thumbnail(caminho)
+                segunda = ui.render_svg_thumbnail(caminho)
+                self.assertIs(
+                    primeira, segunda, "o cache tinha que devolver o mesmo pixmap"
+                )
+                os.utime(caminho, ns=(1_000, 1_000))
+                terceira = ui.render_svg_thumbnail(caminho)
+                self.assertIsNot(primeira, terceira, "mtime novo invalida a entrada")
+        finally:
+            for nome, valor in anteriores.items():
+                setattr(ui, nome, valor)
+            ui.limpar_cache_miniaturas()
+
     def test_dockers_usam_o_helper_compartilhado(self):
         # A miniatura estava copiada em três dockers, com alturas diferentes;
         # voltar a definir uma local desfaz a dedupe sem ninguém notar.
         for nome in ("balloons", "biblioteca", "onomatopeias"):
             fonte = (MODULES / nome / "docker.py").read_text(encoding="utf-8")
             self.assertNotIn(
-                "def render_svg_thumbnail", fonte, nome + " voltou a definir a miniatura local"
+                "def render_svg_thumbnail",
+                fonte,
+                nome + " voltou a definir a miniatura local",
             )
             self.assertIn(
-                "ui.render_svg_thumbnail(", fonte, nome + " não usa o helper compartilhado"
+                "ui.render_svg_thumbnail(",
+                fonte,
+                nome + " não usa o helper compartilhado",
             )
+
+
+class TestRegioesDo3D(unittest.TestCase):
+    """A classe do bug do slider que existia e nunca aparecia.
+
+    O `_montar_sliders` deriva o lado do osso do sufixo da chave da região
+    (`_lado("braco_esq")` devolvia "" e o slider de dedos sumia em silêncio);
+    as chaves de braço têm que terminar num sufixo mapeável e o mapeamento
+    tem que continuar no código.
+    """
+
+    def test_regioes_de_braco_tem_sufixo_mapeavel(self):
+        fonte = (MODULES / "viewer3d" / "docker.py").read_text(encoding="utf-8")
+        arvore = ast.parse(fonte)
+        chaves = []
+        for no in ast.walk(arvore):
+            if not isinstance(no, ast.Assign):
+                continue
+            alvos = [getattr(alvo, "id", None) for alvo in no.targets]
+            if "REGIOES" in alvos and isinstance(no.value, ast.Tuple):
+                for item in no.value.elts:
+                    if isinstance(item, ast.Tuple) and item.elts:
+                        primeiro = item.elts[0]
+                        if isinstance(primeiro, ast.Constant):
+                            chaves.append(primeiro.value)
+        self.assertTrue(chaves, "REGIOES não encontrado no docker do 3D")
+        for chave in chaves:
+            if chave.startswith("braco"):
+                self.assertIn(
+                    chave[-4:],
+                    ("_esq", "_dir"),
+                    "região de braço sem sufixo de lado: " + chave,
+                )
+        self.assertIn('endswith("_esq")', fonte)
+        self.assertIn('endswith("_dir")', fonte)
 
 
 def _chamadas_de_widget(arvore, nome_metodo):
@@ -244,9 +364,15 @@ class TestRegraDosDockers(unittest.TestCase):
     def test_nenhum_botao_criado_direto(self):
         problemas = []
         for caminho in self._arquivos():
-            arvore = ast.parse(caminho.read_text(encoding="utf-8"), filename=str(caminho))
+            arvore = ast.parse(
+                caminho.read_text(encoding="utf-8"), filename=str(caminho)
+            )
             for linha in _criacoes_de_widget(arvore, "QPushButton"):
-                problemas.append("{0}:{1}: QPushButton direto; use ui.botao()".format(caminho.name, linha))
+                problemas.append(
+                    "{0}:{1}: QPushButton direto; use ui.botao()".format(
+                        caminho.name, linha
+                    )
+                )
         self.assertEqual([], problemas, "\n".join(problemas))
 
     def test_nenhuma_altura_fixa(self):
@@ -254,11 +380,15 @@ class TestRegraDosDockers(unittest.TestCase):
         # dpi; era o que travava a altura dos botões de cor.
         problemas = []
         for caminho in self._arquivos():
-            arvore = ast.parse(caminho.read_text(encoding="utf-8"), filename=str(caminho))
+            arvore = ast.parse(
+                caminho.read_text(encoding="utf-8"), filename=str(caminho)
+            )
             for metodo in ("setFixedHeight", "setFixedWidth"):
                 for linha in _chamadas_de_widget(arvore, metodo):
                     problemas.append(
-                        "{0}:{1}: {2}(); deixe o tema decidir o tamanho".format(caminho.name, linha, metodo)
+                        "{0}:{1}: {2}(); deixe o tema decidir o tamanho".format(
+                            caminho.name, linha, metodo
+                        )
                     )
         self.assertEqual([], problemas, "\n".join(problemas))
 

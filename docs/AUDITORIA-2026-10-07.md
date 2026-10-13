@@ -133,11 +133,13 @@ rótulos de dados já era travada por teste desde a v0.12.1.
   docker de paletas agora guarda `resource is None` antes de instanciar);
   contagem de módulos; tabela Flatpak do INSTALL; `install-dev.sh` (nesta
   auditoria).
-- **Continua aberto (recomendações):** cache de miniatura para os SVGs de
-  balões/onomatopeias (o `core/thumbs.py` não é usado por esses dockers);
-  `pack_instalado` com estado "parcial"; listas de validação dentro do Krita
-  (consolidadas abaixo). O lint no CI entrou em 13/10 (ruff, regras F + E9);
-  o respiro do rótulo das miniaturas de perspectiva também (13/10).
+- **Continua aberto (recomendações):** `pack_instalado` com estado "parcial";
+  listas de validação dentro do Krita (consolidadas abaixo).
+- **Resolvido depois (13/10):** o lint no CI (ruff, regras F + E9), o respiro
+  do rótulo das miniaturas de perspectiva e o cache de miniatura dos SVGs de
+  balões/onomatopeias (entrou no `ui.py` com chave por mtime/tamanho e teste).
+  De quebra: os rótulos compostos do 3D (osso/região/eixo) ganharam tradução
+  EN e o teste de i18n passou a cobrir os dicionários do viewer3d.
 - **Resolvido de passagem:** `ui.rotulo_info` ganhou `setMinimumWidth(0)` e
   `setWordWrap` (documentado no próprio helper); falta a conferência visual
   em documento aberto (na lista).

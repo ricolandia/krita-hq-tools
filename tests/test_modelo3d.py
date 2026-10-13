@@ -523,6 +523,38 @@ class TestPosesUsuario(unittest.TestCase):
         corpo["spine_01.x"]["dobrar"] = 99.0
         self.assertEqual(5.0, semantica["spine_01.x"]["dobrar"])
 
+    def test_dedos_por_graus_interpola_a_referencia(self):
+        referencia = {
+            "index1.r": {"abrir": -82.0},
+            "thumb1.r": {"abrir": -33.0, "girar": -4.9},
+        }
+        inteira = modelo3d.dedos_por_graus(referencia, modelo3d.LADO_DIREITA, 82)
+        self.assertEqual(-82.0, inteira["index1.r"]["abrir"])
+        self.assertEqual(-33.0, inteira["thumb1.r"]["abrir"])
+        metade = modelo3d.dedos_por_graus(referencia, modelo3d.LADO_DIREITA, 41)
+        self.assertEqual(-41.0, metade["index1.r"]["abrir"])
+        aberta = modelo3d.dedos_por_graus(referencia, modelo3d.LADO_DIREITA, 0)
+        self.assertEqual(0.0, aberta["index1.r"]["abrir"])
+        self.assertEqual(0.0, aberta["thumb1.r"]["girar"])
+
+    def test_dedos_por_graus_espelha_a_esquerda(self):
+        referencia = {"index1.r": {"abrir": -82.0, "girar": -8.0}}
+        esquerda = modelo3d.dedos_por_graus(referencia, modelo3d.LADO_ESQUERDA, 82)
+        self.assertEqual({"index1.l"}, set(esquerda))
+        self.assertEqual(-82.0, esquerda["index1.l"]["abrir"])
+        self.assertEqual(8.0, esquerda["index1.l"]["girar"])
+
+    def test_graus_dos_dedos_e_o_inverso(self):
+        referencia = {"index1.r": {"abrir": -82.0}, "thumb1.r": {"abrir": -33.07}}
+        valores = modelo3d.dedos_por_graus(referencia, modelo3d.LADO_DIREITA, 90)
+        self.assertEqual(
+            90, modelo3d.graus_dos_dedos(referencia, ["index1.r"], valores)
+        )
+        espelho = modelo3d.dedos_por_graus(referencia, modelo3d.LADO_ESQUERDA, 60)
+        self.assertEqual(
+            60, modelo3d.graus_dos_dedos(referencia, ["index1.l"], espelho)
+        )
+
     def test_semantica_da_mao_por_lado(self):
         semantica = {
             "hand.l": {"girar": -10.0},

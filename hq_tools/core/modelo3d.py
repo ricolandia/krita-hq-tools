@@ -415,6 +415,46 @@ def semantica_do_corpo(semantica):
     }
 
 
+REFERENCIA_DEDOS_GRAUS = 82.0
+
+
+def dedos_por_graus(referencia, lado, graus, graus_referencia=REFERENCIA_DEDOS_GRAUS):
+    """Valores dos dedos interpolando a pose de referência (0..graus_referencia).
+
+    ``referencia`` é o mapa de ossos da pose "fechada" (autoral da direita);
+    a esquerda sai do espelho dela. Devolve ``{osso: {chave: valor}}`` pronto
+    para entrar na semântica (0° = repouso/aberta, a referência em
+    ``graus_referencia`` = punho).
+    """
+    base = referencia if lado == LADO_DIREITA else espelhar(referencia)
+    fator = float(graus) / float(graus_referencia)
+    return {
+        osso: {
+            chave: round(float(valor) * fator, 2) for chave, valor in valores.items()
+        }
+        for osso, valores in base.items()
+    }
+
+
+def graus_dos_dedos(
+    referencia, ossos, semantica, graus_referencia=REFERENCIA_DEDOS_GRAUS
+):
+    """O caminho inverso: o valor do slider a partir da semântica atual.
+
+    Usa o primeiro osso que existe na referência (o polegar é composto, então
+    a razão do primeiro osso resolve os três).
+    """
+    base = referencia if (ossos and ossos[0].endswith(".r")) else espelhar(referencia)
+    for osso in ossos:
+        if osso in base and "abrir" in base[osso]:
+            marco = base[osso]["abrir"]
+            if abs(marco) > 1e-6:
+                atual = semantica.get(osso, {}).get("abrir", 0.0)
+                return int(round(atual * graus_referencia / marco))
+            return 0
+    return 0
+
+
 def semantica_da_mao(semantica, lado):
     """Só os ossos de uma mão (pulso e dedos), para salvar a pose de mão.
 

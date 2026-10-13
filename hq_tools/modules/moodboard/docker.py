@@ -42,7 +42,7 @@ from . import core as mb
 class MoodboardDocker(DockWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(i18n.t('HQ Tools: moodboard'))
+        self.setWindowTitle(i18n.t("HQ Tools: moodboard"))
         registro.registrar("moodboard", self)
         self.config = Config()
         self._build_ui()
@@ -69,7 +69,7 @@ class MoodboardDocker(DockWidget):
 
     def pick_folder(self):
         pasta = QtWidgets.QFileDialog.getExistingDirectory(
-            self.widget(), i18n.t('Pasta das referências (moodboard)'), self.folder()
+            self.widget(), i18n.t("Pasta das referências (moodboard)"), self.folder()
         )
         if pasta:
             self.config.set("moodboard.folder", pasta)
@@ -86,20 +86,25 @@ class MoodboardDocker(DockWidget):
         widgets = QtWidgets
         main, layout = ui.painel(self)
 
-        group_folder = widgets.QGroupBox(i18n.t('Pasta'))
-        folder_layout = ui.espacamento(widgets.QVBoxLayout(group_folder), margem=0, espaco=ui.GAP)
+        group_folder = widgets.QGroupBox(i18n.t("Pasta"))
+        folder_layout = ui.espacamento(
+            widgets.QVBoxLayout(group_folder), margem=0, espaco=ui.GAP
+        )
         folder_row = widgets.QHBoxLayout()
         self.lbl_folder = ui.rotulo_info("")
         folder_row.addWidget(self.lbl_folder, 1)
         button_pick = ui.botao(
-            i18n.t('Pasta...'),
-            i18n.t('Escolhe a pasta das referências (por padrão, moodboard/ na pasta do projeto).'),
+            i18n.t("Pasta..."),
+            i18n.t(
+                "Escolhe a pasta das referências (por padrão, moodboard/ na pasta do projeto)."
+            ),
             icone_chave="pasta",
         )
         button_pick.clicked.connect(self.pick_folder)
         folder_row.addWidget(button_pick)
         button_open = ui.botao(
-            i18n.t('Abrir'), i18n.t('Abre a pasta de referências no explorador de arquivos.')
+            i18n.t("Abrir"),
+            i18n.t("Abre a pasta de referências no explorador de arquivos."),
         )
         button_open.clicked.connect(self.open_folder)
         folder_row.addWidget(button_open)
@@ -107,8 +112,10 @@ class MoodboardDocker(DockWidget):
 
         board_row = widgets.QHBoxLayout()
         button_board = ui.botao(
-            i18n.t('Abrir moodboard'),
-            i18n.t('Abre o quadro moodboard.kra (cria na pasta do projeto, se ainda não existir).'),
+            i18n.t("Abrir moodboard"),
+            i18n.t(
+                "Abre o quadro moodboard.kra (cria na pasta do projeto, se ainda não existir)."
+            ),
             icone_chave="abrir",
         )
         button_board.clicked.connect(self.open_board)
@@ -117,19 +124,25 @@ class MoodboardDocker(DockWidget):
         layout.addWidget(group_folder)
         layout.addWidget(ui.separador())
 
-        group_refs = widgets.QGroupBox(i18n.t('Referências'))
-        refs_layout = ui.espacamento(widgets.QVBoxLayout(group_refs), margem=0, espaco=ui.GAP)
+        group_refs = widgets.QGroupBox(i18n.t("Referências"))
+        refs_layout = ui.espacamento(
+            widgets.QVBoxLayout(group_refs), margem=0, espaco=ui.GAP
+        )
 
         buttons = widgets.QHBoxLayout()
         button_add = ui.botao(
-            i18n.t('Adicionar referências...'),
-            i18n.t('Escolhe imagens, comprime em JPG e linka no quadro (os originais não mudam).'),
+            i18n.t("Adicionar referências..."),
+            i18n.t(
+                "Escolhe imagens, comprime em JPG e linka no quadro (os originais não mudam)."
+            ),
             icone_chave="novo",
         )
         button_add.clicked.connect(self.add_references)
         buttons.addWidget(button_add)
         button_refresh = ui.botao(
-            i18n.t('Atualizar'), i18n.t('Relê as referências da pasta atual.'), icone_chave="atualizar"
+            i18n.t("Atualizar"),
+            i18n.t("Relê as referências da pasta atual."),
+            icone_chave="atualizar",
         )
         button_refresh.clicked.connect(self.refresh)
         buttons.addWidget(button_refresh)
@@ -143,23 +156,34 @@ class MoodboardDocker(DockWidget):
         self.list_items.setWordWrap(True)
         self.list_items.itemDoubleClicked.connect(self.insert_into_selection)
         refs_layout.addWidget(self.list_items, 1)
+        self.lbl_vazio = ui.rotulo_info(
+            i18n.t('Sem referências ainda: use "Adicionar referências...".')
+        )
+        self.lbl_vazio.setVisible(False)
+        refs_layout.addWidget(self.lbl_vazio)
 
         acoes = widgets.QHBoxLayout()
         button_insert = ui.botao(
-            i18n.t('Inserir na seleção'),
-            i18n.t('Insere a referência selecionada na seleção do documento ativo, travada para desenhar por cima.'),
+            i18n.t("Inserir na seleção"),
+            i18n.t(
+                "Insere a referência selecionada na seleção do documento ativo, travada para desenhar por cima."
+            ),
         )
         button_insert.clicked.connect(self.insert_into_selection)
         acoes.addWidget(button_insert)
         button_rename = ui.botao(
-            i18n.t('Renomear...'),
-            i18n.t('Renomeia o arquivo do recurso selecionado, preservando a extensão.'),
+            i18n.t("Renomear..."),
+            i18n.t(
+                "Renomeia o arquivo do recurso selecionado, preservando a extensão."
+            ),
         )
         button_rename.clicked.connect(self.rename_reference)
         acoes.addWidget(button_rename)
         button_delete = ui.botao(
-            i18n.t('Apagar'),
-            i18n.t('Apaga o arquivo da referência selecionada; pede confirmação antes.'),
+            i18n.t("Apagar"),
+            i18n.t(
+                "Apaga o arquivo da referência selecionada; pede confirmação antes."
+            ),
         )
         button_delete.clicked.connect(self.delete_reference)
         acoes.addWidget(button_delete)
@@ -167,7 +191,9 @@ class MoodboardDocker(DockWidget):
         layout.addWidget(group_refs, 1)
 
         hint = ui.rotulo(
-            i18n.t("1) 'Adicionar referências...' comprime e linka as imagens no quadro. 2) Duplo clique (ou 'Inserir na seleção') traz a referência para o painel selecionado. 3) O quadro é leve: guarda só os links para a pasta moodboard/.")
+            i18n.t(
+                "1) 'Adicionar referências...' comprime e linka as imagens no quadro. 2) Duplo clique (ou 'Inserir na seleção') traz a referência para o painel selecionado. 3) O quadro é leve: guarda só os links para a pasta moodboard/."
+            )
         )
         layout.addWidget(hint)
 
@@ -181,9 +207,11 @@ class MoodboardDocker(DockWidget):
             os.makedirs(pasta, exist_ok=True)
         except OSError:
             pass
-        self.lbl_folder.setText(i18n.t('Pasta: {0}').format(pasta))
+        self.lbl_folder.setText(i18n.t("Pasta: {0}").format(pasta))
         self.list_items.clear()
-        for nome, caminho in mb.listar_referencias(pasta):
+        referencias = mb.listar_referencias(pasta)
+        self.lbl_vazio.setVisible(not referencias)
+        for nome, caminho in referencias:
             item = QtWidgets.QListWidgetItem(nome)
             item.setData(USER_ROLE, caminho)
             item.setToolTip(caminho)
@@ -197,7 +225,7 @@ class MoodboardDocker(DockWidget):
     def _referencia_selecionada(self):
         item = self.list_items.currentItem()
         if item is None:
-            helpers.show_message(i18n.t('Escolha uma referência na lista.'))
+            helpers.show_message(i18n.t("Escolha uma referência na lista."))
             return None
         return item.text(), item.data(USER_ROLE)
 
@@ -241,7 +269,7 @@ class MoodboardDocker(DockWidget):
             documento = Krita.instance().openDocument(caminho)
             if documento is None:
                 helpers.show_info(
-                    i18n.t('Moodboard'), i18n.t('Não foi possível abrir o quadro.')
+                    i18n.t("Moodboard"), i18n.t("Não foi possível abrir o quadro.")
                 )
                 return None
             helpers.present_document(documento)
@@ -251,7 +279,7 @@ class MoodboardDocker(DockWidget):
         )
         if documento is None:
             helpers.show_info(
-                i18n.t('Moodboard'), i18n.t('Não foi possível criar o quadro.')
+                i18n.t("Moodboard"), i18n.t("Não foi possível criar o quadro.")
             )
             return None
         documento.saveAs(caminho)
@@ -264,7 +292,7 @@ class MoodboardDocker(DockWidget):
         if self._garantir_quadro() is None:
             return
         if novo:
-            helpers.show_message(i18n.t('Quadro criado: {0}').format(caminho))
+            helpers.show_message(i18n.t("Quadro criado: {0}").format(caminho))
         self.refresh()
 
     def _montar_camada(self, documento, caminho, nome, escala, dx, dy):
@@ -335,13 +363,15 @@ class MoodboardDocker(DockWidget):
         if self.config.get("moodboard.aviso_compressao"):
             return True
         caixa = QtWidgets.QMessageBox(self.widget())
-        caixa.setWindowTitle(i18n.t('Moodboard'))
+        caixa.setWindowTitle(i18n.t("Moodboard"))
         caixa.setText(
-            i18n.t('As referências são redimensionadas (lado máximo {0} px) e salvas em JPG na pasta do projeto, para o quadro ficar leve.').format(mb.MAX_LADO)
+            i18n.t(
+                "As referências são redimensionadas (lado máximo {0} px) e salvas em JPG na pasta do projeto, para o quadro ficar leve."
+            ).format(mb.MAX_LADO)
         )
-        caixa.setInformativeText(i18n.t('Os arquivos originais não são alterados.'))
+        caixa.setInformativeText(i18n.t("Os arquivos originais não são alterados."))
         caixa.setStandardButtons(DIALOG_OK | DIALOG_CANCEL)
-        marcar = QtWidgets.QCheckBox(i18n.t('Não mostrar de novo'))
+        marcar = QtWidgets.QCheckBox(i18n.t("Não mostrar de novo"))
         caixa.setCheckBox(marcar)
         caixa.exec()
         if caixa.clickedButton() != caixa.button(DIALOG_OK):
@@ -358,9 +388,9 @@ class MoodboardDocker(DockWidget):
         ultima = self.config.get("moodboard.ultima_pasta") or os.path.expanduser("~")
         caminhos, _ = QtWidgets.QFileDialog.getOpenFileNames(
             self.widget(),
-            i18n.t('Adicionar referências'),
+            i18n.t("Adicionar referências"),
             ultima,
-            i18n.t('Imagens (*.png *.jpg *.jpeg *.webp *.bmp *.tif *.tiff)'),
+            i18n.t("Imagens (*.png *.jpg *.jpeg *.webp *.bmp *.tif *.tiff)"),
         )
         if not caminhos:
             return
@@ -379,7 +409,12 @@ class MoodboardDocker(DockWidget):
             imagem = QImage(destino)
             x, y, escala = mb.destino(len(itens), imagem.width(), imagem.height())
             camada = self._montar_camada(
-                documento, destino, os.path.splitext(os.path.basename(destino))[0], escala, x, y
+                documento,
+                destino,
+                os.path.splitext(os.path.basename(destino))[0],
+                escala,
+                x,
+                y,
             )
             if camada is None:
                 falhas.append(os.path.basename(origem))
@@ -404,11 +439,13 @@ class MoodboardDocker(DockWidget):
         self.refresh()
         if falhas:
             helpers.show_info(
-                i18n.t('Moodboard'),
-                i18n.t('Não foi possível adicionar: {0}').format(", ".join(falhas)),
+                i18n.t("Moodboard"),
+                i18n.t("Não foi possível adicionar: {0}").format(", ".join(falhas)),
             )
         if adicionadas:
-            helpers.show_message(i18n.t('Referências adicionadas: {0}').format(adicionadas))
+            helpers.show_message(
+                i18n.t("Referências adicionadas: {0}").format(adicionadas)
+            )
 
     def _colocar_referencia(self, documento, camada):
         """Insere a referência visível: abaixo do ativo; acima, se ele for o fundo.
@@ -439,17 +476,19 @@ class MoodboardDocker(DockWidget):
         nome, caminho = selecionado
         documento = helpers.active_document()
         if documento is None:
-            helpers.show_message(i18n.t('Abra um documento para inserir a referência.'))
+            helpers.show_message(i18n.t("Abra um documento para inserir a referência."))
             return
         selecao = helpers.selection_bounds(documento)
         if selecao is None or selecao[2] <= 0 or selecao[3] <= 0:
             helpers.show_message(
-                i18n.t('Desenhe uma seleção retangular no painel para inserir a referência.')
+                i18n.t(
+                    "Desenhe uma seleção retangular no painel para inserir a referência."
+                )
             )
             return
         imagem = QImage(caminho)
         if imagem.isNull():
-            helpers.show_message(i18n.t('Não foi possível ler a imagem.'))
+            helpers.show_message(i18n.t("Não foi possível ler a imagem."))
             return
         x, y, largura, altura = selecao
         pos_x, pos_y, escala = mb.encaixe_em(
@@ -471,7 +510,7 @@ class MoodboardDocker(DockWidget):
 
         if not helpers.run_in_macro(documento, _inserir):
             return
-        helpers.show_message(i18n.t('Referência inserida: {0}').format(nome))
+        helpers.show_message(i18n.t("Referência inserida: {0}").format(nome))
 
     # ------------------------------------------------------------- gerência
 
@@ -505,7 +544,10 @@ class MoodboardDocker(DockWidget):
             return
         nome, caminho = selecionado
         novo, ok = QtWidgets.QInputDialog.getText(
-            self.widget(), i18n.t('Renomear referência'), i18n.t('Novo nome:'), text=nome
+            self.widget(),
+            i18n.t("Renomear referência"),
+            i18n.t("Novo nome:"),
+            text=nome,
         )
         if not ok or not novo.strip():
             return
@@ -518,7 +560,9 @@ class MoodboardDocker(DockWidget):
         try:
             novo_caminho = renomear_recurso(caminho, novo.strip())
         except OSError as erro:
-            helpers.show_info(i18n.t('Moodboard'), i18n.t('Falha ao renomear: {0}').format(erro))
+            helpers.show_info(
+                i18n.t("Moodboard"), i18n.t("Falha ao renomear: {0}").format(erro)
+            )
             return
         if item is not None and documento is not None:
             self._remover_camada(documento, item)
@@ -545,7 +589,7 @@ class MoodboardDocker(DockWidget):
         nome, caminho = selecionado
         resposta = QtWidgets.QMessageBox.question(
             self.widget(),
-            i18n.t('Apagar referência?'),
+            i18n.t("Apagar referência?"),
             i18n.t("Apagar '{0}'? O arquivo sai da pasta do moodboard.").format(nome),
             DIALOG_YES | DIALOG_NO,
             DIALOG_NO,
@@ -561,7 +605,9 @@ class MoodboardDocker(DockWidget):
         try:
             mb.apagar_referencia(caminho)
         except (OSError, ValueError) as erro:
-            helpers.show_info(i18n.t('Moodboard'), i18n.t('Falha ao apagar: {0}').format(erro))
+            helpers.show_info(
+                i18n.t("Moodboard"), i18n.t("Falha ao apagar: {0}").format(erro)
+            )
             return
         if item is not None and documento is not None:
             self._remover_camada(documento, item)
