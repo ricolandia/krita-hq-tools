@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.21.0] — 2026-10-13
+
+Visualizador 3D: **aba "Mãos"** para posar os dedos. Um slider "Dobrar" por
+dedo (Polegar, Indicador, Médio, Anelar, Mindinho), de 0° (mão aberta) a 90°
+(punho), medido na pose de referência do kit (a esquerda usa a referência
+espelhada; o polegar, que é composto, sai certo junto). O botão "Salvar pose
+da mão..." grava na sua biblioteca, com miniatura, espelhando a esquerda para
+a convenção autoral da direita; o kit e as suas poses ficam na mesma lista.
+De quebra, o slider antigo "Dedos · Dobrar" (que usava o eixo errado e
+deformava a mão) foi corrigido, e a região do braço voltou a mostrá-lo.
+
+**English:** 3D viewer: **"Hands" tab** to pose the fingers. A "Bend" slider
+per finger (Thumb, Index, Middle, Ring, Pinky), from 0° (open hand) to 90°
+(fist), measured against the kit reference pose (the left hand uses the
+mirrored reference; the thumb, which is compound, comes out right with it).
+The "Save hand pose..." button stores it in your library, with a thumbnail,
+mirroring the left hand to the right-hand authored convention; the kit and
+your own poses share the same list. As a bonus, the old "Fingers · Bend"
+slider (which used the wrong axis and deformed the hand) was fixed, and the
+arm region shows it again.
+
 ## [0.20.0] — 2026-10-13
 
 Biblioteca de perspectiva: **sete conjuntos novos** (16 no total), pensando em
