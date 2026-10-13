@@ -46,10 +46,21 @@ a da nota do roadmap no Trilium.
 - **v0.14.1 (07/10, publicada):** auditoria de 07/10 (macro de desfazer na
   inserção da biblioteca e do 3D, bordas) e desempenho do 3D (culling de
   costas + caches; render puro 34 → 9,8 ms).
-- **v0.15 (08/10, pronta, sem release):** produção com auto-save do roteiro,
+- **v0.15 (08/10, publicada):** produção com auto-save do roteiro,
   barra de progresso em três cores, bolinha de estado na árvore, "Abrir
   próxima pendente", timetracking manual (total e por página, `tempos.json`)
   e `checklist.md` com checkboxes, emojis e tempo por página.
+- **v0.16–v0.18 (08–09/10, publicadas):** comando `plano`; troca de pose por
+  parte no 3D com os manequins low-poly novos; poses Sentado/Boxing e mãos
+  Fechada boxing/Pega (kit do autor).
+- **v0.19 (13/10, publicada):** miniaturas no seletor de poses (galeria em
+  `resources/poses-preview/`), "Salvar pose do corpo..." na biblioteca do
+  usuário, respiro no rótulo das miniaturas de perspectiva,
+  `render_svg_thumbnail` compartilhado e lint (ruff) no CI.
+- **v0.20 (13/10, publicada):** perspectivas de 9 → 16 (enquadramentos de GN
+  e cinema: deslocados, quina próxima, pássaro/verme extremos, horizonte
+  inclinado e grade de chão) e, no 3D, luz girável (azimute/altura) com o
+  estilo Toon no lugar do Contorno; capturas novas no README.
 - **Fora do roadmap original:** camada de UI compartilhada (52 botões), ícone
   e social preview, vídeos demo no YouTube com roteiros de captura, CI no
   Windows, automação de release (tag → ZIP + notas do CHANGELOG), duas
@@ -89,13 +100,12 @@ inserida num painel dentro de uma seleção. Decisões e achados:
 
 ### Próximo (reavaliado)
 
-1. **Biblioteca de poses:** ✅ "Salvar pose atual" do corpo (13/10, botão
-   "Salvar pose..." com aviso de que só o corpo entra) e ✅ miniatura no
-   seletor (13/10, galeria em `resources/poses-preview/`). **Próximo update
-   (pedido do autor, 13/10):** aba "Mãos" — regiões Mão esquerda/direita com
-   um "Dobrar" por dedo, além do slider único atual (que fica na região do
-   braço), e "Salvar pose de mão" com espelho da esquerda para a convenção da
-   direita. O joinha foi feito em 07/10 (`Mao_joinha_v2_.fbx`).
+1. **Aba "Mãos" (próximo update; pedido do autor em 13/10):** regiões Mão
+   esquerda/direita com um "Dobrar" por dedo, além do slider único atual (que
+   fica na região do braço), e "Salvar pose de mão" com espelho da esquerda
+   para a convenção da direita. O "Salvar pose atual" do corpo e as
+   miniaturas no seletor saíram na v0.19; o joinha, em 07/10
+   (`Mao_joinha_v2_.fbx`).
 2. **Validação no Krita da v0.9.0:** hub (abrir/fechar), malha de perspectiva
    (Ctrl+Z único), flutuante com dois documentos e a interface em inglês.
 3. **Krita 6:** validar o plugin no PyQt6 (pré-requisito do balão
