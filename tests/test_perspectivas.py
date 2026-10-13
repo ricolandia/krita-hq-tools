@@ -35,8 +35,10 @@ class TestDoisNosPorLinha(unittest.TestCase):
         return ET.fromstring(linhas.gerar(nome, 300, 400))
 
     def test_todos_os_presets_geram(self):
-        self.assertEqual(len(linhas.PRESETS), 9)
-        for arquivo, _, _, _ in linhas.PRESETS:
+        arquivos = [arquivo for arquivo, _, _, _ in linhas.PRESETS]
+        self.assertTrue(arquivos, "sem presets")
+        self.assertEqual(len(arquivos), len(set(arquivos)), "arquivo repetido em PRESETS")
+        for arquivo in arquivos:
             arvore = self._arvore(arquivo)
             self.assertEqual(arvore.get("viewBox"), "0 0 300 400")
 
@@ -83,10 +85,10 @@ class TestDoisNosPorLinha(unittest.TestCase):
 
 
 class TestArquivosGerados(unittest.TestCase):
-    def test_gerar_todos_escreve_os_nove(self):
+    def test_gerar_todos_escreve_todos_os_presets(self):
         with tempfile.TemporaryDirectory() as pasta:
             caminhos = linhas.gerar_todos(pasta, 300, 400)
-            self.assertEqual(len(caminhos), 9)
+            self.assertEqual(len(caminhos), len(linhas.PRESETS))
             for caminho in caminhos:
                 self.assertTrue(os.path.isfile(caminho))
                 with open(caminho, encoding="utf-8") as arquivo:

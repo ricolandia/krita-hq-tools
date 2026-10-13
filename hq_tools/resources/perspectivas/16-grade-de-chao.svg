@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200">
+<!-- HQ Tools: 16-grade-de-chao.svg | Grade de chão em um ponto, para posicionar figuras: laranja = profundidade; cinza = travessas em espaçamento de perspectiva; horizonte a 35% | gerado por scripts/gerar-perspectivas.py -->
+<path d="M 0.0 810.0 L 900.0 810.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 680.0 L 900.0 680.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 615.0 L 900.0 615.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 576.0 L 900.0 576.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 550.0 L 900.0 550.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 531.4 L 900.0 531.4" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 517.5 L 900.0 517.5" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 506.7 L 900.0 506.7" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 498.0 L 900.0 498.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 490.9 L 900.0 490.9" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 0.0 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 34.6 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 69.2 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 103.8 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 138.5 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 173.1 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 207.7 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 242.3 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 276.9 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 311.5 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 346.2 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 380.8 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 415.4 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 450.0 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 484.6 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 519.2 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 553.8 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 588.5 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 623.1 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 657.7 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 692.3 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 726.9 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 761.5 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 796.2 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 830.8 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 865.4 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 450.0 420.0 L 900.0 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 420.0 L 900.0 420.0" fill="none" stroke="#b0b4ba" stroke-width="2.0"/>
+</svg>

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200">
+<!-- HQ Tools: 14-verme-extremo.svg | Vista de verme extrema: horizonte a 95% da altura e 3º VP dentro do quadro (convergência forte) | gerado por scripts/gerar-perspectivas.py -->
+<path d="M 0.0 518.2 L 450.0 0.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 572.7 L 545.2 0.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 627.3 L 660.6 0.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 681.8 L 803.6 0.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 736.4 L 900.0 63.6" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 790.9 L 900.0 209.1" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 845.5 L 900.0 354.5" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 900.0 L 900.0 500.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 954.5 L 900.0 645.5" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 1009.1 L 900.0 790.9" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 1063.6 L 900.0 936.4" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 1118.2 L 900.0 1081.8" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 1172.7 L 450.0 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 900.0 518.2 L 450.0 0.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 900.0 572.7 L 354.8 0.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 900.0 627.3 L 239.4 0.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 900.0 681.8 L 96.4 0.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 63.6 L 900.0 736.4" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 209.1 L 900.0 790.9" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 354.5 L 900.0 845.5" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 500.0 L 900.0 900.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 645.5 L 900.0 954.5" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 790.9 L 900.0 1009.1" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 936.4 L 900.0 1063.6" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 1081.8 L 900.0 1118.2" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 900.0 1172.7 L 450.0 1200.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 1140.0 L 855.0 0.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 787.5 0.0 L 37.5 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 720.0 0.0 L 120.0 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 652.5 0.0 L 202.5 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 585.0 0.0 L 285.0 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 517.5 0.0 L 367.5 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 450.0 0.0 L 450.0 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 382.5 0.0 L 532.5 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 315.0 0.0 L 615.0 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 247.5 0.0 L 697.5 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 180.0 0.0 L 780.0 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 112.5 0.0 L 862.5 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 900.0 1140.0 L 45.0 0.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 0.0 1140.0 L 900.0 1140.0" fill="none" stroke="#b0b4ba" stroke-width="2.0"/>
+</svg>

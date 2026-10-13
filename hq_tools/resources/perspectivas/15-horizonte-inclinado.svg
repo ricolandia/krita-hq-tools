@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200">
+<!-- HQ Tools: 15-horizonte-inclinado.svg | Horizonte torto (câmera inclinada): o conjunto de dois pontos girado 12°; mesmas cores, todas as famílias inclinadas | gerado por scripts/gerar-perspectivas.py -->
+<path d="M 0.0 213.5 L 612.4 0.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 257.2 L 900.0 19.5" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 302.8 L 900.0 144.1" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 350.1 L 900.0 273.6" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 399.4 L 900.0 408.5" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 450.8 L 900.0 549.1" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 560.3 L 900.0 848.7" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 618.7 L 900.0 1008.6" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 679.8 L 900.0 1175.8" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 743.8 L 676.3 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 810.9 L 484.0 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 881.3 L 339.2 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 900.0 318.7 L 560.8 0.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 900.0 389.1 L 416.0 0.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 900.0 456.2 L 223.7 0.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 24.2 L 900.0 520.2" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 191.4 L 900.0 581.3" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 351.3 L 900.0 639.7" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 650.9 L 900.0 749.2" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 791.5 L 900.0 800.6" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 926.4 L 900.0 849.9" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 1055.9 L 900.0 897.2" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 1180.5 L 900.0 942.8" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 900.0 986.5 L 287.6 1200.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 985.6 L 209.5 0.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 301.5 0.0 L 46.4 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 393.5 0.0 L 138.4 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 485.5 0.0 L 230.5 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 577.5 0.0 L 322.5 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 669.5 0.0 L 414.5 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 761.6 0.0 L 506.5 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 853.6 0.0 L 598.5 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 900.0 214.4 L 690.5 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 0.0 504.3 L 900.0 695.7" fill="none" stroke="#b0b4ba" stroke-width="2.0"/>
+</svg>

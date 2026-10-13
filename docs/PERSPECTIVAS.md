@@ -1,7 +1,9 @@
 # Perspectivas: pesquisa e conjuntos de linhas
 
 Pesquisa feita em 05/10/2026 para a biblioteca de linhas de perspectiva
-(ideia registrada no `IDEIAS-FUTURAS.md`). Os SVGs estão em
+(ideia registrada no `IDEIAS-FUTURAS.md`). Ampliada em 13/10/2026 com os
+conjuntos de enquadramento (deslocados, quina assimétrica, extremos, horizonte
+inclinado e grade de chão). Os SVGs estão em
 `hq_tools/resources/perspectivas/` e são gerados por
 `scripts/gerar-perspectivas.py`.
 
@@ -46,7 +48,25 @@ reta é `M` + `L`, arco é `M` + `A` (dois pontos de ancoragem e as alças).
 - **5 pontos**: a de 4 pontos mais o VP central; a família de profundidade é
   reta, porque as linhas que passam pelo centro da visão não curvam.
 
-## Catálogo (9 conjuntos)
+## Enquadramentos de quadrinhos e cinema (13/10/2026)
+
+Sete conjuntos a partir do pedido do autor ("enquadramentos de graphic novels
+e cinema"), todos variações da mesma geometria:
+
+- **Deslocados (2)**: o VP do um ponto sai do centro e vai ao terço; a
+  composição assimétrica é o padrão do cinema e dirige o olhar.
+- **Quina próxima (1)**: dois pontos com VPs a distâncias diferentes (esquerdo
+  perto, parede curta e íngreme; direito longe, parede longa).
+- **Extremos (2)**: pássaro/verme no limite (horizonte a 5%/95% e o 3º VP
+  dentro do quadro), o plongée/contra-plongée forte.
+- **Horizonte inclinado (1)**: o dois pontos girado 12° (câmera torta); os
+  VPs e as referências giram antes do recorte, então as três famílias saem
+  inclinadas e o quadro continua preenchido.
+- **Grade de chão (1)**: um ponto com o horizonte a 35% e as travessas no
+  espaçamento real da perspectiva (y = horizonte + altura do piso /
+  profundidade), para posicionar figuras no espaço.
+
+## Catálogo (16 conjuntos)
 
 | Arquivo | Perspectiva | Uso típico |
 |---|---|---|
@@ -59,6 +79,13 @@ reta é `M` + `L`, arco é `M` + `A` (dois pontos de ancoragem e as alças).
 | `07-verme-nivel-2.svg` | verme forte (horizonte a 85%) | opressão |
 | `08-curvilinea-4-pontos.svg` | curvilínea 4 pontos | grande angular, sonho |
 | `09-curvilinea-5-pontos.svg` | curvilínea 5 pontos (fisheye) | vertigem extrema |
+| `10-frontal-deslocado-esq.svg` | 1 ponto deslocado (esq.) | corredor lateral, olhar dirigido |
+| `11-frontal-deslocado-dir.svg` | 1 ponto deslocado (dir.) | corredor lateral, olhar dirigido |
+| `12-quina-proxima.svg` | 2 pontos assimétrico | cena de esquina próxima, cinema |
+| `13-passaro-extremo.svg` | pássaro extremo (horizonte a 5%) | plongée forte, vertigem |
+| `14-verme-extremo.svg` | verme extremo (horizonte a 95%) | contra-plongée forte, opressão |
+| `15-horizonte-inclinado.svg` | horizonte torto (12°) | câmera torta, tensão |
+| `16-grade-de-chao.svg` | grade de chão (1 ponto) | posicionar figuras no espaço |
 
 Cores (uma família por cor, legenda no comentário de cada arquivo):
 **azul** = família vertical (ou do 3º VP); **laranja** = profundidade/VP

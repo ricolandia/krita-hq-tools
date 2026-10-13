@@ -96,9 +96,9 @@ def _guias_retas(elementos, origem, referencias, largura, altura, cor):
         elementos.append(linha(x1, y1, x2, y2, cor))
 
 
-def frontal(largura, altura):
-    """Um ponto: tudo converge para o VP central; verticais e horizontais ficam retas."""
-    cx = largura / 2.0
+def frontal(largura, altura, vp_x_fator=0.5):
+    """Um ponto: tudo converge para o VP; verticais e horizontais ficam retas."""
+    cx = largura * vp_x_fator
     hy = altura / 2.0
     elementos = []
     for indice in range(1, 10):
@@ -121,12 +121,27 @@ def frontal(largura, altura):
     return elementos
 
 
-def _dois_ou_tres_pontos(largura, altura, hy_fator, vp3_fator=None):
-    """Dois pontos (``vp3_fator`` None) ou três pontos, com o 3º VP deslocado."""
+def frontal_deslocado_esquerda(largura, altura):
+    """Um ponto com o VP no terço esquerdo (composição assimétrica)."""
+    return frontal(largura, altura, vp_x_fator=1.0 / 3.0)
+
+
+def frontal_deslocado_direita(largura, altura):
+    """Um ponto com o VP no terço direito (composição assimétrica)."""
+    return frontal(largura, altura, vp_x_fator=2.0 / 3.0)
+
+
+def _dois_ou_tres_pontos(largura, altura, hy_fator, vp3_fator=None,
+                         vp1_fator=-0.60, vp2_fator=1.60):
+    """Dois pontos (``vp3_fator`` None) ou três pontos, com o 3º VP deslocado.
+
+    ``vp1_fator``/``vp2_fator`` são as posições dos VPs em relação à largura
+    (os padrões deixam os dois fora do quadro, a distâncias iguais).
+    """
     cx = largura / 2.0
     hy = altura * hy_fator
-    vp1 = (-0.60 * largura, hy)
-    vp2 = (largura + 0.60 * largura, hy)
+    vp1 = (vp1_fator * largura, hy)
+    vp2 = (vp2_fator * largura, hy)
     elementos = []
     referencias_verticais = [(cx, indice * altura / 12.0) for indice in range(13)]
     referencias_verticais = [
@@ -169,6 +184,23 @@ def verme_nivel_1(largura, altura):
 
 def verme_nivel_2(largura, altura):
     return _dois_ou_tres_pontos(largura, altura, 0.85, vp3_fator=-0.9)
+
+
+def quina_proxima(largura, altura):
+    """Dois pontos assimétrico: VP esquerdo perto (parede curta), direito longe."""
+    return _dois_ou_tres_pontos(
+        largura, altura, 0.5, vp1_fator=-0.10, vp2_fator=2.60
+    )
+
+
+def passaro_nivel_3(largura, altura):
+    """Vista de pássaro extrema: horizonte no topo e 3º VP dentro do quadro."""
+    return _dois_ou_tres_pontos(largura, altura, 0.05, vp3_fator=0.50)
+
+
+def verme_nivel_3(largura, altura):
+    """Vista de verme extrema: horizonte no fundo e 3º VP dentro do quadro."""
+    return _dois_ou_tres_pontos(largura, altura, 0.95, vp3_fator=-0.50)
 
 
 def _curvilinea(largura, altura, centro, divisoes=8):
@@ -231,6 +263,101 @@ def curvilinea_5_pontos(largura, altura):
     return _curvilinea(largura, altura, centro=True)
 
 
+def _rotacionar_ponto(ponto, angulo, largura, altura):
+    """Ponto girado em torno do centro do quadro (graus, sentido horário)."""
+    cx, cy = largura / 2.0, altura / 2.0
+    radianos = math.radians(angulo)
+    cosseno, seno = math.cos(radianos), math.sin(radianos)
+    dx, dy = ponto[0] - cx, ponto[1] - cy
+    return (cx + dx * cosseno - dy * seno, cy + dx * seno + dy * cosseno)
+
+
+def inclinada(largura, altura, angulo=12.0):
+    """Dois pontos girado: o "horizonte torto" (câmera inclinada).
+
+    Os VPs e as referências giram antes do recorte, então as três famílias
+    saem inclinadas e o quadro continua preenchido de borda a borda.
+    """
+    cx = largura / 2.0
+    hy = altura / 2.0
+
+    def girar(ponto):
+        return _rotacionar_ponto(ponto, angulo, largura, altura)
+
+    vp1 = girar((-0.60 * largura, hy))
+    vp2 = girar((largura + 0.60 * largura, hy))
+    elementos = []
+    referencias = [
+        girar((cx, indice * altura / 12.0)) for indice in range(13) if indice != 6
+    ]
+    _guias_retas(elementos, vp1, referencias, largura, altura, LARANJA)
+    _guias_retas(elementos, vp2, referencias, largura, altura, CINZA)
+    for indice in range(1, 10):
+        x = indice * largura / 10.0
+        recorte = recortar_reta(girar((x, 0)), girar((x, altura)), largura, altura)
+        if recorte is not None:
+            (x1, y1), (x2, y2) = recorte
+            elementos.append(linha(x1, y1, x2, y2, AZUL))
+    recorte = recortar_reta(girar((0, hy)), girar((largura, hy)), largura, altura)
+    if recorte is not None:
+        (x1, y1), (x2, y2) = recorte
+        elementos.append(linha(x1, y1, x2, y2, CINZA, ESPESSURA_EIXO))
+    return elementos
+
+
+def _trecho_na_faixa(ponto_a, ponto_b, y_min, y_max):
+    """Trecho da reta por A e B dentro da faixa horizontal (só interpolação)."""
+    (x1, y1), (x2, y2) = ponto_a, ponto_b
+    if abs(y2 - y1) < 1e-9:
+        if y_min - 1e-6 <= y1 <= y_max + 1e-6:
+            return (ponto_a, ponto_b)
+        return None
+    t_min = (y_min - y1) / float(y2 - y1)
+    t_max = (y_max - y1) / float(y2 - y1)
+    t0, t1 = sorted((t_min, t_max))
+    t0, t1 = max(0.0, t0), min(1.0, t1)
+    if t0 >= t1:
+        return None
+
+    def ponto_em(t):
+        return (x1 + (x2 - x1) * t, y1 + (y2 - y1) * t)
+
+    return (ponto_em(t0), ponto_em(t1))
+
+
+def grade_de_chao(largura, altura):
+    """Grade de chão em um ponto, para posicionar figuras no espaço.
+
+    Horizonte a 35% da altura; as travessas seguem o espaçamento real da
+    perspectiva (y = horizonte + altura do piso / profundidade), então o
+    piso parece um piso, não listras iguais.
+    """
+    cx = largura / 2.0
+    hy = altura * 0.35
+    piso = altura - hy
+    elementos = []
+    # Travessas: da segunda em diante (a primeira seria a própria borda do
+    # quadro); para quando a faixa fica mais fina que 5 px.
+    profundidade = 2
+    while True:
+        passo = piso * (1.0 / profundidade - 1.0 / (profundidade + 1.0))
+        if passo < 5.0:
+            break
+        y = hy + piso / float(profundidade)
+        elementos.append(linha(0, y, largura, y, CINZA))
+        profundidade += 1
+    # Profundidade: do VP pelas divisões da borda inferior (cantos incluídos).
+    for indice in range(0, 27):
+        x = indice * largura / 26.0
+        trecho = _trecho_na_faixa((cx, hy), (x, altura), hy, altura)
+        if trecho is None:
+            continue
+        (x1, y1), (x2, y2) = trecho
+        elementos.append(linha(x1, y1, x2, y2, LARANJA))
+    elementos.append(linha(0, hy, largura, hy, CINZA, ESPESSURA_EIXO))
+    return elementos
+
+
 PRESETS = (
     ("01-frontal.svg", "Frontal (1 ponto)", frontal,
      "Um ponto: laranja = profundidade; azul = verticais; cinza = horizontais e horizonte"),
@@ -250,6 +377,20 @@ PRESETS = (
      "Curvilínea 4 pontos: azul = arcos verticais; cinza = arcos horizontais; laranja = eixos retos"),
     ("09-curvilinea-5-pontos.svg", "Curvilínea · 5 pontos", curvilinea_5_pontos,
      "Curvilínea 5 pontos: como a de 4, mais a família reta do VP central (laranja)"),
+    ("10-frontal-deslocado-esq.svg", "Frontal · deslocado (esq.)", frontal_deslocado_esquerda,
+     "Um ponto com o VP no terço esquerdo (composição assimétrica): laranja = profundidade; azul = verticais; cinza = horizontais e horizonte"),
+    ("11-frontal-deslocado-dir.svg", "Frontal · deslocado (dir.)", frontal_deslocado_direita,
+     "Um ponto com o VP no terço direito (composição assimétrica): laranja = profundidade; azul = verticais; cinza = horizontais e horizonte"),
+    ("12-quina-proxima.svg", "Quina próxima", quina_proxima,
+     "Dois pontos assimétrico: VP esquerdo perto (parede curta e íngreme) e direito longe (parede longa); laranja = VP esquerdo; cinza = VP direito; azul = verticais"),
+    ("13-passaro-extremo.svg", "Pássaro · extremo", passaro_nivel_3,
+     "Vista de pássaro extrema: horizonte a 5% da altura e 3º VP dentro do quadro (convergência forte)"),
+    ("14-verme-extremo.svg", "Verme · extremo", verme_nivel_3,
+     "Vista de verme extrema: horizonte a 95% da altura e 3º VP dentro do quadro (convergência forte)"),
+    ("15-horizonte-inclinado.svg", "Horizonte inclinado", inclinada,
+     "Horizonte torto (câmera inclinada): o conjunto de dois pontos girado 12°; mesmas cores, todas as famílias inclinadas"),
+    ("16-grade-de-chao.svg", "Grade de chão", grade_de_chao,
+     "Grade de chão em um ponto, para posicionar figuras: laranja = profundidade; cinza = travessas em espaçamento de perspectiva; horizonte a 35%"),
 )
 
 

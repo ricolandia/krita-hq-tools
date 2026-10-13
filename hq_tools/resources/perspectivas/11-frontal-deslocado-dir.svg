@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200">
+<!-- HQ Tools: 11-frontal-deslocado-dir.svg | Um ponto com o VP no terço direito (composição assimétrica): laranja = profundidade; azul = verticais; cinza = horizontais e horizonte | gerado por scripts/gerar-perspectivas.py -->
+<path d="M 90.0 0.0 L 90.0 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 180.0 0.0 L 180.0 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 270.0 0.0 L 270.0 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 360.0 0.0 L 360.0 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 450.0 0.0 L 450.0 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 540.0 0.0 L 540.0 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 630.0 0.0 L 630.0 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 720.0 0.0 L 720.0 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 810.0 0.0 L 810.0 1200.0" fill="none" stroke="#2f6fd0" stroke-width="1.2"/>
+<path d="M 0.0 120.0 L 900.0 120.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 240.0 L 900.0 240.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 360.0 L 900.0 360.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 480.0 L 900.0 480.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 600.0 L 900.0 600.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 720.0 L 900.0 720.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 840.0 L 900.0 840.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 960.0 L 900.0 960.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 1080.0 L 900.0 1080.0" fill="none" stroke="#b0b4ba" stroke-width="1.2"/>
+<path d="M 0.0 494.7 L 900.0 652.7" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 268.6 L 900.0 765.7" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 900.0 906.9 L 13.5 0.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 900.0 1121.3 L 254.7 0.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 413.6 0.0 L 786.4 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 540.8 0.0 L 659.2 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 659.2 0.0 L 540.8 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 786.4 0.0 L 413.6 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 900.0 78.7 L 254.7 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 900.0 293.1 L 13.5 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 931.4 L 900.0 434.3" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 705.3 L 900.0 547.3" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 494.7 L 900.0 652.7" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 268.6 L 900.0 765.7" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 900.0 906.9 L 13.5 0.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 900.0 1121.3 L 254.7 0.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 413.6 0.0 L 786.4 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 540.8 0.0 L 659.2 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 659.2 0.0 L 540.8 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 786.4 0.0 L 413.6 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 900.0 78.7 L 254.7 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 900.0 293.1 L 13.5 1200.0" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 931.4 L 900.0 434.3" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 705.3 L 900.0 547.3" fill="none" stroke="#e8843c" stroke-width="1.2"/>
+<path d="M 0.0 600.0 L 900.0 600.0" fill="none" stroke="#b0b4ba" stroke-width="2.0"/>
+</svg>
