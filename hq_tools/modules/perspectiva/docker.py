@@ -206,17 +206,33 @@ class PerspectivaDocker(DockWidget):
         self.atualizar_preview()
 
     def _miniatura(self, arquivo):
-        return self._rasterizar(linhas.gerar(arquivo, 120, 160), 120, 160)
+        return self._rasterizar(
+            linhas.gerar(arquivo, 120, 160), 120, 160, margem_inferior=10
+        )
 
     @staticmethod
-    def _rasterizar(svg, largura, altura):
+    def _rasterizar(svg, largura, altura, margem_inferior=0):
+        """Rasteriza o SVG; com margem inferior, o desenho fica acima dela.
+
+        A margem é o respiro entre a malha e o rótulo do item na lista (o texto
+        encostava nas linhas azuis); o desenho encolhe mantendo a proporção e
+        fica centrado na horizontal.
+        """
         if QSvgRenderer is None:
             return None
         renderer = QSvgRenderer(QtCore.QByteArray(svg.encode("utf-8")))
         imagem = QImage(largura, altura, IMAGE_FORMAT_RGBA8888)
         imagem.fill(TRANSPARENT)
         painter = QtGui.QPainter(imagem)
-        renderer.render(painter)
+        if margem_inferior:
+            util = altura - margem_inferior
+            largura_util = largura * util / float(altura)
+            renderer.render(
+                painter,
+                QtCore.QRectF((largura - largura_util) / 2.0, 0.0, largura_util, util),
+            )
+        else:
+            renderer.render(painter)
         painter.end()
         return QtGui.QPixmap.fromImage(imagem)
 
