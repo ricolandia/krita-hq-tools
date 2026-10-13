@@ -22,7 +22,6 @@ def _decodificar(png):
         payload = png[offset + 8:offset + 8 + tamanho]
         if tipo == b"IHDR":
             largura, altura, depth, cor, _, _, _ = struct.unpack(">IIBBBBB", payload)
-            self_ = None
             assert depth == 8 and cor == 6
         elif tipo == b"IDAT":
             idat += payload

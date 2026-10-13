@@ -1,0 +1,9 @@
+# Lint leve do CI: erros de sintaxe (E9) e a suíte F do pyflakes (nome
+# indefinido, import/variável sem uso, f-string sem placeholder). Sem regras
+# de estilo: o código é formatado à mão e o objetivo é pegar engano, não
+# reformatar. As pastas fora do código entregue ficam de fora.
+target-version = "py311"
+extend-exclude = ["Novas_ideias", "Referencias", "dist"]
+
+[lint]
+select = ["F", "E9"]

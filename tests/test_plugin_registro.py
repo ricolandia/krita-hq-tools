@@ -152,7 +152,7 @@ class TestRegistroDoPlugin(unittest.TestCase):
         self.assertNotIn("hq_tools_pages", ids)
 
     def test_atalhos_criam_as_oito_acoes(self):
-        modulo = self.carregar()
+        self.carregar()
         janela = _Janela()
         self.instancia.extensoes[0].createActions(janela)
         self.assertEqual(len(janela.acoes), 8)

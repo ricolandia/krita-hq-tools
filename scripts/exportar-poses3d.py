@@ -143,7 +143,6 @@ def main():
     bpy.context.view_layer.update()
 
     ossos = _ossos_em_ordem(armadura)
-    indice = {osso.name: posicao for posicao, osso in enumerate(ossos)}
     repouso = {osso.name: osso.matrix_local.copy() for osso in ossos}
     posed = {osso.name: armadura.pose.bones[osso.name].matrix.copy() for osso in ossos}
 
