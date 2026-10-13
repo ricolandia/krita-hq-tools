@@ -285,6 +285,16 @@ paramétrico.
 
 ### Anotadas, ainda fora
 
+- **Polimento visual da interface (QSS)**: botões, áreas de texto, espaçamento
+  e alinhamento das docas (puramente estético; sem animação e sem QML).
+  Avaliado em 09/10: o Qt não é limitação (QSS, animações e QML disponíveis;
+  o AppImage do Krita traz o QtQuick) e o caminho barato é o QSS. Decisão do
+  autor: não mexer agora.
+- **Manequim: smooth / decimar / texturizar**: avaliado em 08–09/10 — shade
+  smooth no pipeline SVG pesa (gradiente por triângulo), texturizar = cores por
+  região via materiais (sem custo) × textura de imagem (inviável no SVG), e o
+  exportador tem `--decimar`. Decisão do autor: performance manda, ficar como
+  está.
 - **Textura no vetor ("lápis tremido")**: avaliado em 08/10. O Krita aceita
   preenchimento e traço com **pattern** no vetor (nativo), mas **não** traço com
   pincel (é recurso pedido no tracker do KDE, "brush vector lines"); o libkis
