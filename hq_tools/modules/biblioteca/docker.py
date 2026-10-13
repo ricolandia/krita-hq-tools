@@ -24,8 +24,6 @@ from ...core.compat import (
     SMOOTH_TRANSFORMATION,
     QImage,
     QPixmap,
-    QSvgRenderer,
-    TRANSPARENT,
     USER_ROLE,
     QtCore,
     QtGui,
@@ -40,20 +38,6 @@ from . import core as lib
 TAMANHO = lib.tamanho_novo_documento()
 
 MODOS_CAMADA = (("Vetorial (formas)", "vetorial"), ("Pintura (pincel)", "pintura"))
-
-
-def render_svg_thumbnail(path, size=120):
-    if QSvgRenderer is None:
-        return None
-    renderer = QSvgRenderer(path)
-    if not renderer.isValid():
-        return None
-    image = QImage(size, size, IMAGE_FORMAT_ARGB32)
-    image.fill(TRANSPARENT)
-    painter = QtGui.QPainter(image)
-    renderer.render(painter)
-    painter.end()
-    return QPixmap.fromImage(image)
 
 
 def render_png_thumbnail(path, size=120):
@@ -216,7 +200,7 @@ class BibliotecaDocker(DockWidget):
             if path.lower().endswith(".png"):
                 pixmap = render_png_thumbnail(path)
             else:
-                pixmap = render_svg_thumbnail(path)
+                pixmap = ui.render_svg_thumbnail(path, proporcao=1.0)
             if pixmap is not None:
                 item.setIcon(QtGui.QIcon(pixmap))
             self.list_items.addItem(item)

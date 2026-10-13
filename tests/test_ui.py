@@ -178,6 +178,27 @@ class TestIcones(unittest.TestCase):
             self.assertTrue(nome.startswith("SP_"), nome + " não é um QStyle.StandardPixmap")
 
 
+class TestMiniaturas(unittest.TestCase):
+    def test_sem_qt_de_svg_devolve_none(self):
+        # Sem o Qt do SVG (a máquina de teste não tem PyQt), a lista cai no
+        # item sem ícone em vez de quebrar.
+        if ui.QSvgRenderer is not None:  # pragma: no cover - só com PyQt real
+            self.skipTest("ambiente com QSvgRenderer real")
+        self.assertIsNone(ui.render_svg_thumbnail("/nao/existe.svg"))
+
+    def test_dockers_usam_o_helper_compartilhado(self):
+        # A miniatura estava copiada em três dockers, com alturas diferentes;
+        # voltar a definir uma local desfaz a dedupe sem ninguém notar.
+        for nome in ("balloons", "biblioteca", "onomatopeias"):
+            fonte = (MODULES / nome / "docker.py").read_text(encoding="utf-8")
+            self.assertNotIn(
+                "def render_svg_thumbnail", fonte, nome + " voltou a definir a miniatura local"
+            )
+            self.assertIn(
+                "ui.render_svg_thumbnail(", fonte, nome + " não usa o helper compartilhado"
+            )
+
+
 def _chamadas_de_widget(arvore, nome_metodo):
     """Nomes de método Qt chamados no arquivo (ex.: ``widgets.setToolTip``)."""
     achados = []

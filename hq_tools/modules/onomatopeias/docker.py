@@ -13,13 +13,8 @@ from krita import DockWidget
 from ...core import krita_helpers as helpers
 from ...core.compat import (
     ICON_MODE,
-    IMAGE_FORMAT_ARGB32,
     LIST_ADJUST,
     LIST_STATIC,
-    QImage,
-    QPixmap,
-    QSvgRenderer,
-    TRANSPARENT,
     USER_ROLE,
     QtCore,
     QtGui,
@@ -55,20 +50,6 @@ def ensure_default_folder(config):
             except OSError:
                 pass
     return folder
-
-
-def render_svg_thumbnail(path, size=120):
-    if QSvgRenderer is None:
-        return None
-    renderer = QSvgRenderer(path)
-    if not renderer.isValid():
-        return None
-    image = QImage(size, int(size * 0.6), IMAGE_FORMAT_ARGB32)
-    image.fill(TRANSPARENT)
-    painter = QtGui.QPainter(image)
-    renderer.render(painter)
-    painter.end()
-    return QPixmap.fromImage(image)
 
 
 class OnomatopoeiasDocker(DockWidget):
@@ -160,7 +141,7 @@ class OnomatopoeiasDocker(DockWidget):
             item = QtWidgets.QListWidgetItem(os.path.splitext(name)[0])
             item.setData(USER_ROLE, path)
             item.setToolTip(path)
-            pixmap = render_svg_thumbnail(path)
+            pixmap = ui.render_svg_thumbnail(path, proporcao=0.6)
             if pixmap is not None:
                 item.setIcon(QtGui.QIcon(pixmap))
             self.list_items.addItem(item)

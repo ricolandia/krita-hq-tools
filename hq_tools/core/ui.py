@@ -15,7 +15,17 @@ escolheu, com o alto dpi e com os ícones do programa.
 
 import os
 
-from .compat import FRAME_HLINE, QtGui, QtWidgets, standard_icon
+from .compat import (
+    FRAME_HLINE,
+    IMAGE_FORMAT_ARGB32,
+    TRANSPARENT,
+    QImage,
+    QPixmap,
+    QSvgRenderer,
+    QtGui,
+    QtWidgets,
+    standard_icon,
+)
 from .paths import ICONE_PATH
 
 # Escala de espaçamento do DESIGN.md (seção 4), recortada para o que cabe num
@@ -87,6 +97,27 @@ def rotulo_info(texto="", dica=None, pai=None):
     widget = rotulo(texto, dica, pai)
     widget.setMinimumWidth(0)
     return widget
+
+
+def render_svg_thumbnail(path, size=120, proporcao=0.75):
+    """Miniatura rasterizada de um SVG, para as listas dos dockers.
+
+    Estava copiada em três (balões, onomatopeias e biblioteca) com alturas
+    diferentes; aqui a proporção vira parâmetro para cada lista manter o que
+    já usava. Devolve ``None`` quando o Qt do SVG não está disponível ou o
+    arquivo não é um SVG legível: a lista cai no item sem ícone, sem quebrar.
+    """
+    if QSvgRenderer is None:
+        return None
+    renderer = QSvgRenderer(path)
+    if not renderer.isValid():
+        return None
+    image = QImage(size, int(size * proporcao), IMAGE_FORMAT_ARGB32)
+    image.fill(TRANSPARENT)
+    painter = QtGui.QPainter(image)
+    renderer.render(painter)
+    painter.end()
+    return QPixmap.fromImage(image)
 
 
 def separador(pai=None):
