@@ -46,6 +46,7 @@ def luz_de_angulos(azimute, altura):
         math.sin(al),
     )
 
+
 # Lentes oferecidas na perspectiva (mm, sensor cheio de 36 mm). Sem lente, a
 # projeção é ortográfica (o padrão do visualizador).
 SENSOR_MM = 36.0
@@ -77,7 +78,24 @@ def fator_perspectiva(profundidade, distancia):
 
 
 def identidade():
-    return [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0]
+    return [
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+    ]
 
 
 def multiplicar(a, b):
@@ -121,10 +139,22 @@ def inversa_afim(matriz):
     r21 = (b * g - a * h) * fator
     r22 = (a * e - b * d) * fator
     return [
-        r00, r01, r02, -(r00 * tx + r01 * ty + r02 * tz),
-        r10, r11, r12, -(r10 * tx + r11 * ty + r12 * tz),
-        r20, r21, r22, -(r20 * tx + r21 * ty + r22 * tz),
-        0.0, 0.0, 0.0, 1.0,
+        r00,
+        r01,
+        r02,
+        -(r00 * tx + r01 * ty + r02 * tz),
+        r10,
+        r11,
+        r12,
+        -(r10 * tx + r11 * ty + r12 * tz),
+        r20,
+        r21,
+        r22,
+        -(r20 * tx + r21 * ty + r22 * tz),
+        0.0,
+        0.0,
+        0.0,
+        1.0,
     ]
 
 
@@ -132,10 +162,22 @@ def rotacao_x(graus):
     radianos = math.radians(graus)
     cosseno, seno = math.cos(radianos), math.sin(radianos)
     return [
-        1.0, 0.0, 0.0, 0.0,
-        0.0, cosseno, -seno, 0.0,
-        0.0, seno, cosseno, 0.0,
-        0.0, 0.0, 0.0, 1.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        cosseno,
+        -seno,
+        0.0,
+        0.0,
+        seno,
+        cosseno,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
     ]
 
 
@@ -143,10 +185,22 @@ def rotacao_y(graus):
     radianos = math.radians(graus)
     cosseno, seno = math.cos(radianos), math.sin(radianos)
     return [
-        cosseno, 0.0, seno, 0.0,
-        0.0, 1.0, 0.0, 0.0,
-        -seno, 0.0, cosseno, 0.0,
-        0.0, 0.0, 0.0, 1.0,
+        cosseno,
+        0.0,
+        seno,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        -seno,
+        0.0,
+        cosseno,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
     ]
 
 
@@ -154,10 +208,22 @@ def rotacao_z(graus):
     radianos = math.radians(graus)
     cosseno, seno = math.cos(radianos), math.sin(radianos)
     return [
-        cosseno, -seno, 0.0, 0.0,
-        seno, cosseno, 0.0, 0.0,
-        0.0, 0.0, 1.0, 0.0,
-        0.0, 0.0, 0.0, 1.0,
+        cosseno,
+        -seno,
+        0.0,
+        0.0,
+        seno,
+        cosseno,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
     ]
 
 
@@ -349,6 +415,20 @@ def semantica_do_corpo(semantica):
     }
 
 
+def semantica_da_mao(semantica, lado):
+    """Só os ossos de uma mão (pulso e dedos), para salvar a pose de mão.
+
+    A pose salva sai sempre na convenção autoral (mão direita): a esquerda é
+    espelhada com :func:`espelhar` na hora de gravar.
+    """
+    sufixo = ".r" if lado == LADO_DIREITA else ".l"
+    return {
+        osso: dict(valores)
+        for osso, valores in semantica.items()
+        if osso_de_mao(osso) and osso.endswith(sufixo)
+    }
+
+
 def eixos_semanticos(osso):
     """Mapeia os eixos locais do osso para nomes de junta.
 
@@ -363,9 +443,7 @@ def eixos_semanticos(osso):
     matriz = osso["matriz"]
 
     def coluna(indice):
-        return _normalizar((
-            matriz[indice], matriz[4 + indice], matriz[8 + indice]
-        ))
+        return _normalizar((matriz[indice], matriz[4 + indice], matriz[8 + indice]))
 
     eixo_x, eixo_y, eixo_z = coluna(0), coluna(1), coluna(2)
     if abs(eixo_z[0]) >= abs(eixo_x[0]):
@@ -383,9 +461,7 @@ def eixos_semanticos(osso):
             a[0] * eixo_y[1] - a[1] * eixo_y[0],
         )
         produto = (
-            cruzamento[0] * alvo[0]
-            + cruzamento[1] * alvo[1]
-            + cruzamento[2] * alvo[2]
+            cruzamento[0] * alvo[0] + cruzamento[1] * alvo[1] + cruzamento[2] * alvo[2]
         )
         return 1 if produto > 0 else -1
 
@@ -405,12 +481,26 @@ def eixos_semanticos(osso):
 # docker espelha para a esquerda) com o braço levantado ao lado, para a mão
 # sair da silhueta do corpo e o fundo ficar limpo.
 PREVIA_LARGURA, PREVIA_ALTURA = 120, 160
-PREVIA_CAMERA_CORPO = {"yaw": 0.0, "pitch": -10.0, "zoom": 1.708, "pan_x": 1.8, "pan_y": -0.3}
-PREVIA_CAMERA_MAOS = {"yaw": -15.0, "pitch": -10.0, "zoom": 11.142, "pan_x": 356.7, "pan_y": 362.5}
+PREVIA_CAMERA_CORPO = {
+    "yaw": 0.0,
+    "pitch": -10.0,
+    "zoom": 1.708,
+    "pan_x": 1.8,
+    "pan_y": -0.3,
+}
+PREVIA_CAMERA_MAOS = {
+    "yaw": -15.0,
+    "pitch": -10.0,
+    "zoom": 11.142,
+    "pan_x": 356.7,
+    "pan_y": 362.5,
+}
 PREVIA_ABRIR_MAO = 70.0
 
 
-def render_previa(modelo, semantica, parte, largura=PREVIA_LARGURA, altura=PREVIA_ALTURA):
+def render_previa(
+    modelo, semantica, parte, largura=PREVIA_LARGURA, altura=PREVIA_ALTURA
+):
     """SVG da prévia de pose (``parte`` = "corpo" ou "maos").
 
     Nas mãos, o braço direito sai para o lado antes de renderizar (a mão fica
@@ -545,16 +635,22 @@ class Modelo:
             for osso, peso in self.pesos[indice]:
                 matriz = matrizes[osso]
                 x += peso * (
-                    matriz[0] * vertice[0] + matriz[1] * vertice[1]
-                    + matriz[2] * vertice[2] + matriz[3]
+                    matriz[0] * vertice[0]
+                    + matriz[1] * vertice[1]
+                    + matriz[2] * vertice[2]
+                    + matriz[3]
                 )
                 y += peso * (
-                    matriz[4] * vertice[0] + matriz[5] * vertice[1]
-                    + matriz[6] * vertice[2] + matriz[7]
+                    matriz[4] * vertice[0]
+                    + matriz[5] * vertice[1]
+                    + matriz[6] * vertice[2]
+                    + matriz[7]
                 )
                 z += peso * (
-                    matriz[8] * vertice[0] + matriz[9] * vertice[1]
-                    + matriz[10] * vertice[2] + matriz[11]
+                    matriz[8] * vertice[0]
+                    + matriz[9] * vertice[1]
+                    + matriz[10] * vertice[2]
+                    + matriz[11]
                 )
             resultado.append((x, y, z))
         return resultado
@@ -565,7 +661,10 @@ class Modelo:
         não planares, que é o caso de todas as faces do modelo exportado."""
         if len(face) <= 3:
             return [face]
-        return [(face[0], face[indice], face[indice + 1]) for indice in range(1, len(face) - 1)]
+        return [
+            (face[0], face[indice], face[indice + 1])
+            for indice in range(1, len(face) - 1)
+        ]
 
     def _camera(self, yaw, pitch, zoom, largura, altura, pan_x, pan_y, lente=None):
         """(visão, centro, escala, distância): distância é None na ortográfica."""
@@ -577,8 +676,9 @@ class Modelo:
             distancia = distancia_da_lente(escala, largura, lente)
         return visao, centro, escala, distancia
 
-    def _projetar(self, na_camera, centro, escala, distancia, largura, altura,
-                  pan_x, pan_y):
+    def _projetar(
+        self, na_camera, centro, escala, distancia, largura, altura, pan_x, pan_y
+    ):
         """Pontos de tela a partir das coordenadas de câmera.
 
         Com lente, o fator de perspectiva cresce para o que está perto; para o
@@ -592,8 +692,12 @@ class Modelo:
             fatores = [
                 fator_perspectiva(y - centro[1], distancia) for _, y, _ in na_camera
             ]
-            ortogonal_x = max((abs(x - centro[0]) for x, _, _ in na_camera), default=0.0)
-            ortogonal_y = max((abs(z - centro[2]) for _, _, z in na_camera), default=0.0)
+            ortogonal_x = max(
+                (abs(x - centro[0]) for x, _, _ in na_camera), default=0.0
+            )
+            ortogonal_y = max(
+                (abs(z - centro[2]) for _, _, z in na_camera), default=0.0
+            )
             projetado_x = max(
                 (abs((x - centro[0]) * f) for (x, _, _), f in zip(na_camera, fatores)),
                 default=0.0,
@@ -617,9 +721,19 @@ class Modelo:
             for (x, y, z), f in zip(na_camera, fatores)
         ]
 
-    def vertices_em_tela(self, rotacoes=None, yaw=0.0, pitch=-10.0, zoom=1.0,
-                         largura=700, altura=700, pan_x=0.0, pan_y=0.0,
-                         posados=None, lente=None):
+    def vertices_em_tela(
+        self,
+        rotacoes=None,
+        yaw=0.0,
+        pitch=-10.0,
+        zoom=1.0,
+        largura=700,
+        altura=700,
+        pan_x=0.0,
+        pan_y=0.0,
+        posados=None,
+        lente=None,
+    ):
         """Projeta os vértices posados: (x, y na tela, profundidade)."""
         visao, centro, escala, distancia = self._camera(
             yaw, pitch, zoom, largura, altura, pan_x, pan_y, lente=lente
@@ -631,10 +745,24 @@ class Modelo:
             na_camera, centro, escala, distancia, largura, altura, pan_x, pan_y
         )
 
-    def renderizar(self, rotacoes=None, yaw=0.0, pitch=-10.0, zoom=1.0,
-                   largura=700, altura=700, pan_x=0.0, pan_y=0.0,
-                   cor=None, fundo=None, luz=LUZ_PADRAO, cull=False, posados=None,
-                   estilo="sombreado", lente=None):
+    def renderizar(
+        self,
+        rotacoes=None,
+        yaw=0.0,
+        pitch=-10.0,
+        zoom=1.0,
+        largura=700,
+        altura=700,
+        pan_x=0.0,
+        pan_y=0.0,
+        cor=None,
+        fundo=None,
+        luz=LUZ_PADRAO,
+        cull=False,
+        posados=None,
+        estilo="sombreado",
+        lente=None,
+    ):
         """Devolve o SVG do modelo posado.
 
         ``estilo="sombreado"`` (padrão) usa painter's algorithm e sombreamento
@@ -662,7 +790,9 @@ class Modelo:
         ]
         if fundo:
             partes.append(
-                '<rect width="{0}" height="{1}" fill="{2}"/>'.format(largura, altura, fundo)
+                '<rect width="{0}" height="{1}" fill="{2}"/>'.format(
+                    largura, altura, fundo
+                )
             )
 
         if estilo == "chapado":
@@ -694,11 +824,13 @@ class Modelo:
                 )
                 aresta1 = (p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2])
                 aresta2 = (p2[0] - p0[0], p2[1] - p0[1], p2[2] - p0[2])
-                normal = _normalizar((
-                    aresta1[1] * aresta2[2] - aresta1[2] * aresta2[1],
-                    aresta1[2] * aresta2[0] - aresta1[0] * aresta2[2],
-                    aresta1[0] * aresta2[1] - aresta1[1] * aresta2[0],
-                ))
+                normal = _normalizar(
+                    (
+                        aresta1[1] * aresta2[2] - aresta1[2] * aresta2[1],
+                        aresta1[2] * aresta2[0] - aresta1[0] * aresta2[2],
+                        aresta1[0] * aresta2[1] - aresta1[1] * aresta2[0],
+                    )
+                )
                 if cull and normal[1] >= -1e-9:
                     continue
                 produto = (
@@ -713,17 +845,14 @@ class Modelo:
                     brilho = 1.0 if produto >= LIMITE_TOON else 0.30
                 else:
                     brilho = 0.35 + 0.65 * abs(produto)
-                profundidade = (
-                    p0[1] + p1[1] + p2[1]
-                ) / 3.0
+                profundidade = (p0[1] + p1[1] + p2[1]) / 3.0
                 desenhaveis.append((profundidade, triangulo, brilho))
 
         desenhaveis.sort(key=lambda item: item[0], reverse=True)
         for _, face, brilho in desenhaveis:
             rgb = tuple(canal * brilho for canal in base)
             pontos_svg = " ".join(
-                f"{tela[indice][0]:.1f},{tela[indice][1]:.1f}"
-                for indice in face
+                f"{tela[indice][0]:.1f},{tela[indice][1]:.1f}" for indice in face
             )
             cor_face = _rgb_para_hex(rgb)
             partes.append(

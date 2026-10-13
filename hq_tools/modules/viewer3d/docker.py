@@ -14,6 +14,7 @@ flutuante, mapeado para pixels do documento, e entra logo abaixo do nó ativo
 para o esboço ficar por cima.
 """
 
+import json
 import os
 
 from krita import DockWidget
@@ -52,6 +53,11 @@ from ...core.paths import (
 )
 
 LIMITE_SLIDER = 120
+# Slider "Dobrar" dos dedos: 0° = mão aberta (repouso) e 90° = punho. Os
+# valores saem da interpolação da pose de referência "fechada" (medida em QA:
+# o fechar do dedo mora no eixo "abrir" negativo; "dobrar"/"girar" deformam).
+LIMITE_FECHAR_DEDO = 90
+REFERENCIA_FECHADA_GRAUS = 82.0
 
 ORIENTACAO_HORIZONTAL = getattr(
     getattr(QtCore.Qt, "Orientation", QtCore.Qt), "Horizontal"
@@ -145,9 +151,7 @@ def _botao_do_meio(evento):
 
 
 def _shift_pressionado(evento):
-    shift = getattr(
-        getattr(QtCore.Qt, "KeyboardModifier", QtCore.Qt), "ShiftModifier"
-    )
+    shift = getattr(getattr(QtCore.Qt, "KeyboardModifier", QtCore.Qt), "ShiftModifier")
     return bool(evento.modifiers() & shift)
 
 
@@ -332,7 +336,7 @@ class _Flutuante(QtWidgets.QWidget):
 class Viewer3DDocker(DockWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(i18n.t('HQ Tools: 3D'))
+        self.setWindowTitle(i18n.t("HQ Tools: 3D"))
         registro.registrar("viewer3d", self)
         self.modelo = None
         self.corpo = "homem"
@@ -367,6 +371,10 @@ class Viewer3DDocker(DockWidget):
         # padrões reproduzem a LUZ_PADRAO do núcleo.
         self.luz_azimute = 26.6
         self.luz_altura = 26.7
+        # Mão em ajuste na aba "Mãos" (a pose salva sai na convenção da
+        # direita; a esquerda é espelhada ao gravar).
+        self.mao_ajuste = modelo3d.LADO_DIREITA
+        self._ref_fechada = None
         self._tela = []
         self._canvas = None
         self._flutuante = None
@@ -396,18 +404,19 @@ class Viewer3DDocker(DockWidget):
         self.preview = _Preview(self)
         layout.addWidget(self.preview, 1)
 
-        layout.addWidget(ui.rotulo(
-            i18n.t('Clique sobre a parte do corpo que deseja rotacionar.')
-        ))
+        layout.addWidget(
+            ui.rotulo(i18n.t("Clique sobre a parte do corpo que deseja rotacionar."))
+        )
 
-        self.lbl_regiao = ui.rotulo_info(i18n.t('Nenhuma região selecionada.'))
+        self.lbl_regiao = ui.rotulo_info(i18n.t("Nenhuma região selecionada."))
         layout.addWidget(self.lbl_regiao)
 
         self.tabs = widgets.QTabWidget()
         layout.addWidget(self.tabs, 1)
-        self.tabs.addTab(self._build_pose_tab(), i18n.t('Pose'))
-        self.tabs.addTab(self._build_camera_tab(), i18n.t('Câmera'))
-        self.tabs.addTab(self._build_insert_tab(), i18n.t('Inserir'))
+        self.tabs.addTab(self._build_pose_tab(), i18n.t("Pose"))
+        self.tabs.addTab(self._build_maos_tab(), i18n.t("Mãos"))
+        self.tabs.addTab(self._build_camera_tab(), i18n.t("Câmera"))
+        self.tabs.addTab(self._build_insert_tab(), i18n.t("Inserir"))
 
         self.setWidget(main)
 
@@ -417,7 +426,7 @@ class Viewer3DDocker(DockWidget):
         layout = ui.espacamento(widgets.QVBoxLayout(tab))
 
         modelo_row = widgets.QHBoxLayout()
-        modelo_row.addWidget(ui.rotulo(i18n.t('Modelo:')))
+        modelo_row.addWidget(ui.rotulo(i18n.t("Modelo:")))
         self.cmb_corpo = widgets.QComboBox()
         for chave, rotulo, _ in VIEWER3D_MODELOS:
             self.cmb_corpo.addItem(i18n.t(rotulo), chave)
@@ -426,43 +435,83 @@ class Viewer3DDocker(DockWidget):
         layout.addLayout(modelo_row)
 
         corpo_row = widgets.QHBoxLayout()
-        corpo_row.addWidget(ui.rotulo(i18n.t('Corpo:')))
+        corpo_row.addWidget(ui.rotulo(i18n.t("Corpo:")))
         self.cmb_pose_corpo = widgets.QComboBox()
         self.cmb_pose_corpo.currentIndexChanged.connect(self._mudar_pose_corpo)
         corpo_row.addWidget(self.cmb_pose_corpo, 1)
-        corpo_row.addWidget(ui.botao(
-            i18n.t('Salvar pose...'),
-            i18n.t('Salva a pose do corpo atual na sua biblioteca. As mãos não entram.'),
-            self._salvar_pose_corpo,
-            icone_chave="salvar",
-        ))
+        corpo_row.addWidget(
+            ui.botao(
+                i18n.t("Salvar pose..."),
+                i18n.t(
+                    "Salva a pose do corpo atual na sua biblioteca. As mãos não entram."
+                ),
+                self._salvar_pose_corpo,
+                icone_chave="salvar",
+            )
+        )
         layout.addLayout(corpo_row)
 
         mao_direita_row = widgets.QHBoxLayout()
-        mao_direita_row.addWidget(ui.rotulo(i18n.t('Mão direita:')))
+        mao_direita_row.addWidget(ui.rotulo(i18n.t("Mão direita:")))
         self.cmb_mao_direita = widgets.QComboBox()
         self.cmb_mao_direita.currentIndexChanged.connect(self._mudar_mao_direita)
         mao_direita_row.addWidget(self.cmb_mao_direita, 1)
         layout.addLayout(mao_direita_row)
 
         mao_esquerda_row = widgets.QHBoxLayout()
-        mao_esquerda_row.addWidget(ui.rotulo(i18n.t('Mão esquerda:')))
+        mao_esquerda_row.addWidget(ui.rotulo(i18n.t("Mão esquerda:")))
         self.cmb_mao_esquerda = widgets.QComboBox()
         self.cmb_mao_esquerda.currentIndexChanged.connect(self._mudar_mao_esquerda)
         mao_esquerda_row.addWidget(self.cmb_mao_esquerda, 1)
         layout.addLayout(mao_esquerda_row)
 
-        self.grupo_juntas = widgets.QGroupBox(i18n.t('Juntas'))
+        self.grupo_juntas = widgets.QGroupBox(i18n.t("Juntas"))
         self.juntas_layout = ui.espacamento(
             widgets.QVBoxLayout(self.grupo_juntas), margem=0, espaco=ui.GAP
         )
         layout.addWidget(self.grupo_juntas)
 
         posse = widgets.QHBoxLayout()
-        button_reset = ui.botao(i18n.t('Limpar pose'), i18n.t('Zera todas as juntas.'))
+        button_reset = ui.botao(i18n.t("Limpar pose"), i18n.t("Zera todas as juntas."))
         button_reset.clicked.connect(self.limpar_pose)
         posse.addWidget(button_reset)
         layout.addLayout(posse)
+        layout.addStretch(1)
+        return tab
+
+    def _build_maos_tab(self):
+        widgets = QtWidgets
+        tab = widgets.QWidget()
+        layout = ui.espacamento(widgets.QVBoxLayout(tab))
+        layout.addWidget(
+            ui.rotulo(
+                i18n.t(
+                    "Escolha a mão, ajuste os dedos e salve na sua biblioteca: a esquerda é espelhada ao salvar, como as poses do kit."
+                )
+            )
+        )
+        lado_row = widgets.QHBoxLayout()
+        lado_row.addWidget(ui.rotulo(i18n.t("Mão:")))
+        self.cmb_mao_ajuste = widgets.QComboBox()
+        self.cmb_mao_ajuste.addItem(i18n.t("Direita"), modelo3d.LADO_DIREITA)
+        self.cmb_mao_ajuste.addItem(i18n.t("Esquerda"), modelo3d.LADO_ESQUERDA)
+        self.cmb_mao_ajuste.currentIndexChanged.connect(self._mudar_mao_ajuste)
+        lado_row.addWidget(self.cmb_mao_ajuste, 1)
+        layout.addLayout(lado_row)
+
+        self.grupo_dedos = widgets.QGroupBox(i18n.t("Dedos"))
+        self.dedos_layout = ui.espacamento(
+            widgets.QVBoxLayout(self.grupo_dedos), margem=0, espaco=ui.GAP
+        )
+        layout.addWidget(self.grupo_dedos)
+
+        self.button_salvar_mao = ui.botao(
+            i18n.t("Salvar pose da mão direita..."),
+            i18n.t("Salva a pose atual da mão direita na sua biblioteca."),
+            self._salvar_pose_de_mao,
+            icone_chave="salvar",
+        )
+        layout.addWidget(self.button_salvar_mao)
         layout.addStretch(1)
         return tab
 
@@ -472,51 +521,51 @@ class Viewer3DDocker(DockWidget):
         layout = ui.espacamento(widgets.QVBoxLayout(tab))
 
         camera_row = widgets.QHBoxLayout()
-        camera_row.addWidget(ui.rotulo(i18n.t('Câmera:')))
+        camera_row.addWidget(ui.rotulo(i18n.t("Câmera:")))
         self.cmb_camera = widgets.QComboBox()
-        self.cmb_camera.addItem(i18n.t('Ortográfica'), "ortografica")
-        self.cmb_camera.addItem(i18n.t('Perspectiva'), "perspectiva")
+        self.cmb_camera.addItem(i18n.t("Ortográfica"), "ortografica")
+        self.cmb_camera.addItem(i18n.t("Perspectiva"), "perspectiva")
         self.cmb_camera.currentIndexChanged.connect(self._mudar_camera)
         camera_row.addWidget(self.cmb_camera, 1)
         layout.addLayout(camera_row)
 
         lente_row = widgets.QHBoxLayout()
-        lente_row.addWidget(ui.rotulo(i18n.t('Lente:')))
+        lente_row.addWidget(ui.rotulo(i18n.t("Lente:")))
         self.cmb_lente = widgets.QComboBox()
         for lente in modelo3d.LENTES:
-            self.cmb_lente.addItem(i18n.t('{0:.0f} mm').format(lente), lente)
+            self.cmb_lente.addItem(i18n.t("{0:.0f} mm").format(lente), lente)
         self.cmb_lente.currentIndexChanged.connect(self._mudar_lente)
         lente_row.addWidget(self.cmb_lente, 1)
         layout.addLayout(lente_row)
         self._atualizar_lente()
 
         estilo_row = widgets.QHBoxLayout()
-        estilo_row.addWidget(ui.rotulo(i18n.t('Estilo:')))
+        estilo_row.addWidget(ui.rotulo(i18n.t("Estilo:")))
         self.cmb_estilo = widgets.QComboBox()
-        self.cmb_estilo.addItem(i18n.t('Sombreado'), "sombreado")
-        self.cmb_estilo.addItem(i18n.t('Silhueta'), "silhueta")
-        self.cmb_estilo.addItem(i18n.t('Toon'), "toon")
+        self.cmb_estilo.addItem(i18n.t("Sombreado"), "sombreado")
+        self.cmb_estilo.addItem(i18n.t("Silhueta"), "silhueta")
+        self.cmb_estilo.addItem(i18n.t("Toon"), "toon")
         self.cmb_estilo.currentIndexChanged.connect(self.agendar_render)
         estilo_row.addWidget(self.cmb_estilo, 1)
         layout.addLayout(estilo_row)
 
         cor_row = widgets.QHBoxLayout()
-        cor_row.addWidget(ui.rotulo(i18n.t('Cor:')))
+        cor_row.addWidget(ui.rotulo(i18n.t("Cor:")))
         self.cmb_cor = widgets.QComboBox()
-        self.cmb_cor.addItem(i18n.t('Bege'), None)
-        self.cmb_cor.addItem(i18n.t('Azul'), "#7da7d9")
-        self.cmb_cor.addItem(i18n.t('Gelo'), "#eef4fb")
-        self.cmb_cor.addItem(i18n.t('Grafite'), "#5c5c5c")
+        self.cmb_cor.addItem(i18n.t("Bege"), None)
+        self.cmb_cor.addItem(i18n.t("Azul"), "#7da7d9")
+        self.cmb_cor.addItem(i18n.t("Gelo"), "#eef4fb")
+        self.cmb_cor.addItem(i18n.t("Grafite"), "#5c5c5c")
         self.cmb_cor.currentIndexChanged.connect(self._mudar_cor)
         cor_row.addWidget(self.cmb_cor, 1)
         layout.addLayout(cor_row)
 
         luz_azimute_row = widgets.QHBoxLayout()
-        luz_azimute_row.addWidget(ui.rotulo(i18n.t('Luz · Azimute')))
+        luz_azimute_row.addWidget(ui.rotulo(i18n.t("Luz · Azimute")))
         self.sld_luz_azimute = widgets.QSlider(ORIENTACAO_HORIZONTAL)
         self.sld_luz_azimute.setRange(-180, 180)
         self.sld_luz_azimute.setValue(int(self.luz_azimute))
-        etiqueta_azimute = ui.rotulo_info(i18n.t('{0}°').format(int(self.luz_azimute)))
+        etiqueta_azimute = ui.rotulo_info(i18n.t("{0}°").format(int(self.luz_azimute)))
         self.sld_luz_azimute.valueChanged.connect(
             lambda novo, etiqueta=etiqueta_azimute: self._mudar_luz(
                 "azimute", novo, etiqueta
@@ -527,11 +576,11 @@ class Viewer3DDocker(DockWidget):
         layout.addLayout(luz_azimute_row)
 
         luz_altura_row = widgets.QHBoxLayout()
-        luz_altura_row.addWidget(ui.rotulo(i18n.t('Luz · Altura')))
+        luz_altura_row.addWidget(ui.rotulo(i18n.t("Luz · Altura")))
         self.sld_luz_altura = widgets.QSlider(ORIENTACAO_HORIZONTAL)
         self.sld_luz_altura.setRange(-80, 80)
         self.sld_luz_altura.setValue(int(self.luz_altura))
-        etiqueta_altura = ui.rotulo_info(i18n.t('{0}°').format(int(self.luz_altura)))
+        etiqueta_altura = ui.rotulo_info(i18n.t("{0}°").format(int(self.luz_altura)))
         self.sld_luz_altura.valueChanged.connect(
             lambda novo, etiqueta=etiqueta_altura: self._mudar_luz(
                 "altura", novo, etiqueta
@@ -543,34 +592,42 @@ class Viewer3DDocker(DockWidget):
 
         cameras = widgets.QHBoxLayout()
         button_front = ui.botao(
-            i18n.t('Frente'), i18n.t('Volta à vista frontal (ângulo, zoom e enquadramento).')
+            i18n.t("Frente"),
+            i18n.t("Volta à vista frontal (ângulo, zoom e enquadramento)."),
         )
         button_front.clicked.connect(self.reset_camera)
         cameras.addWidget(button_front)
         button_fit = ui.botao(
-            i18n.t('Enquadrar'), i18n.t('Centraliza o modelo e volta ao zoom 1, sem mudar o ângulo.')
+            i18n.t("Enquadrar"),
+            i18n.t("Centraliza o modelo e volta ao zoom 1, sem mudar o ângulo."),
         )
         button_fit.clicked.connect(self.enquadrar)
         cameras.addWidget(button_fit)
-        button_zoom_out = ui.botao(i18n.t('−'), i18n.t('Diminui o zoom.'))
+        button_zoom_out = ui.botao(i18n.t("−"), i18n.t("Diminui o zoom."))
         button_zoom_out.clicked.connect(lambda: self.aplicar_zoom(0.8))
         cameras.addWidget(button_zoom_out)
-        button_zoom_in = ui.botao(i18n.t('+'), i18n.t('Aumenta o zoom.'))
+        button_zoom_in = ui.botao(i18n.t("+"), i18n.t("Aumenta o zoom."))
         button_zoom_in.clicked.connect(lambda: self.aplicar_zoom(1.25))
         cameras.addWidget(button_zoom_in)
         layout.addLayout(cameras)
 
         self.button_move = ui.botao(
-            i18n.t('Mover'),
-            i18n.t('Ligado, arrastar desloca o enquadramento em vez de girar (ou use Shift/botão do meio).'),
+            i18n.t("Mover"),
+            i18n.t(
+                "Ligado, arrastar desloca o enquadramento em vez de girar (ou use Shift/botão do meio)."
+            ),
         )
         self.button_move.setCheckable(True)
         self.button_move.toggled.connect(self._alternar_mover)
         layout.addWidget(self.button_move)
 
-        layout.addWidget(ui.rotulo(
-            i18n.t('Arraste no preview para orbitar; Shift+arraste desloca; roda ou +/− dão zoom.')
-        ))
+        layout.addWidget(
+            ui.rotulo(
+                i18n.t(
+                    "Arraste no preview para orbitar; Shift+arraste desloca; roda ou +/− dão zoom."
+                )
+            )
+        )
         layout.addStretch(1)
         return tab
 
@@ -581,16 +638,20 @@ class Viewer3DDocker(DockWidget):
 
         flutuante = widgets.QHBoxLayout()
         self.button_flutuar = ui.botao(
-            i18n.t('Flutuar na página'),
-            i18n.t('Mostra o preview sobre a seleção (desenhe uma seleção retangular sobre o painel primeiro); arraste e redimensione à vontade.'),
+            i18n.t("Flutuar na página"),
+            i18n.t(
+                "Mostra o preview sobre a seleção (desenhe uma seleção retangular sobre o painel primeiro); arraste e redimensione à vontade."
+            ),
             icone_chave="novo",
         )
         self.button_flutuar.setCheckable(True)
         self.button_flutuar.toggled.connect(self._alternar_flutuar)
         flutuante.addWidget(self.button_flutuar)
         self.button_fixar = ui.botao(
-            i18n.t('Fixar'),
-            i18n.t('Com o flutuante fixado, o mouse atravessa e você desenha por baixo.'),
+            i18n.t("Fixar"),
+            i18n.t(
+                "Com o flutuante fixado, o mouse atravessa e você desenha por baixo."
+            ),
         )
         self.button_fixar.setCheckable(True)
         self.button_fixar.setEnabled(False)
@@ -599,11 +660,11 @@ class Viewer3DDocker(DockWidget):
         layout.addLayout(flutuante)
 
         opacidade = widgets.QHBoxLayout()
-        opacidade.addWidget(ui.rotulo(i18n.t('Opacidade:')))
+        opacidade.addWidget(ui.rotulo(i18n.t("Opacidade:")))
         self.sld_opacidade = widgets.QSlider(ORIENTACAO_HORIZONTAL)
         self.sld_opacidade.setRange(20, 100)
         self.sld_opacidade.setValue(80)
-        self.lbl_opacidade = ui.rotulo_info(i18n.t('80%'))
+        self.lbl_opacidade = ui.rotulo_info(i18n.t("80%"))
         self.sld_opacidade.valueChanged.connect(self._mudar_opacidade)
         opacidade.addWidget(self.sld_opacidade, 1)
         opacidade.addWidget(self.lbl_opacidade)
@@ -611,23 +672,31 @@ class Viewer3DDocker(DockWidget):
 
         acoes = widgets.QHBoxLayout()
         button_layer = ui.botao(
-            i18n.t('Inserir como camada'),
-            i18n.t('Insere na seleção ativa (desenhe uma seleção retangular sobre o painel); a camada entra abaixo da camada ativa, para o esboço ficar por cima, e a seleção é desfeita.'),
+            i18n.t("Inserir como camada"),
+            i18n.t(
+                "Insere na seleção ativa (desenhe uma seleção retangular sobre o painel); a camada entra abaixo da camada ativa, para o esboço ficar por cima, e a seleção é desfeita."
+            ),
             icone_chave="aplicar",
         )
         button_layer.clicked.connect(lambda: self.inserir(referencia=False))
         acoes.addWidget(button_layer)
         button_ref = ui.botao(
-            i18n.t('Inserir como referência'),
-            i18n.t('Insere na seleção ativa, travado, com rótulo de cor e opacidade reduzida, abaixo da camada ativa; a seleção é desfeita.'),
+            i18n.t("Inserir como referência"),
+            i18n.t(
+                "Insere na seleção ativa, travado, com rótulo de cor e opacidade reduzida, abaixo da camada ativa; a seleção é desfeita."
+            ),
         )
         button_ref.clicked.connect(lambda: self.inserir(referencia=True))
         acoes.addWidget(button_ref)
         layout.addLayout(acoes)
 
-        layout.addWidget(ui.rotulo(
-            i18n.t("1) Desenhe uma seleção retangular sobre o painel. 2) Ajuste a pose e o zoom (o preview mostra exatamente o recorte). 3) 'Inserir' coloca a camada abaixo da ativa e desfaz a seleção.")
-        ))
+        layout.addWidget(
+            ui.rotulo(
+                i18n.t(
+                    "1) Desenhe uma seleção retangular sobre o painel. 2) Ajuste a pose e o zoom (o preview mostra exatamente o recorte). 3) 'Inserir' coloca a camada abaixo da ativa e desfaz a seleção."
+                )
+            )
+        )
         layout.addStretch(1)
         return tab
 
@@ -641,7 +710,7 @@ class Viewer3DDocker(DockWidget):
         try:
             self.modelo = modelo3d.Modelo.carregar(self._caminho_do_corpo(self.corpo))
         except (OSError, ValueError) as error:
-            self.lbl_regiao.setText(i18n.t('Modelo 3D indisponível: {0}').format(error))
+            self.lbl_regiao.setText(i18n.t("Modelo 3D indisponível: {0}").format(error))
             return
         self._posados_cache = None
         self._popular_poses()
@@ -676,7 +745,7 @@ class Viewer3DDocker(DockWidget):
     def _popular_combo(self, combo, pastas, parte, atual):
         combo.blockSignals(True)
         combo.clear()
-        combo.addItem(i18n.t('—'), None)
+        combo.addItem(i18n.t("—"), None)
         combo.setIconSize(QtCore.QSize(28, 40))
         for pasta in pastas:
             try:
@@ -741,7 +810,9 @@ class Viewer3DDocker(DockWidget):
         try:
             dados = modelo3d.carregar_pose(caminho)
         except (OSError, ValueError) as error:
-            helpers.show_info(i18n.t('3D'), i18n.t('Não foi possível ler a pose: {0}').format(error))
+            helpers.show_info(
+                i18n.t("3D"), i18n.t("Não foi possível ler a pose: {0}").format(error)
+            )
             return {}
         return dados.get("ossos", {})
 
@@ -783,7 +854,7 @@ class Viewer3DDocker(DockWidget):
             self.luz_azimute = float(valor)
         else:
             self.luz_altura = float(valor)
-        etiqueta.setText(i18n.t('{0}°').format(valor))
+        etiqueta.setText(i18n.t("{0}°").format(valor))
         self.agendar_render()
 
     def _atualizar_lente(self):
@@ -830,10 +901,7 @@ class Viewer3DDocker(DockWidget):
 
     def _posados(self):
         """Vértices na pose atual, recalculados só quando a pose muda."""
-        if (
-            self._posados_cache is None
-            or self._posados_cache[0] != self._pose_revisao
-        ):
+        if self._posados_cache is None or self._posados_cache[0] != self._pose_revisao:
             self._posados_cache = (
                 self._pose_revisao,
                 self.modelo.vertices_em_pose(self._rotacoes()),
@@ -969,20 +1037,27 @@ class Viewer3DDocker(DockWidget):
         view = helpers.active_view()
         documento = view.document() if view is not None else None
         if documento is None:
-            helpers.show_info(i18n.t('3D'), i18n.t('Abra um documento para usar o flutuante.'))
+            helpers.show_info(
+                i18n.t("3D"), i18n.t("Abra um documento para usar o flutuante.")
+            )
             self.button_flutuar.setChecked(False)
             return
         selecao = helpers.selection_bounds(documento)
         if selecao is None or selecao[2] <= 0 or selecao[3] <= 0:
             helpers.show_info(
-                i18n.t('3D'),
-                i18n.t('Desenhe uma seleção retangular sobre o painel para usar o flutuante.'),
+                i18n.t("3D"),
+                i18n.t(
+                    "Desenhe uma seleção retangular sobre o painel para usar o flutuante."
+                ),
             )
             self.button_flutuar.setChecked(False)
             return
         viewport = _viewport_da_view(view)
         if viewport is None:
-            helpers.show_info(i18n.t('3D'), i18n.t('Não foi possível ancorar o flutuante nesta janela.'))
+            helpers.show_info(
+                i18n.t("3D"),
+                i18n.t("Não foi possível ancorar o flutuante nesta janela."),
+            )
             self.button_flutuar.setChecked(False)
             return
         self._fechar_flutuante()
@@ -1025,9 +1100,7 @@ class Viewer3DDocker(DockWidget):
             viewport.height() / max(1.0, float(tela[3])),
         )
         largura = max(_Flutuante.TAMANHO_MINIMO, int(round(tela[2] * fator)))
-        altura = max(
-            _Flutuante.TAMANHO_MINIMO, int(round(largura / aspecto))
-        )
+        altura = max(_Flutuante.TAMANHO_MINIMO, int(round(largura / aspecto)))
         x = int(round(tela[0] + (tela[2] - largura) / 2.0))
         y = int(round(tela[1] + (tela[3] - altura) / 2.0))
         x = max(0, min(x, viewport.width() - largura))
@@ -1088,7 +1161,7 @@ class Viewer3DDocker(DockWidget):
             self._flutuante.update()
 
     def _mudar_opacidade(self, valor):
-        self.lbl_opacidade.setText(i18n.t('{0}%').format(valor))
+        self.lbl_opacidade.setText(i18n.t("{0}%").format(valor))
         if self._flutuante is not None:
             self._flutuante.definir_opacidade(valor / 100.0)
 
@@ -1146,12 +1219,12 @@ class Viewer3DDocker(DockWidget):
     def _salvar_pose_corpo(self):
         """Salva a pose atual do corpo na biblioteca do usuário (só o corpo)."""
         if self.modelo is None:
-            helpers.show_info(i18n.t('3D'), i18n.t('O modelo não está disponível.'))
+            helpers.show_info(i18n.t("3D"), i18n.t("O modelo não está disponível."))
             return
         nome, ok = QtWidgets.QInputDialog.getText(
             self.widget(),
-            i18n.t('Salvar pose do corpo'),
-            i18n.t('Nome da pose do corpo (somente o corpo será salvo):'),
+            i18n.t("Salvar pose do corpo"),
+            i18n.t("Nome da pose do corpo (somente o corpo será salvo):"),
         )
         if not ok or not nome.strip():
             return
@@ -1161,8 +1234,8 @@ class Viewer3DDocker(DockWidget):
         )
         if os.path.exists(destino):
             helpers.show_info(
-                i18n.t('3D'),
-                i18n.t('Já existe uma pose com esse nome na sua biblioteca.'),
+                i18n.t("3D"),
+                i18n.t("Já existe uma pose com esse nome na sua biblioteca."),
             )
             return
         try:
@@ -1172,30 +1245,38 @@ class Viewer3DDocker(DockWidget):
             self._salvar_previa_da_pose(destino, valores)
         except OSError as error:
             helpers.show_info(
-                i18n.t('3D'),
-                i18n.t('Não foi possível salvar a pose: {0}').format(error),
+                i18n.t("3D"),
+                i18n.t("Não foi possível salvar a pose: {0}").format(error),
             )
             return
         self.pose_corpo = destino
         self._popular_poses()
         helpers.show_info(
-            i18n.t('3D'), i18n.t('Pose do corpo salva na sua biblioteca.')
+            i18n.t("3D"), i18n.t("Pose do corpo salva na sua biblioteca.")
         )
 
-    def _salvar_previa_da_pose(self, caminho_json, valores):
+    def _salvar_previa_da_pose(self, caminho_json, valores, parte="corpo"):
         """Miniatura ao lado da pose do usuário, na câmera da galeria.
 
-        Falha de miniatura não derruba o salvamento: a pose já está gravada e
-        a lista mostra o item sem ícone.
+        Corpo: a pose com as mãos fechadas padrão. Mãos: o corpo em Idle com a
+        mão salva (que sai na convenção da direita). Falha de miniatura não
+        derruba o salvamento: a pose já está gravada e a lista mostra o item
+        sem ícone.
         """
         if QSvgRenderer is None:
             return
         try:
-            fechada = self._ler_pose(
-                os.path.join(VIEWER3D_POSES_MAOS_DIR, VIEWER3D_POSE_MAOS_PADRAO)
-            )
-            semantica = modelo3d.combinar_poses(valores, fechada, fechada)
-            svg = modelo3d.render_previa(self.modelo, semantica, "corpo")
+            if parte == "maos":
+                corpo = self._ler_pose(
+                    os.path.join(VIEWER3D_POSES_CORPO_DIR, VIEWER3D_POSE_CORPO_PADRAO)
+                )
+                semantica = modelo3d.combinar_poses(corpo, valores, {})
+            else:
+                fechada = self._ler_pose(
+                    os.path.join(VIEWER3D_POSES_MAOS_DIR, VIEWER3D_POSE_MAOS_PADRAO)
+                )
+                semantica = modelo3d.combinar_poses(valores, fechada, fechada)
+            svg = modelo3d.render_previa(self.modelo, semantica, parte)
             imagem = self._rasterizar(
                 svg, modelo3d.PREVIA_LARGURA, modelo3d.PREVIA_ALTURA
             )
@@ -1203,24 +1284,72 @@ class Viewer3DDocker(DockWidget):
         except (OSError, ValueError) as erro:
             helpers.log("prévia da pose não gerada: {0}".format(erro))
 
+    def _salvar_pose_de_mao(self):
+        """Salva a mão em ajuste na biblioteca do usuário (direita por padrão).
+
+        A pose sai sempre na convenção autoral (mão direita): a esquerda é
+        espelhada ao gravar, como as poses do kit.
+        """
+        if self.modelo is None:
+            helpers.show_info(i18n.t("3D"), i18n.t("O modelo não está disponível."))
+            return
+        lado = self.mao_ajuste
+        nome, ok = QtWidgets.QInputDialog.getText(
+            self.widget(),
+            i18n.t("Salvar pose de mão"),
+            i18n.t("Nome da pose de mão:"),
+        )
+        if not ok or not nome.strip():
+            return
+        nome = nome.strip()
+        valores = modelo3d.semantica_da_mao(self.semantica, lado)
+        if not valores:
+            helpers.show_info(
+                i18n.t("3D"),
+                i18n.t("Ajuste os dedos antes de salvar a pose da mão."),
+            )
+            return
+        if lado == modelo3d.LADO_ESQUERDA:
+            valores = modelo3d.espelhar(valores)
+        destino = os.path.join(
+            VIEWER3D_POSES_USUARIO_MAOS_DIR, modelo3d.slug_de_pose(nome) + ".json"
+        )
+        if os.path.exists(destino):
+            helpers.show_info(
+                i18n.t("3D"),
+                i18n.t("Já existe uma pose com esse nome na sua biblioteca."),
+            )
+            return
+        try:
+            os.makedirs(VIEWER3D_POSES_USUARIO_MAOS_DIR, exist_ok=True)
+            modelo3d.salvar_pose(destino, nome, valores)
+            self._salvar_previa_da_pose(destino, valores, parte="maos")
+        except OSError as error:
+            helpers.show_info(
+                i18n.t("3D"),
+                i18n.t("Não foi possível salvar a pose: {0}").format(error),
+            )
+            return
+        if lado == modelo3d.LADO_DIREITA:
+            self.pose_mao_direita = destino
+        else:
+            self.pose_mao_esquerda = destino
+        self._popular_poses()
+        helpers.show_info(i18n.t("3D"), i18n.t("Pose de mão salva na sua biblioteca."))
+
     def selecionar_em(self, x, y):
         if self.modelo is None or not self._tela:
             return
         x -= self._offset_preview[0]
         y -= self._offset_preview[1]
-        if (
-            x < 0
-            or y < 0
-            or x > self._tamanho_render[0]
-            or y > self._tamanho_render[1]
-        ):
+        if x < 0 or y < 0 or x > self._tamanho_render[0] or y > self._tamanho_render[1]:
             return
         melhor = None
         for indice, (tela_x, tela_y, _) in enumerate(self._tela):
             distancia = (tela_x - x) ** 2 + (tela_y - y) ** 2
             if melhor is None or distancia < melhor[0]:
                 melhor = (distancia, indice)
-        if melhor is None or melhor[0] > 48 ** 2:
+        if melhor is None or melhor[0] > 48**2:
             return
         pesos = self.modelo.pesos[melhor[1]]
         if not pesos:
@@ -1265,7 +1394,7 @@ class Viewer3DDocker(DockWidget):
         slider = widgets.QSlider(ORIENTACAO_HORIZONTAL)
         slider.setRange(-LIMITE_SLIDER, LIMITE_SLIDER)
         slider.setValue(int(self.semantica.get(osso, {}).get(chave, 0)))
-        valor = ui.rotulo_info(i18n.t('0°'))
+        valor = ui.rotulo_info(i18n.t("0°"))
         slider.valueChanged.connect(
             lambda novo, o=osso, c=chave, etiqueta=valor: self._mudar_junta(
                 o, c, novo, etiqueta
@@ -1278,25 +1407,81 @@ class Viewer3DDocker(DockWidget):
     def _mudar_junta(self, osso, chave, valor, etiqueta):
         self.semantica.setdefault(osso, {})[chave] = float(valor)
         self._pose_mudou()
-        etiqueta.setText(i18n.t('{0}°').format(valor))
+        etiqueta.setText(i18n.t("{0}°").format(valor))
         self.agendar_render()
 
-    def _linha_dedos(self, lado):
-        ossos = [
-            osso["nome"]
-            for osso in self.modelo.ossos
-            if osso["nome"].startswith(FAMILIAS_DEDO)
-            and osso["nome"].endswith("." + lado)
-        ]
+    def _referencia_fechada(self):
+        """Valores de referência da pose "fechada" (só os dedos, sem o pulso).
+
+        O fechar do dedo neste rig mora no eixo "abrir" negativo (medido em
+        QA contra as poses abertas/fechada); "dobrar" e "girar" deformam.
+        """
+        if self._ref_fechada is None:
+            caminho = os.path.join(VIEWER3D_POSES_MAOS_DIR, "fechada.json")
+            try:
+                with open(caminho, encoding="utf-8") as arquivo:
+                    dados = json.load(arquivo)
+                self._ref_fechada = {
+                    osso: valores
+                    for osso, valores in dados.get("ossos", {}).items()
+                    if osso.startswith(FAMILIAS_DEDO)
+                }
+            except (OSError, ValueError):
+                self._ref_fechada = {}
+        return self._ref_fechada
+
+    def _valor_do_dedo(self, ossos):
+        """Valor do slider (0 = aberta, 90 = fechada) a partir da semântica.
+
+        É a razão contra o valor da referência "fechada" da família (o
+        polegar tem valores compostos, então a razão resolve os três ossos).
+        """
+        referencia = self._referencia_fechada()
+        if ossos and ossos[0].endswith(".l"):
+            referencia = modelo3d.espelhar(referencia)
+        for osso in ossos:
+            if osso in referencia and "abrir" in referencia[osso]:
+                base = referencia[osso]["abrir"]
+                if abs(base) > 1e-6:
+                    atual = self.semantica.get(osso, {}).get("abrir", 0.0)
+                    return max(
+                        0,
+                        min(
+                            LIMITE_FECHAR_DEDO,
+                            int(round(atual * REFERENCIA_FECHADA_GRAUS / base)),
+                        ),
+                    )
+                return 0
+        return 0
+
+    def _mudar_dedos(self, ossos, valor, etiqueta):
+        """Interpola os valores da pose "fechada" na proporção do slider."""
+        referencia = self._referencia_fechada()
+        if ossos and ossos[0].endswith(".l"):
+            referencia = modelo3d.espelhar(referencia)
+        fator = float(valor) / REFERENCIA_FECHADA_GRAUS
+        for osso in ossos:
+            if osso not in referencia:
+                continue
+            self.semantica[osso] = {
+                chave: round(base * fator, 2)
+                for chave, base in referencia[osso].items()
+            }
+        self._pose_mudou()
+        etiqueta.setText(i18n.t("{0}°").format(valor))
+        self.agendar_render()
+
+    def _linha_dedo(self, rotulo, ossos):
+        """Linha de slider "Dobrar" (0 = aberta, 90 = fechada) para um grupo."""
         if not ossos:
             return None
         widgets = QtWidgets
         linha = widgets.QHBoxLayout()
-        linha.addWidget(ui.rotulo(i18n.t('Dedos · Dobrar')))
+        linha.addWidget(ui.rotulo(rotulo))
         slider = widgets.QSlider(ORIENTACAO_HORIZONTAL)
-        slider.setRange(-LIMITE_SLIDER, LIMITE_SLIDER)
-        slider.setValue(int(self.semantica.get(ossos[0], {}).get("dobrar", 0)))
-        valor = ui.rotulo_info(i18n.t('0°'))
+        slider.setRange(0, LIMITE_FECHAR_DEDO)
+        slider.setValue(self._valor_do_dedo(ossos))
+        valor = ui.rotulo_info(i18n.t("{0}°").format(slider.value()))
         slider.valueChanged.connect(
             lambda novo, alvos=tuple(ossos), etiqueta=valor: self._mudar_dedos(
                 alvos, novo, etiqueta
@@ -1306,15 +1491,63 @@ class Viewer3DDocker(DockWidget):
         linha.addWidget(valor)
         return linha
 
-    def _mudar_dedos(self, ossos, valor, etiqueta):
-        for osso in ossos:
-            self.semantica.setdefault(osso, {})["dobrar"] = float(valor)
-        self._pose_mudou()
-        etiqueta.setText(i18n.t('{0}°').format(valor))
-        self.agendar_render()
+    def _linha_dedos(self, lado):
+        """Slider de todos os dedos de um lado (usado na região do braço)."""
+        ossos = [
+            osso["nome"]
+            for osso in self.modelo.ossos
+            if osso["nome"].startswith(FAMILIAS_DEDO)
+            and osso["nome"].endswith("." + lado)
+        ]
+        return self._linha_dedo(i18n.t("Dedos · Dobrar"), ossos)
+
+    def _montar_dedos(self):
+        """Rebuild dos sliders da aba "Mãos" para o lado em ajuste."""
+        self._limpar_layout(self.dedos_layout)
+        if self.modelo is None:
+            return
+        lado = "l" if self.mao_ajuste == modelo3d.LADO_ESQUERDA else "r"
+        for familia, rotulo in (
+            ("thumb", i18n.t("Polegar")),
+            ("index", i18n.t("Indicador")),
+            ("middle", i18n.t("Médio")),
+            ("ring", i18n.t("Anelar")),
+            ("pinky", i18n.t("Mindinho")),
+        ):
+            ossos = [
+                osso["nome"]
+                for osso in self.modelo.ossos
+                if osso["nome"].startswith(familia)
+                and osso["nome"].endswith("." + lado)
+            ]
+            linha = self._linha_dedo(
+                "{0} · {1}".format(rotulo, i18n.t("Dobrar")), ossos
+            )
+            if linha is not None:
+                self.dedos_layout.addLayout(linha)
+        linha = self._linha_dedos(lado)
+        if linha is not None:
+            self.dedos_layout.addLayout(linha)
+
+    def _mudar_mao_ajuste(self, indice):
+        self.mao_ajuste = self.cmb_mao_ajuste.itemData(indice) or modelo3d.LADO_DIREITA
+        if self.mao_ajuste == modelo3d.LADO_ESQUERDA:
+            self.button_salvar_mao.setText(i18n.t("Salvar pose da mão esquerda..."))
+            self.button_salvar_mao.setToolTip(
+                i18n.t(
+                    "Salva a pose atual da mão esquerda na sua biblioteca (espelhada para a convenção da direita, como as poses do kit)."
+                )
+            )
+        else:
+            self.button_salvar_mao.setText(i18n.t("Salvar pose da mão direita..."))
+            self.button_salvar_mao.setToolTip(
+                i18n.t("Salva a pose atual da mão direita na sua biblioteca.")
+            )
+        self._montar_dedos()
 
     def _montar_sliders(self):
         self._limpar_layout(self.juntas_layout)
+        self._montar_dedos()
         if self.modelo is None or self.regiao is None:
             self.grupo_juntas.setTitle(i18n.t("Juntas"))
             return
@@ -1324,13 +1557,23 @@ class Viewer3DDocker(DockWidget):
         else:
             return
         self.grupo_juntas.setTitle(i18n.t("Juntas: {0}").format(nome))
-        self.lbl_regiao.setText(i18n.t('Região: {0}').format(nome))
+        self.lbl_regiao.setText(i18n.t("Região: {0}").format(nome))
         for osso in ossos:
             for eixo in EIXOS_POR_BASE.get(_base(osso), ("dobrar",)):
-                self.juntas_layout.addLayout(self._linha_slider(
-                    osso, eixo, "{0} · {1}".format(nome_amigavel(osso), ROTULOS[eixo])
-                ))
-        lado = _lado(self.regiao)
+                self.juntas_layout.addLayout(
+                    self._linha_slider(
+                        osso,
+                        eixo,
+                        "{0} · {1}".format(nome_amigavel(osso), ROTULOS[eixo]),
+                    )
+                )
+        # As regiões do braço mostram também o slider de todos os dedos
+        # (as chaves são "braco_esq"/"braco_dir", daí o sufixo do osso).
+        lado = ""
+        if self.regiao.endswith("_esq"):
+            lado = "l"
+        elif self.regiao.endswith("_dir"):
+            lado = "r"
         if self.regiao.startswith("braco") and lado:
             linha = self._linha_dedos(lado)
             if linha is not None:
@@ -1388,17 +1631,21 @@ class Viewer3DDocker(DockWidget):
 
     def inserir(self, referencia=False):
         if self.modelo is None:
-            helpers.show_info(i18n.t('3D'), i18n.t('O modelo não está disponível.'))
+            helpers.show_info(i18n.t("3D"), i18n.t("O modelo não está disponível."))
             return
         documento = helpers.active_document()
         if documento is None:
-            helpers.show_info(i18n.t('3D'), i18n.t('Abra um documento para inserir o desenho.'))
+            helpers.show_info(
+                i18n.t("3D"), i18n.t("Abra um documento para inserir o desenho.")
+            )
             return
         selecao = helpers.selection_bounds(documento)
         if selecao is None or selecao[2] <= 0 or selecao[3] <= 0:
             helpers.show_info(
-                i18n.t('3D'),
-                i18n.t('Desenhe uma seleção retangular sobre o painel de destino para inserir.'),
+                i18n.t("3D"),
+                i18n.t(
+                    "Desenhe uma seleção retangular sobre o painel de destino para inserir."
+                ),
             )
             return
         x, y, largura, altura = selecao
@@ -1417,7 +1664,9 @@ class Viewer3DDocker(DockWidget):
             nome = helpers.unique_layer_name(documento, "3D")
             camada = documento.createNode(nome, "paintlayer")
             if camada is None or not camada.setPixelData(dados, x, y, largura, altura):
-                helpers.show_info(i18n.t('3D'), i18n.t('Não foi possível criar a camada.'))
+                helpers.show_info(
+                    i18n.t("3D"), i18n.t("Não foi possível criar a camada.")
+                )
                 return
             helpers.attach_below_active(documento, camada)
             if referencia:
@@ -1429,7 +1678,9 @@ class Viewer3DDocker(DockWidget):
             documento.refreshProjection()
             self._sincronizar_flutuante()
             helpers.show_message(
-                i18n.t("Camada '{0}' inserida abaixo de '{1}'{2}; seleção desfeita.").format(
+                i18n.t(
+                    "Camada '{0}' inserida abaixo de '{1}'{2}; seleção desfeita."
+                ).format(
                     nome,
                     nome_ativo or "camada ativa",
                     " como referência" if referencia else "",

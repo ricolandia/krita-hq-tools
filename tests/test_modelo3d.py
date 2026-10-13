@@ -149,8 +149,12 @@ class TestManequim(unittest.TestCase):
     def test_painter_desenha_o_longe_primeiro(self):
         dados = triangulo_visivel()
         dados["vertices"] = [
-            (0.0, 0.0, 0.0), (1.0, 0.0, 0.0), (0.0, 0.0, 1.0),
-            (10.0, 1.0, 0.0), (11.0, 1.0, 0.0), (10.0, 1.0, 1.0),
+            (0.0, 0.0, 0.0),
+            (1.0, 0.0, 0.0),
+            (0.0, 0.0, 1.0),
+            (10.0, 1.0, 0.0),
+            (11.0, 1.0, 0.0),
+            (10.0, 1.0, 1.0),
         ]
         dados["pesos"] = [[[0, 1.0]]] * 6
         dados["faces"] = [[0, 1, 2], [3, 4, 5]]
@@ -174,8 +178,12 @@ class TestManequim(unittest.TestCase):
     def test_chapado_normaliza_o_winding(self):
         dados = triangulo_visivel()
         dados["vertices"] = [
-            (0.0, 0.0, 0.0), (1.0, 0.0, 0.0), (0.0, 0.0, 1.0),
-            (0.0, 0.0, 0.0), (1.0, 0.0, 0.0), (0.0, 0.0, 1.0),
+            (0.0, 0.0, 0.0),
+            (1.0, 0.0, 0.0),
+            (0.0, 0.0, 1.0),
+            (0.0, 0.0, 0.0),
+            (1.0, 0.0, 0.0),
+            (0.0, 0.0, 1.0),
         ]
         dados["pesos"] = [[[0, 1.0]]] * 6
         dados["faces"] = [[0, 1, 2], [5, 4, 3]]
@@ -186,7 +194,7 @@ class TestManequim(unittest.TestCase):
         numeros = [float(valor) for valor in re.findall(r"-?\d+(?:\.\d+)?", caminho)]
         areas = []
         for inicio in range(0, len(numeros), 6):
-            x0, y0, x1, y1, x2, y2 = numeros[inicio:inicio + 6]
+            x0, y0, x1, y1, x2, y2 = numeros[inicio : inicio + 6]
             areas.append((x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0))
         self.assertTrue(areas)
         self.assertTrue(all(area >= 0 for area in areas))
@@ -223,12 +231,15 @@ class TestManequim(unittest.TestCase):
         with tempfile.TemporaryDirectory() as pasta:
             caminho = os.path.join(pasta, "pose.json")
             with open(caminho, "w", encoding="utf-8") as arquivo:
-                json.dump({
-                    "formato": "hq_tools.pose3d",
-                    "versao": 1,
-                    "nome": "teste",
-                    "ossos": {"filho": {"dobrar": 10.0}},
-                }, arquivo)
+                json.dump(
+                    {
+                        "formato": "hq_tools.pose3d",
+                        "versao": 1,
+                        "nome": "teste",
+                        "ossos": {"filho": {"dobrar": 10.0}},
+                    },
+                    arquivo,
+                )
             pose = modelo3d.carregar_pose(caminho)
             self.assertEqual(pose["nome"], "teste")
 
@@ -327,9 +338,7 @@ class TestEspelhoDePose(unittest.TestCase):
         )
 
     def test_combinar_poses_com_arquivos_do_repositorio(self):
-        pasta = os.path.join(
-            RAIZ, "hq_tools", "modules", "viewer3d", "poses", "maos"
-        )
+        pasta = os.path.join(RAIZ, "hq_tools", "modules", "viewer3d", "poses", "maos")
         direita = modelo3d.carregar_pose(os.path.join(pasta, "joinha.json"))["ossos"]
         esquerda = modelo3d.carregar_pose(os.path.join(pasta, "fechada.json"))["ossos"]
         combinado = modelo3d.combinar_poses({}, direita, esquerda)
@@ -338,9 +347,7 @@ class TestEspelhoDePose(unittest.TestCase):
         self.assertNotIn("hand.r", combinado)
         self.assertEqual(
             combinado["hand.l"],
-            modelo3d.pose_maos_por_lado(
-                esquerda, modelo3d.LADO_ESQUERDA
-            )["hand.l"],
+            modelo3d.pose_maos_por_lado(esquerda, modelo3d.LADO_ESQUERDA)["hand.l"],
         )
 
     def test_modelos_do_repositorio_cobrem_as_poses(self):
@@ -352,15 +359,21 @@ class TestEspelhoDePose(unittest.TestCase):
             for nome in sorted(os.listdir(os.path.join(pasta, parte))):
                 if nome.endswith(".json"):
                     usados |= set(
-                        modelo3d.carregar_pose(os.path.join(pasta, parte, nome))["ossos"].keys()
+                        modelo3d.carregar_pose(os.path.join(pasta, parte, nome))[
+                            "ossos"
+                        ].keys()
                     )
         self.assertTrue(usados)
         for _, _, caminho in VIEWER3D_MODELOS:
             modelo = modelo3d.Modelo.carregar(caminho)
             self.assertTrue(modelo.vertices, caminho)
             self.assertTrue(modelo.faces, caminho)
-            self.assertTrue(all(pesos for pesos in modelo.pesos), "vértice sem peso em " + caminho)
-            faltando = sorted(osso for osso in usados if osso not in modelo.osso_por_nome)
+            self.assertTrue(
+                all(pesos for pesos in modelo.pesos), "vértice sem peso em " + caminho
+            )
+            faltando = sorted(
+                osso for osso in usados if osso not in modelo.osso_por_nome
+            )
             self.assertEqual(faltando, [], "%s sem os ossos: %s" % (caminho, faltando))
 
     def test_galeria_de_icones_cobre_as_poses(self):
@@ -436,9 +449,7 @@ class TestEspelhoDePose(unittest.TestCase):
         self.assertFalse(modelo3d.osso_de_mao("head.x"))
 
     def test_poses_de_mao_do_repositorio_sao_da_direita(self):
-        pasta = os.path.join(
-            RAIZ, "hq_tools", "modules", "viewer3d", "poses", "maos"
-        )
+        pasta = os.path.join(RAIZ, "hq_tools", "modules", "viewer3d", "poses", "maos")
         arquivos = [
             nome for nome in sorted(os.listdir(pasta)) if nome.endswith(".json")
         ]
@@ -453,7 +464,9 @@ class TestEspelhoDePose(unittest.TestCase):
         prefixos = ("hand", "index", "middle", "pinky", "ring", "thumb")
         corpo = modelo3d.carregar_pose(POSE_IDLE)["ossos"]
         maos = modelo3d.carregar_pose(
-            os.path.join(RAIZ, "hq_tools", "modules", "viewer3d", "poses", "maos", "fechada.json")
+            os.path.join(
+                RAIZ, "hq_tools", "modules", "viewer3d", "poses", "maos", "fechada.json"
+            )
         )["ossos"]
         self.assertTrue(corpo)
         self.assertTrue(maos)
@@ -510,6 +523,44 @@ class TestPosesUsuario(unittest.TestCase):
         corpo["spine_01.x"]["dobrar"] = 99.0
         self.assertEqual(5.0, semantica["spine_01.x"]["dobrar"])
 
+    def test_semantica_da_mao_por_lado(self):
+        semantica = {
+            "hand.l": {"girar": -10.0},
+            "index1.l": {"abrir": -82.0},
+            "hand.r": {"girar": 5.0},
+            "spine_01.x": {"dobrar": 5.0},
+        }
+        esquerda = modelo3d.semantica_da_mao(semantica, modelo3d.LADO_ESQUERDA)
+        self.assertEqual({"hand.l", "index1.l"}, set(esquerda))
+        # Cópia: mexer no resultado não altera a pose em uso.
+        esquerda["hand.l"]["girar"] = 99.0
+        self.assertEqual(-10.0, semantica["hand.l"]["girar"])
+
+    def test_mao_esquerda_espelha_para_a_convencao_da_direita(self):
+        semantica = {
+            "hand.l": {"girar": -12.0},
+            "index1.l": {"abrir": -82.0},
+            "thumb2.l": {"abrir": 18.6},
+        }
+        espelhada = modelo3d.espelhar(
+            modelo3d.semantica_da_mao(semantica, modelo3d.LADO_ESQUERDA)
+        )
+        self.assertEqual({"hand.r", "index1.r", "thumb2.r"}, set(espelhada))
+        self.assertEqual(12.0, espelhada["hand.r"]["girar"])
+        self.assertEqual(-82.0, espelhada["index1.r"]["abrir"])
+
+    def test_pose_de_mao_salva_aplica_no_lugar_certo(self):
+        with tempfile.TemporaryDirectory() as pasta:
+            caminho = os.path.join(pasta, "mao.json")
+            valores = {"hand.r": {"girar": -12.0}, "index1.r": {"abrir": -82.0}}
+            modelo3d.salvar_pose(caminho, "Minha Mão", valores)
+            lidos = modelo3d.carregar_pose(caminho)["ossos"]
+            combinada = modelo3d.substituir_mao(
+                {"spine_01.x": {"dobrar": 5.0}}, lidos, modelo3d.LADO_DIREITA
+            )
+            self.assertEqual(-82.0, combinada["index1.r"]["abrir"])
+            self.assertEqual(5.0, combinada["spine_01.x"]["dobrar"])
+
 
 class TestCorDoRender(unittest.TestCase):
     def test_cor_escolhida_aparece_no_svg(self):
@@ -556,11 +607,15 @@ class TestLuz(unittest.TestCase):
             self.skipTest("homem.json não está no repositório")
         modelo = modelo3d.Modelo.carregar(MODELO_REAL)
         esquerda = modelo.renderizar(
-            largura=200, altura=200, estilo="toon",
+            largura=200,
+            altura=200,
+            estilo="toon",
             luz=modelo3d.luz_de_angulos(-60, 25),
         )
         direita = modelo.renderizar(
-            largura=200, altura=200, estilo="toon",
+            largura=200,
+            altura=200,
+            estilo="toon",
             luz=modelo3d.luz_de_angulos(60, 25),
         )
         self.assertNotEqual(esquerda, direita)
@@ -610,9 +665,7 @@ class TestLentes(unittest.TestCase):
         max_orto_y = max(abs(ponto[1] - altura / 2.0) for ponto in base)
         self.assertGreater(max_orto_x, 1.0)
         for lente in (14.0, 28.0, 35.0):
-            persp = modelo.vertices_em_tela(
-                largura=largura, altura=altura, lente=lente
-            )
+            persp = modelo.vertices_em_tela(largura=largura, altura=altura, lente=lente)
             self.assertEqual(len(persp), len(base))
             max_x = max(abs(ponto[0] - largura / 2.0) for ponto in persp)
             max_y = max(abs(ponto[1] - altura / 2.0) for ponto in persp)
@@ -634,7 +687,10 @@ class TestEixosSemanticos(unittest.TestCase):
             if osso["nome"] == "thigh_stretch.l"
         )
         return max(
-            ((indice, dict(pares).get(alvo, 0.0)) for indice, pares in enumerate(self.modelo.pesos)),
+            (
+                (indice, dict(pares).get(alvo, 0.0))
+                for indice, pares in enumerate(self.modelo.pesos)
+            ),
             key=lambda item: item[1],
         )[0]
 
@@ -652,18 +708,14 @@ class TestEixosSemanticos(unittest.TestCase):
     def test_dobrar_positivo_vai_para_frente(self):
         indice = self._vertice_da_coxa()
         repouso = self.modelo.vertices_em_pose()[indice]
-        rotacoes = self.modelo.aplicar_semantica(
-            {"thigh_stretch.l": {"dobrar": 40.0}}
-        )
+        rotacoes = self.modelo.aplicar_semantica({"thigh_stretch.l": {"dobrar": 40.0}})
         posado = self.modelo.vertices_em_pose(rotacoes)[indice]
         self.assertLess(posado[1], repouso[1] - 0.02)
 
     def test_abrir_positivo_vai_para_fora(self):
         indice = self._vertice_da_coxa()
         repouso = self.modelo.vertices_em_pose()[indice]
-        rotacoes = self.modelo.aplicar_semantica(
-            {"thigh_stretch.l": {"abrir": 40.0}}
-        )
+        rotacoes = self.modelo.aplicar_semantica({"thigh_stretch.l": {"abrir": 40.0}})
         posado = self.modelo.vertices_em_pose(rotacoes)[indice]
         self.assertGreater(posado[0], repouso[0] + 0.02)
 
@@ -702,7 +754,8 @@ class TestModeloMulher(unittest.TestCase):
             self.modelo.aplicar_semantica(pose["ossos"])
         )
         diferente = sum(
-            1 for a, b in zip(repouso, posado)
+            1
+            for a, b in zip(repouso, posado)
             if abs(a[0] - b[0]) + abs(a[1] - b[1]) + abs(a[2] - b[2]) > 1e-6
         )
         self.assertGreater(diferente, 100)
@@ -743,7 +796,8 @@ class TestModeloReal(unittest.TestCase):
         repouso = self.modelo.vertices_em_pose()
         pose = self.modelo.vertices_em_pose({"head.x": (0.0, 0.0, 30.0)})
         diferente = sum(
-            1 for a, b in zip(repouso, pose)
+            1
+            for a, b in zip(repouso, pose)
             if abs(a[0] - b[0]) + abs(a[1] - b[1]) + abs(a[2] - b[2]) > 1e-6
         )
         self.assertGreater(diferente, 0)

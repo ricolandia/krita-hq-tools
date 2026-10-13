@@ -100,10 +100,11 @@ inserida num painel dentro de uma seleção. Decisões e achados:
 
 ### Próximo (reavaliado)
 
-1. **Aba "Mãos" (próximo update; pedido do autor em 13/10):** regiões Mão
-   esquerda/direita com um "Dobrar" por dedo, além do slider único atual (que
-   fica na região do braço), e "Salvar pose de mão" com espelho da esquerda
-   para a convenção da direita. O "Salvar pose atual" do corpo e as
+1. **Aba "Mãos" (feita em 13/10, commit local aguardando teste):** slider
+   "Dobrar" por dedo (0° aberta a 90° punho, interpolando a pose de referência
+   `fechada`; a esquerda espelhada) e "Salvar pose da mão..." na biblioteca do
+   usuário. O slider antigo de dedos (que usava o eixo errado) foi corrigido.
+   Falta o teste do autor e a release. O "Salvar pose atual" do corpo e as
    miniaturas no seletor saíram na v0.19; o joinha, em 07/10
    (`Mao_joinha_v2_.fbx`).
 2. **Validação no Krita da v0.9.0:** hub (abrir/fechar), malha de perspectiva
