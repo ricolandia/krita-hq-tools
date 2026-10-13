@@ -38,6 +38,10 @@ Krita 6 (PyQt6).
 |---|---|
 | ![Docker de perspectiva com a galeria de malhas, a prévia ampliada e os botões de inserir na seleção](Screenshots/11-perspectiva.png) | ![Krita com o hub do HQ Tools na coluna da direita (módulos agrupados por divisores), o docker 3D na aba Câmera (ortográfica, lente 14 mm), o manequim inserido na página e o docker de produção flutuando à esquerda](Screenshots/12-hub-e-3d.png) |
 
+| Miniaturas no seletor de poses | Toon, com luz e sombra |
+|---|---|
+| ![Docker 3D na aba Pose com as miniaturas das poses nos seletores de corpo e de mão e o botão "Salvar pose..."](Screenshots/16-3d-miniaturas.png) | ![Docker 3D na aba Câmera no estilo Toon (dois tons chapados, cor azul) com os controles Luz · Azimute e Luz · Altura](Screenshots/17-3d-toon-e-luz.png) |
+
 | Moodboard |
 |---|
 | ![Docker Moodboard com a pasta de referências do projeto, a lista de referências linkadas e os botões de adicionar, inserir na seleção, renomear e apagar](Screenshots/13-Moodboard.png) |

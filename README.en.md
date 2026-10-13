@@ -39,6 +39,10 @@ overview.
 |---|---|
 | ![Perspective docker with the grid gallery, the enlarged preview and the insert-into-selection buttons](Screenshots/11-perspectiva.png) | ![Krita with the HQ Tools hub in the right column (modules grouped by dividers), the 3D docker on the Camera tab (orthographic, 14 mm lens), the mannequin inserted into the page and the production docker floating on the left](Screenshots/12-hub-e-3d.png) |
 
+| Pose selector thumbnails | Toon, with light and shadow |
+|---|---|
+| ![3D docker on the Pose tab with pose thumbnails in the body and hand selectors and the "Save pose..." button](Screenshots/16-3d-miniaturas.png) | ![3D docker on the Camera tab in the Toon style (two flat tones, blue) with the Light · Azimuth and Light · Height controls](Screenshots/17-3d-toon-e-luz.png) |
+
 | Moodboard |
 |---|
 | ![Moodboard docker with the project references folder, the list of linked references and the add, insert-into-selection, rename and delete buttons](Screenshots/13-Moodboard.png) |
