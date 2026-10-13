@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.20.0] — 2026-10-13
+
+Biblioteca de perspectiva: **sete conjuntos novos** (16 no total), pensando em
+enquadramentos de graphic novel e cinema: frontal deslocado (VP no terço,
+esquerda e direita), quina próxima (dois pontos assimétrico), pássaro e verme
+extremos (horizonte a 5%/95%, 3º VP dentro do quadro), horizonte inclinado
+(câmera torta, 12°) e grade de chão (para posicionar figuras no espaço).
+
+Visualizador 3D: a **luz do manequim pode ser girada** (controles "Luz ·
+Azimute" e "Luz · Altura", na aba Câmera) e o estilo **Toon substitui o
+Contorno**: dois tons chapados de alto contraste, claro de um lado e sombra do
+outro, como luz e sombras de quadrinho.
+
+**English:** Perspective library: **seven new sets** (16 in total), aiming at
+graphic novel and cinema framings: shifted frontal (VP on the third, left and
+right), close corner (asymmetric two-point), extreme bird's and worm's eye
+(horizon at 5%/95%, 3rd VP inside the frame), tilted horizon (dutch angle,
+12°) and floor grid (to place figures in space).
+
+3D viewer: the **mannequin light can be turned** ("Light · Azimuth" and
+"Light · Height" controls, in the Camera tab) and the **Toon style replaces
+the Outline**: two high-contrast flat tones, light on one side and shadow on
+the other, like comic light and shadow.
+
 ## [0.19.0] — 2026-10-13
 
 Visualizador 3D: o seletor de poses agora mostra **miniaturas** de cada pose
