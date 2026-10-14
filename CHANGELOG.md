@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.22.0] — 2026-10-13
+
+Ajustes de acabamento: no modo inglês, os rótulos do 3D (nome do osso, da
+região e do eixo) agora aparecem traduzidos, e o visualizador **lembra o
+estado da sessão anterior** (modelo, poses, estilo, cor, luz e câmera). A aba
+"Mãos" explica a escala (0° aberta, 90° punho) e os sliders ganharam dicas; os
+seletores de pose têm ícones maiores; o moodboard mostra um aviso quando está
+vazio; e as listas de balões, onomatopeias e biblioteca usam cache de
+miniatura (mais leves ao atualizar).
+
+**English:** Polish pass: in English mode, the 3D labels (bone, region and
+axis names) are now translated, and the viewer **remembers the previous
+session state** (model, poses, style, color, light and camera). The "Hands"
+tab explains the scale (0° open, 90° fist) and the sliders gained hints; pose
+selectors have larger icons; the moodboard shows a notice when empty; and the
+balloon, onomatopoeia and library lists use a thumbnail cache (lighter to
+refresh).
+
 ## [0.21.0] — 2026-10-13
 
 Visualizador 3D: **aba "Mãos"** para posar os dedos. Um slider "Dobrar" por
