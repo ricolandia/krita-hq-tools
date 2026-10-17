@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.23.0] — 2026-10-17
+
+**Exportação de páginas**: o gerenciador ganhou o botão "Exportar páginas..."
+— escolha o preset (Web: 96 dpi JPG; Impressão: 300 dpi PNG), a resolução
+(72/96/150/300), o formato (PNG/JPG), a qualidade e a pasta de destino
+(padrão `<projeto>/exportacao/`), com progresso e a lista de falhas no fim.
+Na resolução nativa da página a exportação usa a imagem final já embutida no
+`.kra` (mesmo resultado, ~80x mais rápido); nas outras resoluções a página é
+reamostrada numa cópia antes de exportar. CMYK e PDF ficam para depois (sem
+perfis instalados e o filtro de PDF não gera o arquivo).
+
+De passagem: corrigido o `present_document` (o Krita 5.3.4 não tem
+`Krita.addView`; páginas criadas pelo plugin agora abrem na aba de verdade).
+
+**English:** **Page export**: the manager gained the "Export pages..." button
+— pick the preset (Web: 96 dpi JPG; Print: 300 dpi PNG), the resolution
+(72/96/150/300), the format (PNG/JPG), the quality and the destination folder
+(default `<project>/exportacao/`), with progress and the failure list at the
+end. At the page's native resolution the export uses the final image already
+embedded in the .kra (same result, ~80x faster); at other resolutions the
+page is resampled on a copy before exporting. CMYK and PDF are left for later
+(no profiles installed and the PDF filter does not create the file).
+
+Along the way: fixed `present_document` (Krita 5.3.4 has no `Krita.addView`;
+pages created by the plugin now actually open in a tab).
+
 ## [0.22.0] — 2026-10-13
 
 Ajustes de acabamento: no modo inglês, os rótulos do 3D (nome do osso, da
