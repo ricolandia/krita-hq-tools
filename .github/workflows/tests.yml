@@ -2,6 +2,9 @@ name: tests
 
 on:
   push:
+    # Tags rodam só o release.yml (sem o run duplicado da suíte no release).
+    tags-ignore:
+      - "**"
   pull_request:
 
 jobs:
@@ -14,8 +17,8 @@ jobs:
         os: [ubuntu-latest, windows-latest]
         python-version: ["3.11", "3.13"]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
       # numpy e Pillow são do script de vetorização de balões. Sem eles, o
@@ -49,8 +52,8 @@ jobs:
     # o CI não mudar de comportamento sozinho (o ruff.toml define o recorte).
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
       - name: Instalar o ruff
