@@ -47,8 +47,8 @@ não existe no Krita 5.3.4 (falhava em silêncio); agora usa `Window.addView`.
 
 - **Entrada**: botão **"Exportar páginas..."** na fileira do gerenciador de
   páginas (junto de "Pasta..." / "Abrir pasta do Krita").
-- **Presets**: **Web** (RGB, 96 dpi, JPG q85), **Impressão** (CMYK, 300 dpi,
-  TIFF) e **Personalizado**; o preset só preenche os campos, tudo editável.
+- **Presets**: **Web** (RGB, 96 dpi, JPG q90), **Impressão** (RGB, 300 dpi,
+  PNG) e **Personalizado**; o preset só preenche os campos, tudo editável.
 - **Atalho do `mergedimage`**: quando a cor é RGB, o formato é PNG/JPG e a
   resolução pedida **é a da página** (o caso comum das páginas a 300 dpi),
   extrai o `mergedimage.png` do `.kra` — 57 ms por página, sem abrir o
