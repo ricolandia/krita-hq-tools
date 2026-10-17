@@ -9,8 +9,9 @@ Uso:
     python3 scripts/gerar-gantt-roadmap.py [--saida ARQUIVO] [--enviar]
 
 Sem ``--enviar``, só grava o JSON e imprime o comando de envio. Com
-``--enviar``, faz o PUT na nota do Trilium usando ``TRILIUM_URL`` e
-``TRILIUM_TOKEN`` (via ``env_hermes``/``~/.hermes/.env``).
+``--enviar``, faz o PUT na nota do Trilium (via ``curl`` — o urllib leva 403
+neste Trilium) usando ``TRILIUM_URL`` e ``TRILIUM_TOKEN`` de
+``~/.hermes/.env``.
 """
 
 import argparse
@@ -35,25 +36,37 @@ COR_MEDIO = "#ffec99"
 COR_NEUTRO = "#e9ecef"
 
 TITULO = "Roadmap HQ Tools"
-SUBTITULO = "Reavaliado em 05/10/2026 - prioridade: salvar pose, miniatura e joinha"
-FEITO = "Feito: v0.1 a v0.9 (módulos base, pincéis, 3D, hub, perspectiva, PT/EN)"
-PRIORIDADE = "Prioridade: o que falta das poses"
+SUBTITULO = "Atualizado em 17/10/2026 — próximo: Krita 6 e clique direto no canvas"
+FEITO = "Feito: v0.1 a v0.22 (poses, perspectiva ×16, luz/Toon, aba Mãos, polimento)"
+PRIORIDADE = "Próximo: Krita 6 · clique direto no canvas"
 FORA_DO_ROADMAP = (
     "Fora do roadmap original (já feito): UI compartilhada, ícone/social preview, "
-    "vídeos demo, CI Windows,\nautomação de release, auditorias (30/09 e 05/10) e "
-    "documentação no Trilium."
+    "vídeos demo, CI Windows,\nautomação de release, auditorias (30/09, 05/10, "
+    "07/10 e 17/10) e documentação no Trilium."
 )
 
 # (rótulo, dia inicial, dia final, cor, duração)
 TAREFAS = (
-    ("Biblioteca de poses: corpo/mãos e espelho (feito)", 1, 7, COR_RAPIDO, "feito"),
-    ("Validação no Krita da v0.9.0 (hub, perspectiva, i18n)", 1, 3, COR_RAPIDO, "3 dias"),
+    ("Poses: biblioteca, salvar pose e miniatura (feito)", 1, 7, COR_RAPIDO, "feito"),
+    (
+        "Validação no Krita da v0.9.0 (hub, perspectiva, i18n)",
+        1,
+        3,
+        COR_RAPIDO,
+        "3 dias",
+    ),
     ("Krita 6: validação e ferramentas novas", 8, 12, COR_FUNDACAO, "5 dias"),
     ("Lettering nas páginas geradas (balões + fontes)", 13, 17, COR_MEDIO, "5 dias"),
     ("Clique direto no canvas (PoC)", 18, 20, COR_RAPIDO, "3 dias"),
     ("Fillbucket em Python puro (sem numpy)", 21, 26, COR_MEDIO, "6 dias"),
     ("Balão paramétrico (pós-Krita 6)", 27, 30, COR_MEDIO, "4 dias"),
-    ("Avaliar e decidir (joinha, painel, bundle, exportação)", 24, 30, COR_NEUTRO, "quando der"),
+    (
+        "Avaliar e decidir (painel, bundle, exportação, pacote)",
+        24,
+        30,
+        COR_NEUTRO,
+        "quando der",
+    ),
 )
 
 DIAS = 30
@@ -78,36 +91,89 @@ def semente():
     return random.randint(1, 2**31 - 1)
 
 
-def texto(x, y, w, h, conteudo, tamanho=18, cor="#1e1e1e", alinhamento="left",
-          container=None):
+def texto(
+    x, y, w, h, conteudo, tamanho=18, cor="#1e1e1e", alinhamento="left", container=None
+):
     return {
-        "id": novo_id(), "type": "text", "x": x, "y": y, "width": w, "height": h,
-        "angle": 0, "strokeColor": cor, "backgroundColor": "transparent",
-        "fillStyle": "solid", "strokeWidth": 2, "strokeStyle": "solid",
-        "roughness": 0, "opacity": 100, "groupIds": [], "frameId": None,
-        "index": proximo_index(), "roundness": None, "seed": semente(),
-        "version": 1, "versionNonce": semente(), "isDeleted": False,
-        "boundElements": [], "updated": agora, "link": None, "locked": False,
-        "hasTextLink": False, "text": conteudo, "originalText": conteudo,
-        "fontSize": tamanho, "fontFamily": 6, "textAlign": alinhamento,
+        "id": novo_id(),
+        "type": "text",
+        "x": x,
+        "y": y,
+        "width": w,
+        "height": h,
+        "angle": 0,
+        "strokeColor": cor,
+        "backgroundColor": "transparent",
+        "fillStyle": "solid",
+        "strokeWidth": 2,
+        "strokeStyle": "solid",
+        "roughness": 0,
+        "opacity": 100,
+        "groupIds": [],
+        "frameId": None,
+        "index": proximo_index(),
+        "roundness": None,
+        "seed": semente(),
+        "version": 1,
+        "versionNonce": semente(),
+        "isDeleted": False,
+        "boundElements": [],
+        "updated": agora,
+        "link": None,
+        "locked": False,
+        "hasTextLink": False,
+        "text": conteudo,
+        "originalText": conteudo,
+        "fontSize": tamanho,
+        "fontFamily": 6,
+        "textAlign": alinhamento,
         "verticalAlign": "middle" if container else "top",
-        "containerId": container, "autoResize": True, "lineHeight": 1.25,
+        "containerId": container,
+        "autoResize": True,
+        "lineHeight": 1.25,
     }
 
 
 def barra(x, y, w, h, cor, rotulo, tamanho=15):
     retangulo = {
-        "id": novo_id(), "type": "rectangle", "x": x, "y": y, "width": w,
-        "height": h, "angle": 0, "strokeColor": "#1e1e1e",
-        "backgroundColor": cor, "fillStyle": "hachure", "strokeWidth": 0.5,
-        "strokeStyle": "solid", "roughness": 0, "opacity": 100,
-        "groupIds": [], "frameId": None, "index": proximo_index(),
-        "roundness": {"type": 3}, "seed": semente(), "version": 1,
-        "versionNonce": semente(), "isDeleted": False, "boundElements": [],
-        "updated": agora, "link": None, "locked": False, "hasTextLink": False,
+        "id": novo_id(),
+        "type": "rectangle",
+        "x": x,
+        "y": y,
+        "width": w,
+        "height": h,
+        "angle": 0,
+        "strokeColor": "#1e1e1e",
+        "backgroundColor": cor,
+        "fillStyle": "hachure",
+        "strokeWidth": 0.5,
+        "strokeStyle": "solid",
+        "roughness": 0,
+        "opacity": 100,
+        "groupIds": [],
+        "frameId": None,
+        "index": proximo_index(),
+        "roundness": {"type": 3},
+        "seed": semente(),
+        "version": 1,
+        "versionNonce": semente(),
+        "isDeleted": False,
+        "boundElements": [],
+        "updated": agora,
+        "link": None,
+        "locked": False,
+        "hasTextLink": False,
     }
-    texto_barra = texto(x, y, w, h, rotulo, tamanho=tamanho, alinhamento="center",
-                        container=retangulo["id"])
+    texto_barra = texto(
+        x,
+        y,
+        w,
+        h,
+        rotulo,
+        tamanho=tamanho,
+        alinhamento="center",
+        container=retangulo["id"],
+    )
     retangulo["boundElements"] = [{"type": "text", "id": texto_barra["id"]}]
     elementos.append(retangulo)
     elementos.append(texto_barra)
@@ -120,8 +186,15 @@ def montar():
     barra(-430, -118, 430, 40, COR_PRIORIDADE, PRIORIDADE)
 
     for semana in range(SEMANAS):
-        barra(semana * 400, -40, 400, 36, COR_NEUTRO,
-              "Semana {0}".format(semana + 1), tamanho=20)
+        barra(
+            semana * 400,
+            -40,
+            400,
+            36,
+            COR_NEUTRO,
+            "Semana {0}".format(semana + 1),
+            tamanho=20,
+        )
     for dia in range(1, DIAS + 1):
         elementos.append(
             texto(30 + (dia - 1) * PIXEL_POR_DIA, 2, 20, 15, str(dia), tamanho=15)
@@ -143,14 +216,33 @@ def montar():
         (200, COR_MEDIO, "médio"),
     ):
         retangulo = {
-            "id": novo_id(), "type": "rectangle", "x": x, "y": y + 24,
-            "width": 22, "height": 22, "angle": 0, "strokeColor": "#1e1e1e",
-            "backgroundColor": cor, "fillStyle": "hachure", "strokeWidth": 0.5,
-            "strokeStyle": "solid", "roughness": 0, "opacity": 100,
-            "groupIds": [], "frameId": None, "index": proximo_index(),
-            "roundness": None, "seed": semente(), "version": 1,
-            "versionNonce": semente(), "isDeleted": False, "boundElements": [],
-            "updated": agora, "link": None, "locked": False, "hasTextLink": False,
+            "id": novo_id(),
+            "type": "rectangle",
+            "x": x,
+            "y": y + 24,
+            "width": 22,
+            "height": 22,
+            "angle": 0,
+            "strokeColor": "#1e1e1e",
+            "backgroundColor": cor,
+            "fillStyle": "hachure",
+            "strokeWidth": 0.5,
+            "strokeStyle": "solid",
+            "roughness": 0,
+            "opacity": 100,
+            "groupIds": [],
+            "frameId": None,
+            "index": proximo_index(),
+            "roundness": None,
+            "seed": semente(),
+            "version": 1,
+            "versionNonce": semente(),
+            "isDeleted": False,
+            "boundElements": [],
+            "updated": agora,
+            "link": None,
+            "locked": False,
+            "hasTextLink": False,
         }
         elementos.append(retangulo)
         elementos.append(texto(x + 30, y + 26, 140, 18, rotulo, tamanho=15))
@@ -198,28 +290,44 @@ def main(argv=None):
     if not opcoes.enviar:
         print(
             "para enviar ao Trilium:\n"
-            "  curl -X PUT -H \"Authorization: Bearer $TRILIUM_TOKEN\" "
-            "-H \"Content-Type: text/plain\" --data-binary @{0} "
-            "\"$TRILIUM_URL/etapi/notes/{1}/content\"".format(opcoes.saida, opcoes.nota)
+            '  curl -X PUT -H "Authorization: Bearer $TRILIUM_TOKEN" '
+            '-H "Content-Type: text/plain" --data-binary @{0} '
+            '"$TRILIUM_URL/etapi/notes/{1}/content"'.format(opcoes.saida, opcoes.nota)
         )
         return 0
 
-    from urllib import request
+    import subprocess
 
     url = _do_env("TRILIUM_URL")
     token = _do_env("TRILIUM_TOKEN")
     if not url or not token:
         raise SystemExit("TRILIUM_URL/TRILIUM_TOKEN não definidos (~/.hermes/.env)")
     destino = "{0}/etapi/notes/{1}/content".format(url.rstrip("/"), opcoes.nota)
-    with open(opcoes.saida, "rb") as arquivo:
-        dados = arquivo.read()
-    requisicao = request.Request(
-        destino, data=dados, method="PUT",
-        headers={"Authorization": "Bearer {0}".format(token),
-                 "Content-Type": "text/plain"},
+    # O urllib leva 403 neste Trilium (proxy/UA); o curl é o caminho validado.
+    resultado = subprocess.run(
+        [
+            "curl",
+            "-sS",
+            "-o",
+            "/dev/null",
+            "-w",
+            "%{http_code}",
+            "-X",
+            "PUT",
+            "-H",
+            "Authorization: Bearer {0}".format(token),
+            "-H",
+            "Content-Type: text/plain",
+            "--data-binary",
+            "@{0}".format(opcoes.saida),
+            destino,
+        ],
+        capture_output=True,
+        text=True,
     )
-    with request.urlopen(requisicao, timeout=60) as resposta:
-        print("Trilium: HTTP {0}".format(resposta.status))
+    if resultado.returncode != 0:
+        raise SystemExit("curl falhou: {0}".format(resultado.stderr.strip()))
+    print("Trilium: HTTP {0}".format(resultado.stdout.strip()))
     return 0
 
 
