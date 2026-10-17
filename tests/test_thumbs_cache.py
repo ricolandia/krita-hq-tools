@@ -84,6 +84,30 @@ class TestCacheDeMiniaturas(unittest.TestCase):
         self.thumbs.preview_bytes(caminho, usar_cache=False)
         self.assertEqual(len(self.abertos), 2)
 
+    def test_preview_e_merged_nao_se_misturam(self):
+        # O preview_bytes pega a miniatura pequena; o merged_bytes, a imagem
+        # final (o atalho da exportação) — caches e nomes separados.
+        caminho = os.path.join(self.pasta, "p.kra")
+        with zipfile.ZipFile(caminho, "w") as archive:
+            archive.writestr("preview.png", b"miniatura")
+            archive.writestr("mergedimage.png", b"final")
+        self.assertEqual(self.thumbs.preview_bytes(caminho), b"miniatura")
+        self.assertEqual(self.thumbs.merged_bytes(caminho), b"final")
+
+    def test_merged_bytes_memoiza_e_invalida(self):
+        caminho = kra_com_preview(
+            os.path.join(self.pasta, "n.kra"), b"v1", nome="mergedimage.png"
+        )
+        self.assertEqual(self.thumbs.merged_bytes(caminho), b"v1")
+        self.thumbs.merged_bytes(caminho)
+        self.assertEqual(len(self.abertos), 1)
+        kra_com_preview(caminho, b"v2-maior", nome="mergedimage.png")
+        self.assertEqual(self.thumbs.merged_bytes(caminho), b"v2-maior")
+
+    def test_merged_bytes_sem_imagem_final(self):
+        caminho = kra_com_preview(os.path.join(self.pasta, "o.kra"))
+        self.assertIsNone(self.thumbs.merged_bytes(caminho))
+
     def test_pixmap_tambem_e_memoizado(self):
         caminho = kra_com_preview(os.path.join(self.pasta, "e.kra"))
         primeiro = self.thumbs.thumbnail_pixmap(caminho)
@@ -121,7 +145,9 @@ class TestCacheDeMiniaturas(unittest.TestCase):
         self.assertIsNone(self.thumbs.thumbnail_pixmap(caminho))
 
     def test_arquivo_inexistente(self):
-        self.assertIsNone(self.thumbs.preview_bytes(os.path.join(self.pasta, "nao.existe.kra")))
+        self.assertIsNone(
+            self.thumbs.preview_bytes(os.path.join(self.pasta, "nao.existe.kra"))
+        )
 
     def test_usa_mergedimage_quando_falta_preview(self):
         caminho = os.path.join(self.pasta, "h.kra")
