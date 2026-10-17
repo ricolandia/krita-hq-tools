@@ -1,5 +1,13 @@
 # Avaliação do gerenciador de projetos/páginas (17/10/2026)
 
+> **Status (17/10, fim do dia):** todos os achados (A–E) e as propostas
+> maiores aprovadas pelo autor ("Sim. Todos") foram **implementados** e
+> provados no harness: badge da produção (cores por estado), "(ausente)",
+> menu de contexto com Abrir/Abrir selecionadas/Duplicar/Renomear/Remover
+> (este só no modo projeto, com a semântica do CPMT: o arquivo fica no
+> disco), ordem natural no modo pasta e o fallback `pagesLocation: "."`.
+> Aguardando o teste do autor na interface.
+
 A pedido do autor ("algo que ficou de fora da minha parte: avaliar o que pode
 melhorar no gerenciador de projetos"). Método de sempre: cada achado foi
 **reproduzido** — parte pura com o `CPMTProject` e parte na UI no harness do
