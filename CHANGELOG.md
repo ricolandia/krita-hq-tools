@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.24.0] — 2026-10-17
+
+Gerenciador de páginas: **ações por página** no clique direito — Abrir, Abrir
+selecionadas, **Duplicar**, **Renomear...** e **Remover da lista...** (esta
+só em projeto CPMT, com confirmação e a semântica do CPMT: o arquivo `.kra`
+fica no disco). A grade mostra o **estado da produção** de cada página pela
+cor do nome (verde final, laranja arte, cinza esboço) e marca "(ausente)" a
+página registrada cujo arquivo sumiu. Correções: projeto sem
+`pagesLocation` passa a usar a raiz (a convenção real; antes apontava para
+uma subpasta que não existe), o modo pasta ordena os números por valor
+(`pagina_2` antes de `pagina_10`) e a limpeza da página órfã vale também no
+fluxo do gerador.
+
+**English:** Page manager: **per-page actions** on right-click — Open, Open
+selected, **Duplicate**, **Rename...** and **Remove from list...** (the last
+one only in a CPMT project, with confirmation and the CPMT semantics: the
+`.kra` file stays on disk). The grid shows each page's **production state**
+through the name color (green final, orange art, gray sketch) and marks
+"(missing)" on a registered page whose file is gone. Fixes: a project without
+`pagesLocation` now uses the root (the real convention; it used to point to a
+folder that does not exist), folder mode sorts numbers by value (`pagina_2`
+before `pagina_10`) and the orphan-page cleanup also covers the generator
+flow.
+
 ## [0.23.0] — 2026-10-17
 
 **Exportação de páginas**: o gerenciador ganhou o botão "Exportar páginas..."
