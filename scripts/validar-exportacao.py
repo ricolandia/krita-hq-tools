@@ -5,19 +5,22 @@ Krita; ver ``scripts/poc-exportacao.py``). Este script é o par interativo:
 prova, no **seu** Krita, os caminhos que o diálogo de exportação vai usar.
 
 Como rodar (2 minutos):
-1. No Krita: Ferramentas > Scripts > Scripter (Tools > Scripts > Scripter).
-2. Abra este arquivo no Scripter (botão de abrir) e clique em Run (rodar).
+1. Krita: Configurações > Configurar o Krita... > Gerenciador de Plugins
+   Python > marque "Scripter" > OK > reinicie.
+2. Ferramentas > Scripts > Scripter: abra este arquivo e clique em Run.
 3. No fim aparece um resumo; o mesmo texto fica em
-   ``/tmp/validar-exportacao.log``.
+   ``/tmp/validar-exportacao.log`` (copie e cole na conversa).
 
 Ele cria uma A4 300 dpi de teste em ``/tmp/validar-exportacao/`` e tenta:
 PNG nativo, PNG reamostrado (96 dpi), JPG, TIFF CMYK (lista os perfis
 disponíveis) e PDF de uma página — medindo o tempo e conferindo a saída.
+Qualquer erro aparece no próprio resumo (o diálogo sempre abre).
 """
 
 import os
 import shutil
 import time
+import traceback
 import zipfile
 
 BASE = "/tmp/validar-exportacao"
@@ -57,8 +60,15 @@ def _dimensoes(caminho):
 
 
 def executar():
-    from krita import InfoObject, Krita
-    from PyQt5.QtWidgets import QMessageBox
+    try:
+        _validar()
+    except Exception:
+        registrar("ERRO GERAL:\n" + traceback.format_exc())
+    _fechar()
+
+
+def _validar():
+    from krita import InfoObject, Krita, Selection
 
     shutil.rmtree(BASE, ignore_errors=True)
     os.makedirs(BASE, exist_ok=True)
@@ -70,12 +80,15 @@ def executar():
     )
     if doc is None:
         registrar("ERRO: não consegui criar o documento de teste.")
-        return _fechar(QMessageBox)
+        return
     aplicacao.setActiveDocument(doc)
     aplicacao.activeWindow().addView(doc)
+
     info = InfoObject()
     info.setProperty("color", "#3366aa")
-    fundo = doc.createFillLayer("fundo", "color", info, None)
+    selecao = Selection()
+    selecao.select(0, 0, doc.width(), doc.height(), 255)
+    fundo = doc.createFillLayer("fundo", "color", info, selecao)
     if fundo is not None:
         doc.rootNode().addChildNode(fundo, None)
     kra = os.path.join(BASE, "validar_export.kra")
@@ -120,12 +133,14 @@ def executar():
         copia.setColorSpace("CMYK", "U8", perfis[0])
         saida = os.path.join(BASE, "pagina_cmyk.tiff")
         copia.exportImage(saida, info)
-        copia.setModified(False)
-        copia.close()
-        return "%s | %s" % (
-            "modo %s/%s" % (copia.colorModel(), copia.colorDepth()),
+        resultado = "modo %s/%s | %s" % (
+            copia.colorModel(),
+            copia.colorDepth(),
             _dimensoes(saida),
         )
+        copia.setModified(False)
+        copia.close()
+        return resultado
 
     _tempo("tiff cmyk", _cmyk)
 
@@ -153,10 +168,11 @@ def executar():
     doc.setModified(False)
     doc.close()
     registrar("arquivos: %r" % sorted(os.listdir(BASE)))
-    _fechar(QMessageBox)
 
 
-def _fechar(QMessageBox):
+def _fechar():
+    from PyQt5.QtWidgets import QMessageBox
+
     texto = "\n".join(linhas)
     with open(LOG, "w", encoding="utf-8") as arquivo:
         arquivo.write(texto + "\n")
@@ -164,9 +180,7 @@ def _fechar(QMessageBox):
     caixa.setWindowTitle("HQ Tools - validação da exportação")
     caixa.setText("Resultado (também em %s):" % LOG)
     caixa.setDetailedText(texto)
-    caixa.setInformativeText(
-        "Copie o texto (botão 'Show Details'/'Mostrar detalhes') e cole na conversa."
-    )
+    caixa.setInformativeText("Copie o texto (botão de detalhes) e cole na conversa.")
     caixa.exec_()
 
 
