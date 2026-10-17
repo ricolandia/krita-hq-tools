@@ -80,7 +80,9 @@ try:  # Krita 5 usa PyQt5; o Krita 6, PyQt6.
 except ImportError:
     from PyQt6.QtCore import QTimer
 
-QTimer.singleShot(2000, _rodar)
+# Atraso configurável: operações que dependem do app mais assentado (ex.:
+# exportImage) pedem mais tempo que o padrão de 2 s.
+QTimer.singleShot(int(os.environ.get("HQ_HARNESS_DELAY", "2000")), _rodar)
 EOF
 
 cat > "$BASE/config/kritarc" <<'EOF'

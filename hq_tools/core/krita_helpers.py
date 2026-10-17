@@ -73,11 +73,21 @@ def present_document(document):
     Sem ``addView`` o documento fica sem janela: o usuário não vê o que foi
     criado e os comandos que dependem de view (``activateResource``, seleção,
     atalhos de pincel) passam a não ter efeito.
+
+    O Krita 5.3.4 **não tem** ``Krita.addView`` (o atributo não existe e a
+    chamada antiga falhava em silêncio, devolvendo False): o caminho é
+    ``Window.addView``. Medido no harness em 17/10.
     """
     if document is None:
         return False
     try:
         app().addView(document)
+    except (AttributeError, RuntimeError):
+        try:
+            app().activeWindow().addView(document)
+        except (AttributeError, RuntimeError):
+            return False
+    try:
         app().setActiveDocument(document)
     except (AttributeError, RuntimeError):
         return False
@@ -111,7 +121,9 @@ def run_in_macro(document, action):
     if document is None:
         return action()
     try:
-        document.beginMacro(action.__name__ if hasattr(action, "__name__") else "HQ Tools")
+        document.beginMacro(
+            action.__name__ if hasattr(action, "__name__") else "HQ Tools"
+        )
     except (AttributeError, RuntimeError):
         return action()
     try:
