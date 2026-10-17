@@ -2,7 +2,11 @@ name: tests
 
 on:
   push:
-    # Tags rodam só o release.yml (sem o run duplicado da suíte no release).
+    # Só branches (as tags rodam apenas o release.yml, sem o run duplicado da
+    # suíte no release). Os dois filtros são obrigatórios: com apenas um, o
+    # GitHub deixa de rodar para o outro tipo de ref.
+    branches:
+      - "**"
     tags-ignore:
       - "**"
   pull_request:
