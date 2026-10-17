@@ -7,9 +7,7 @@ from .qt_probe import versao_do_krita
 _KRITA_QT = versao_do_krita()
 _USAR_PYQT6 = _escolher_qt(_KRITA_QT) >= 6
 if _KRITA_QT is not None and not _USAR_PYQT6:
-    escrever_erro(
-        "[hq_tools] Krita {0} detectado: usando PyQt5\n".format(_KRITA_QT)
-    )
+    escrever_erro("[hq_tools] Krita {0} detectado: usando PyQt5\n".format(_KRITA_QT))
 
 if _USAR_PYQT6:  # Krita 6
     try:
@@ -17,8 +15,9 @@ if _USAR_PYQT6:  # Krita 6
         from PyQt6.QtCore import pyqtSignal, pyqtSlot
     except ImportError as _erro:  # pragma: no cover
         escrever_erro(
-            "[hq_tools] Krita {0} pede PyQt6 e ele não está disponível: "
-            "{1}\n".format(_KRITA_QT, _erro)
+            "[hq_tools] Krita {0} pede PyQt6 e ele não está disponível: {1}\n".format(
+                _KRITA_QT, _erro
+            )
         )
         raise
 
@@ -119,6 +118,7 @@ def qlibrary_prefix():
         return QtCore.QLibraryInfo.path(QtCore.QLibraryInfo.LibraryPath.PrefixPath)
     return QtCore.QLibraryInfo.location(QtCore.QLibraryInfo.PrefixPath)
 
+
 if QT_VERSION == 6:
     IMAGE_FORMAT_ARGB32 = QtGui.QImage.Format.Format_ARGB32
     TRANSPARENT = QtCore.Qt.GlobalColor.transparent
@@ -133,6 +133,7 @@ if QT_VERSION == 6:
     SIZE_FIXED = QtWidgets.QSizePolicy.Policy.Fixed
     NO_ITEM_FLAGS = QtCore.Qt.ItemFlag.NoItemFlags
     SINGLE_SELECTION = QtWidgets.QAbstractItemView.SelectionMode.SingleSelection
+    EXTENDED_SELECTION = QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection
     FRAME_HLINE = QtWidgets.QFrame.Shape.HLine
 else:
     IMAGE_FORMAT_ARGB32 = QtGui.QImage.Format_ARGB32
@@ -148,6 +149,7 @@ else:
     SIZE_FIXED = QtWidgets.QSizePolicy.Fixed
     NO_ITEM_FLAGS = QtCore.Qt.NoItemFlags
     SINGLE_SELECTION = QtWidgets.QAbstractItemView.SingleSelection
+    EXTENDED_SELECTION = QtWidgets.QAbstractItemView.ExtendedSelection
     FRAME_HLINE = QtWidgets.QFrame.HLine
 
 __all__ = [

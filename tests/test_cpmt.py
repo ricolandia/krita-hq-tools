@@ -6,7 +6,12 @@ import shutil
 import tempfile
 import unittest
 
-from hq_tools.core.cpmt import CPMTError, CPMTProject, create_project_with_page
+from hq_tools.core.cpmt import (
+    CPMTError,
+    CPMTProject,
+    create_project_with_page,
+    ordem_natural,
+)
 
 
 def make_project(root, name="Meu Projeto", location="pages", legacy=False):
@@ -24,7 +29,9 @@ def make_project(root, name="Meu Projeto", location="pages", legacy=False):
     os.makedirs(os.path.join(root, location), exist_ok=True)
     filename = "comicsConfig.json" if legacy else "comicConfig.json"
     encoding = "utf-8" if legacy else "utf-16"
-    with open(os.path.join(root, filename), "w", encoding=encoding, newline="") as handle:
+    with open(
+        os.path.join(root, filename), "w", encoding=encoding, newline=""
+    ) as handle:
         json.dump(config, handle, indent=4, sort_keys=True, ensure_ascii=False)
     return root
 
@@ -105,6 +112,32 @@ class TestCPMTProject(unittest.TestCase):
             self.assertEqual(project.next_page_name(1), "Projeto2_001.kra")
         finally:
             shutil.rmtree(root, ignore_errors=True)
+
+    def test_pageslocation_ausente_cai_na_raiz(self):
+        # Sem a chave, a convenção real (os projetos do autor e o nosso
+        # create_project_with_page) é a raiz; "pages" apontava para uma
+        # subpasta que não existe.
+        root = tempfile.mkdtemp(prefix="hq_tools_cpmt_")
+        try:
+            with open(
+                os.path.join(root, "comicConfig.json"), "w", encoding="utf-8"
+            ) as handle:
+                json.dump(
+                    {"projectName": "Sem", "pageNumber": 1, "pages": ["Pag_00.kra"]},
+                    handle,
+                )
+            projeto = CPMTProject(root)
+            self.assertEqual(projeto.pages_location, ".")
+            self.assertEqual(os.path.normpath(projeto.pages_dir()), root)
+        finally:
+            shutil.rmtree(root, ignore_errors=True)
+
+    def test_ordem_natural_por_valor(self):
+        nomes = ["pagina_10.kra", "pagina_2.kra", "pagina_1.kra"]
+        self.assertEqual(
+            ["pagina_1.kra", "pagina_2.kra", "pagina_10.kra"],
+            ordem_natural(nomes),
+        )
 
     def test_registrar_e_reordenar(self):
         project = CPMTProject(self.root)

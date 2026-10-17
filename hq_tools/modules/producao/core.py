@@ -18,6 +18,8 @@ from ..pages import roteiro
 ESTADOS = ("esboco", "arte", "final")
 ESTADO_PADRAO = "esboco"
 PASTA = "producao"
+# Cores dos estados (a bolinha da produção e o badge do gerenciador de páginas).
+CORES = {"esboco": "#8a8a8a", "arte": "#c07f1f", "final": "#2e8b57"}
 ARQUIVO_ESTADOS = "producao.json"
 ARQUIVO_ROTEIRO = "roteiro.txt"
 ARQUIVO_CHECKLIST = "checklist.md"
@@ -141,7 +143,9 @@ def falas_resumo(painel, rotulo_narracao="Narração"):
     return " · ".join(partes)
 
 
-def para_markdown(checklist, meta_semanal=0, hoje=None, rotulos=None, titulo=None, tempos=None):
+def para_markdown(
+    checklist, meta_semanal=0, hoje=None, rotulos=None, titulo=None, tempos=None
+):
     """Checklist em Markdown (checkboxes e emojis de estado; tempo opcional)."""
     rotulos = dict(ROTULOS_PT, **(rotulos or {}))
     contagem = progresso(checklist)
@@ -177,9 +181,7 @@ def para_markdown(checklist, meta_semanal=0, hoje=None, rotulos=None, titulo=Non
                 formatar_duracao(sum(por_pagina) // len(por_pagina))
             )
         linhas.append(
-            "- Tempo: {0} no total{1}".format(
-                formatar_duracao(tempos["total"]), media
-            )
+            "- Tempo: {0} no total{1}".format(formatar_duracao(tempos["total"]), media)
         )
     linhas.append("")
     for pagina in checklist:

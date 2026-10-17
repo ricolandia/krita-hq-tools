@@ -8,15 +8,18 @@ travada ou importa um PNG como camada de arquivo.
 """
 
 import os
+import re
 import shutil
 
 from krita import DockWidget, Krita
 
 from ...core import krita_helpers as helpers
 from ...core.compat import (
+    CONTEXT_MENU,
     DIALOG_NO,
     DIALOG_YES,
     DRAG_INTERNAL_MOVE,
+    EXTENDED_SELECTION,
     ICON_MODE,
     LIST_ADJUST,
     MOVE_ACTION,
@@ -29,7 +32,7 @@ from ...core.compat import (
     qlibrary_prefix,
 )
 from ...core.config import Config
-from ...core.cpmt import CPMTError, CPMTProject, create_project_with_page
+from ...core.cpmt import CPMTError, CPMTProject, create_project_with_page, ordem_natural
 from ...core.paths import KRITA_HOME, MODELOS_DIR
 from ...core import registro, ui
 from ...core import i18n
@@ -37,6 +40,8 @@ from ...core.thumbs import merged_bytes, thumbnail_pixmap
 from ..biblioteca import core as biblioteca_core
 from ..producao import core as producao_core
 from . import exportacao, generator, guias, modelos as modelos_lib, roteiro
+
+ROTULO_ESTADO = {"esboco": "Esboço", "arte": "Arte", "final": "Final"}
 
 FORMATO_ITENS = (
     ("A4", "A4"),
@@ -239,6 +244,9 @@ class PagesDocker(DockWidget):
         self.list_pages.setWordWrap(True)
         self.list_pages.itemDoubleClicked.connect(self.open_page)
         self.list_pages.orderChanged.connect(self._on_order_changed)
+        self.list_pages.setSelectionMode(EXTENDED_SELECTION)
+        self.list_pages.setContextMenuPolicy(CONTEXT_MENU)
+        self.list_pages.customContextMenuRequested.connect(self._menu_da_pagina)
         list_layout.addWidget(self.list_pages, 1)
         layout.addWidget(group_list, 1)
 
@@ -554,6 +562,7 @@ class PagesDocker(DockWidget):
             if fmt == "tirinha":
                 page["panels"] = roteiro.build_strip_panels(opcoes["strip_panels"])
             panel_svg = generator.panels_svg(page, width_px, height_px, dpi)
+            document = None
             try:
                 document = generator.build_page_document(
                     page, titulo, panel_svg, "", width_px, height_px, dpi
@@ -565,6 +574,9 @@ class PagesDocker(DockWidget):
                     i18n.t("Nova página"),
                     i18n.t("Falha ao criar a página: {0}").format(error),
                 )
+                # Mesma limpeza do fluxo do modelo: sem isso o .kra parcial (e
+                # o documento) ficariam para trás.
+                _descartar_pagina_orphã(document, path)
                 return
 
         registrada = True
@@ -1165,7 +1177,7 @@ class PagesDocker(DockWidget):
         if not self.folder:
             return []
         try:
-            names = sorted(
+            names = ordem_natural(
                 name
                 for name in os.listdir(self.folder)
                 if name.lower().endswith(".kra")
@@ -1183,13 +1195,19 @@ class PagesDocker(DockWidget):
         self._loading = True
         try:
             self.list_pages.clear()
+            estados = self._estados_da_producao()
             for relative, path in self._page_paths():
-                item = QtWidgets.QListWidgetItem(os.path.basename(path))
+                ausente = not os.path.isfile(path)
+                texto = os.path.basename(path)
+                if ausente:
+                    texto += " " + i18n.t("(ausente)")
+                item = QtWidgets.QListWidgetItem(texto)
                 item.setData(USER_ROLE, relative)
                 item.setToolTip(path)
                 pixmap = thumbnail_pixmap(path)
                 if pixmap is not None:
                     item.setIcon(QtGui.QIcon(pixmap))
+                self._aplicar_badge(item, path, estados)
                 self.list_pages.addItem(item)
         finally:
             self._loading = False
@@ -1234,13 +1252,18 @@ class PagesDocker(DockWidget):
         )
         helpers.show_message(i18n.t("Ordem das páginas atualizada no projeto."))
 
-    def open_page(self, item):
-        relative = item.data(USER_ROLE)
-        path = relative
+    def _caminho_da_pagina(self, relative):
+        """Caminho absoluto da página (projeto CPMT ou pasta)."""
         if self.project is not None:
-            path = os.path.join(self.project.root, relative)
-        elif self.folder:
-            path = os.path.join(self.folder, relative)
+            return os.path.join(self.project.root, relative)
+        if self.folder:
+            return os.path.join(self.folder, relative)
+        return relative
+
+    def open_page(self, item):
+        self._abrir_caminho(self._caminho_da_pagina(item.data(USER_ROLE)))
+
+    def _abrir_caminho(self, path):
         if not os.path.isfile(path):
             helpers.show_message(i18n.t("Arquivo não encontrado: {0}").format(path))
             return
@@ -1252,3 +1275,228 @@ class PagesDocker(DockWidget):
         if window is not None:
             window.addView(document)
         Krita.instance().setActiveDocument(document)
+
+    def _abrir_selecionadas(self):
+        for item in self.list_pages.selectedItems():
+            self._abrir_caminho(self._caminho_da_pagina(item.data(USER_ROLE)))
+
+    # ------------------------------------------------------- ações por página
+
+    def _menu_da_pagina(self, posicao):
+        item = self.list_pages.itemAt(posicao)
+        if item is None:
+            return
+        menu = self._montar_menu(item)
+        menu.exec_(self.list_pages.mapToGlobal(posicao))
+
+    def _montar_menu(self, item):
+        """Menu de contexto da página (separado do exec para o harness)."""
+        menu = QtWidgets.QMenu(self.list_pages)
+        acao_abrir = menu.addAction(i18n.t("Abrir"))
+        acao_abrir.triggered.connect(lambda: self.open_page(item))
+        selecionadas = len(self.list_pages.selectedItems())
+        if selecionadas > 1:
+            acao_varias = menu.addAction(
+                i18n.t("Abrir selecionadas ({0})").format(selecionadas)
+            )
+            acao_varias.triggered.connect(self._abrir_selecionadas)
+        menu.addSeparator()
+        acao_duplicar = menu.addAction(i18n.t("Duplicar página"))
+        acao_duplicar.triggered.connect(lambda: self._duplicar_pagina(item))
+        acao_renomear = menu.addAction(i18n.t("Renomear página..."))
+        acao_renomear.triggered.connect(lambda: self._renomear_pagina(item))
+        if self.project is not None:
+            menu.addSeparator()
+            acao_remover = menu.addAction(i18n.t("Remover da lista..."))
+            acao_remover.triggered.connect(lambda: self._remover_da_lista(item))
+        return menu
+
+    def _duplicar_pagina(self, item):
+        """Copia o .kra com o próximo nome livre e registra no projeto."""
+        origem = self._caminho_da_pagina(item.data(USER_ROLE))
+        if not os.path.isfile(origem):
+            helpers.show_message(i18n.t("Arquivo não encontrado: {0}").format(origem))
+            return
+        if self.project is not None:
+            numero = self.project.page_number + 1
+            while True:
+                nome = self.project.next_page_name(
+                    offset=numero - self.project.page_number
+                )
+                destino = os.path.join(self.project.pages_dir(), nome)
+                if not os.path.exists(destino):
+                    break
+                numero += 1
+            if self.project.pages_location:
+                relative = os.path.normpath(
+                    os.path.join(self.project.pages_location, nome)
+                )
+            else:
+                relative = nome
+        else:
+            numero = self._proximo_indice_livre()
+            nome = "pagina_{0:03d}.kra".format(numero)
+            destino = os.path.join(self.folder, nome)
+            relative = nome
+        try:
+            shutil.copy2(origem, destino)
+        except OSError as erro:
+            helpers.show_info(
+                i18n.t("Duplicar página"),
+                i18n.t("Não foi possível duplicar a página: {0}").format(erro),
+            )
+            return
+        if self.project is not None:
+            try:
+                self.project.register_pages([relative])
+            except (OSError, CPMTError) as erro:
+                helpers.log(
+                    "página duplicada, mas registro no CPMT falhou: {0}".format(erro)
+                )
+        self.refresh()
+        helpers.show_message(i18n.t("Página duplicada: {0}").format(nome))
+
+    def _renomear_pagina(self, item):
+        """Renomeia o arquivo (e a entrada na lista do CPMT, quando houver)."""
+        relative = item.data(USER_ROLE)
+        origem = self._caminho_da_pagina(relative)
+        if not os.path.isfile(origem):
+            helpers.show_message(i18n.t("Arquivo não encontrado: {0}").format(origem))
+            return
+        # Renomear com a página aberta recriaria o arquivo antigo no próximo
+        # save do Krita (o documento guarda o nome antigo).
+        for documento in Krita.instance().documents():
+            if documento.fileName() == origem:
+                helpers.show_message(i18n.t("Feche a página antes de renomear."))
+                return
+        atual = os.path.splitext(os.path.basename(origem))[0]
+        nome, ok = QtWidgets.QInputDialog.getText(
+            self.widget(), i18n.t("Renomear página"), i18n.t("Novo nome:"), text=atual
+        )
+        if not ok or not nome.strip():
+            return
+        nome = nome.strip()
+        if "/" in nome or "\\" in nome:
+            helpers.show_message(i18n.t("O nome não pode ter barras."))
+            return
+        if not nome.lower().endswith(".kra"):
+            nome += ".kra"
+        if nome == os.path.basename(origem):
+            return
+        destino = os.path.join(os.path.dirname(origem), nome)
+        if os.path.exists(destino):
+            helpers.show_message(i18n.t("Já existe uma página com esse nome."))
+            return
+        try:
+            os.rename(origem, destino)
+        except OSError as erro:
+            helpers.show_info(
+                i18n.t("Renomear página"),
+                i18n.t("Não foi possível renomear a página: {0}").format(erro),
+            )
+            return
+        if self.project is not None:
+            if self.project.pages_location:
+                novo_relative = os.path.normpath(
+                    os.path.join(self.project.pages_location, nome)
+                )
+            else:
+                novo_relative = nome
+            ordem = [
+                (novo_relative if entrada == relative else entrada)
+                for entrada in self.project.page_relatives()
+            ]
+            try:
+                self.project.set_page_order(ordem)
+            except (OSError, CPMTError) as erro:
+                helpers.log(
+                    "página renomeada, mas a lista do CPMT falhou: {0}".format(erro)
+                )
+                helpers.show_info(
+                    i18n.t("Renomear página"),
+                    i18n.t(
+                        "Renomeada no disco, mas não foi possível atualizar o projeto; confira a lista do CPMT."
+                    ),
+                )
+        self.refresh()
+        helpers.show_message(i18n.t("Página renomeada: {0}").format(nome))
+
+    def _remover_da_lista(self, item):
+        """Tira a página da lista do projeto; o arquivo .kra fica no disco.
+
+        Espelha o CPMT ("does not remove it from disk: far too dangerous").
+        """
+        if self.project is None:
+            return
+        relative = item.data(USER_ROLE)
+        resposta = QtWidgets.QMessageBox.question(
+            self.widget(),
+            i18n.t("Remover da lista"),
+            i18n.t("Remover a página da lista? O arquivo .kra fica no disco."),
+            DIALOG_YES | DIALOG_NO,
+        )
+        if resposta != DIALOG_YES:
+            return
+        ordem = [
+            entrada for entrada in self.project.page_relatives() if entrada != relative
+        ]
+        try:
+            self.project.set_page_order(ordem)
+        except (OSError, CPMTError) as erro:
+            helpers.show_info(
+                i18n.t("Remover da lista"),
+                i18n.t("Não foi possível atualizar a lista: {0}").format(erro),
+            )
+            return
+        self.refresh()
+        helpers.show_message(
+            i18n.t("Página removida da lista (o arquivo continua no disco).")
+        )
+
+    # ------------------------------------------------- badge da produção
+
+    def _estados_da_producao(self):
+        """Estados do ``producao.json`` do projeto atual (vazio se não houver)."""
+        raiz = self.project.root if self.project is not None else self.folder
+        if not raiz:
+            return {}
+        pasta = os.path.join(raiz, producao_core.PASTA)
+        estados, _ = producao_core.carregar(pasta)
+        return estados
+
+    def _estado_da_pagina(self, caminho, estados):
+        """Estado agregado da página (o mais atrasado), ou None.
+
+        O número vem dos dígitos finais do nome (as duas convenções: a nossa
+        ``pagina_002`` e a do CPMT ``Projeto002``); página fora do roteiro
+        não tem estado.
+        """
+        if not estados:
+            return None
+        achado = re.search(r"(\d+)(?=\.kra$)", os.path.basename(caminho))
+        if not achado:
+            return None
+        numero = str(int(achado.group(1)))
+        valores = [
+            valor for chave, valor in estados.items() if chave.split("-")[0] == numero
+        ]
+        if not valores:
+            return None
+        if all(valor == "final" for valor in valores):
+            return "final"
+        if all(valor == "esboco" for valor in valores):
+            return "esboco"
+        return "arte"
+
+    def _aplicar_badge(self, item, caminho, estados):
+        """Colore o nome da página pelo estado da produção (quando houver)."""
+        estado = self._estado_da_pagina(caminho, estados)
+        if estado is None:
+            return
+        item.setForeground(QtGui.QBrush(QtGui.QColor(producao_core.CORES[estado])))
+        item.setToolTip(
+            "{0}\n{1}".format(
+                item.toolTip(),
+                i18n.t("Produção: {0}").format(i18n.t(ROTULO_ESTADO[estado])),
+            )
+        )

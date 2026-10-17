@@ -33,16 +33,26 @@ from . import core as prod
 LINHAS_SINTAXE = (
     i18n.t("Uma página por bloco; palavras-chave sem acento e sem maiúsculas."),
     i18n.t("pagina 1: começa uma página (nova página é criada sozinha)."),
-    i18n.t("formato A4: A4, A5, A3, tirinha, americano, tankobon ou quadrado (padrão A4)."),
+    i18n.t(
+        "formato A4: A4, A5, A3, tirinha, americano, tankobon ou quadrado (padrão A4)."
+    ),
     i18n.t("dpi 300: de 72 a 1200 (padrão 300)."),
-    i18n.t("layout grade2x2: quadro, splash, duplo-h, duplo-v, tira3, tira4, gradeRxC (ex.: grade3x3) ou LxC (ex.: 3x2), até 6 em cada eixo (padrão grade2x2)."),
+    i18n.t(
+        "layout grade2x2: quadro, splash, duplo-h, duplo-v, tira3, tira4, gradeRxC (ex.: grade3x3) ou LxC (ex.: 3x2), até 6 em cada eixo (padrão grade2x2)."
+    ),
     i18n.t("direcao rtl: leitura ocidental (ltr, padrão) ou mangá (rtl)."),
     i18n.t("margem 5% e sarjeta 2%: fração ou porcentagem (padrões 5% e 2%)."),
     i18n.t("fala p1: texto (fala do painel 1)."),
-    i18n.t("fala p1 joao: texto (fala do painel 1 dita pelo Joao; o personagem é opcional)."),
+    i18n.t(
+        "fala p1 joao: texto (fala do painel 1 dita pelo Joao; o personagem é opcional)."
+    ),
     i18n.t("narracao p1: texto (narração do painel 1; 'legenda' também vale)."),
-    i18n.t("plano p1: close (tipo de plano do painel; texto livre, ex.: geral, médio, close)."),
-    i18n.t("A fala aponta para o painel N do layout (a grade define quantos painéis a página tem)."),
+    i18n.t(
+        "plano p1: close (tipo de plano do painel; texto livre, ex.: geral, médio, close)."
+    ),
+    i18n.t(
+        "A fala aponta para o painel N do layout (a grade define quantos painéis a página tem)."
+    ),
 )
 
 EXEMPLO = i18n.t(
@@ -54,7 +64,7 @@ EXEMPLO = i18n.t(
     "fala p4 maria: Ultima fala."
 )
 
-CORES = {"esboco": "#8a8a8a", "arte": "#c07f1f", "final": "#2e8b57"}
+CORES = prod.CORES
 
 
 class _CaixaRoteiro(QtWidgets.QPlainTextEdit):
@@ -121,7 +131,7 @@ class _BarraEstados(QtWidgets.QWidget):
 class ProducaoDocker(DockWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(i18n.t('HQ Tools: produção'))
+        self.setWindowTitle(i18n.t("HQ Tools: produção"))
         registro.registrar("producao", self)
         self.config = Config()
         self.checklist = []
@@ -186,7 +196,7 @@ class ProducaoDocker(DockWidget):
     def pick_folder(self):
         pasta = QtWidgets.QFileDialog.getExistingDirectory(
             self.widget(),
-            i18n.t('Pasta do projeto'),
+            i18n.t("Pasta do projeto"),
             self.folder() or os.path.expanduser("~"),
         )
         if pasta:
@@ -196,7 +206,7 @@ class ProducaoDocker(DockWidget):
     def open_folder(self):
         pasta = self.folder()
         if not pasta:
-            helpers.show_message(i18n.t('Escolha a pasta do projeto.'))
+            helpers.show_message(i18n.t("Escolha a pasta do projeto."))
             return
         QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(pasta))
 
@@ -206,7 +216,7 @@ class ProducaoDocker(DockWidget):
         widgets = QtWidgets
         main, layout = ui.painel(self)
 
-        group_projeto = widgets.QGroupBox(i18n.t('Projeto'))
+        group_projeto = widgets.QGroupBox(i18n.t("Projeto"))
         projeto_layout = ui.espacamento(
             widgets.QVBoxLayout(group_projeto), margem=0, espaco=ui.GAP
         )
@@ -214,20 +224,21 @@ class ProducaoDocker(DockWidget):
         self.lbl_pasta = ui.rotulo_info("")
         linha_pasta.addWidget(self.lbl_pasta, 1)
         botao_pasta = ui.botao(
-            i18n.t('Pasta...'),
-            i18n.t('Escolhe a pasta do projeto (a mesma das páginas .kra).'),
+            i18n.t("Pasta..."),
+            i18n.t("Escolhe a pasta do projeto (a mesma das páginas .kra)."),
             icone_chave="pasta",
         )
         botao_pasta.clicked.connect(self.pick_folder)
         linha_pasta.addWidget(botao_pasta)
         botao_abrir = ui.botao(
-            i18n.t('Abrir'), i18n.t('Abre a pasta do projeto no explorador de arquivos.')
+            i18n.t("Abrir"),
+            i18n.t("Abre a pasta do projeto no explorador de arquivos."),
         )
         botao_abrir.clicked.connect(self.open_folder)
         linha_pasta.addWidget(botao_abrir)
         botao_atualizar = ui.botao(
-            i18n.t('Atualizar'),
-            i18n.t('Relê o roteiro e o progresso da pasta do projeto.'),
+            i18n.t("Atualizar"),
+            i18n.t("Relê o roteiro e o progresso da pasta do projeto."),
             icone_chave="atualizar",
         )
         botao_atualizar.clicked.connect(self.recarregar)
@@ -236,33 +247,39 @@ class ProducaoDocker(DockWidget):
         layout.addWidget(group_projeto)
         layout.addWidget(ui.separador())
 
-        group_roteiro = widgets.QGroupBox(i18n.t('Roteiro'))
+        group_roteiro = widgets.QGroupBox(i18n.t("Roteiro"))
         roteiro_layout = ui.espacamento(
             widgets.QVBoxLayout(group_roteiro), margem=0, espaco=ui.GAP
         )
         self.caixa = _CaixaRoteiro(self.montar, self)
         self.caixa.setPlaceholderText(
-            i18n.t("Cole o roteiro aqui. Ctrl+Enter monta o checklist; 'Sintaxe...' mostra o formato.")
+            i18n.t(
+                "Cole o roteiro aqui. Ctrl+Enter monta o checklist; 'Sintaxe...' mostra o formato."
+            )
         )
         self.caixa.setMinimumHeight(140)
         self.caixa.textChanged.connect(self._roteiro_editado)
         roteiro_layout.addWidget(self.caixa, 1)
         linha_botoes = widgets.QHBoxLayout()
         botao_montar = ui.botao(
-            i18n.t('Montar checklist'),
-            i18n.t('Lê o roteiro (Ctrl+Enter), guarda o texto e monta a árvore de páginas e painéis.'),
+            i18n.t("Montar checklist"),
+            i18n.t(
+                "Lê o roteiro (Ctrl+Enter), guarda o texto e monta a árvore de páginas e painéis."
+            ),
             icone_chave="novo",
         )
         botao_montar.clicked.connect(self.montar)
         linha_botoes.addWidget(botao_montar)
         botao_sintaxe = ui.botao(
-            i18n.t('Sintaxe...'), i18n.t('Mostra o formato do roteiro, com exemplos.')
+            i18n.t("Sintaxe..."), i18n.t("Mostra o formato do roteiro, com exemplos.")
         )
         botao_sintaxe.clicked.connect(self.mostrar_sintaxe)
         linha_botoes.addWidget(botao_sintaxe)
         botao_exportar = ui.botao(
-            i18n.t('Exportar .md'),
-            i18n.t('Salva o checklist em checklist.md na pasta do projeto (para espelhar onde quiser).'),
+            i18n.t("Exportar .md"),
+            i18n.t(
+                "Salva o checklist em checklist.md na pasta do projeto (para espelhar onde quiser)."
+            ),
         )
         botao_exportar.clicked.connect(self.exportar_markdown)
         linha_botoes.addWidget(botao_exportar)
@@ -272,7 +289,7 @@ class ProducaoDocker(DockWidget):
         layout.addWidget(group_roteiro)
         layout.addWidget(ui.separador())
 
-        group_checklist = widgets.QGroupBox(i18n.t('Checklist'))
+        group_checklist = widgets.QGroupBox(i18n.t("Checklist"))
         checklist_layout = ui.espacamento(
             widgets.QVBoxLayout(group_checklist), margem=0, espaco=ui.GAP
         )
@@ -280,10 +297,10 @@ class ProducaoDocker(DockWidget):
         self.arvore.setColumnCount(4)
         self.arvore.setHeaderLabels(
             [
-                i18n.t('Página / Painel'),
-                i18n.t('Estado'),
-                i18n.t('Plano'),
-                i18n.t('Falas'),
+                i18n.t("Página / Painel"),
+                i18n.t("Estado"),
+                i18n.t("Plano"),
+                i18n.t("Falas"),
             ]
         )
         self.arvore.setColumnWidth(0, 130)
@@ -301,20 +318,24 @@ class ProducaoDocker(DockWidget):
         linha_barra.addWidget(self.barra, 1)
         checklist_layout.addLayout(linha_barra)
         self.lbl_legenda = ui.rotulo("")
-        self.lbl_legenda.setText(" &nbsp; ".join(
-            '<span style="color:{0}">●</span> {1}'.format(
-                CORES[estado], self._rotulo_estado(estado)
+        self.lbl_legenda.setText(
+            " &nbsp; ".join(
+                '<span style="color:{0}">●</span> {1}'.format(
+                    CORES[estado], self._rotulo_estado(estado)
+                )
+                for estado in ("final", "arte", "esboco")
             )
-            for estado in ("final", "arte", "esboco")
-        ))
+        )
         checklist_layout.addWidget(self.lbl_legenda)
 
         linha_pendente = widgets.QHBoxLayout()
         self.lbl_pendente = ui.rotulo_info("")
         linha_pendente.addWidget(self.lbl_pendente, 1)
         botao_pendente = ui.botao(
-            i18n.t('Abrir próxima pendente'),
-            i18n.t('Abre a primeira página com painel não final e a seleciona na lista.'),
+            i18n.t("Abrir próxima pendente"),
+            i18n.t(
+                "Abre a primeira página com painel não final e a seleciona na lista."
+            ),
             icone_chave="abrir",
         )
         botao_pendente.clicked.connect(self.abrir_proxima_pendente)
@@ -322,10 +343,10 @@ class ProducaoDocker(DockWidget):
         checklist_layout.addLayout(linha_pendente)
 
         linha_meta = widgets.QHBoxLayout()
-        linha_meta.addWidget(ui.rotulo(i18n.t('Meta semanal:')))
+        linha_meta.addWidget(ui.rotulo(i18n.t("Meta semanal:")))
         self.meta = widgets.QSpinBox()
         self.meta.setRange(0, 200)
-        self.meta.setSuffix(i18n.t(' painéis'))
+        self.meta.setSuffix(i18n.t(" painéis"))
         self.meta.valueChanged.connect(self._meta_mudou)
         linha_meta.addWidget(self.meta)
         self.lbl_meta = ui.rotulo_info("")
@@ -337,8 +358,8 @@ class ProducaoDocker(DockWidget):
 
         linha_tempo = widgets.QHBoxLayout()
         self.btn_tempo = ui.botao(
-            i18n.t('Iniciar'),
-            i18n.t('Conta o tempo da produção (manual): inicia ou pausa a sessão.'),
+            i18n.t("Iniciar"),
+            i18n.t("Conta o tempo da produção (manual): inicia ou pausa a sessão."),
         )
         self.btn_tempo.clicked.connect(self.alternar_tempo)
         linha_tempo.addWidget(self.btn_tempo)
@@ -348,7 +369,9 @@ class ProducaoDocker(DockWidget):
         layout.addWidget(group_checklist, 1)
 
         dica = ui.rotulo(
-            i18n.t("1) Cole o roteiro e use Ctrl+Enter. 2) Clique na coluna Estado para ciclar esboço, arte e final (botão direito define direto). 3) Duplo clique na página abre a pagina_NNN.kra. O roteiro.txt e o producao.json ficam na pasta do projeto.")
+            i18n.t(
+                "1) Cole o roteiro e use Ctrl+Enter. 2) Clique na coluna Estado para ciclar esboço, arte e final (botão direito define direto). 3) Duplo clique na página abre a pagina_NNN.kra. O roteiro.txt e o producao.json ficam na pasta do projeto."
+            )
         )
         layout.addWidget(dica)
 
@@ -360,7 +383,7 @@ class ProducaoDocker(DockWidget):
         """Reinicia o relógio do auto-save e avisa que há texto novo."""
         if self._carregando:
             return
-        self.lbl_roteiro_salvo.setText(i18n.t('salvando…'))
+        self.lbl_roteiro_salvo.setText(i18n.t("salvando…"))
         self._timer_roteiro.start()
 
     def _salvar_roteiro_automatico(self):
@@ -372,12 +395,10 @@ class ProducaoDocker(DockWidget):
             os.makedirs(pasta, exist_ok=True)
             prod.salvar_roteiro(pasta, self.caixa.toPlainText())
         except OSError:
-            self.lbl_roteiro_salvo.setText(i18n.t('falha ao salvar'))
+            self.lbl_roteiro_salvo.setText(i18n.t("falha ao salvar"))
             return
         self.lbl_roteiro_salvo.setText(
-            i18n.t('salvo {0}').format(
-                QtCore.QTime.currentTime().toString("HH:mm")
-            )
+            i18n.t("salvo {0}").format(QtCore.QTime.currentTime().toString("HH:mm"))
         )
 
     def _salvar_ao_fechar(self):
@@ -400,11 +421,13 @@ class ProducaoDocker(DockWidget):
             pass
         if self._pasta_padrao():
             self.lbl_pasta.setText(
-                i18n.t('Escolha a pasta do projeto em "Pasta..." (salvando provisoriamente em {0}).').format(pasta)
+                i18n.t(
+                    'Escolha a pasta do projeto em "Pasta..." (salvando provisoriamente em {0}).'
+                ).format(pasta)
             )
         else:
-            self.lbl_pasta.setText(i18n.t('Projeto: {0}').format(self.folder()))
-            self.lbl_pasta.setToolTip(i18n.t('Checklist em: {0}').format(pasta))
+            self.lbl_pasta.setText(i18n.t("Projeto: {0}").format(self.folder()))
+            self.lbl_pasta.setToolTip(i18n.t("Checklist em: {0}").format(pasta))
         self._carregando = True
         texto = prod.carregar_roteiro(pasta)
         estados, meta = prod.carregar(pasta)
@@ -428,28 +451,32 @@ class ProducaoDocker(DockWidget):
         try:
             self._montar(texto, estados)
         except ValueError as erro:
-            helpers.show_info(i18n.t('Produção'), i18n.t('Roteiro: {0}').format(erro))
+            helpers.show_info(i18n.t("Produção"), i18n.t("Roteiro: {0}").format(erro))
             return
         try:
             prod.salvar_roteiro(pasta, texto)
-            prod.salvar(pasta, prod.estados_do_checklist(self.checklist), self.meta.value())
+            prod.salvar(
+                pasta, prod.estados_do_checklist(self.checklist), self.meta.value()
+            )
         except OSError as erro:
-            helpers.show_info(i18n.t('Produção'), i18n.t('Falha ao salvar: {0}').format(erro))
+            helpers.show_info(
+                i18n.t("Produção"), i18n.t("Falha ao salvar: {0}").format(erro)
+            )
             return
         self.lbl_roteiro_salvo.setText(
-            i18n.t('salvo {0}').format(
-                QtCore.QTime.currentTime().toString("HH:mm")
-            )
+            i18n.t("salvo {0}").format(QtCore.QTime.currentTime().toString("HH:mm"))
         )
         contagem = prod.progresso(self.checklist)
         helpers.show_message(
-            i18n.t('Checklist montado: {0} página(s), {1} painel(éis).').format(
+            i18n.t("Checklist montado: {0} página(s), {1} painel(éis).").format(
                 len(self.checklist), contagem["total"]
             )
         )
         if self._pasta_padrao():
             helpers.show_message(
-                i18n.t('Checklist salvo em {0}. Escolha a pasta do projeto para guardar junto das páginas.').format(pasta)
+                i18n.t(
+                    "Checklist salvo em {0}. Escolha a pasta do projeto para guardar junto das páginas."
+                ).format(pasta)
             )
 
     def _montar(self, texto, estados):
@@ -464,8 +491,8 @@ class ProducaoDocker(DockWidget):
             finais, total = prod.progresso_da_pagina(pagina)
             item = QtWidgets.QTreeWidgetItem(
                 [
-                    i18n.t('Página {0}').format(pagina["pagina"]),
-                    i18n.t('{0}/{1} finais').format(finais, total),
+                    i18n.t("Página {0}").format(pagina["pagina"]),
+                    i18n.t("{0}/{1} finais").format(finais, total),
                     "",
                     "",
                 ]
@@ -477,7 +504,7 @@ class ProducaoDocker(DockWidget):
             else:
                 item.setToolTip(
                     2,
-                    i18n.t('Página ainda não gerada (pagina_{0:03d}.kra).').format(
+                    i18n.t("Página ainda não gerada (pagina_{0:03d}.kra).").format(
                         pagina["pagina"]
                     ),
                 )
@@ -485,13 +512,15 @@ class ProducaoDocker(DockWidget):
             for painel in pagina["paineis"]:
                 filho = QtWidgets.QTreeWidgetItem(
                     [
-                        i18n.t('Painel {0}').format(painel["painel"]),
+                        i18n.t("Painel {0}").format(painel["painel"]),
                         self._rotulo_estado(painel["estado"]),
                         painel.get("plano", ""),
-                        prod.falas_resumo(painel, i18n.t('Narração')),
+                        prod.falas_resumo(painel, i18n.t("Narração")),
                     ]
                 )
-                filho.setData(0, USER_ROLE, ("painel", pagina["pagina"], painel["painel"]))
+                filho.setData(
+                    0, USER_ROLE, ("painel", pagina["pagina"], painel["painel"])
+                )
                 self._pintar_estado(filho, painel["estado"])
                 item.addChild(filho)
             item.setExpanded(True)
@@ -500,10 +529,10 @@ class ProducaoDocker(DockWidget):
 
     def _rotulo_estado(self, estado):
         if estado == "arte":
-            return i18n.t('Arte')
+            return i18n.t("Arte")
         if estado == "final":
-            return i18n.t('Final')
-        return i18n.t('Esboço')
+            return i18n.t("Final")
+        return i18n.t("Esboço")
 
     def _pintar_estado(self, item, estado):
         item.setForeground(1, QtGui.QBrush(QtGui.QColor(CORES.get(estado, "#8a8a8a"))))
@@ -553,7 +582,7 @@ class ProducaoDocker(DockWidget):
         pagina = self._achar_pagina(numero_pagina)
         if pai is not None and pagina is not None:
             finais, total = prod.progresso_da_pagina(pagina)
-            pai.setText(1, i18n.t('{0}/{1} finais').format(finais, total))
+            pai.setText(1, i18n.t("{0}/{1} finais").format(finais, total))
         self._salvar_estados()
         self._atualizar_resumo()
 
@@ -586,22 +615,28 @@ class ProducaoDocker(DockWidget):
                 acao = menu.addAction(self._rotulo_estado(estado))
                 acao.setCheckable(True)
                 acao.setChecked(
-                    (self._achar_painel(dados[1], dados[2]) or {}).get("estado") == estado
+                    (self._achar_painel(dados[1], dados[2]) or {}).get("estado")
+                    == estado
                 )
                 acao.triggered.connect(
-                    lambda marcado=False, alvo=estado, d=dados, i=item: self._definir_estado(
-                        i, d[1], d[2], alvo
+                    lambda marcado=False, alvo=estado, d=dados, i=item: (
+                        self._definir_estado(i, d[1], d[2], alvo)
                     )
                 )
             menu.addSeparator()
-            avancar = menu.addAction(i18n.t('Avançar estado'))
+            avancar = menu.addAction(i18n.t("Avançar estado"))
             avancar.triggered.connect(
                 lambda marcado=False, d=dados, i=item: self._definir_estado(
-                    i, d[1], d[2], prod.proximo_estado((self._achar_painel(d[1], d[2]) or {}).get("estado", "esboco"))
+                    i,
+                    d[1],
+                    d[2],
+                    prod.proximo_estado(
+                        (self._achar_painel(d[1], d[2]) or {}).get("estado", "esboco")
+                    ),
                 )
             )
         elif dados[0] == "pagina":
-            abrir = menu.addAction(i18n.t('Abrir página'))
+            abrir = menu.addAction(i18n.t("Abrir página"))
             abrir.triggered.connect(
                 lambda marcado=False, numero=dados[1]: self.abrir_pagina(numero)
             )
@@ -632,7 +667,9 @@ class ProducaoDocker(DockWidget):
         if total:
             porcentagem = int(round(100.0 * contagem["finais"] / total))
             self.lbl_progresso.setText(
-                i18n.t('{0}/{1} painéis finais ({2}%) · {3} em arte · {4} em esboço').format(
+                i18n.t(
+                    "{0}/{1} painéis finais ({2}%) · {3} em arte · {4} em esboço"
+                ).format(
                     contagem["finais"],
                     total,
                     porcentagem,
@@ -641,21 +678,21 @@ class ProducaoDocker(DockWidget):
                 )
             )
         else:
-            self.lbl_progresso.setText(i18n.t('Monte o checklist para ver o progresso.'))
+            self.lbl_progresso.setText(
+                i18n.t("Monte o checklist para ver o progresso.")
+            )
         meta = self.meta.value()
         if total and restantes <= 0:
-            self.lbl_meta.setText(i18n.t('Tudo finalizado!'))
+            self.lbl_meta.setText(i18n.t("Tudo finalizado!"))
         elif meta and restantes > 0:
             semanas, previsao = prod.projecao(restantes, meta)
             self.lbl_meta.setText(
-                i18n.t('Faltam {0} painéis: ~{1} semana(s) · entrega ~{2}').format(
-                    restantes, semanas, previsao.strftime('%d/%m')
+                i18n.t("Faltam {0} painéis: ~{1} semana(s) · entrega ~{2}").format(
+                    restantes, semanas, previsao.strftime("%d/%m")
                 )
             )
         else:
-            self.lbl_meta.setText(
-                i18n.t('Defina a meta semanal para ver a projeção.')
-            )
+            self.lbl_meta.setText(i18n.t("Defina a meta semanal para ver a projeção."))
 
     def _atualizar_pendente(self):
         """Acha a primeira página com painel não final e marca na árvore."""
@@ -669,7 +706,7 @@ class ProducaoDocker(DockWidget):
             item = self.arvore.topLevelItem(indice)
             dados = item.data(0, USER_ROLE)
             numero = dados[1] if dados else None
-            rotulo = i18n.t('Página {0}').format(numero)
+            rotulo = i18n.t("Página {0}").format(numero)
             if numero == self._pagina_pendente:
                 item.setText(0, "▶ " + rotulo)
             else:
@@ -677,19 +714,19 @@ class ProducaoDocker(DockWidget):
         if not self.checklist:
             self.lbl_pendente.setText("")
         elif self._pagina_pendente is None:
-            self.lbl_pendente.setText(i18n.t('Tudo finalizado!'))
+            self.lbl_pendente.setText(i18n.t("Tudo finalizado!"))
         else:
             self.lbl_pendente.setText(
-                i18n.t('Próxima pendente: Página {0}').format(self._pagina_pendente)
+                i18n.t("Próxima pendente: Página {0}").format(self._pagina_pendente)
             )
 
     def abrir_proxima_pendente(self):
         """Abre a primeira página com painel não final (selecionando na lista)."""
         if not self.checklist:
-            helpers.show_message(i18n.t('Monte o checklist antes de abrir.'))
+            helpers.show_message(i18n.t("Monte o checklist antes de abrir."))
             return
         if self._pagina_pendente is None:
-            helpers.show_message(i18n.t('Tudo finalizado!'))
+            helpers.show_message(i18n.t("Tudo finalizado!"))
             return
         self._selecionar_pagina(self._pagina_pendente)
         self.abrir_pagina(self._pagina_pendente)
@@ -718,7 +755,7 @@ class ProducaoDocker(DockWidget):
         self._sessao_inicio = time.monotonic()
         self._ultimo_save = self._sessao_inicio
         self._timer_tempo.start()
-        self.btn_tempo.setText(i18n.t('Pausar'))
+        self.btn_tempo.setText(i18n.t("Pausar"))
         self._atualizar_tempo()
 
     def _parar_tempo(self):
@@ -731,7 +768,7 @@ class ProducaoDocker(DockWidget):
         self._ultimo_save = None
         self._timer_tempo.stop()
         try:
-            self.btn_tempo.setText(i18n.t('Iniciar'))
+            self.btn_tempo.setText(i18n.t("Iniciar"))
         except (AttributeError, RuntimeError):
             pass
         self._atualizar_tempo()
@@ -745,9 +782,7 @@ class ProducaoDocker(DockWidget):
         self._ultimo_save = agora
         if segundos <= 0:
             return
-        self.tempos = prod.acumular_tempo(
-            self.tempos, self._sessao_pagina, segundos
-        )
+        self.tempos = prod.acumular_tempo(self.tempos, self._sessao_pagina, segundos)
         try:
             prod.salvar_tempos(self._sessao_pasta or self.pasta_dados(), self.tempos)
         except OSError:
@@ -764,17 +799,17 @@ class ProducaoDocker(DockWidget):
         if self._sessao_inicio is None:
             if self.tempos.get("total"):
                 self.lbl_tempo.setText(
-                    i18n.t('Tempo total: {0}').format(
+                    i18n.t("Tempo total: {0}").format(
                         prod.formatar_duracao(self.tempos["total"])
                     )
                 )
             else:
-                self.lbl_tempo.setText(i18n.t('Sem tempo registrado.'))
+                self.lbl_tempo.setText(i18n.t("Sem tempo registrado."))
             return
         cronometro = prod.formatar_cronometro(time.monotonic() - self._sessao_inicio)
         if self._sessao_pagina:
             self.lbl_tempo.setText(
-                i18n.t('Tempo: {0} · Página {1} · total {2}').format(
+                i18n.t("Tempo: {0} · Página {1} · total {2}").format(
                     cronometro,
                     self._sessao_pagina,
                     prod.formatar_duracao(self.tempos["total"]),
@@ -782,7 +817,7 @@ class ProducaoDocker(DockWidget):
             )
         else:
             self.lbl_tempo.setText(
-                i18n.t('Tempo: {0} · total {1}').format(
+                i18n.t("Tempo: {0} · total {1}").format(
                     cronometro, prod.formatar_duracao(self.tempos["total"])
                 )
             )
@@ -802,37 +837,39 @@ class ProducaoDocker(DockWidget):
     def abrir_pagina(self, numero):
         pasta = self.folder()
         if not pasta:
-            helpers.show_message(i18n.t('Escolha a pasta do projeto.'))
+            helpers.show_message(i18n.t("Escolha a pasta do projeto."))
             return
         caminho = prod.pagina_do_arquivo(pasta, numero)
         if not caminho:
             helpers.show_message(
-                i18n.t('A pagina_{0:03d}.kra ainda não existe na pasta.').format(numero)
+                i18n.t("A pagina_{0:03d}.kra ainda não existe na pasta.").format(numero)
             )
             return
         documento = Krita.instance().openDocument(caminho)
         if documento is None:
-            helpers.show_info(i18n.t('Produção'), i18n.t('Não foi possível abrir a página.'))
+            helpers.show_info(
+                i18n.t("Produção"), i18n.t("Não foi possível abrir a página.")
+            )
             return
         helpers.present_document(documento)
 
     def exportar_markdown(self):
         if not self.checklist:
-            helpers.show_message(i18n.t('Monte o checklist antes de exportar.'))
+            helpers.show_message(i18n.t("Monte o checklist antes de exportar."))
             return
         pasta = self.pasta_dados()
         rotulos = {
-            "esboco": i18n.t('Esboço'),
-            "arte": i18n.t('Arte'),
-            "final": i18n.t('Final'),
-            "narracao": i18n.t('Narração'),
-            "plano": i18n.t('Plano'),
+            "esboco": i18n.t("Esboço"),
+            "arte": i18n.t("Arte"),
+            "final": i18n.t("Final"),
+            "narracao": i18n.t("Narração"),
+            "plano": i18n.t("Plano"),
         }
         texto = prod.para_markdown(
             self.checklist,
             self.meta.value(),
             rotulos=rotulos,
-            titulo=i18n.t('Checklist de produção'),
+            titulo=i18n.t("Checklist de produção"),
             tempos=self.tempos,
         )
         caminho = os.path.join(pasta, prod.ARQUIVO_CHECKLIST)
@@ -840,22 +877,26 @@ class ProducaoDocker(DockWidget):
             with open(caminho, "w", encoding="utf-8") as arquivo:
                 arquivo.write(texto)
         except OSError as erro:
-            helpers.show_info(i18n.t('Produção'), i18n.t('Falha ao salvar: {0}').format(erro))
+            helpers.show_info(
+                i18n.t("Produção"), i18n.t("Falha ao salvar: {0}").format(erro)
+            )
             return
-        helpers.show_message(i18n.t('Checklist salvo: {0}').format(caminho))
+        helpers.show_message(i18n.t("Checklist salvo: {0}").format(caminho))
 
     # ---------------------------------------------------------------- sintaxe
 
     def mostrar_sintaxe(self):
         dialogo = QtWidgets.QDialog(self.widget())
-        dialogo.setWindowTitle(i18n.t('Sintaxe do roteiro'))
+        dialogo.setWindowTitle(i18n.t("Sintaxe do roteiro"))
         layout = ui.espacamento(QtWidgets.QVBoxLayout(dialogo))
         texto = QtWidgets.QPlainTextEdit(dialogo)
         texto.setReadOnly(True)
         corpo = "\n".join(LINHAS_SINTAXE)
-        texto.setPlainText("{0}\n\n{1}\n\n{2}".format(corpo, i18n.t('Exemplo:'), EXEMPLO))
+        texto.setPlainText(
+            "{0}\n\n{1}\n\n{2}".format(corpo, i18n.t("Exemplo:"), EXEMPLO)
+        )
         layout.addWidget(texto, 1)
-        fechar = ui.botao(i18n.t('Fechar'), i18n.t('Fecha a janela da sintaxe.'))
+        fechar = ui.botao(i18n.t("Fechar"), i18n.t("Fecha a janela da sintaxe."))
         fechar.clicked.connect(dialogo.accept)
         layout.addWidget(fechar)
         dialogo.resize(620, 460)

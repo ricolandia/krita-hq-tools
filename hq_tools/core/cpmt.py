@@ -14,6 +14,18 @@ import uuid
 CONFIG_NAMES = ("comicConfig.json", "comicsConfig.json")
 
 
+def ordem_natural(nomes):
+    """Ordena nomes de arquivo com os números por valor (``pagina_2`` antes de ``pagina_10``)."""
+
+    def chave(nome):
+        return [
+            int(parte) if parte.isdigit() else parte.lower()
+            for parte in re.split(r"(\d+)", nome)
+        ]
+
+    return sorted(nomes, key=chave)
+
+
 class CPMTError(ValueError):
     """Erro de leitura ou escrita do arquivo de projeto do CPMT."""
 
@@ -32,11 +44,7 @@ def create_project_with_page(folder, page_relative, project_name=None):
     folder = os.path.abspath(folder)
     os.makedirs(folder, exist_ok=True)
     existente = next(
-        (
-            name
-            for name in CONFIG_NAMES
-            if os.path.isfile(os.path.join(folder, name))
-        ),
+        (name for name in CONFIG_NAMES if os.path.isfile(os.path.join(folder, name))),
         None,
     )
     if existente is not None:
@@ -129,9 +137,7 @@ class CPMTProject:
     @classmethod
     def is_project(cls, root):
         root = os.path.abspath(root)
-        return any(
-            os.path.isfile(os.path.join(root, name)) for name in CONFIG_NAMES
-        )
+        return any(os.path.isfile(os.path.join(root, name)) for name in CONFIG_NAMES)
 
     @property
     def project_name(self):
@@ -139,7 +145,10 @@ class CPMTProject:
 
     @property
     def pages_location(self):
-        return str(self.config.get("pagesLocation") or "pages")
+        # Sem a chave, a convenção real (e a do nosso create_project_with_page)
+        # é a raiz do projeto; "pages" apontava para uma subpasta inexistente.
+        # O CPMT, quando a chave está em branco, pergunta ao usuário.
+        return str(self.config.get("pagesLocation") or ".")
 
     @property
     def page_number(self):
