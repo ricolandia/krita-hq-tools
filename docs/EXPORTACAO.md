@@ -25,6 +25,24 @@ corte continuam lá.
 Achado de passagem corrigido: `present_document` usava `Krita.addView`, que
 não existe no Krita 5.3.4 (falhava em silêncio); agora usa `Window.addView`.
 
+### Validação interativa (17/10, Krita real do autor)
+
+`scripts/validar-exportacao.py` rodou no Scripter; resultados:
+
+| Variante | Resultado |
+|---|---|
+| PNG nativo (300 dpi) | ✅ 5,5 s/página, 2480×3508 dpi=(300,300) |
+| PNG 96 dpi (cópia + `scaleImage`) | ✅ 2,0 s, 794×1123 dpi=(96,96) |
+| JPG q90 | ✅ 2,2 s, 2480×3508 dpi=(300,300) |
+| **CMYK (TIFF)** | ❌ **sem perfis CMYK instalados** (`profiles("CMYK","U8")` vazio) |
+| **PDF (1 página)** | ❌ o filtro não criou o arquivo (caminho não confiável) |
+| `mergedimage` (atalho) | ✅ **69 ms**, 2480×3508 dpi=(300,300) |
+
+- **`exportImage` funciona no Krita real** (o crash era só do harness headless).
+- O atalho do `mergedimage` é **pixel a pixel idêntico** ao PNG exportado na
+  mesma resolução (diff = 0 no `ImageChops.getbbox()`) e **80× mais rápido**
+  (69 ms vs 5,5 s).
+
 ## Decisões propostas (v1)
 
 - **Entrada**: botão **"Exportar páginas..."** na fileira do gerenciador de
@@ -39,17 +57,17 @@ não existe no Krita 5.3.4 (falhava em silêncio); agora usa `Window.addView`.
   listados** no fim (página sem `mergedimage`, export que falhou).
 - **Saída**: pasta `<projeto>/exportacao/`; o nome do arquivo é o da página
   com a extensão trocada; opção "abrir a pasta ao terminar".
-- **Fora da v1**: PDF multi-página (não há caminho nativo; o escritor puro em
-  Python segue adiado), PSD em camadas (v1.1) e imposição/sangria (Scribus).
+- **Fora da v1**: CMYK e PDF (evidência acima), PSD em camadas (v1.1) e
+  imposição/sangria (Scribus).
 
 ## Campos do diálogo
 
 | Campo | Opções | Padrão | Notas |
 |---|---|---|---|
 | Preset | Web / Impressão / Personalizado | Web | só preenche os campos |
-| Cor | RGB / CMYK | RGB | CMYK pede perfil (combo dos perfis do Krita) e só vale para TIFF/PDF; PNG/JPG são RGB |
+| Cor | RGB (fixo na v1) | RGB | CMYK fica para quando houver perfil instalado |
 | Resolução | 72 / 96 / 150 / 300 dpi | dpi da página (`pages.dpi`, 300) | igual à da página ⇒ atalho do `mergedimage` |
-| Formato | PNG / JPG / TIFF / PDF (1 por página) | PNG | PDF único fica fora (sem multi-página nativo) |
+| Formato | PNG / JPG | PNG | CMYK/PDF fora da v1 (evidência) |
 | Qualidade | 1–100 (JPG) | 90 | só para JPG |
 | Destino | pasta | `<projeto>/exportacao/` | criar se não existir |
 | Abrir a pasta ao terminar | sim/não | sim | |
@@ -74,9 +92,13 @@ não existe no Krita 5.3.4 (falhava em silêncio); agora usa `Window.addView`.
    decisão do CMYK.
 3. **QA de visão**: uma página exportada conferida por visão (cortes/cor).
 
-## Decisões que faltam (autor)
+## Decisões fechadas pela evidência (17/10)
 
-1. **CMYK na v1?** — depende do validador interativo passar (perfis + TIFF).
-2. Qualidade padrão do JPG (90 ok?).
-3. Nome da pasta de destino (`exportacao/` ok?).
-4. Presets Web (RGB 96 dpi JPG) e Impressão (CMYK 300 dpi TIFF) — confere?
+1. **CMYK fora da v1** — não há perfis CMYK no Krita do autor (o
+   `profiles("CMYK","U8")` volta vazio); revisitar se um perfil for instalado.
+2. **PDF fora da v1** — o filtro não cria o arquivo nem em uma página; o
+   caminho não é confiável. O escritor puro em Python segue adiado.
+3. **v1 = RGB**, PNG/JPG, 72/96/150/300 dpi, pasta `<projeto>/exportacao/`.
+4. **Presets**: Web = RGB 96 dpi JPG q90; Impressão = **RGB 300 dpi PNG**
+   (lossless; o CMYK sai quando houver perfil). TIFF RGB pode entrar depois.
+5. Qualidade JPG padrão: **90**.
