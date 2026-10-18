@@ -6,8 +6,8 @@
 
 Krita plugin with screentones and hatching, vector speech balloons and sound
 effects, an asset library, a page manager, brush shortcuts, a 3D viewer, a
-perspective line library and a hub to open and close the modules. Built for
-Krita 5.3.4 (AppImage, PyQt5) with preparation for Krita 6 (PyQt6). The
+perspective line library and a hub to open and close the modules. Runs on
+**Krita 5.3.4 (PyQt5) and Krita 6.0.4 (PyQt6)** — a single ZIP for both. The
 project documentation is written in Portuguese; this file is the English
 overview.
 

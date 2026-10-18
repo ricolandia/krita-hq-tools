@@ -7,8 +7,8 @@
 Plugin do Krita com retículas e hachuras, balões e onomatopeias vetoriais,
 biblioteca de recursos, gerenciador de páginas, pincéis com atalhos,
 visualizador 3D, biblioteca de perspectivas e um hub para abrir e fechar os
-módulos. Feito para o Krita 5.3.4 (AppImage, PyQt5) com preparação para o
-Krita 6 (PyQt6).
+módulos. Roda no **Krita 5.3.4 (PyQt5) e no Krita 6.0.4 (PyQt6)** — um único
+ZIP para os dois.
 
 ## Demo
 

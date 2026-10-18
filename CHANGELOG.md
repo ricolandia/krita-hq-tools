@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.25.0] — 2026-10-18
+
+**Suporte ao Krita 6**: o mesmo ZIP agora roda no **Krita 5.3.4 e no Krita
+6.0.4**. Dois ajustes de compatibilidade: a escolha do binding de Qt lia o
+`krita.QT_VERSION` como se fosse uma string (no Krita 6 ele é o macro
+numérico do Qt, `395264` = 6.8.0) e acabava escolhendo PyQt5, que o Krita 6
+recusa; e o registro das docas usava `DockWidgetFactoryBase.DockRight`, que o
+Krita 6 moveu para `DockPosition.DockRight`. Validado no harness (12/12
+dockers nos dois) e pelo autor nos dois Krita.
+
+**English:** **Krita 6 support**: the same ZIP now runs on **Krita 5.3.4 and
+Krita 6.0.4**. Two compatibility fixes: the Qt binding choice read
+`krita.QT_VERSION` as if it were a string (on Krita 6 it is the numeric Qt
+macro, `395264` = 6.8.0) and ended up choosing PyQt5, which Krita 6 refuses;
+and the docker registration used `DockWidgetFactoryBase.DockRight`, which
+Krita 6 moved to `DockPosition.DockRight`. Validated in the harness (12/12
+dockers on both) and by the author on both Krita versions.
+
 ## [0.24.0] — 2026-10-17
 
 Gerenciador de páginas: **ações por página** no clique direito — Abrir, Abrir
