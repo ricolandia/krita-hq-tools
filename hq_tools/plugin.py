@@ -7,6 +7,13 @@ aqui, conforme a configuração salva em ``~/.local/share/krita/hq_tools``.
 
 from krita import DockWidgetFactory, DockWidgetFactoryBase, Extension, Krita
 
+# O Krita 6 moveu os enums do libkis para dentro de classes (DockPosition);
+# o getattr cobre os dois (Krita 5: DockWidgetFactoryBase.DockRight).
+DOCK_DIREITA = getattr(
+    getattr(DockWidgetFactoryBase, "DockPosition", DockWidgetFactoryBase),
+    "DockRight",
+)
+
 from .core import i18n
 from .core.config import Config
 from .core.krita_helpers import log
@@ -106,7 +113,7 @@ class HQTools(Extension):
                 instance.addDockWidgetFactory(
                     DockWidgetFactory(
                         dock_id,
-                        DockWidgetFactoryBase.DockRight,
+                        DOCK_DIREITA,
                         tipo_docker,
                     )
                 )

@@ -85,9 +85,16 @@ except ImportError:
 QTimer.singleShot(int(os.environ.get("HQ_HARNESS_DELAY", "2000")), _rodar)
 EOF
 
+# O plugin de verdade também carrega (symlink), para o ``plugin.py`` rodar:
+# sem isso o harness não pegava erro de registro das docas (o Krita 6 moveu
+# os enums do libkis e o setup quebrava só no Krita real).
+ln -sfn "$REPO/hq_tools" "$BASE/data/krita/pykrita/hq_tools"
+ln -sfn "$REPO/hq_tools.desktop" "$BASE/data/krita/pykrita/hq_tools.desktop"
+
 cat > "$BASE/config/kritarc" <<'EOF'
 [python]
 enable_hq_harness=true
+enable_hq_tools=true
 EOF
 
 rm -f "$LOG"
