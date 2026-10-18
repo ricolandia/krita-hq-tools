@@ -27,6 +27,8 @@ except ImportError:  # Krita 6
 
 from krita import Krita, Selection
 
+from hq_tools.core.compat import IMAGE_FORMAT_ARGB32, IMAGE_FORMAT_RGB32
+
 BASE = "/tmp/insercao-smoke"
 LOG_PATH = "/tmp/insercao-smoke.log"
 BALAO = os.path.join(REPO, "hq_tools/modules/balloons/samples/Fala_Speak_01_.svg")
@@ -58,7 +60,7 @@ def _exportar(documento, caminho):
     dados = documento.pixelData(0, 0, largura, altura)
     if dados is None:
         return False
-    reserva = QtGui.QImage(bytes(dados), largura, altura, QtGui.QImage.Format_ARGB32)
+    reserva = QtGui.QImage(bytes(dados), largura, altura, IMAGE_FORMAT_ARGB32)
     return bool(reserva.save(caminho))
 
 
@@ -75,15 +77,17 @@ def _detalhar_camada(rotulo, camada):
         return
     for shape in shapes:
         try:
-            log("   shape {0!r} box={1} transform={2}".format(
-                shape.name(), shape.boundingBox(), shape.transformation()
-            ))
+            log(
+                "   shape {0!r} box={1} transform={2}".format(
+                    shape.name(), shape.boundingBox(), shape.transformation()
+                )
+            )
         except (AttributeError, RuntimeError) as erro:
             log("   shape com erro: {0}".format(erro))
 
 
 def _png_de_teste(caminho, largura, altura, cor):
-    imagem = QtGui.QImage(largura, altura, QtGui.QImage.Format_RGB32)
+    imagem = QtGui.QImage(largura, altura, IMAGE_FORMAT_RGB32)
     imagem.fill(QtGui.QColor(*cor))
     return imagem.save(caminho, "PNG")
 
@@ -129,26 +133,38 @@ def executar():
             # real a vista ativa é a do documento que o autor está olhando.
             view = views[-1]
             helpers.active_view = lambda: view
-    log("dpi: {0} | centro da vista: {1}".format(
-        documento.resolution(), helpers.centro_da_vista(documento)
-    ))
+    log(
+        "dpi: {0} | centro da vista: {1}".format(
+            documento.resolution(), helpers.centro_da_vista(documento)
+        )
+    )
 
     _selecionar(documento, 200, 300, 600, 400)
     camada, ok = _inserir_vetor(documento, helpers, BALAO, "balao-selecao")
     log("A) balao com selecao (200,300 600x400): posicionou={0}".format(ok))
     _detalhar_camada("A", camada)
-    log("A) export: {0}".format(_exportar(documento, "/tmp/insercao-a-balao-selecao.png")))
+    log(
+        "A) export: {0}".format(
+            _exportar(documento, "/tmp/insercao-a-balao-selecao.png")
+        )
+    )
 
     camada, ok = _inserir_vetor(documento, helpers, BALAO, "balao-centro")
     log("B) balao sem selecao: posicionou={0}".format(ok))
     _detalhar_camada("B", camada)
-    log("B) export: {0}".format(_exportar(documento, "/tmp/insercao-b-balao-centro.png")))
+    log(
+        "B) export: {0}".format(
+            _exportar(documento, "/tmp/insercao-b-balao-centro.png")
+        )
+    )
 
     _selecionar(documento, 1000, 500, 400, 300)
     camada, ok = _inserir_vetor(documento, helpers, ONO, "ono-selecao")
     log("C) onomatopeia com selecao (1000,500 400x300): posicionou={0}".format(ok))
     _detalhar_camada("C", camada)
-    log("C) export: {0}".format(_exportar(documento, "/tmp/insercao-c-ono-selecao.png")))
+    log(
+        "C) export: {0}".format(_exportar(documento, "/tmp/insercao-c-ono-selecao.png"))
+    )
 
     from hq_tools.modules.biblioteca.docker import BibliotecaDocker
 
@@ -156,15 +172,19 @@ def executar():
     _png_de_teste(PNG, 800, 600, (30, 120, 220))
     _selecionar(documento, 900, 100, 400, 300)
     biblioteca._insert_paint(documento, PNG, "png-selecao")
-    log("D) PNG 800x600 na selecao (900,100 400x300): export={0}".format(
-        _exportar(documento, "/tmp/insercao-d-png-selecao.png")
-    ))
+    log(
+        "D) PNG 800x600 na selecao (900,100 400x300): export={0}".format(
+            _exportar(documento, "/tmp/insercao-d-png-selecao.png")
+        )
+    )
 
     helpers.deselect(documento)
     biblioteca._insert_paint(documento, PNG, "png-centro")
-    log("E) PNG sem selecao: export={0}".format(
-        _exportar(documento, "/tmp/insercao-e-png-centro.png")
-    ))
+    log(
+        "E) PNG sem selecao: export={0}".format(
+            _exportar(documento, "/tmp/insercao-e-png-centro.png")
+        )
+    )
 
     # F) perspectiva com seleção a 300 dpi: a malha tem que cair na seleção.
     # O SVG sem unidade é interpretado em pixels do documento pelo Krita

@@ -25,6 +25,8 @@ except ImportError:  # Krita 6
 
 from krita import Krita
 
+from hq_tools.core.compat import IMAGE_FORMAT_ARGB32, IMAGE_FORMAT_RGB32
+
 BASE = "/tmp/moodboard-smoke"
 LINK = "/tmp/moodboard-link"
 PASTA = os.path.join(LINK, "moodboard")
@@ -39,7 +41,7 @@ def log(mensagem):
 
 
 def _jpg_de_teste(caminho, largura, altura, cor):
-    imagem = QtGui.QImage(largura, altura, QtGui.QImage.Format_RGB32)
+    imagem = QtGui.QImage(largura, altura, IMAGE_FORMAT_RGB32)
     imagem.fill(QtGui.QColor(*cor))
     return imagem.save(caminho, "JPG", 95)
 
@@ -52,7 +54,7 @@ def _exportar(documento, caminho):
     dados = documento.pixelData(0, 0, largura, altura)
     if dados is None:
         return False
-    reserva = QtGui.QImage(bytes(dados), largura, altura, QtGui.QImage.Format_ARGB32)
+    reserva = QtGui.QImage(bytes(dados), largura, altura, IMAGE_FORMAT_ARGB32)
     return bool(reserva.save(caminho))
 
 
@@ -82,7 +84,11 @@ def executar_smoke():
         (os.path.join(BASE, "gigante.jpg"), 2000, 1000, (40, 80, 220)),
     ]
     for caminho, largura, altura, cor in origens:
-        log("jpg de teste {0}: {1}".format(os.path.basename(caminho), _jpg_de_teste(caminho, largura, altura, cor)))
+        log(
+            "jpg de teste {0}: {1}".format(
+                os.path.basename(caminho), _jpg_de_teste(caminho, largura, altura, cor)
+            )
+        )
 
     documento = docker._garantir_quadro()
     if documento is None:
@@ -97,20 +103,35 @@ def executar_smoke():
         imagem = QtGui.QImage(destino)
         x, y, escala = mb.destino(len(itens), imagem.width(), imagem.height())
         camada = docker._montar_camada(
-            documento, destino, os.path.splitext(os.path.basename(destino))[0], escala, x, y
+            documento,
+            destino,
+            os.path.splitext(os.path.basename(destino))[0],
+            escala,
+            x,
+            y,
         )
         if camada is None:
             log("FALHA: camada de {0}".format(destino))
             continue
         item = mb.item_de_layout(
-            os.path.basename(destino), x, y, escala, imagem.width(), imagem.height(),
+            os.path.basename(destino),
+            x,
+            y,
+            escala,
+            imagem.width(),
+            imagem.height(),
             camada.uniqueId().toString(),
         )
         itens.append(item)
         log(
             "item {0}: x={1:.1f} y={2:.1f} escala={3:.4f} {4}x{5} camada={6}".format(
-                len(itens), item["x"], item["y"], item["escala"],
-                item["largura"], item["altura"], item["camada"],
+                len(itens),
+                item["x"],
+                item["y"],
+                item["escala"],
+                item["largura"],
+                item["altura"],
+                item["camada"],
             )
         )
     mb.salvar_layout(PASTA, itens)
@@ -130,21 +151,35 @@ def executar_smoke():
                 "guarda: doc aberto name={0!r} fileName={1!r} abspath-igual={2} realpath-igual={3}".format(
                     aberto.name(),
                     nome_arquivo,
-                    os.path.abspath(nome_arquivo) == os.path.abspath(docker.board_path()),
-                    os.path.realpath(nome_arquivo) == os.path.realpath(docker.board_path()),
+                    os.path.abspath(nome_arquivo)
+                    == os.path.abspath(docker.board_path()),
+                    os.path.realpath(nome_arquivo)
+                    == os.path.realpath(docker.board_path()),
                 )
             )
         except (AttributeError, RuntimeError) as erro:
             log("guarda: doc aberto erro {0}".format(erro))
     achado = docker._quadro_aberto()
-    log("guarda: quadro aberto={0}".format(achado.name() if achado is not None else None))
-    log("exportacao inicial: {0}".format(_exportar(documento, "/tmp/moodboard-smoke.png")))
+    log(
+        "guarda: quadro aberto={0}".format(
+            achado.name() if achado is not None else None
+        )
+    )
+    log(
+        "exportacao inicial: {0}".format(
+            _exportar(documento, "/tmp/moodboard-smoke.png")
+        )
+    )
     log("tamanho do quadro: {0}x{1}".format(documento.width(), documento.height()))
     caminho_kra = docker.board_path()
     log("tamanho do kra: {0} bytes".format(os.path.getsize(caminho_kra)))
 
     quadro = docker._quadro_para_atualizar()
-    log("guarda: quadro para atualizar={0}".format(quadro.name() if quadro is not None else None))
+    log(
+        "guarda: quadro para atualizar={0}".format(
+            quadro.name() if quadro is not None else None
+        )
+    )
     if quadro is not None and item is not None:
         removida = docker._remover_camada(quadro, item)
         itens.remove(item)
@@ -153,10 +188,15 @@ def executar_smoke():
         docker._salvar_quadro(quadro)
         log(
             "guarda: camada removida={0}; camadas agora={1}".format(
-                removida, [no.name() for no in quadro.rootNode().findChildNodes(recursive=False)]
+                removida,
+                [no.name() for no in quadro.rootNode().findChildNodes(recursive=False)],
             )
         )
-        log("exportacao apagada: {0}".format(_exportar(quadro, "/tmp/moodboard-smoke-apagada.png")))
+        log(
+            "exportacao apagada: {0}".format(
+                _exportar(quadro, "/tmp/moodboard-smoke-apagada.png")
+            )
+        )
 
     documento.setModified(False)
     documento.close()
@@ -165,7 +205,11 @@ def executar_smoke():
         log("FALHA: reabertura do quadro")
         return
     reaberto.refreshProjection()
-    log("exportacao reaberto: {0}".format(_exportar(reaberto, "/tmp/moodboard-smoke-reaberto.png")))
+    log(
+        "exportacao reaberto: {0}".format(
+            _exportar(reaberto, "/tmp/moodboard-smoke-reaberto.png")
+        )
+    )
     camadas = reaberto.rootNode().findChildNodes(recursive=False)
     log("camadas no kra reaberto: {0}".format([no.name() for no in camadas]))
     reaberto.setModified(False)
@@ -174,7 +218,9 @@ def executar_smoke():
     # 2) inserir na seleção
     from hq_tools.core import krita_helpers as helpers
 
-    pagina = aplicacao.createDocument(1600, 1000, "pagina-teste", "RGBA", "U8", "sRGB built-in", 300.0)
+    pagina = aplicacao.createDocument(
+        1600, 1000, "pagina-teste", "RGBA", "U8", "sRGB built-in", 300.0
+    )
     if pagina is None:
         log("FALHA: pagina de teste")
         return
@@ -187,8 +233,16 @@ def executar_smoke():
         if docker.list_items.item(indice).text() == "gigante":
             docker.list_items.setCurrentRow(indice)
     ativo = aplicacao.activeDocument()
-    log("documento ativo antes do insert: {0}".format(ativo.name() if ativo is not None else None))
-    log("referencia selecionada na lista: {0}".format(docker.list_items.currentItem().text()))
+    log(
+        "documento ativo antes do insert: {0}".format(
+            ativo.name() if ativo is not None else None
+        )
+    )
+    log(
+        "referencia selecionada na lista: {0}".format(
+            docker.list_items.currentItem().text()
+        )
+    )
     # No ambiente headless o Krita não marca a página como ativa (não há foco
     # de janela); no uso real o ativo é o documento que o autor está olhando.
     helpers.active_document = lambda: pagina
@@ -199,12 +253,21 @@ def executar_smoke():
         try:
             log(
                 "no: {0} tipo={1} visivel={2} pos={3} opacidade={4} bounds={5}".format(
-                    no.name(), no.type(), no.visible(), no.position(), no.opacity(), no.bounds()
+                    no.name(),
+                    no.type(),
+                    no.visible(),
+                    no.position(),
+                    no.opacity(),
+                    no.bounds(),
                 )
             )
         except (AttributeError, RuntimeError) as erro:
             log("no: erro {0}".format(erro))
-    log("exportacao selecao: {0}".format(_exportar(pagina, "/tmp/moodboard-smoke-selecao.png")))
+    log(
+        "exportacao selecao: {0}".format(
+            _exportar(pagina, "/tmp/moodboard-smoke-selecao.png")
+        )
+    )
     pagina.setModified(False)
     pagina.close()
 

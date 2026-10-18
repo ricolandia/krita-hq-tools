@@ -121,6 +121,7 @@ def qlibrary_prefix():
 
 if QT_VERSION == 6:
     IMAGE_FORMAT_ARGB32 = QtGui.QImage.Format.Format_ARGB32
+    IMAGE_FORMAT_RGB32 = QtGui.QImage.Format.Format_RGB32
     TRANSPARENT = QtCore.Qt.GlobalColor.transparent
     LIST_ADJUST = QtWidgets.QListView.ResizeMode.Adjust
     LIST_STATIC = QtWidgets.QListView.Movement.Static
@@ -137,6 +138,7 @@ if QT_VERSION == 6:
     FRAME_HLINE = QtWidgets.QFrame.Shape.HLine
 else:
     IMAGE_FORMAT_ARGB32 = QtGui.QImage.Format_ARGB32
+    IMAGE_FORMAT_RGB32 = QtGui.QImage.Format_RGB32
     TRANSPARENT = QtCore.Qt.transparent
     LIST_ADJUST = QtWidgets.QListView.Adjust
     LIST_STATIC = QtWidgets.QListView.Static
@@ -169,6 +171,7 @@ __all__ = [
     "standard_icon",
     "qlibrary_prefix",
     "IMAGE_FORMAT_ARGB32",
+    "IMAGE_FORMAT_RGB32",
     "TRANSPARENT",
     "LIST_ADJUST",
     "LIST_STATIC",

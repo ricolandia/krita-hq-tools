@@ -126,8 +126,13 @@ inserida num painel dentro de uma seleção. Decisões e achados:
    a cauda arrastável.
 6. **Fillbucket em Python puro:** reescrever o núcleo sem numpy, com as
    correções obrigatórias (ordem de canais, camada transparente, imports).
-7. **Balão paramétrico:** cauda reposicionável e texto que redimensiona o
-   balão (depois do Krita 6).
+7. **Balão paramétrico (adiado — autor, 18/10):** cauda reposicionável e
+   texto que redimensiona o balão. Fica para quando o Krita 6 for o dia a dia
+   do autor; por ora a meta é **paridade de funções nos dois** (5.3.4 e 6.0.4).
+   A metade "cauda reposicionável" não depende do 6 (é geometria nossa + o
+   clique direto no canvas); a metade "texto" depende de validar o
+   texto-em-forma no libkis do 6, com o plano B de layout próprio (medir e
+   quebrar linhas como o gerador de storyboard já faz).
 8. **Avaliar e decidir:** preset de "estilo de painel", exportar o conjunto
    próprio como bundle e os presets de assistente de perspectiva por painel
    (com a biblioteca de perspectiva pronta, o valor caiu; decidir se sai da
@@ -218,7 +223,8 @@ Avaliação em 2026-09-25. **Decisão: avaliar sem integrar** (a pedido do autor
   simetria): salvar e reaplicar config de assistente por painel; barato e
   economiza tempo repetitivo.
 - **Balão paramétrico** (cauda reposicionável + texto que redimensiona o
-  balão): depende de validar texto-em-forma (fluxo em forma) no Krita 6.
+  balão): depende de validar texto-em-forma (fluxo em forma) no Krita 6 —
+  **adiado pelo autor em 18/10** (ver item 7 do "Próximo").
 - **Exportação webtoon/social**: dispensável por enquanto (Batch Exporter
   cobre o genérico).
 - **Preflight de impressão** (sangria, marcas de corte, numeração): continua
