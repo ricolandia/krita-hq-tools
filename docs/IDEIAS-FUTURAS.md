@@ -61,6 +61,13 @@ a da nota do roadmap no Trilium.
   e cinema: deslocados, quina próxima, pássaro/verme extremos, horizonte
   inclinado e grade de chão) e, no 3D, luz girável (azimute/altura) com o
   estilo Toon no lugar do Contorno; capturas novas no README.
+- **v0.21–v0.24 (13–17/10, publicadas):** aba "Mãos" no 3D; polimento (i18n
+  composto, memória de estado do visualizador, cache de miniatura); exportação
+  de páginas no gerenciador (presets, resoluções, atalho do `mergedimage`) e
+  as ações por página (duplicar/renomear/remover), o badge da produção e as
+  correções (`pagesLocation`, ordem natural, órfã do gerador). T1 completo
+  (forgejo espelhado, Gantt sincronizado, `dist/` limpo, harness versionado)
+  e o CI consertado (lint, actions v7, `scripts/lint.sh`).
 - **Fora do roadmap original:** camada de UI compartilhada (52 botões), ícone
   e social preview, vídeos demo no YouTube com roteiros de captura, CI no
   Windows, automação de release (tag → ZIP + notas do CHANGELOG), duas
@@ -100,17 +107,18 @@ inserida num painel dentro de uma seleção. Decisões e achados:
 
 ### Próximo (reavaliado)
 
-1. **Aba "Mãos" (feita em 13/10, commit local aguardando teste):** slider
-   "Dobrar" por dedo (0° aberta a 90° punho, interpolando a pose de referência
-   `fechada`; a esquerda espelhada) e "Salvar pose da mão..." na biblioteca do
-   usuário. O slider antigo de dedos (que usava o eixo errado) foi corrigido.
-   Falta o teste do autor e a release. O "Salvar pose atual" do corpo e as
-   miniaturas no seletor saíram na v0.19; o joinha, em 07/10
-   (`Mao_joinha_v2_.fbx`).
-2. **Validação no Krita da v0.9.0:** hub (abrir/fechar), malha de perspectiva
-   (Ctrl+Z único), flutuante com dois documentos e a interface em inglês.
-3. **Krita 6:** validar o plugin no PyQt6 (pré-requisito do balão
-   paramétrico) e conferir dockers e i18n no 6.
+1. **Aba "Mãos" (feita em 13/10, v0.21.0 publicada):** slider "Dobrar" por
+   dedo (0° aberta a 90° punho, interpolando a pose de referência `fechada`;
+   a esquerda espelhada) e "Salvar pose da mão..." na biblioteca do usuário.
+   O slider antigo de dedos (que usava o eixo errado) foi corrigido. O
+   "Salvar pose atual" do corpo e as miniaturas no seletor saíram na v0.19; o
+   joinha, em 07/10 (`Mao_joinha_v2_.fbx`).
+2. **Validação no Krita da v0.9.0 (feita — autor, 17/10):** hub
+   (abrir/fechar), malha de perspectiva (Ctrl+Z único), flutuante com dois
+   documentos e a interface em inglês — **tudo ok**.
+3. **Krita 6 (foco atual, 18/10):** validar o plugin no PyQt6 (pré-requisito
+   do balão paramétrico) e conferir dockers e i18n no 6 — correções no
+   `compat`, com o Krita 5 sempre verde.
 4. **Lettering nas páginas geradas:** usar os balões e as fontes do kit no
    lugar do texto sans-serif do storyboard.
 5. **Clique direto no canvas:** PoC de ~20 linhas (event filter no
@@ -124,7 +132,12 @@ inserida num painel dentro de uma seleção. Decisões e achados:
    próprio como bundle e os presets de assistente de perspectiva por painel
    (com a biblioteca de perspectiva pronta, o valor caiu; decidir se sai da
    lista).
-9. **Exportação de páginas (amadurecer, adiada em 05/10):** diálogo com cor
+9. **Exportação de páginas (feita em 17/10, v0.23.0):** botão no gerenciador,
+   presets Web (96 dpi JPG) / Impressão (300 dpi PNG), resoluções 72–300,
+   atalho do `mergedimage` na resolução nativa (pixel a pixel idêntico,
+   ~80x mais rápido), progresso com falhas listadas; CMYK/PDF fora
+   (evidência no `docs/EXPORTACAO.md`). *Especificação original (histórico):*
+   diálogo com cor
    (RGB/CMYK + perfil), resolução (72/96/150/300), saída (pasta de imagens ou
    PDF único) e presets web/impressão; especificação abaixo.
 10. **Compartilhar o projeto (pacote):** "Exportar pacote..." em `.zip` com
