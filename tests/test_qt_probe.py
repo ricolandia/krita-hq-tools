@@ -44,6 +44,21 @@ class TestEscolhaDeQt(unittest.TestCase):
         self.instalar_krita("desconhecido")
         self.assertIsNone(qt_probe.versao_do_krita())
 
+    def test_krita_6_expoe_o_macro_numerico_do_qt(self):
+        # Medido no harness: o Krita 6.0.4 expõe QT_VERSION = 395264
+        # (0x060800 = Qt 6.8.0); pegar o primeiro dígito dava "3" e o plugin
+        # escolhia PyQt5, que o Krita 6 recusa — nenhum docker abria.
+        self.instalar_krita(395264)
+        self.assertEqual(qt_probe.versao_do_krita(), 6)
+        self.assertEqual(qt_probe.escolher(), 6)
+        # O macro do Qt 5 (0x050F07 = 5.15.7) também decodifica certo.
+        self.instalar_krita(331527)
+        self.assertEqual(qt_probe.versao_do_krita(), 5)
+        self.assertEqual(qt_probe.escolher(), 5)
+        # Inteiro simples continua valendo.
+        self.instalar_krita(6)
+        self.assertEqual(qt_probe.versao_do_krita(), 6)
+
     def test_sem_krita_usa_o_que_esta_no_processo(self):
         # Isto aqui é o caso dos testes e scripts: com PyQt5 já importado,
         # fixar PyQt6 criava widgets de um Qt que o processo não usa.

@@ -14,6 +14,27 @@ _PREFERENCIA = (6, 5)
 _NAO_INFORMADO = object()
 
 
+def _maior_do_qt(valor):
+    """Maior do Qt a partir do que o Krita expõe, ou ``None``.
+
+    Dois formatos medidos: o Krita 5 expõe a string da versão ("5.15.2") e o
+    **Krita 6.0.4 expõe o macro numérico** do Qt (``395264`` = ``0x060800`` =
+    Qt 6.8.0). Pegar o primeiro dígito do macro dava "3" e o plugin escolhia
+    PyQt5, que o Krita 6 recusa ("This version of Krita is not compatible with
+    PyQt5!") — nenhum docker abria.
+    """
+    if isinstance(valor, int):
+        return (valor >> 16) if valor > 0xFFFF else valor
+    texto = str(valor).strip()
+    if "." in texto:
+        texto = texto.split(".", 1)[0]
+    try:
+        numero = int(texto)
+    except (TypeError, ValueError):
+        return None
+    return (numero >> 16) if numero > 0xFFFF else numero
+
+
 def versao_do_krita():
     """Versão do Qt que o processo do Krita está usando, ou ``None``.
 
@@ -28,7 +49,7 @@ def versao_do_krita():
     except ImportError:
         return None
     try:
-        return int(str(QT_VERSION).strip()[0])
+        return _maior_do_qt(QT_VERSION)
     except (AttributeError, IndexError, TypeError, ValueError):
         return None
 
@@ -60,7 +81,9 @@ def versao_disponivel():
     return None
 
 
-def escolher(versao_krita=_NAO_INFORMADO, no_processo=_NAO_INFORMADO, disponivel=_NAO_INFORMADO):
+def escolher(
+    versao_krita=_NAO_INFORMADO, no_processo=_NAO_INFORMADO, disponivel=_NAO_INFORMADO
+):
     """Devolve 5 ou 6: qual binding de Qt o plugin deve usar.
 
     A ordem importa: o que o Krita disser ganha sempre, porque o processo já
