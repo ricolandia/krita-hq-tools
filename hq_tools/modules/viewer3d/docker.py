@@ -34,6 +34,7 @@ from ...core.compat import (
     IMAGE_FORMAT_RGBA8888,
     QImage,
     QSvgRenderer,
+    SIZE_IGNORED,
     TRANSPARENT,
     WA_NO_SYSTEM_BACKGROUND,
     WA_TRANSLUCENT_BACKGROUND,
@@ -414,6 +415,7 @@ class Viewer3DDocker(DockWidget):
         main, layout = ui.painel(self)
 
         self.preview = _Preview(self)
+        self.preview.setSizePolicy(SIZE_IGNORED, SIZE_IGNORED)
         layout.addWidget(self.preview, 1)
 
         layout.addWidget(
@@ -425,10 +427,10 @@ class Viewer3DDocker(DockWidget):
 
         self.tabs = widgets.QTabWidget()
         layout.addWidget(self.tabs, 1)
-        self.tabs.addTab(self._build_pose_tab(), i18n.t("Pose"))
-        self.tabs.addTab(self._build_maos_tab(), i18n.t("Mãos"))
-        self.tabs.addTab(self._build_camera_tab(), i18n.t("Câmera"))
-        self.tabs.addTab(self._build_insert_tab(), i18n.t("Inserir"))
+        self.tabs.addTab(ui.rolavel(self._build_pose_tab()), i18n.t("Pose"))
+        self.tabs.addTab(ui.rolavel(self._build_maos_tab()), i18n.t("Mãos"))
+        self.tabs.addTab(ui.rolavel(self._build_camera_tab()), i18n.t("Câmera"))
+        self.tabs.addTab(ui.rolavel(self._build_insert_tab()), i18n.t("Inserir"))
 
         self.setWidget(main)
 

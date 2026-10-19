@@ -220,9 +220,9 @@ class ProducaoDocker(DockWidget):
         projeto_layout = ui.espacamento(
             widgets.QVBoxLayout(group_projeto), margem=0, espaco=ui.GAP
         )
+        self.lbl_pasta = ui.rotulo_caminho("")
+        projeto_layout.addWidget(self.lbl_pasta)
         linha_pasta = widgets.QHBoxLayout()
-        self.lbl_pasta = ui.rotulo_info("")
-        linha_pasta.addWidget(self.lbl_pasta, 1)
         botao_pasta = ui.botao(
             i18n.t("Pasta..."),
             i18n.t("Escolhe a pasta do projeto (a mesma das páginas .kra)."),
@@ -243,6 +243,7 @@ class ProducaoDocker(DockWidget):
         )
         botao_atualizar.clicked.connect(self.recarregar)
         linha_pasta.addWidget(botao_atualizar)
+        linha_pasta.addStretch(1)
         projeto_layout.addLayout(linha_pasta)
         layout.addWidget(group_projeto)
         layout.addWidget(ui.separador())
@@ -257,7 +258,7 @@ class ProducaoDocker(DockWidget):
                 "Cole o roteiro aqui. Ctrl+Enter monta o checklist; 'Sintaxe...' mostra o formato."
             )
         )
-        self.caixa.setMinimumHeight(140)
+        self.caixa.setMinimumHeight(120)
         self.caixa.textChanged.connect(self._roteiro_editado)
         roteiro_layout.addWidget(self.caixa, 1)
         linha_botoes = widgets.QHBoxLayout()
@@ -307,6 +308,7 @@ class ProducaoDocker(DockWidget):
         self.arvore.setColumnWidth(1, 80)
         self.arvore.setColumnWidth(2, 80)
         self.arvore.setIconSize(QtCore.QSize(12, 12))
+        self.arvore.setMinimumHeight(100)
         self.arvore.itemClicked.connect(self._item_clicado)
         self.arvore.itemDoubleClicked.connect(self._item_duplo_clique)
         self.arvore.setContextMenuPolicy(CONTEXT_MENU)
@@ -349,9 +351,11 @@ class ProducaoDocker(DockWidget):
         self.meta.setSuffix(i18n.t(" painéis"))
         self.meta.valueChanged.connect(self._meta_mudou)
         linha_meta.addWidget(self.meta)
-        self.lbl_meta = ui.rotulo_info("")
-        linha_meta.addWidget(self.lbl_meta, 1)
+        linha_meta.addStretch(1)
         checklist_layout.addLayout(linha_meta)
+
+        self.lbl_meta = ui.rotulo_info("")
+        checklist_layout.addWidget(self.lbl_meta)
 
         self.lbl_progresso = ui.rotulo_info("")
         checklist_layout.addWidget(self.lbl_progresso)
@@ -370,7 +374,7 @@ class ProducaoDocker(DockWidget):
 
         dica = ui.rotulo(
             i18n.t(
-                "1) Cole o roteiro e use Ctrl+Enter. 2) Clique na coluna Estado para ciclar esboço, arte e final (botão direito define direto). 3) Duplo clique na página abre a pagina_NNN.kra. O roteiro.txt e o producao.json ficam na pasta do projeto."
+                "1) Cole o roteiro e use Ctrl+Enter. 2) Clique no Estado para ciclar (botão direito define direto). 3) Duplo clique abre a página. roteiro.txt e producao.json ficam na pasta do projeto."
             )
         )
         layout.addWidget(dica)
@@ -420,7 +424,8 @@ class ProducaoDocker(DockWidget):
         except OSError:
             pass
         if self._pasta_padrao():
-            self.lbl_pasta.setText(
+            self.lbl_pasta.setText(i18n.t("Escolha a pasta do projeto."))
+            self.lbl_pasta.setToolTip(
                 i18n.t(
                     'Escolha a pasta do projeto em "Pasta..." (salvando provisoriamente em {0}).'
                 ).format(pasta)

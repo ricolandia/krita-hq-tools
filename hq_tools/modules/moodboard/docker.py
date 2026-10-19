@@ -91,7 +91,7 @@ class MoodboardDocker(DockWidget):
             widgets.QVBoxLayout(group_folder), margem=0, espaco=ui.GAP
         )
         folder_row = widgets.QHBoxLayout()
-        self.lbl_folder = ui.rotulo_info("")
+        self.lbl_folder = ui.rotulo_caminho("")
         folder_row.addWidget(self.lbl_folder, 1)
         button_pick = ui.botao(
             i18n.t("Pasta..."),

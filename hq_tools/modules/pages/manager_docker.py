@@ -39,7 +39,7 @@ from ...core import i18n
 from ...core.thumbs import merged_bytes, thumbnail_pixmap
 from ..biblioteca import core as biblioteca_core
 from ..producao import core as producao_core
-from . import exportacao, generator, guias, modelos as modelos_lib, roteiro
+from . import exportacao, generator, guias, modelos as modelos_lib, nomes, roteiro
 
 ROTULO_ESTADO = {"esboco": "Esboço", "arte": "Arte", "final": "Final"}
 
@@ -603,21 +603,11 @@ class PagesDocker(DockWidget):
 
     def _proximo_indice_livre(self):
         """Próximo número de página livre (sem sobrescrever buracos)."""
-        import re as _re
-
-        numeros = []
         try:
-            nomes = os.listdir(self.folder)
+            arquivos = os.listdir(self.folder)
         except OSError:
-            nomes = []
-        for nome in nomes:
-            match = _re.search(r"pagina_(\d+)\.kra$", nome)
-            if match:
-                numeros.append(int(match.group(1)))
-        numero = 1
-        while numero in numeros:
-            numero += 1
-        return numero
+            arquivos = []
+        return nomes.proximo_indice_livre(arquivos)
 
     def _adaptar_modelo(self, document, fmt, width_px, height_px, dpi, strip_panels):
         """Redimensiona e/ou adapta o modelo ao formato pedido."""
@@ -718,9 +708,11 @@ class PagesDocker(DockWidget):
     def _refresh_model_label(self):
         modelo = self.config.get("pages.model") or ""
         if modelo and os.path.isfile(modelo):
-            self.lbl_model.setText(
-                i18n.t("Modelo: {0}").format(os.path.basename(modelo))
-            )
+            rotulo = os.path.basename(modelo)
+            if rotulo.startswith("modelo-") and rotulo.lower().endswith(".kra"):
+                slug = rotulo[len("modelo-") : -4]
+                rotulo = modelos_lib.nome_por_slug().get(slug, rotulo)
+            self.lbl_model.setText(i18n.t("Modelo: {0}").format(i18n.t(rotulo)))
         else:
             self.lbl_model.setText(i18n.t("Sem modelo definido (gera o padrão)."))
 
@@ -803,7 +795,7 @@ class PagesDocker(DockWidget):
                 rotulo = nomes_por_slug.get(slug_arquivo, nome)
                 caminho = os.path.join(MODELOS_DIR, nome)
                 if cmb.findData(caminho) < 0:
-                    cmb.addItem(i18n.t("HQ Tools: {0}").format(rotulo), caminho)
+                    cmb.addItem(i18n.t("HQ Tools: {0}").format(i18n.t(rotulo)), caminho)
         gerar_row = widgets.QHBoxLayout()
         button_gerar = ui.botao(
             i18n.t("Gerar modelos padrão do HQ Tools"),
@@ -818,7 +810,7 @@ class PagesDocker(DockWidget):
             gerados = self._gerar_modelos_padrao()
             for nome, caminho in gerados:
                 if cmb.findData(caminho) < 0:
-                    cmb.addItem(i18n.t("HQ Tools: {0}").format(nome), caminho)
+                    cmb.addItem(i18n.t("HQ Tools: {0}").format(i18n.t(nome)), caminho)
             helpers.show_info(
                 i18n.t("Modelo de página"),
                 i18n.t("{0} modelos gerados em {1}.").format(len(gerados), MODELOS_DIR),
@@ -1337,6 +1329,12 @@ class PagesDocker(DockWidget):
             numero = self._proximo_indice_livre()
             nome = "pagina_{0:03d}.kra".format(numero)
             destino = os.path.join(self.folder, nome)
+            # Rede de segurança: um arquivo fora do padrão (ou uma pasta
+            # case-insensitive) não pode ser sobrescrito pela cópia.
+            while os.path.exists(destino):
+                numero += 1
+                nome = "pagina_{0:03d}.kra".format(numero)
+                destino = os.path.join(self.folder, nome)
             relative = nome
         try:
             shutil.copy2(origem, destino)

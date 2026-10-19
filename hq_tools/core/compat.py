@@ -51,6 +51,13 @@ if _USAR_PYQT6:  # Krita 6
     KEY_RETURN = QtCore.Qt.Key.Key_Return
     KEY_ENTER = QtCore.Qt.Key.Key_Enter
     CONTROL_MODIFIER = QtCore.Qt.KeyboardModifier.ControlModifier
+    ELIDE_MIDDLE = QtCore.Qt.TextElideMode.ElideMiddle
+    FRAME_NOFRAME = QtWidgets.QFrame.Shape.NoFrame
+    PALETTE_NO_ROLE = QtGui.QPalette.ColorRole.NoRole
+    SIZE_IGNORED = QtWidgets.QSizePolicy.Policy.Ignored
+    SIZE_PREFERRED = QtWidgets.QSizePolicy.Policy.Preferred
+    TEXT_PLAIN = QtCore.Qt.TextFormat.PlainText
+    TEXT_SELECTABLE = QtCore.Qt.TextInteractionFlag.TextSelectableByMouse
 else:  # Krita 5.x
     from PyQt5 import QtCore, QtGui, QtWidgets
     from PyQt5.QtCore import pyqtSignal, pyqtSlot
@@ -85,6 +92,13 @@ else:  # Krita 5.x
     KEY_RETURN = QtCore.Qt.Key_Return
     KEY_ENTER = QtCore.Qt.Key_Enter
     CONTROL_MODIFIER = QtCore.Qt.ControlModifier
+    ELIDE_MIDDLE = QtCore.Qt.ElideMiddle
+    FRAME_NOFRAME = QtWidgets.QFrame.NoFrame
+    PALETTE_NO_ROLE = QtGui.QPalette.NoRole
+    SIZE_IGNORED = QtWidgets.QSizePolicy.Ignored
+    SIZE_PREFERRED = QtWidgets.QSizePolicy.Preferred
+    TEXT_PLAIN = QtCore.Qt.PlainText
+    TEXT_SELECTABLE = QtCore.Qt.TextSelectableByMouse
 
 QImage = QtGui.QImage
 QIcon = QtGui.QIcon
@@ -208,4 +222,11 @@ __all__ = [
     "KEY_RETURN",
     "KEY_ENTER",
     "CONTROL_MODIFIER",
+    "ELIDE_MIDDLE",
+    "FRAME_NOFRAME",
+    "PALETTE_NO_ROLE",
+    "SIZE_IGNORED",
+    "SIZE_PREFERRED",
+    "TEXT_PLAIN",
+    "TEXT_SELECTABLE",
 ]

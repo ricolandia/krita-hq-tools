@@ -14,6 +14,8 @@ não cria o arquivo).
 
 import os
 
+from ...core import i18n
+
 RESOLUCOES = (72, 96, 150, 300)
 FORMATOS = ("png", "jpg")
 
@@ -46,11 +48,11 @@ def dimensoes_reamostradas(largura, altura, dpi_pagina, dpi_pedido):
 def preparar_destino(pasta):
     """Cria a pasta de destino; devolve ``None`` ou a mensagem de erro."""
     if not pasta:
-        return "pasta de destino vazia"
+        return i18n.t("pasta de destino vazia")
     try:
         os.makedirs(pasta, exist_ok=True)
     except OSError as erro:
         return str(erro)
     if not os.path.isdir(pasta):
-        return "não é uma pasta: {0}".format(pasta)
+        return i18n.t("não é uma pasta: {0}").format(pasta)
     return None

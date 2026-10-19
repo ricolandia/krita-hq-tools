@@ -104,6 +104,7 @@ def strings_usadas():
     usadas |= _rotulos_do_ast(
         PACOTE / "modules/pages/manager_docker.py", "FORMATO_ITENS", 1
     )
+    usadas |= _rotulos_do_ast(PACOTE / "modules/pages/modelos.py", "MODELOS", 0)
     usadas |= _rotulos_do_ast(
         PACOTE / "modules/biblioteca/docker.py", "MODOS_CAMADA", 0
     )

@@ -55,7 +55,7 @@ def ensure_default_folder(config):
 class OnomatopoeiasDocker(DockWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(i18n.t('HQ Tools: onomatopeias'))
+        self.setWindowTitle(i18n.t("HQ Tools: onomatopeias"))
         registro.registrar("onomatopeias", self)
         self.config = Config()
         self.folder = ensure_default_folder(self.config)
@@ -70,16 +70,21 @@ class OnomatopoeiasDocker(DockWidget):
         main, layout = ui.painel(self)
 
         folder_row = widgets.QHBoxLayout()
-        self.lbl_folder = ui.rotulo_info("")
+        self.lbl_folder = ui.rotulo_caminho("")
         folder_row.addWidget(self.lbl_folder, 1)
         button_pick = ui.botao(
-            i18n.t('Pasta...'),
-            i18n.t('Escolhe a pasta de modelos de onomatopeia; use Atualizar depois de adicionar SVGs.'),
+            i18n.t("Pasta..."),
+            i18n.t(
+                "Escolhe a pasta de modelos de onomatopeia; use Atualizar depois de adicionar SVGs."
+            ),
             icone_chave="pasta",
         )
         button_pick.clicked.connect(self.pick_folder)
         folder_row.addWidget(button_pick)
-        button_open = ui.botao(i18n.t('Abrir'), i18n.t('Abre a pasta de modelos no explorador de arquivos.'))
+        button_open = ui.botao(
+            i18n.t("Abrir"),
+            i18n.t("Abre a pasta de modelos no explorador de arquivos."),
+        )
         button_open.clicked.connect(self.open_folder)
         folder_row.addWidget(button_open)
         layout.addLayout(folder_row)
@@ -95,26 +100,32 @@ class OnomatopoeiasDocker(DockWidget):
 
         buttons = widgets.QHBoxLayout()
         button_insert = ui.botao(
-            i18n.t('Inserir onomatopeia'), i18n.t('Insere o modelo selecionado na camada ativa.')
+            i18n.t("Inserir onomatopeia"),
+            i18n.t("Insere o modelo selecionado na camada ativa."),
         )
         button_insert.clicked.connect(self.insert_effect)
         buttons.addWidget(button_insert)
         button_refresh = ui.botao(
-            i18n.t('Atualizar'), i18n.t('Relê os modelos da pasta atual.'), icone_chave="atualizar"
+            i18n.t("Atualizar"),
+            i18n.t("Relê os modelos da pasta atual."),
+            icone_chave="atualizar",
         )
         button_refresh.clicked.connect(self.refresh)
         buttons.addWidget(button_refresh)
         layout.addLayout(buttons)
 
         hint = ui.rotulo(
-            i18n.t('Crie os seus modelos no Inkscape (texto + formas) e salve na pasta acima como SVG. Clique duas vezes para inserir no grupo ativo.'))
+            i18n.t(
+                "Crie os seus modelos no Inkscape (texto + formas) e salve na pasta acima como SVG. Clique duas vezes para inserir no grupo ativo."
+            )
+        )
         layout.addWidget(hint)
 
         self.setWidget(main)
 
     def pick_folder(self):
         folder = QtWidgets.QFileDialog.getExistingDirectory(
-            self.widget(), i18n.t('Pasta de onomatopeias'), self.folder
+            self.widget(), i18n.t("Pasta de onomatopeias"), self.folder
         )
         if folder:
             self.folder = folder
@@ -125,14 +136,14 @@ class OnomatopoeiasDocker(DockWidget):
         QtGui.QDesktopServices.openUrl(QtCore.QUrl.fromLocalFile(self.folder))
 
     def refresh(self):
-        self.lbl_folder.setText(i18n.t('Pasta: {0}').format(self.folder))
+        self.lbl_folder.setText(i18n.t("Pasta: {0}").format(self.folder))
         self.list_items.clear()
         try:
             names = sorted(os.listdir(self.folder))
         except OSError as erro:
             names = []
             self.lbl_folder.setText(
-                i18n.t('Pasta: {0} (não pôde ser lida: {1})').format(self.folder, erro)
+                i18n.t("Pasta: {0} (não pôde ser lida: {1})").format(self.folder, erro)
             )
         for name in names:
             if not name.lower().endswith(".svg"):
@@ -154,22 +165,24 @@ class OnomatopoeiasDocker(DockWidget):
     def _insert_effect(self):
         document = helpers.active_document()
         if document is None:
-            helpers.show_message(i18n.t('Abra um documento para inserir a onomatopeia.'))
+            helpers.show_message(
+                i18n.t("Abra um documento para inserir a onomatopeia.")
+            )
             return
         item = self.list_items.currentItem()
         if item is None:
-            helpers.show_message(i18n.t('Escolha uma onomatopeia na lista.'))
+            helpers.show_message(i18n.t("Escolha uma onomatopeia na lista."))
             return
         path = item.data(USER_ROLE)
         try:
             svg = helpers.read_text_file(path)
         except OSError:
-            helpers.show_message(i18n.t('Não foi possível ler o arquivo.'))
+            helpers.show_message(i18n.t("Não foi possível ler o arquivo."))
             return
         name = helpers.unique_layer_name(document, item.text())
         layer = document.createVectorLayer(name)
         if layer is None:
-            helpers.show_message(i18n.t('Não foi possível criar a camada vetorial.'))
+            helpers.show_message(i18n.t("Não foi possível criar a camada vetorial."))
             return
         shapes = layer.addShapesFromSvg(svg)
         if not shapes:
@@ -180,7 +193,9 @@ class OnomatopoeiasDocker(DockWidget):
             except (AttributeError, RuntimeError):
                 pass
             helpers.show_message(
-                i18n.t('O SVG não gerou formas. Verifique o arquivo (use texto e formas).')
+                i18n.t(
+                    "O SVG não gerou formas. Verifique o arquivo (use texto e formas)."
+                )
             )
             return
         tinha_selecao = helpers.has_selection(document)
@@ -190,4 +205,4 @@ class OnomatopoeiasDocker(DockWidget):
         document.refreshProjection()
         if tinha_selecao:
             helpers.deselect(document)
-        helpers.show_message(i18n.t('Onomatopeia inserida: {0}').format(item.text()))
+        helpers.show_message(i18n.t("Onomatopeia inserida: {0}").format(item.text()))

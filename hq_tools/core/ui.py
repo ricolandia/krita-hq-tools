@@ -17,8 +17,15 @@ import collections
 import os
 
 from .compat import (
+    ELIDE_MIDDLE,
     FRAME_HLINE,
+    FRAME_NOFRAME,
     IMAGE_FORMAT_ARGB32,
+    PALETTE_NO_ROLE,
+    SIZE_IGNORED,
+    SIZE_PREFERRED,
+    TEXT_PLAIN,
+    TEXT_SELECTABLE,
     TRANSPARENT,
     QImage,
     QPixmap,
@@ -98,6 +105,69 @@ def rotulo_info(texto="", dica=None, pai=None):
     widget = rotulo(texto, dica, pai)
     widget.setMinimumWidth(0)
     return widget
+
+
+class _RotuloCaminho(QtWidgets.QLabel):
+    """Caminho em uma linha: elide no meio quando falta espaço.
+
+    Caminho longo não tem espaço para quebrar (``/home/.../hq_tools``), então
+    o ``wordWrap`` do ``rotulo_info`` deixava o rótulo com três ou quatro
+    linhas e empurrava o resto do docker para baixo. Aqui o texto fica em uma
+    linha, com o caminho inteiro no tooltip e selecionável para copiar.
+    """
+
+    def __init__(self, texto="", dica=None, pai=None):
+        super().__init__(pai)
+        self._dica = dica
+        self._texto = ""
+        self.setWordWrap(False)
+        self.setMinimumWidth(0)
+        self.setTextFormat(TEXT_PLAIN)
+        self.setTextInteractionFlags(TEXT_SELECTABLE)
+        self.setSizePolicy(SIZE_IGNORED, SIZE_PREFERRED)
+        self.setText(texto)
+
+    def setText(self, texto):
+        self._texto = str(texto)
+        self.setToolTip(self._dica or self._texto)
+        self._elidir()
+
+    def _elidir(self):
+        largura = max(24, self.width())
+        super().setText(
+            self.fontMetrics().elidedText(self._texto, ELIDE_MIDDLE, largura)
+        )
+
+    def resizeEvent(self, evento):
+        super().resizeEvent(evento)
+        self._elidir()
+
+
+def rotulo_caminho(texto="", dica=None, pai=None):
+    """Rótulo de caminho em uma linha, com o texto inteiro no tooltip."""
+    return _RotuloCaminho(texto, dica, pai)
+
+
+def rolavel(widget, pai=None):
+    """Põe um conteúdo longo dentro de uma área rolável.
+
+    O mínimo de altura de um formulário longo (Retículas tem 860 px) vira o
+    mínimo do docker inteiro e não cabe em tela de 768 px. Com a área rolável,
+    o docker encolhe e o conteúdo continua acessível pela barra. O fundo e a
+    moldura seguem o tema do Krita (sem QSS).
+    """
+    area = QtWidgets.QScrollArea(pai)
+    area.setWidgetResizable(True)
+    area.setFrameShape(FRAME_NOFRAME)
+    area.setBackgroundRole(PALETTE_NO_ROLE)
+    area.viewport().setAutoFillBackground(False)
+    area.setWidget(widget)
+    # Mantém a largura mínima do conteúdo: assim não aparece barra horizontal
+    # nem campo cortado na lateral. O que ganha rolagem é só a altura.
+    minimo = widget.minimumSizeHint().width()
+    if minimo > 0:
+        area.setMinimumWidth(minimo)
+    return area
 
 
 # Cache das miniaturas de SVG: as listas redesenham a cada refresh e o mesmo
