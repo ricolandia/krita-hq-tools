@@ -1,8 +1,8 @@
 # Auditoria de 19/10/2026: bugs, interface, i18n e performance
 
 Auditoria do plugin depois da v0.25.0, com foco no que o autor pediu: bugs,
-polimento de interface, experiência de uso e desempenho. Sem recurso novo e
-sem release: o que entrou são correções e ajustes de layout.
+polimento de interface, experiência de uso e desempenho. Sem recurso novo: o
+que entrou são correções e ajustes de layout, publicados como **v0.25.1**.
 
 ## Método
 
