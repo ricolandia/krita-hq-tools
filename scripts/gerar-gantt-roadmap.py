@@ -36,9 +36,11 @@ COR_MEDIO = "#ffec99"
 COR_NEUTRO = "#e9ecef"
 
 TITULO = "Roadmap HQ Tools"
-SUBTITULO = "Atualizado em 17/10/2026 — próximo: Krita 6 e clique direto no canvas"
-FEITO = "Feito: v0.1 a v0.22 (poses, perspectiva ×16, luz/Toon, aba Mãos, polimento)"
-PRIORIDADE = "Próximo: Krita 6 · clique direto no canvas"
+SUBTITULO = (
+    "Atualizado em 19/10/2026 — paridade K5/K6 feita; próximo: clique direto no canvas"
+)
+FEITO = "Feito: v0.1 a v0.25 (poses, perspectiva ×16, luz/Toon, aba Mãos, exportação, gerenciador, Krita 6)"
+PRIORIDADE = "Próximo: clique direto no canvas · acervo do autor (mais balões, caudas, onomatopeias e poses)"
 FORA_DO_ROADMAP = (
     "Fora do roadmap original (já feito): UI compartilhada, ícone/social preview, "
     "vídeos demo, CI Windows,\nautomação de release, auditorias (30/09, 05/10, "
@@ -55,11 +57,23 @@ TAREFAS = (
         COR_RAPIDO,
         "3 dias",
     ),
-    ("Krita 6: validação e ferramentas novas", 8, 12, COR_FUNDACAO, "5 dias"),
-    ("Lettering nas páginas geradas (balões + fontes)", 13, 17, COR_MEDIO, "5 dias"),
+    ("Krita 6: suporte e paridade K5/K6 (feito)", 8, 14, COR_RAPIDO, "feito"),
+    (
+        "Acervo do autor: mais balões, caudas, onomatopeias e poses",
+        13,
+        17,
+        COR_NEUTRO,
+        "autor",
+    ),
     ("Clique direto no canvas (PoC)", 18, 20, COR_RAPIDO, "3 dias"),
     ("Fillbucket em Python puro (sem numpy)", 21, 26, COR_MEDIO, "6 dias"),
-    ("Balão paramétrico (pós-Krita 6)", 27, 30, COR_MEDIO, "4 dias"),
+    (
+        "Balão paramétrico (adiado: quando o 6 for o dia a dia)",
+        27,
+        30,
+        COR_MEDIO,
+        "4 dias",
+    ),
     (
         "Avaliar e decidir (painel, bundle, exportação, pacote)",
         24,

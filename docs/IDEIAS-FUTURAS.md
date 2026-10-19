@@ -10,6 +10,12 @@ joinha, que o autor vai refazer). O estado completo, com o que já foi feito e
 o que vem, está na seção "Roadmap reavaliado" abaixo; a linha do tempo viva é
 a da nota do roadmap no Trilium.
 
+**Atualização de 19/10/2026:** Krita 6 suportado e paridade K5/K6 validada;
+balão paramétrico adiado (quando o 6 for o dia a dia); lettering automático
+descartado (engessa o artista); o autor vai criar mais balões, caudas,
+onomatopeias e poses, e o plugin foca em organizar esse acervo
+(`docs/COMPARATIVO-SOFTWARES.md`).
+
 ## Roadmap reavaliado (05/10/2026)
 
 ### Feito até agora (dentro e fora do roadmap original)
@@ -119,8 +125,9 @@ inserida num painel dentro de uma seleção. Decisões e achados:
 3. **Krita 6 (foco atual, 18/10):** validar o plugin no PyQt6 (pré-requisito
    do balão paramétrico) e conferir dockers e i18n no 6 — correções no
    `compat`, com o Krita 5 sempre verde.
-4. **Lettering nas páginas geradas:** usar os balões e as fontes do kit no
-   lugar do texto sans-serif do storyboard.
+4. **Acervo (conteúdo do autor, 19/10):** o autor vai criar mais balões,
+   caudas, onomatopeias e poses. O plugin cuida de organizar, mostrar,
+   inserir e gerenciar esse acervo; não gera nem decide o conteúdo.
 5. **Clique direto no canvas:** PoC de ~20 linhas (event filter no
    `canvasWidget` + transformações do Canvas); destrava o balde por clique e
    a cauda arrastável.
@@ -153,10 +160,17 @@ inserida num painel dentro de uma seleção. Decisões e achados:
     v0.15; avaliar junto com o clique direto.
 12. **Duplo clique no painel com zoom:** abrir a `pagina_NNN.kra` já focando o
     painel (depende do clique direto no canvas).
+13. **Melhorias do acervo (avaliar, 19/10):** busca/filtro/favoritos nos
+    dockers de balões, onomatopeias, biblioteca e poses; importação em lote
+    com validação; exportar/importar a biblioteca própria; regenerar a máscara
+    dos painéis depois de editá-los. Comparação com CSP, MediBang, Comic Life e
+    o Krita nativo em `docs/COMPARATIVO-SOFTWARES.md`; nenhum item entra sem o
+    autor decidir.
 
 **Fora de escopo (mantido):** exportação webtoon (Batch Exporter cobre),
 preflight de impressão (Scribus), rotas B/C do 3D (Blender Layer e pose
-makers web) e apagador vetorial por interseção.
+makers web), apagador vetorial por interseção e **lettering automático nas
+páginas geradas** (descartado em 19/10 por engessar o artista).
 
 ### Exportação de páginas (amadurecer, adiada em 05/10/2026)
 
@@ -339,10 +353,10 @@ paramétrico.
 - **Miniatura na produção** (na coluna do arquivo): não é prioridade e talvez
   nem precise entrar (autor, 08/10); o cache de miniaturas já existe para
   quando fizer sentido.
-- **Lettering nas páginas geradas**: o gerador desenha as falas como `<text>`
-  sans-serif simples; usar os balões e as fontes do kit deixaria o storyboard
-  mais perto da arte final. Parente do item "Atualizar textos das páginas
-  geradas" (SESSION.md).
+- **Lettering automático nas páginas geradas**: **descartado pelo autor em
+  19/10** porque engessa o artista. O texto simples do storyboard fica como
+  está; o lettering é decisão manual na arte. O foco do acervo é o autor
+  criar mais balões, caudas, onomatopeias e poses.
 - **Preset de "estilo de painel"**: um clique aplica sombra + contorno +
   retícula coerentes na página, reaproveitando os presets do módulo de
   retículas. Diferente da "hachura por presets de pincel", que é desenho à
