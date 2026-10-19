@@ -1,5 +1,57 @@
 # Changelog
 
+## [0.25.1] — 2026-10-19
+
+**Auditoria de 19/10**: correções de robustez, polimento de interface e
+i18n, sem recurso novo.
+
+- **Duplicar página** não escolhe mais um número ocupado quando o arquivo está
+  em maiúsculas (`Pagina_005.KRA`): a numeração agora ignora
+  maiúsculas/minúsculas e a cópia confere o destino antes de gravar (no
+  Windows isso podia sobrescrever a página existente). Sete testes novos.
+- **Dockers que não cabiam em tela de 768 px**: as abas de Retículas e 3D
+  ficaram roláveis (altura mínima de 939 para 147 px e de 895 para 445 px) e
+  o preview do 3D se adapta ao espaço.
+- **Produção** reorganizada: o caminho da pasta em uma linha própria, a
+  projeção da meta sem corte e a árvore do checklist com altura mínima
+  (mínimo do docker: 356x711).
+- **Caminhos longos** em balões, onomatopeias, biblioteca, moodboard e
+  produção agora usam uma linha com elipse no meio, caminho inteiro no
+  tooltip e texto selecionável.
+- **i18n**: nomes dos modelos de página (A4 padrão, tirinhas, grades),
+  retícula padrão e erros de destino da exportação traduzidos; seis
+  checkboxes ganharam dica; o teste de i18n passou a cobrir os modelos.
+- **Performance medida**: 3D 700x700 com pose cacheada em 5,2 ms (chapado),
+  6,6 ms (sombreado) e 6,1 ms (toon); gerenciador com 200 páginas em 0,18 s
+  (frio) e 0,01 s (quente); os 12 dockers montam em 134 ms.
+- Validado no Krita 5.3.4 e no 6.0.4 (12 dockers), com 455 testes, lint e
+  packs verdes.
+
+**English:** **19/10 audit**: robustness, interface and i18n fixes, no new
+features.
+
+- **Duplicating a page** no longer picks an occupied number when the file is
+  uppercase (`Pagina_005.KRA`): numbering is case-insensitive and the copy
+  checks the destination before writing (on Windows this could overwrite the
+  existing page). Seven new tests.
+- **Dockers that did not fit a 768 px screen**: the Screentone and 3D tabs are
+  now scrollable (minimum height from 939 to 147 px and from 895 to 445 px)
+  and the 3D preview adapts to the available space.
+- **Production** reorganized: the folder path on its own line, the weekly goal
+  projection no longer clipped and the checklist tree with a minimum height
+  (docker minimum: 356x711).
+- **Long paths** in balloons, onomatopoeias, library, moodboard and production
+  now use one line with a middle ellipsis, the full path in the tooltip and
+  selectable text.
+- **i18n**: page model names (A4 default, strips, grids), default screentone
+  name and export destination errors translated; six checkboxes gained
+  tooltips; the i18n test now covers the models.
+- **Measured performance**: 3D 700x700 with cached pose at 5.2 ms (flat),
+  6.6 ms (shaded) and 6.1 ms (toon); manager with 200 pages at 0.18 s (cold)
+  and 0.01 s (warm); the 12 dockers mount in 134 ms.
+- Validated on Krita 5.3.4 and 6.0.4 (12 dockers), with 455 tests, lint and
+  packs green.
+
 ## [0.25.0] — 2026-10-18
 
 **Suporte ao Krita 6**: o mesmo ZIP agora roda no **Krita 5.3.4 e no Krita
