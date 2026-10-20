@@ -115,6 +115,20 @@ class TestContrato(unittest.TestCase):
         ui.botao("Ver licença", "Abre a licença do pack.")
         self.assertEqual([], self.qt.chamadas("connect"))
 
+    def test_painel_tem_rodape_com_versao_e_link(self):
+        from hq_tools.core.version import __version__
+
+        ui.painel()
+        rotulos = [item[2][0] for item in self.qt.criados("QLabel")]
+        self.assertTrue(
+            any("HQ Tools v{0}".format(__version__) in str(texto) for texto in rotulos),
+            "o rodapé precisa mostrar a versão instalada",
+        )
+        self.assertTrue(
+            any(ui.RELEASES_URL in str(texto) for texto in rotulos),
+            "o rodapé precisa linkar a última release",
+        )
+
     def test_dica_e_argumento_obrigatorio(self):
         # Se algum dia `dica` ganhar valor padrão, a trava some em silêncio.
         import inspect
@@ -160,8 +174,9 @@ class TestContrato(unittest.TestCase):
 
     def test_painel_devolve_widget_e_layout(self):
         widget, layout = ui.painel()
+        # Um layout externo (conteúdo + rodapé) e o interno do conteúdo.
         self.assertEqual(
-            ["QWidget", "QVBoxLayout"],
+            ["QWidget", "QVBoxLayout", "QVBoxLayout"],
             [c[1] for c in self.qt.criados("QWidget") + self.qt.criados("QVBoxLayout")],
         )
 

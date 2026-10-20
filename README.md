@@ -118,6 +118,10 @@ Krita. Se instalou pelo ZIP, copie o `hq_tools.action` (dentro do ZIP) para
 Configurar Krita > Atalhos (o `install-dev.sh` faz isso sozinho). Os dockers
 ficam em Configurações > Dockers com o prefixo "HQ Tools"; para agrupá-los
 como abas de um mesmo painel, arraste um docker sobre o outro (o Krita junta
+
+**Atualização:** o rodapé de cada doca mostra a versão instalada e o link
+"Verificar atualização", que abre a última release no GitHub. A checagem é
+manual; o plugin não consulta a internet nem baixa arquivos sozinho.
 automaticamente; você pode desagrupar quando quiser).
 
 ## Uso rápido

@@ -770,4 +770,7 @@ TRADUCOES = {
     "Nomeia a camada como 'text', a convenção que o CPMT lê na exportação.": "Names the layer 'text', the convention CPMT reads on export.",
     "pasta de destino vazia": "empty destination folder",
     "não é uma pasta: {0}": "not a folder: {0}",
+    "Verificar atualização": "Check for update",
+    "Abre a última release no GitHub. A atualização é manual.": "Opens the latest release on GitHub. Updating is manual.",
+    "Versão instalada do HQ Tools.": "Installed HQ Tools version.",
 }

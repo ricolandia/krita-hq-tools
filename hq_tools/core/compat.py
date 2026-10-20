@@ -58,6 +58,7 @@ if _USAR_PYQT6:  # Krita 6
     SIZE_PREFERRED = QtWidgets.QSizePolicy.Policy.Preferred
     TEXT_PLAIN = QtCore.Qt.TextFormat.PlainText
     TEXT_SELECTABLE = QtCore.Qt.TextInteractionFlag.TextSelectableByMouse
+    TEXT_BROWSER_INTERACTION = QtCore.Qt.TextInteractionFlag.TextBrowserInteraction
     WINDING_FILL = QtCore.Qt.FillRule.WindingFill
 else:  # Krita 5.x
     from PyQt5 import QtCore, QtGui, QtWidgets
@@ -100,6 +101,7 @@ else:  # Krita 5.x
     SIZE_PREFERRED = QtWidgets.QSizePolicy.Preferred
     TEXT_PLAIN = QtCore.Qt.PlainText
     TEXT_SELECTABLE = QtCore.Qt.TextSelectableByMouse
+    TEXT_BROWSER_INTERACTION = QtCore.Qt.TextBrowserInteraction
     WINDING_FILL = QtCore.Qt.WindingFill
 
 QImage = QtGui.QImage
@@ -231,5 +233,6 @@ __all__ = [
     "SIZE_PREFERRED",
     "TEXT_PLAIN",
     "TEXT_SELECTABLE",
+    "TEXT_BROWSER_INTERACTION",
     "WINDING_FILL",
 ]

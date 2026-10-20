@@ -24,6 +24,7 @@ from .compat import (
     PALETTE_NO_ROLE,
     SIZE_IGNORED,
     SIZE_PREFERRED,
+    TEXT_BROWSER_INTERACTION,
     TEXT_PLAIN,
     TEXT_SELECTABLE,
     TRANSPARENT,
@@ -35,6 +36,11 @@ from .compat import (
     standard_icon,
 )
 from .paths import ICONE_PATH
+from .version import __version__
+from . import i18n
+
+# Endereço do rodapé de cada doca: sempre a última release publicada.
+RELEASES_URL = "https://github.com/ricolandia/krita-hq-tools/releases/latest"
 
 # Escala de espaçamento do DESIGN.md (seção 4), recortada para o que cabe num
 # docker estreito: 4 entre controles, 8 entre linhas, 12 na borda do painel.
@@ -240,10 +246,31 @@ def espacamento(layout, margem=MARGEM, espaco=GAP):
     return layout
 
 
+def _rodape():
+    """Versão instalada e link manual para a última release, no pé da doca."""
+    linha = QtWidgets.QHBoxLayout()
+    linha.setContentsMargins(0, 0, 0, 0)
+    linha.setSpacing(GAP)
+    versao = QtWidgets.QLabel("HQ Tools v{0}".format(__version__))
+    versao.setToolTip(i18n.t("Versão instalada do HQ Tools."))
+    link = QtWidgets.QLabel(
+        '<a href="{0}">{1}</a>'.format(RELEASES_URL, i18n.t("Verificar atualização"))
+    )
+    link.setOpenExternalLinks(True)
+    link.setTextInteractionFlags(TEXT_BROWSER_INTERACTION)
+    link.setToolTip(i18n.t("Abre a última release no GitHub. A atualização é manual."))
+    linha.addWidget(versao)
+    linha.addStretch(1)
+    linha.addWidget(link)
+    return linha
+
+
 def painel(pai=None, margem=MARGEM, espaco=GAP):
     """``(widget, layout vertical)`` já com o espaçamento da casa.
 
-    Os dockers abriam com as mesmas duas linhas; agora abrem com uma.
+    Os dockers abriam com as mesmas duas linhas; agora abrem com uma. O
+    conteúdo fica num layout interno com esticamento e o rodapé (versão e
+    link da release) fica sempre no pé, fora do conteúdo.
     """
     widget = QtWidgets.QWidget(pai)
     if os.path.isfile(ICONE_PATH):
@@ -251,5 +278,8 @@ def painel(pai=None, margem=MARGEM, espaco=GAP):
         widget.setWindowIcon(icone)
         if pai is not None:
             pai.setWindowIcon(icone)
-    layout = QtWidgets.QVBoxLayout(widget)
-    return widget, espacamento(layout, margem, espaco)
+    externo = espacamento(QtWidgets.QVBoxLayout(widget), margem, espaco)
+    conteudo = espacamento(QtWidgets.QVBoxLayout(), 0, espaco)
+    externo.addLayout(conteudo, 1)
+    externo.addLayout(_rodape())
+    return widget, conteudo

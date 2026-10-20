@@ -121,6 +121,10 @@ The dockers live in Settings > Dockers with the "HQ Tools" prefix; to group
 them as tabs of one panel, drag one docker over another (Krita merges them
 automatically, and you can ungroup whenever you want).
 
+**Updating:** the footer of every docker shows the installed version and a
+"Check for update" link that opens the latest release on GitHub. The check is
+manual; the plugin does not access the internet or download files by itself.
+
 ## Quick start
 
 1. **Screentone**: "HQ Tools: screentones" docker, pick a preset (e.g. medium

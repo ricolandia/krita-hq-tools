@@ -112,6 +112,14 @@ Full credits and licenses in `CREDITS.en.md`. Everything installed into Krita's
 resources (fonts, patterns, palettes, packs) requires restarting the program
 to show up.
 
+## Updating the plugin
+
+The footer of every docker shows the installed version and a "Check for
+update" link that opens the latest release on GitHub. The check is manual:
+download the new ZIP and import it via Tools > Scripts > Import Python Plugin
+from File (or replace the plugin folder) and restart Krita. The plugin does
+not update itself.
+
 ## Uninstall
 
 1. In Configure Krita > Python Plugin Manager, uncheck HQ Tools.

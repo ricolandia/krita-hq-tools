@@ -112,6 +112,14 @@ Créditos e licenças completos em `CREDITS.md`. Tudo que é instalado nos
 recursos do Krita (fontes, padrões, paletas, packs) exige reiniciar o
 programa para aparecer.
 
+## Atualizar o plugin
+
+O rodapé de cada doca mostra a versão instalada e o link "Verificar
+atualização", que abre a última release no GitHub. A checagem é manual: baixe
+o ZIP novo e importe em Ferramentas > Scripts > Importar plugin Python (ou
+substitua a pasta do plugin) e reinicie o Krita. O plugin não se atualiza
+sozinho.
+
 ## Desinstalação
 
 1. Em Configurar Krita > Gerenciador de plugins Python, desmarque HQ Tools.
