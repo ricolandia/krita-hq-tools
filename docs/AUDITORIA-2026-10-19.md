@@ -135,8 +135,8 @@ no render cheio. O slider de luz continua no render cheio, porque a silhueta
 não mostraria a luz.
 
 Medido no Krita 5.3.4 e no 6.0.4: gesto ~8 a 14 ms (antes ~25 a 30 ms) e
-flutuante com +0,4 ms no 5 e +1,6 ms no 6. 463 testes e lint verdes. Sem
-release até o autor pedir.
+flutuante com +0,4 ms no 5 e +1,6 ms no 6. 463 testes e lint verdes.
+Publicado como **v0.25.2** em 20/10.
 
 ## Validação
 
