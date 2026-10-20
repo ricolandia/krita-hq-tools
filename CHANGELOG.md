@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.25.2] — 2026-10-20
+
+**Preview rápido no 3D:** o preview do visualizador voltou a responder no
+arrasto depois do ganho de espaço da v0.25.1. Durante órbita, pan, zoom e
+sliders de pose, o manequim é desenhado como silhueta chapada direto com
+`QPainter`, sem SVG e sem antialias; 180 ms depois do último movimento, o
+render cheio em SVG volta. O render parado é limitado a 720 px no maior lado e
+ampliado acima disso.
+
+O flutuante sobre a página acompanha o gesto com a mesma silhueta (escala da
+imagem principal) e volta ao sombreado no render cheio; a camada inserida
+continua no render cheio. O slider de luz permanece no render cheio, porque a
+silhueta não mostraria a luz. Medido no Krita 5.3.4 e no 6.0.4: gesto de ~8 a
+14 ms (antes ~25 a 30 ms) e flutuante com +0,4 ms no 5 e +1,6 ms no 6. 463
+testes e lint verdes.
+
+**English:** **Fast 3D preview:** the viewer preview is responsive while
+dragging again after the extra space gained in v0.25.1. During orbit, pan,
+zoom and pose sliders, the mannequin is drawn as a flat silhouette directly
+with `QPainter`, without SVG and without antialiasing; 180 ms after the last
+movement, the full SVG render returns. The idle render is capped at 720 px on
+the longest side and upscaled above that.
+
+The floating preview over the page follows the gesture with the same
+silhouette (scaled from the main image) and returns to shading on the full
+render; the inserted layer remains full quality. The light slider stays on the
+full render, since the silhouette would not show the light. Measured on Krita
+5.3.4 and 6.0.4: gesture ~8 to 14 ms (previously ~25 to 30 ms) and floating
+preview +0.4 ms on 5 and +1.6 ms on 6. 463 tests and lint green.
+
 ## [0.25.1] — 2026-10-19
 
 **Auditoria de 19/10**: correções de robustez, polimento de interface e
