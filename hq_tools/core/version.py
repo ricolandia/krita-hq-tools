@@ -1,3 +1,3 @@
 """Versão do plugin."""
 
-__version__ = "0.25.2"
+__version__ = "0.26.0"

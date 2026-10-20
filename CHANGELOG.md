@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.26.0] — 2026-10-20
+
+**Rodapé com versão e link de atualização:** as 12 docas mostram, no rodapé, a
+versão instalada ("HQ Tools v0.26.0") e o link "Verificar atualização", que
+abre a última release no GitHub. A checagem é manual: o plugin não consulta a
+internet, não baixa e não instala nada; o usuário baixa o ZIP se quiser. No
+modo EN, o link vira "Check for update". Os READMEs e o INSTALL PT/EN ganharam
+a seção de atualização manual. 464 testes; 12 docas no Krita 5.3.4 e no 6.0.4.
+
+**English:** **Footer with version and update link:** all 12 dockers show, in
+the footer, the installed version ("HQ Tools v0.26.0") and a "Check for
+update" link that opens the latest release on GitHub. The check is manual:
+the plugin does not access the internet, download or install anything; the
+user downloads the ZIP if they want. In EN mode the link reads "Check for
+update". READMEs and INSTALL PT/EN gained the manual update section. 464
+tests; 12 dockers on Krita 5.3.4 and 6.0.4.
+
 ## [0.25.2] — 2026-10-20
 
 **Preview rápido no 3D:** o preview do visualizador voltou a responder no
