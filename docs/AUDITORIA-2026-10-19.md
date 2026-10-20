@@ -117,6 +117,27 @@ reutilizar) e o de balões ("Nomear a camada como 'text'") ganharam tooltip.
 - Ações do gerenciador (duplicar/renomear/remover) continuam sem teste de UI;
   os casos de nome case-insensitive agora têm teste no núcleo.
 
+## Pós-auditoria (20/10): preview rápido do 3D
+
+O autor sentiu o 3D mais lento depois da v0.25.1. O núcleo não regrediu
+(5,2/6,7/6,2 ms a 700x700 com a pose cacheada); o que cresceu foi a área do
+preview, porque as abas roláveis deixaram o dock mais baixo e o preview ocupou
+a sobra. Reduzir a resolução sozinho quase não ajudava: o custo está em gerar
+e rasterizar o SVG (2.269 triângulos), não nos pixels.
+
+Solução: durante órbita, pan, zoom e sliders de pose, o preview desenha a
+silhueta chapada com `QPainterPath` direto, sem SVG e sem antialias; 180 ms
+depois do último movimento, o render cheio em SVG volta. O render parado é
+limitado a 720 px no maior lado e ampliado acima disso. O flutuante acompanha
+o gesto com a mesma silhueta, escalando a imagem principal (a proporção já é a
+da seleção), e volta ao sombreado no render cheio; a camada inserida continua
+no render cheio. O slider de luz continua no render cheio, porque a silhueta
+não mostraria a luz.
+
+Medido no Krita 5.3.4 e no 6.0.4: gesto ~8 a 14 ms (antes ~25 a 30 ms) e
+flutuante com +0,4 ms no 5 e +1,6 ms no 6. 463 testes e lint verdes. Sem
+release até o autor pedir.
+
 ## Validação
 
 - Suíte: **455 testes** verdes (448 + 7 novos), lint limpo, 74 presets.

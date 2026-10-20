@@ -27,18 +27,22 @@ from ...core.config import Config
 from ...core import i18n
 from ...core.compat import (
     ALIGN_CENTER,
+    ANTIALIASING,
     CURSOR_ARROW,
     CURSOR_SIZE_ALL,
     CURSOR_SIZE_FDIAG,
     IMAGE_FORMAT_ARGB32,
     IMAGE_FORMAT_RGBA8888,
+    KEEP_ASPECT,
     QImage,
     QSvgRenderer,
     SIZE_IGNORED,
+    SMOOTH_TRANSFORMATION,
     TRANSPARENT,
     WA_NO_SYSTEM_BACKGROUND,
     WA_TRANSLUCENT_BACKGROUND,
     WA_TRANSPARENT_FOR_MOUSE,
+    WINDING_FILL,
     QtCore,
     QtGui,
     QtWidgets,
@@ -53,6 +57,7 @@ from ...core.paths import (
     VIEWER3D_POSES_USUARIO_CORPO_DIR,
     VIEWER3D_POSES_USUARIO_MAOS_DIR,
 )
+from . import render as render_preview
 
 LIMITE_SLIDER = 120
 # Slider "Dobrar" dos dedos: 0° = mão aberta (repouso) e 90° = punho. Os
@@ -390,6 +395,13 @@ class Viewer3DDocker(DockWidget):
         self._timer.setSingleShot(True)
         self._timer.setInterval(30)
         self._timer.timeout.connect(self.atualizar_preview)
+        # Gesto contínuo (órbita, pan, zoom e sliders): render em resolução
+        # menor enquanto o usuário mexe; 180 ms depois, o render cheio.
+        self._gesto = False
+        self._timer_gesto = QtCore.QTimer(self)
+        self._timer_gesto.setSingleShot(True)
+        self._timer_gesto.setInterval(180)
+        self._timer_gesto.timeout.connect(self._fim_do_gesto)
         # Autosave do estado (config.json): grava com um respiro depois da
         # última mudança; o agendar_render agenda as duas coisas.
         self._salvar_timer = QtCore.QTimer(self)
@@ -870,6 +882,8 @@ class Viewer3DDocker(DockWidget):
         else:
             self.luz_altura = float(valor)
         etiqueta.setText(i18n.t("{0}°").format(valor))
+        # A luz precisa aparecer sombreada enquanto o slider anda: aqui o
+        # render cheio vale mais que a silhueta rápida do gesto.
         self.agendar_render()
 
     def _atualizar_lente(self):
@@ -928,9 +942,24 @@ class Viewer3DDocker(DockWidget):
             return {}
         return self.modelo.aplicar_semantica(self.semantica)
 
-    def agendar_render(self):
+    def agendar_render(self, gesto=False):
+        if gesto:
+            self._iniciar_gesto()
         self._timer.start()
         self._salvar_timer.start()
+
+    def _iniciar_gesto(self):
+        """Marca interação contínua; o render cheio vem depois da pausa."""
+        self._gesto = True
+        self._timer_gesto.start()
+
+    def _fim_do_gesto(self):
+        """Pausa no gesto: volta ao render cheio e atualiza o flutuante."""
+        if not self._gesto:
+            return
+        self._gesto = False
+        self._timer.stop()
+        self.atualizar_preview()
 
     def _restaurar_estado(self):
         """Lê o estado da sessão anterior do config.json (tolerante a lixo)."""
@@ -1090,6 +1119,42 @@ class Viewer3DDocker(DockWidget):
             altura = max(80, int(round(largura / aspecto)))
         return largura, altura
 
+    def _preview_rapido(self, largura, altura):
+        """Silhueta chapada para o gesto: QPainter direto, sem SVG.
+
+        O custo do SVG (gerar e rasterizar 2.269 triângulos) domina o tick e
+        não cai com a resolução. Aqui os triângulos já projetados em
+        ``self._tela`` viram um único ``QPainterPath`` preenchido, sem
+        antialias e sem ordenação: é a silhueta do manequim, suficiente para
+        orbitar e enquadrar. O render cheio (sombreamento) volta 180 ms depois
+        do último movimento.
+        """
+        estilo, cor, fundo = self._estilo()
+        cor = cor or self.modelo.cor_padrao
+        imagem = QImage(largura, altura, IMAGE_FORMAT_ARGB32)
+        imagem.fill(QtGui.QColor(fundo) if fundo else TRANSPARENT)
+        painter = QtGui.QPainter(imagem)
+        painter.setRenderHint(ANTIALIASING, False)
+        caminho = QtGui.QPainterPath()
+        caminho.setFillRule(WINDING_FILL)
+        for triangulos in self.modelo.triangulos:
+            for a, b, c in triangulos:
+                pa, pb, pc = self._tela[a], self._tela[b], self._tela[c]
+                # Orientação consistente: com WindingFill, triângulos em
+                # sentidos opostos se cancelam e a silhueta some.
+                area = (pb[0] - pa[0]) * (pc[1] - pa[1]) - (pc[0] - pa[0]) * (
+                    pb[1] - pa[1]
+                )
+                if area < 0:
+                    pb, pc = pc, pb
+                caminho.moveTo(pa[0], pa[1])
+                caminho.lineTo(pb[0], pb[1])
+                caminho.lineTo(pc[0], pc[1])
+                caminho.closeSubpath()
+        painter.fillPath(caminho, QtGui.QColor(cor))
+        painter.end()
+        return imagem
+
     def atualizar_preview(self):
         if self.modelo is None:
             return
@@ -1109,16 +1174,31 @@ class Viewer3DDocker(DockWidget):
         )
         if QSvgRenderer is None:
             return
-        svg = self._render_svg(largura, altura, posados=posados)
-        imagem = self._rasterizar(svg, largura, altura)
+        if self._gesto:
+            imagem = self._preview_rapido(largura, altura)
+        else:
+            largura_render, altura_render = render_preview.resolucao_do_render(
+                largura, altura
+            )
+            svg = self._render_svg(largura_render, altura_render, posados=posados)
+            imagem = self._rasterizar(svg, largura_render, altura_render)
+            if (largura_render, altura_render) != (largura, altura):
+                imagem = imagem.scaled(
+                    largura, altura, KEEP_ASPECT, SMOOTH_TRANSFORMATION
+                )
         self.preview.setPixmap(QtGui.QPixmap.fromImage(imagem))
         self._tamanho_render = (largura, altura)
         self._offset_preview = (
             max(0, (self.preview.width() - largura) // 2),
             max(0, (self.preview.height() - altura) // 2),
         )
-        self._atualizar_flutuante(posados)
-        self._sincronizar_flutuante()
+        # O flutuante acompanha o gesto com a silhueta rápida e volta ao SVG
+        # cheio junto com o preview principal.
+        if self._gesto:
+            self._atualizar_flutuante_rapido(imagem)
+        else:
+            self._atualizar_flutuante(posados)
+            self._sincronizar_flutuante()
 
     def atualizar_flutuante(self):
         self._atualizar_flutuante()
@@ -1131,6 +1211,23 @@ class Viewer3DDocker(DockWidget):
         svg = self._render_svg(largura, altura, com_fundo=False, posados=posados)
         imagem = self._rasterizar(svg, largura, altura)
         self._flutuante.definir_pixmap(QtGui.QPixmap.fromImage(imagem))
+
+    def _atualizar_flutuante_rapido(self, imagem):
+        """Flutuante acompanha o gesto com a silhueta, sem passar por SVG.
+
+        A imagem do preview principal já tem a proporção da seleção (é o que
+        garante o WYSIWYG); basta escalá-la para o tamanho do flutuante. Assim
+        ele continua se movendo enquanto a câmera gira, em vez de congelar até
+        o render cheio.
+        """
+        if self._flutuante is None:
+            return
+        largura = max(self._flutuante.width(), 60)
+        altura = max(self._flutuante.height(), 60)
+        pixmap = QtGui.QPixmap.fromImage(
+            imagem.scaled(largura, altura, KEEP_ASPECT, SMOOTH_TRANSFORMATION)
+        )
+        self._flutuante.definir_pixmap(pixmap)
 
     def _alternar_flutuar(self, ligado):
         if ligado:
@@ -1273,12 +1370,12 @@ class Viewer3DDocker(DockWidget):
     def orbitar(self, dx, dy):
         self.camera["yaw"] = (self.camera["yaw"] + dx * 0.5) % 360.0
         self.camera["pitch"] = max(-89.0, min(89.0, self.camera["pitch"] + dy * 0.5))
-        self.agendar_render()
+        self.agendar_render(gesto=True)
 
     def aplicar_zoom(self, fator):
         # Até 12x: dá para enquadrar detalhes (uma mão, um rosto) na seleção.
         self.camera["zoom"] = max(0.3, min(12.0, self.camera["zoom"] * fator))
-        self.agendar_render()
+        self.agendar_render(gesto=True)
 
     def deslocar(self, dx, dy):
         # Pan relativo à menor dimensão: assim o enquadramento chega igual na
@@ -1286,7 +1383,7 @@ class Viewer3DDocker(DockWidget):
         minimo = max(1.0, float(min(self.preview.width(), self.preview.height())))
         self.camera["pan_x"] += dx / minimo
         self.camera["pan_y"] += dy / minimo
-        self.agendar_render()
+        self.agendar_render(gesto=True)
 
     def enquadrar(self):
         self.camera["zoom"] = 1.0
@@ -1520,7 +1617,7 @@ class Viewer3DDocker(DockWidget):
         self.semantica.setdefault(osso, {})[chave] = float(valor)
         self._pose_mudou()
         etiqueta.setText(i18n.t("{0}°").format(valor))
-        self.agendar_render()
+        self.agendar_render(gesto=True)
 
     def _referencia_fechada(self):
         """Valores de referência da pose "fechada" (só os dedos, sem o pulso).
@@ -1567,7 +1664,7 @@ class Viewer3DDocker(DockWidget):
                 self.semantica[osso] = valores[osso]
         self._pose_mudou()
         etiqueta.setText(i18n.t("{0}°").format(valor))
-        self.agendar_render()
+        self.agendar_render(gesto=True)
 
     def _linha_dedo(self, rotulo, ossos):
         """Linha de slider "Dobrar" (0 = aberta, 90 = fechada) para um grupo."""
